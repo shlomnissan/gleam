@@ -16,7 +16,6 @@
 
 #include "utilities/logger.hpp"
 
-#include <algorithm>
 #include <expected>
 #include <string>
 

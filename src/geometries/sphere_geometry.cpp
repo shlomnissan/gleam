@@ -10,7 +10,6 @@
 #include "vglx/math/vector3.hpp"
 #include "vglx/math/utilities.hpp"
 
-#include <algorithm>
 #include <cassert>
 
 namespace vglx {

@@ -11,7 +11,7 @@
 
 #include "utilities/logger.hpp"
 
-#include <algorithm>
+#include <ranges>
 #include <cassert>
 #include <numeric>
 
@@ -48,10 +48,10 @@ auto Geometry::VertexCount() const -> size_t {
 }
 
 auto Geometry::Stride() const -> size_t {
-    return std::accumulate(begin(attributes_), end(attributes_), 0,
-        [](auto sum, const auto& attr){
-            return sum + attr.item_size;
-        }
+    return std::ranges::fold_left(
+        attributes_ | std::views::transform(&GeometryAttribute::item_size),
+        0,
+        std::plus {}
     );
 }
 

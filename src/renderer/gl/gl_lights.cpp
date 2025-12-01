@@ -14,8 +14,6 @@
 
 #include "utilities/logger.hpp"
 
-#include <algorithm>
-
 namespace vglx {
 
 auto GLLights::AddLight(Light* light, Camera* camera) -> void {
