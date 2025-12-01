@@ -16,35 +16,42 @@
 
 namespace vglx {
 
-class Vector4;
+struct Vector4;
 auto constexpr Dot(const Vector4& a, const Vector4& b) -> float;
 
 /**
- * @brief A 4D vector class for mathematical operations.
+ * @brief Represents a 4D floating-point vector.
+ *
+ * Vector4 stores four components `(x, y, z, w)` and is typically used for
+ * homogeneous coordinates, and general 4D math. It provides basic arithmetic,
+ * and utility helpers.
  *
  * @ingroup MathGroup
  */
-class VGLX_EXPORT Vector4 {
-public:
-    float x; ///< X component of the vector.
-    float y; ///< Y component of the vector.
-    float z; ///< Z component of the vector.
-    float w; ///< W component of the vector.
+struct VGLX_EXPORT Vector4 {
+    /// @brief X component.
+    float x;
+    /// @brief Y component.
+    float y;
+    /// @brief Z component.
+    float z;
+    /// @brief W component.
+    float w;
 
     /**
-     * @brief Default constructor. Initializes to (0, 0, 0, 0).
+     * @brief Constructs an uninitialized vector.
      */
     constexpr Vector4() = default;
 
     /**
      * @brief Constructs a vector with all components set to the same value.
      *
-     * @param value Value to assign to x, y, z, and w.
+     * @param value Value to assign to all four components.
      */
     constexpr Vector4(float value) : Vector4(value, value, value, value) {}
 
     /**
-     * @brief Constructs a vector with specified x, y, z, and w components.
+     * @brief Constructs a vector from individual components.
      *
      * @param x X component.
      * @param y Y component.
@@ -54,69 +61,60 @@ public:
     constexpr Vector4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
 
     /**
-     * @brief Returns a zero vector (0, 0, 0, 0).
-     *
-     * @return vglx::Vector4
+     * @brief Returns the zero vector.
      */
-    [[nodiscard]] static constexpr auto Zero() { return Vector4 {0.0f}; }
+    [[nodiscard]] static constexpr auto Zero() -> Vector4 { return {0.0f}; }
 
     /**
-     * @brief Computes the approximate magnitude of the vector.
-     *
-     * This function uses a fast inverse square root approximation to compute the
-     * square root, which is significantly faster than the standard library `sqrt`,
-     * but introduces a small precision error (~0.001%).
-     *
-     * @return float Approximate vector length.
+     * @brief Computes the vector length.
      */
-    [[nodiscard]] constexpr auto Length() const { return math::Sqrt(Dot(*this, *this)); }
+    [[nodiscard]] constexpr auto Length() const -> float { return math::Sqrt(Dot(*this, *this)); }
 
     /**
-     * @brief Computes the squared length (magnitude) of the vector.
+     * @brief Computes the squared vector length.
      *
-     * This is a precise and inexpensive operation that avoids computing a square root.
-     * Use this when comparing relative lengths or avoiding unnecessary precision loss.
-     *
-     * @return float Exact length squared.
+     * Useful when comparing lengths without paying the cost of a square root.
      */
-    [[nodiscard]] constexpr auto LengthSquared() const { return Dot(*this, *this); }
+    [[nodiscard]] constexpr auto LengthSquared() const -> float { return Dot(*this, *this); }
 
     /**
-     * @brief Accesses vector components by index.
+     * @brief Accesses a component by index.
      *
-     * @param i Index (0 for x, 1 for y, 2 for z, 3 for w).
-     * @return float Reference to component.
+     * @param i Index: `0 → x`, `1 → y`, `2 → z`, `3 → w`.
      */
-    [[nodiscard]] constexpr auto& operator[](int i) {
+    [[nodiscard]] constexpr auto operator[](int i) -> float& {
         assert(i >= 0 && i < 4);
         switch (i) {
             case 0: return x;
             case 1: return y;
             case 2: return z;
             case 3: return w;
-            default: return x; // placeholder
+            default: return x; // unreachable
         }
     }
 
     /**
-     * @brief Accesses vector components by index (const).
+     * @brief Accesses a component by index.
      *
-     * @param i Index (0 for x, 1 for y, 2 for z, 3 for w).
-     * @return float Const reference to component.
+     * @param i Index: `0 → x`, `1 → y`, `2 → z`, `3 → w`.
      */
-    [[nodiscard]] constexpr const auto& operator[](int i) const {
+    [[nodiscard]] constexpr auto operator[](int i) const -> float {
         assert(i >= 0 && i < 4);
         switch (i) {
             case 0: return x;
             case 1: return y;
             case 2: return z;
             case 3: return w;
-            default: return x; // placeholder
+            default: return x; // unreachable
         }
     }
 
-    /// @brief Adds another vector to this one.
-    constexpr auto& operator+=(const Vector4& v) {
+    /**
+     * @brief Adds another vector in-place.
+     *
+     * @param v Vector to add.
+     */
+    constexpr auto operator+=(const Vector4& v) -> Vector4& {
         x += v.x;
         y += v.y;
         z += v.z;
@@ -124,8 +122,12 @@ public:
         return *this;
     }
 
-    /// @brief Subtracts another vector from this one.
-    constexpr auto& operator-=(const Vector4& v) {
+    /**
+     * @brief Subtracts another vector in-place.
+     *
+     * @param v Vector to subtract.
+     */
+    constexpr auto operator-=(const Vector4& v) -> Vector4& {
         x -= v.x;
         y -= v.y;
         z -= v.z;
@@ -133,8 +135,12 @@ public:
         return *this;
     }
 
-    /// @brief Scales the vector by a scalar.
-    constexpr auto& operator*=(float n) {
+    /**
+     * @brief Multiplies the vector by a scalar in-place.
+     *
+     * @param n Scalar value.
+     */
+    constexpr auto operator*=(float n) -> Vector4& {
         x *= n;
         y *= n;
         z *= n;
@@ -142,8 +148,12 @@ public:
         return *this;
     }
 
-    /// @brief Scales each component by another vector.
-    constexpr auto& operator*=(const Vector4& v) {
+    /**
+     * @brief Multiplies the vector component-wise by another vector in-place.
+     *
+     * @param v Vector to multiply.
+     */
+    constexpr auto operator*=(const Vector4& v) -> Vector4& {
         x *= v.x;
         y *= v.y;
         z *= v.z;
@@ -152,15 +162,11 @@ public:
     }
 
     /**
-     * @brief Component-wise in-place minimum.
-     *
-     * Sets each component of this vector to the smaller of the corresponding components
-     * in this vector and the given vector @p v.
+     * @brief Applies a component-wise minimum.
      *
      * @param v Vector to compare against.
-     * @return vglx::Vector4 Reference to this vector after modification.
      */
-    constexpr auto& Min(const Vector4& v) noexcept {
+    constexpr auto Min(const Vector4& v) -> Vector4& {
         x = std::min(x, v.x);
         y = std::min(y, v.y);
         z = std::min(z, v.z);
@@ -169,15 +175,11 @@ public:
     };
 
     /**
-     * @brief Component-wise in-place maximum.
-     *
-     * Sets each component of this vector to the larger of the corresponding components
-     * in this vector and the given vector @p v.
+     * @brief Applies a component-wise maximum.
      *
      * @param v Vector to compare against.
-     * @return vglx::Vector4 Reference to this vector after modification.
      */
-    constexpr auto& Max(const Vector4& v) noexcept {
+    constexpr auto Max(const Vector4& v) -> Vector4& {
         x = std::max(x, v.x);
         y = std::max(y, v.y);
         z = std::max(z, v.z);
@@ -188,84 +190,121 @@ public:
     /**
      * @brief Normalizes the vector in-place.
      *
-     * If the length is zero, the vector is left unchanged.
-     *
-     * @return vglx::Vector4 Reference to this vector.
+     * If the length is zero, the vector is unchanged.
      */
-    constexpr auto& Normalize() {
+    constexpr auto Normalize() -> Vector4& {
         const auto len = Length();
         return len == 0.0f ? *this : (*this *= (1.0f / len));
     }
 
-private:
-    /// @brief Equality comparison operator.
-    [[nodiscard]] friend constexpr auto operator==(const Vector4& a, const Vector4& b) -> bool = default;
-
-    /// @brief Vector addition.
-    [[nodiscard]] friend constexpr auto operator+(const Vector4& a, const Vector4& b) {
-        return Vector4 {a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w};
-    }
-
-    /// @brief Vector subtraction.
-    [[nodiscard]] friend constexpr auto operator-(const Vector4& a, const Vector4& b) {
-        return Vector4 {a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w};
-    }
-
-    /// @brief Scalar multiplication (vector * scalar).
-    [[nodiscard]] friend constexpr auto operator*(const Vector4& v, float n) {
-        return Vector4 {v.x * n, v.y * n, v.z * n, v.w * n};
-    }
-
-    /// @brief Scalar multiplication (scalar * vector).
-    [[nodiscard]] friend constexpr auto operator*(float n, const Vector4& v) {
-        return v * n;
-    }
-
-    /// @brief Component-wise multiplication.
-    [[nodiscard]] friend constexpr auto operator*(const Vector4& a, const Vector4& b) {
-        return Vector4 {a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w};
-    }
-
-    /// @brief Scalar division.
-    [[nodiscard]] friend constexpr auto operator/(const Vector4& v, float n) {
-        n = 1.0f / n;
-        return Vector4 {v.x * n, v.y * n, v.z * n, v.w * n};
-    }
+    /**
+     * @brief Compares two vectors for equality.
+     */
+    constexpr auto operator==(const Vector4&) const -> bool = default;
 };
 
 /**
- * @brief Computes the dot product between two vectors.
- * @relatesalso Vector4
+ * @brief Adds two 4D vectors.
+ * @related Vector4
  *
  * @param a First vector.
  * @param b Second vector.
- * @return float Dot product (a · b).
  */
-[[nodiscard]] inline constexpr auto Dot(const Vector4& a, const Vector4& b) -> float {
+[[nodiscard]] constexpr auto operator+(const Vector4& a, const Vector4& b) -> Vector4 {
+    return {a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w};
+}
+
+/**
+ * @brief Subtracts one 4D vector from another.
+ * @related Vector4
+ *
+ * @param a First vector.
+ * @param b Second vector.
+ */
+[[nodiscard]] constexpr auto operator-(const Vector4& a, const Vector4& b) -> Vector4 {
+    return {a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w};
+}
+
+/**
+ * @brief Multiplies a vector by a scalar.
+ * @related Vector4
+ *
+ * @param v Input vector.
+ * @param n Scalar value.
+ */
+[[nodiscard]] constexpr auto operator*(const Vector4& v, float n) -> Vector4 {
+    return {v.x * n, v.y * n, v.z * n, v.w * n};
+}
+
+/**
+ * @brief Multiplies a scalar by avector.
+ * @related Vector4
+ *
+ * @param n Scalar value.
+ * @param v Input vector.
+ */
+[[nodiscard]] constexpr auto operator*(float n, const Vector4& v) -> Vector4 {
+    return v * n;
+}
+
+/**
+ * @brief Multiplies two vectors component-wise.
+ * @related Vector4
+ *
+ * @param a First vector.
+ * @param b Second vector.
+ */
+[[nodiscard]] constexpr auto operator*(const Vector4& a, const Vector4& b) -> Vector4 {
+    return {a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w};
+}
+
+/**
+ * @brief Divides a vector by a scalar.
+ * @related Vector4
+ *
+ * @param v Input vector.
+ * @param n Scalar value.
+ */
+[[nodiscard]] constexpr auto operator/(const Vector4& v, float n) -> Vector4 {
+    n = 1.0f / n;
+    return {v.x * n, v.y * n, v.z * n, v.w * n};
+}
+
+/**
+ * @brief Computes the dot product of two 4D vectors.
+ * @related Vector4
+ *
+ * Computes the scalar product ($a_x b_x + a_y b_y + a_z b_z + a_w b_w$),
+ * which measures how aligned the two vectors are.
+ *
+ * @param a First vector.
+ * @param b Second vector.
+ */
+[[nodiscard]] constexpr auto Dot(const Vector4& a, const Vector4& b) -> float {
     return a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
 }
 
 /**
- * @brief Linearly interpolates between two vectors.
- * @relatesalso Vector4
+ * @brief Linearly interpolates between two 4D vectors.
+ * @related Vector4
  *
  * @param v1 Start vector.
  * @param v2 End vector.
- * @param f Interpolation factor [0, 1].
- * @return vglx::Vector4 Interpolated vector.
+ * @param f Interpolation factor in $[0, 1]$.
  */
-[[nodiscard]] inline constexpr auto Lerp(const Vector4& v1, const Vector4& v2, float f) {
+[[nodiscard]] constexpr auto Lerp(const Vector4& v1, const Vector4& v2, float f) {
     return v1 + (v2 - v1) * f;
 }
 
 /**
- * @brief Returns a normalized copy of the given vector.
- * @relatesalso Vector4
+ * @brief Returns a normalized copy of a vector.
+ * @related Vector4
+ *
+ * If the input has zero length, the zero vector is returned.
  *
  * @param v Input vector.
- * @return vglx::Vector4 Normalized vector or zero if the input is zero-length.
  */
-[[nodiscard]] inline constexpr auto Normalize(const Vector4& v) {
+[[nodiscard]] constexpr auto Normalize(const Vector4& v) -> Vector4 {
     const auto len = v.Length();
     return len == 0.0f ? Vector4::Zero() : v * (1.0f / len);
 }

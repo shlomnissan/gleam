@@ -24,7 +24,7 @@ auto constexpr Dot(const Vector2& a, const Vector2& b) -> float;
  *
  * Vector2 stores an `(x, y)` pair and is used for positions, directions,
  * UV coordinates, and general 2D math. It provides basic arithmetic,
- * normalization, and utility helpers.
+ * and utility helpers.
  *
  * @ingroup MathGroup
  */
@@ -79,6 +79,8 @@ struct VGLX_EXPORT Vector2 {
 
     /**
      * @brief Returns the squared vector length.
+     *
+     * Useful when comparing lengths without paying the cost of a square root.
      */
     [[nodiscard]] constexpr auto LengthSquared() const -> float {
         return Dot(*this, *this);
@@ -103,7 +105,7 @@ struct VGLX_EXPORT Vector2 {
      *
      * @param i Index: `0 → x`, `1 → y`.
      */
-    [[nodiscard]] constexpr auto operator[](int i) const -> const float {
+    [[nodiscard]] constexpr auto operator[](int i) const -> float {
         assert(i >= 0 && i < 2);
         switch (i) {
             case 0: return x;

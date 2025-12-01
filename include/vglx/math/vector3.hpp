@@ -23,7 +23,7 @@ auto constexpr Dot(const Vector3& a, const Vector3& b) -> float;
  * @brief Represents a 3D vector with floating-point components.
  *
  * Vector3 stores an `(x, y, z)` triple and is used for positions, directions,
- * normals, and general 3D math. It provides basic arithmetic, normalization,
+ * normals, and general 3D math. It provides basic arithmetic,
  * and utility helpers.
  *
  * @ingroup MathGroup
@@ -109,7 +109,7 @@ struct VGLX_EXPORT Vector3 {
      *
      * @param i Index: `0 → x`, `1 → y`, `2 → z`.
      */
-    [[nodiscard]] constexpr auto operator[](int i) const -> const float {
+    [[nodiscard]] constexpr auto operator[](int i) const -> float {
         assert(i >= 0 && i < 3);
         switch (i) {
             case 0: return x;
