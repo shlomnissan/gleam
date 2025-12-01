@@ -67,7 +67,7 @@ public:
     [[nodiscard]] static auto Create(
         std::shared_ptr<Texture2D> texture_map,
         const Color& color = 0xFFFFFF
-    ) {
+    ) -> std::shared_ptr<SpriteMaterial> {
         return std::make_shared<SpriteMaterial>(std::move(texture_map), color);
     }
 

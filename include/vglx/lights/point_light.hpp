@@ -62,7 +62,7 @@ public:
      * @param params @ref PointLight::Parameters "Initialization parameters"
      * for constructing the light.
      */
-    [[nodiscard]] static auto Create(const Parameters& params) {
+    [[nodiscard]] static auto Create(const Parameters& params) -> std::shared_ptr<PointLight> {
         return std::make_shared<PointLight>(params);
     }
 

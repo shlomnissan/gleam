@@ -63,7 +63,7 @@ public:
      * @param params @ref DirectionalLight::Parameters "Initialization parameters"
      * for constructing the light.
      */
-    [[nodiscard]] static auto Create(const Parameters& params) {
+    [[nodiscard]] static auto Create(const Parameters& params) -> std::shared_ptr<DirectionalLight> {
         return std::make_shared<DirectionalLight>(params);
     }
 

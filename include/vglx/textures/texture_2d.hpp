@@ -77,7 +77,7 @@ public:
      * @param params @ref Texture2D::Parameters "Initialization parameters"
      * for constructing the texture.
      */
-    [[nodiscard]] static auto Create(const Parameters& params) {
+    [[nodiscard]] static auto Create(const Parameters& params) -> std::shared_ptr<Texture2D> {
         return std::make_shared<Texture2D>(params);
     }
 

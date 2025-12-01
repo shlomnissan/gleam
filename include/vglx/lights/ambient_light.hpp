@@ -58,7 +58,7 @@ public:
      * @param params @ref AmbientLight::Parameters "Initialization parameters"
      * for constructing the light.
      */
-    [[nodiscard]] static auto Create(const Parameters& params) {
+    [[nodiscard]] static auto Create(const Parameters& params) -> std::shared_ptr<AmbientLight> {
         return std::make_shared<AmbientLight>(params);
     }
 

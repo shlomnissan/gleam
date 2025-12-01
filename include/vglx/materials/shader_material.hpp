@@ -101,7 +101,7 @@ public:
      * @param params @ref ShaderMaterial::Parameters "Initialization parameters"
      * defining the shader sources and initial uniform values.
      */
-    [[nodiscard]] static auto Create(const Parameters& params) {
+    [[nodiscard]] static auto Create(const Parameters& params) -> std::shared_ptr<ShaderMaterial> {
         return std::make_shared<ShaderMaterial>(params);
     }
 

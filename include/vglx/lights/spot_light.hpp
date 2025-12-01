@@ -82,7 +82,7 @@ public:
      * @param params @ref SpotLight::Parameters "Initialization parameters"
      * for constructing the light.
      */
-    [[nodiscard]] static auto Create(const Parameters& params) {
+    [[nodiscard]] static auto Create(const Parameters& params) -> std::shared_ptr<SpotLight> {
         return std::make_shared<SpotLight>(params);
     }
 

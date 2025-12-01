@@ -58,7 +58,7 @@ public:
      *
      * @param color Base color of the material.
      */
-    [[nodiscard]] static auto Create(const Color& color = 0xFFFFFF) {
+    [[nodiscard]] static auto Create(const Color& color = 0xFFFFFF) -> std::shared_ptr<UnlitMaterial> {
         return std::make_shared<UnlitMaterial>(color);
     }
 
