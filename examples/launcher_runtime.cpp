@@ -21,8 +21,8 @@ public:
             .clear_color = 0x444444,
             .width = 1024,
             .height = 768,
-            .antialiasing = 0,
-            .vsync = false,
+            .antialiasing = 4,
+            .vsync = true,
             .show_stats = true
         };
     }
