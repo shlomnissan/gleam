@@ -11,6 +11,8 @@
 #include "vglx/math/vector2.hpp"
 #include "vglx/math/vector3.hpp"
 
+#include <cmath>
+
 namespace vglx {
 
 struct OrbitControls::Impl {
@@ -41,7 +43,7 @@ struct OrbitControls::Impl {
         }
 
         if (do_zoom) {
-            spherical.radius -= curr_scroll_offset * zoom_speed;
+            spherical.radius *= std::pow(zoom_speed, curr_scroll_offset);
             spherical.radius = std::max(0.1f, spherical.radius);
             curr_scroll_offset = 0.0f;
         }
