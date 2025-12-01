@@ -89,6 +89,15 @@ struct VGLX_EXPORT MouseEvent : public Event {
     MouseButton button;
 
     /**
+     * @brief Modifier keys active during this mouse event.
+     *
+     * Indicates which keyboard modifiers were held at the time the event was generated.
+     * Multiple modifiers may be active depending on platform and input backend.
+     * Refer to the source code for enum details.
+     */
+    int mods;
+
+    /**
      * @brief Identifies this event as @ref Event::Type "Event::Type::Mouse".
      */
     auto GetType() const -> Event::Type override {
@@ -102,5 +111,18 @@ enum class MouseButton {
     Right,
     Middle
 };
+
+enum class MouseMod {
+    Shift       = 1 << 0,
+    Control     = 1 << 1,
+    Alt         = 1 << 2,
+    Super       = 1 << 3,
+    CapsLock    = 1 << 4,
+    NumLock     = 1 << 5
+};
+
+constexpr auto operator&(int lhs, MouseMod rhs) -> int {
+    return lhs & static_cast<int>(rhs);
+}
 
 }

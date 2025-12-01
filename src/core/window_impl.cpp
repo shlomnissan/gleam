@@ -30,6 +30,7 @@ auto glfw_cursor_pos_callback(GLFWwindow*, double x, double y) -> void;
 auto glfw_mouse_button_callback(GLFWwindow*, int button, int action, int mods) -> void;
 auto glfw_scroll_callback(GLFWwindow*, double x, double y) -> void;
 auto glfw_mouse_button_map(int button) -> MouseButton;
+auto glfw_mouse_mod_map(int mods) -> int;
 auto glfw_keyboard_map(int key) -> Key;
 auto glfw_framebuffer_size_callback(GLFWwindow*, int w, int h) -> void;
 auto glfw_window_size_callback(GLFWwindow*, int w, int h) -> void;
@@ -201,22 +202,23 @@ auto glfw_cursor_pos_callback(GLFWwindow* window, double x, double y) -> void {
 
     event->type = MouseEvent::Type::Moved;
     event->button = MouseButton::None;
+    event->mods = 0;
     event->position = {static_cast<float>(x), static_cast<float>(y)};
     event->scroll = {0.0f, 0.0f};
 
     EventDispatcher::Get().Dispatch("mouse_event", std::move(event));
 }
 
-auto glfw_mouse_button_callback(GLFWwindow* window, int button, int action, int) -> void {
+auto glfw_mouse_button_callback(GLFWwindow* window, int button, int action, int mods) -> void {
 #ifdef VGLX_USE_IMGUI
     if (imgui_wants_input()) return;
 #endif
-
     auto event = std::make_unique<MouseEvent>();
     auto instance = static_cast<Window::Impl*>(glfwGetWindowUserPointer(window));
 
     event->type = MouseEvent::Type::ButtonPressed;
     event->button = glfw_mouse_button_map(button);
+    event->mods = glfw_mouse_mod_map(mods);
     event->position = {
         static_cast<float>(instance->mouse_pos_x),
         static_cast<float>(instance->mouse_pos_y)
@@ -243,6 +245,7 @@ auto glfw_scroll_callback(GLFWwindow* window, double x, double y) -> void {
 
     event->type = MouseEvent::Type::Scrolled;
     event->button = MouseButton::None;
+    event->mods = 0;
     event->position = {
         static_cast<float>(instance->mouse_pos_x),
         static_cast<float>(instance->mouse_pos_y)
@@ -260,6 +263,17 @@ auto glfw_mouse_button_map(int button) -> MouseButton {
         default: Logger::Log(LogLevel::Error, "Unrecognized GLFW mouse button key {}", button);
     }
     return MouseButton::None;
+}
+
+auto glfw_mouse_mod_map(int mods) -> int {
+    int engine_mods = 0;
+    if (mods & GLFW_MOD_SHIFT) engine_mods |= std::to_underlying(MouseMod::Shift);
+    if (mods & GLFW_MOD_CONTROL) engine_mods |= std::to_underlying(MouseMod::Control);
+    if (mods & GLFW_MOD_ALT) engine_mods |= std::to_underlying(MouseMod::Alt);
+    if (mods & GLFW_MOD_SUPER) engine_mods |= std::to_underlying(MouseMod::Super);
+    if (mods & GLFW_MOD_CAPS_LOCK) engine_mods |= std::to_underlying(MouseMod::CapsLock);
+    if (mods & GLFW_MOD_NUM_LOCK) engine_mods |= std::to_underlying(MouseMod::NumLock);
+    return engine_mods;
 }
 
 auto glfw_framebuffer_size_callback(GLFWwindow* window, int w, int h) -> void {
