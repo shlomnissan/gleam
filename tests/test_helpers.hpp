@@ -93,18 +93,6 @@ auto EXPECT_MAT4_NEAR(const vglx::Matrix4& a, const vglx::Matrix4& b, float v) -
     EXPECT_NEAR(a(3, 3), b(3, 3), v);
 }
 
-auto EXPECT_COLOR_EQ(const vglx::Color& a, const vglx::Color& b) -> void {
-    EXPECT_FLOAT_EQ(a.r, b.r);
-    EXPECT_FLOAT_EQ(a.g, b.g);
-    EXPECT_FLOAT_EQ(a.b, b.b);
-}
-
-auto EXPECT_COLOR_NEAR(const vglx::Color& a, const vglx::Color& b, float v) -> void {
-    EXPECT_NEAR(a.r, b.r, v);
-    EXPECT_NEAR(a.g, b.g, v);
-    EXPECT_NEAR(a.b, b.b, v);
-}
-
 auto EXPECT_VEC2_EQ(const vglx::Vector2& a, const vglx::Vector2& b) -> void {
     EXPECT_EQ(a.x, b.x);
     EXPECT_EQ(a.y, b.y);

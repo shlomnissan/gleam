@@ -9,6 +9,8 @@
 
 #include "vglx_export.h"
 
+#include "vglx/math/utilities.hpp"
+
 #include <algorithm>
 #include <cassert>
 #include <span>
@@ -182,9 +184,9 @@ public:
  */
 [[nodiscard]] constexpr auto Lerp(const Color& a, const Color& b, float f) -> Color {
     return Color {
-        a.r + (b.r - a.r) * f,
-        a.g + (b.g - a.g) * f,
-        a.b + (b.b - a.b) * f
+        math::Lerp(a.r, b.r, f),
+        math::Lerp(a.g, b.g, f),
+        math::Lerp(a.b, b.b, f)
     };
 }
 

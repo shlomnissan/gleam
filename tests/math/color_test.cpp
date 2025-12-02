@@ -12,6 +12,18 @@
 
 #include <vglx/math/color.hpp>
 
+auto EXPECT_COLOR_EQ(const vglx::Color& a, const vglx::Color& b) {
+    EXPECT_FLOAT_EQ(a.r, b.r);
+    EXPECT_FLOAT_EQ(a.g, b.g);
+    EXPECT_FLOAT_EQ(a.b, b.b);
+}
+
+auto EXPECT_COLOR_NEAR(const vglx::Color& a, const vglx::Color& b, float v) {
+    EXPECT_NEAR(a.r, b.r, v);
+    EXPECT_NEAR(a.g, b.g, v);
+    EXPECT_NEAR(a.b, b.b, v);
+}
+
 #pragma region Constructors
 
 TEST(Color, ConstructorDefault) {

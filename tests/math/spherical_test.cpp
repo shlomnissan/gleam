@@ -155,3 +155,46 @@ TEST(Spherical, ToVector3EquatorZDirection) {
 }
 
 #pragma endregion
+
+#pragma region Lerp
+
+TEST(Spherical, Lerp) {
+    constexpr auto s1 = vglx::Spherical {10.0f, 0.0f, 0.0f};
+    constexpr auto s2 = vglx::Spherical {20.0f, 2.0f, 4.0f};
+
+    const auto result = vglx::Lerp(s1, s2, 0.5f);
+
+    EXPECT_FLOAT_EQ(result.radius, 15.0f);
+    EXPECT_FLOAT_EQ(result.phi, 1.0f);
+    EXPECT_FLOAT_EQ(result.theta, 2.0f);
+
+    static_assert(vglx::Lerp(s1, s2, 0.5f) == vglx::Spherical {15.0f, 1.0f, 2.0f});
+}
+
+TEST(Spherical, LerpZeroFactor) {
+    constexpr auto s1 = vglx::Spherical {10.0f, 1.0f, 1.0f};
+    constexpr auto s2 = vglx::Spherical {20.0f, 2.0f, 2.0f};
+
+    const auto result = vglx::Lerp(s1, s2, 0.0f);
+
+    EXPECT_FLOAT_EQ(result.radius, s1.radius);
+    EXPECT_FLOAT_EQ(result.phi, s1.phi);
+    EXPECT_FLOAT_EQ(result.theta, s1.theta);
+
+    static_assert(vglx::Lerp(s1, s2, 0.0f) == s1);
+}
+
+TEST(Spherical, LerpOneFactor) {
+    constexpr auto s1 = vglx::Spherical {10.0f, 1.0f, 1.0f};
+    constexpr auto s2 = vglx::Spherical {20.0f, 2.0f, 2.0f};
+
+    const auto result = vglx::Lerp(s1, s2, 1.0f);
+
+    EXPECT_FLOAT_EQ(result.radius, s2.radius);
+    EXPECT_FLOAT_EQ(result.phi, s2.phi);
+    EXPECT_FLOAT_EQ(result.theta, s2.theta);
+
+    static_assert(vglx::Lerp(s1, s2, 1.0f) == s2);
+}
+
+#pragma endregion

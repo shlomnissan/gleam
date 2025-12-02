@@ -66,7 +66,7 @@ struct VGLX_EXPORT Spherical {
         }
     }
 
-/**
+    /**
      * @brief Converts this spherical coordinate to a @ref Vector3.
      *
      * In this convention, `phi` equals 0 along the +Z axis and increases toward +X.
@@ -81,6 +81,27 @@ struct VGLX_EXPORT Spherical {
             radius * math::Cos(phi) * c
         };
     }
+
+    /**
+     * @brief Compares two spherical objects for equality.
+     */
+    constexpr auto operator==(const Spherical&) const -> bool = default;
 };
+
+/**
+ * @brief Linearly interpolates between two spherical coordinates.
+ * @related Spherical
+ *
+ * @param a Start color.
+ * @param b End color.
+ * @param f Interpolation factor in $[0, 1]$.
+ */
+[[nodiscard]] constexpr auto Lerp(const Spherical& a, const Spherical& b, float f) -> Spherical {
+    return Spherical {
+        math::Lerp(a.radius, b.radius, f),
+        math::Lerp(a.phi, b.phi, f),
+        math::Lerp(a.theta, b.theta, f),
+    };
+}
 
 }
