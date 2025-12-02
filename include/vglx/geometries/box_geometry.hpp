@@ -17,12 +17,12 @@
 namespace vglx {
 
 /**
- * @brief Generates a box geometry assignable to any mesh.
+ * @brief Represents a box geometry assignable to any mesh.
  *
- * `BoxGeometry` creates a 3D box or rectangular box composed of triangles,
- * based on configurable width, height, and depth. Optional segment parameters
- * allow for subdividing each face, enabling smoother lighting or custom
- * deformation effects.
+ * BoxGeometry generates a mesh for an axis-aligned box defined by its width,
+ * height, and depth. Each dimension can be subdivided using segment counts
+ * to control vertex density and support smoother lighting or deformation.
+ * The geometry is constructed in local space, centered at the origin.
  *
  * @code
  * auto geometry = vglx::BoxGeometry::Create({
@@ -34,53 +34,52 @@ namespace vglx {
  *   .depth_segments = 2
  * });
  *
- * auto mesh = vglx::Mesh::Create(geometry, UnlitMaterial::Create(0x049EF4));
- * my_scene->Add(mesh);
+ * auto material = vglx::PhongMaterial::Create(0x049EF4);
+ *
+ * my_scene->Add(vglx::Mesh::Create(geometry, material));
  * @endcode
  *
  * @ingroup GeometryGroup
  */
 class VGLX_EXPORT BoxGeometry : public Geometry {
 public:
-    /// @brief Parameters for constructing a BoxGeometry object.
+    /// @brief Parameters for constructing a @ref BoxGeometry object.
     struct Parameters {
-        float width {1.0f}; ///< Width of the box.
-        float height {1.0f}; ///< Height of the box.
-        float depth {1.0f}; ///< Depth of the box.
-        unsigned width_segments {1}; ///< Subdivisions along the X-axis.
-        unsigned height_segments {1}; ///< Subdivisions along the Y-axis.
-        unsigned depth_segments {1}; ///< Subdivisions along the Z-axis.
+        float width {1.0f}; ///< Size along the X-axis.
+        float height {1.0f}; ///< Size along the Y-axis.
+        float depth {1.0f}; ///< Size along the Z-axis.
+        unsigned width_segments {1}; ///< Subdivisions along X.
+        unsigned height_segments {1}; ///< Subdivisions along Y.
+        unsigned depth_segments {1}; ///< Subdivisions along Z.
     };
 
     /**
-     * @brief Constructs a BoxGeometry object.
+     * @brief Constructs a box geometry.
      *
-     * @param params BoxGeometry::Parameters
+     * @param params @ref BoxGeometry::Parameters "Initialization parameters"
+     * for constructing the geometry.
      */
     explicit BoxGeometry(const Parameters& params);
 
     /**
-     * @brief Creates a shared pointer to a BoxGeometry object with default parameters.
+     * @brief Creates a shared instance of @ref BoxGeometry with default parameters.
      *
-     * @return std::shared_ptr<BoxGeometry>
+     * @param params @ref BoxGeometry::Parameters "Initialization parameters"
+     * for constructing the geometry.
      */
-    [[nodiscard]] static auto Create() {
+    [[nodiscard]] static auto Create() -> std::shared_ptr<BoxGeometry> {
         return std::make_shared<BoxGeometry>(Parameters {});
     }
 
     /**
-     * @brief Creates a shared pointer to a BoxGeometry object.
+     * @brief Creates a shared instance of @ref BoxGeometry with custom parameters.
      *
-     * @param params BoxGeometry::Parameters
-     * @return std::shared_ptr<BoxGeometry>
+     * @param params @ref BoxGeometry::Parameters "Initialization parameters"
+     * for constructing the geometry.
      */
-    [[nodiscard]] static auto Create(const Parameters& params){
+    [[nodiscard]] static auto Create(const Parameters& params) -> std::shared_ptr<BoxGeometry> {
         return std::make_shared<BoxGeometry>(params);
     }
-
-private:
-    /// @brief Internal counter used during generation.
-    unsigned int vertex_counter_ {0};
 };
 
 }

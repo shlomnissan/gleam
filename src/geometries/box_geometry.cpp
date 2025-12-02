@@ -115,43 +115,45 @@ BoxGeometry::BoxGeometry(const Parameters& params) {
     assert(params.height_segments > 0);
     assert(params.depth_segments > 0);
 
+    auto vertex_counter = 0u;
+
     SetName("box geometry");
 
     build_plane({
         'z', 'y', 'x', -1, -1,
         params.depth, params.height, params.width,
         params.depth_segments, params.height_segments
-    }, vertex_counter_, vertex_data_, index_data_);
+    }, vertex_counter, vertex_data_, index_data_);
 
     build_plane({
         'z', 'y', 'x', 1, -1,
         params.depth, params.height, -params.width,
         params.depth_segments, params.height_segments
-    }, vertex_counter_, vertex_data_, index_data_);
+    }, vertex_counter, vertex_data_, index_data_);
 
     build_plane({
         'x', 'z', 'y', 1, 1,
         params.width, params.depth, params.height,
         params.width_segments, params.depth_segments
-    }, vertex_counter_, vertex_data_, index_data_);
+    }, vertex_counter, vertex_data_, index_data_);
 
     build_plane({
         'x', 'z', 'y', 1, -1,
         params.width, params.depth, -params.height,
         params.width_segments, params.depth_segments
-    }, vertex_counter_, vertex_data_, index_data_);
+    }, vertex_counter, vertex_data_, index_data_);
 
     build_plane({
         'x', 'y', 'z', 1, -1,
         params.width, params.height, params.depth,
         params.width_segments, params.height_segments
-    }, vertex_counter_, vertex_data_, index_data_);
+    }, vertex_counter, vertex_data_, index_data_);
 
     build_plane({
         'x', 'y', 'z', -1, -1,
         params.width, params.height, -params.depth,
         params.width_segments, params.height_segments
-    }, vertex_counter_, vertex_data_, index_data_);
+    }, vertex_counter, vertex_data_, index_data_);
 
     SetAttribute({.type = VertexAttributeType::Position, .item_size = 3});
     SetAttribute({.type = VertexAttributeType::Normal, .item_size = 3});
