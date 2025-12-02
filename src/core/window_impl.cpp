@@ -31,6 +31,7 @@ auto glfw_mouse_button_callback(GLFWwindow*, int button, int action, int mods) -
 auto glfw_scroll_callback(GLFWwindow*, double x, double y) -> void;
 auto glfw_mouse_button_map(int button) -> MouseButton;
 auto glfw_mouse_mod_map(int mods) -> int;
+auto glfw_mouse_mods = 0;
 auto glfw_keyboard_map(int key) -> Key;
 auto glfw_framebuffer_size_callback(GLFWwindow*, int w, int h) -> void;
 auto glfw_window_size_callback(GLFWwindow*, int w, int h) -> void;
@@ -202,7 +203,7 @@ auto glfw_cursor_pos_callback(GLFWwindow* window, double x, double y) -> void {
 
     event->type = MouseEvent::Type::Moved;
     event->button = MouseButton::None;
-    event->mods = 0;
+    event->mods = glfw_mouse_mods;
     event->position = {static_cast<float>(x), static_cast<float>(y)};
     event->scroll = {0.0f, 0.0f};
 
@@ -215,10 +216,11 @@ auto glfw_mouse_button_callback(GLFWwindow* window, int button, int action, int 
 #endif
     auto event = std::make_unique<MouseEvent>();
     auto instance = static_cast<Window::Impl*>(glfwGetWindowUserPointer(window));
+    glfw_mouse_mods = mods;
 
     event->type = MouseEvent::Type::ButtonPressed;
     event->button = glfw_mouse_button_map(button);
-    event->mods = glfw_mouse_mod_map(mods);
+    event->mods = glfw_mouse_mod_map(glfw_mouse_mods);
     event->position = {
         static_cast<float>(instance->mouse_pos_x),
         static_cast<float>(instance->mouse_pos_y)
@@ -245,7 +247,7 @@ auto glfw_scroll_callback(GLFWwindow* window, double x, double y) -> void {
 
     event->type = MouseEvent::Type::Scrolled;
     event->button = MouseButton::None;
-    event->mods = 0;
+    event->mods = glfw_mouse_mods;
     event->position = {
         static_cast<float>(instance->mouse_pos_x),
         static_cast<float>(instance->mouse_pos_y)

@@ -24,17 +24,21 @@ struct OrbitControls::Impl {
     Vector2 curr_pos {0.0f, 0.0f};
     Vector2 prev_pos {0.0f, 0.0f};
 
-    MouseButton curr_button {MouseButton::None};
-
     float orbit_speed {0.0f};
     float pan_speed {0.0f};
     float zoom_speed {0.0f};
     float curr_scroll_offset {0.0f};
 
+    MouseButton curr_button {MouseButton::None};
+
+    bool shift_key_pressed {false};
+
     auto OnUpdate([[maybe_unused]] float delta) {
+        using enum MouseButton;
+
         const auto offset = curr_pos - prev_pos;
-        const auto do_orbit = curr_button == MouseButton::Left;
-        const auto do_pan = curr_button == MouseButton::Right;
+        const auto do_orbit = curr_button == Left && !shift_key_pressed;
+        const auto do_pan = curr_button == Right || curr_button == Left && shift_key_pressed;
         const auto do_zoom = curr_scroll_offset != 0.0f;
 
         if (do_orbit) {
@@ -77,6 +81,7 @@ OrbitControls::OrbitControls(Camera* camera, const Parameters& params)
 
 auto OrbitControls::OnMouseEvent(MouseEvent* event) -> void {
     impl_->curr_pos = event->position;
+    impl_->shift_key_pressed = event->mods & MouseMod::Shift;
 
     const auto is_pressed = event->type == MouseEvent::Type::ButtonPressed;
     if (is_pressed && impl_->curr_button == MouseButton::None) {
