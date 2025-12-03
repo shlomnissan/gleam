@@ -33,7 +33,7 @@ struct OrbitControls::Impl {
     Vector2 curr_pos {0.0f, 0.0f};
     Vector2 prev_pos {0.0f, 0.0f};
 
-    float damping_factor {15.0f};
+    float damping_factor {0.0f};
     float orbit_speed {0.0f};
     float pan_speed {0.0f};
     float zoom_speed {0.0f};
@@ -42,7 +42,6 @@ struct OrbitControls::Impl {
     MouseButton curr_button {MouseButton::None};
 
     bool shift_key_pressed {false};
-    bool first_frame {true};
 
     auto OnUpdate(float delta) {
         using enum MouseButton;
@@ -73,15 +72,9 @@ struct OrbitControls::Impl {
 
         prev_pos = curr_pos;
 
-        if (first_frame) {
-            curr_orientation = target_orientation;
-            curr_center = target_center;
-            first_frame = false;
-        } else {
-            const auto t = 1.0f - std::exp(-damping_factor * delta);
-            curr_orientation = Lerp(curr_orientation, target_orientation, t);
-            curr_center = Lerp(curr_center, target_center, t);
-        }
+        const auto t = 1.0f - std::exp(-damping_factor * delta);
+        curr_orientation = Lerp(curr_orientation, target_orientation, t);
+        curr_center = Lerp(curr_center, target_center, t);
 
         camera->transform.SetPosition(curr_center + curr_orientation.ToVector3());
         camera->LookAt(curr_center);
@@ -92,12 +85,14 @@ OrbitControls::OrbitControls(Camera* camera, const Parameters& params)
     : impl_(std::make_unique<Impl>())
 {
     impl_->camera = camera;
-    impl_->target_orientation.radius = params.radius;
-    impl_->target_orientation.phi = params.yaw;
-    impl_->target_orientation.theta = params.pitch;
     impl_->orbit_speed = params.orbit_speed;
     impl_->pan_speed = params.pan_speed;
     impl_->zoom_speed = params.zoom_speed;
+    impl_->damping_factor = params.damping_factor;
+
+    const auto s = Spherical {params.radius, params.yaw, params.pitch};
+    impl_->target_orientation = s;
+    impl_->curr_orientation = s;
 };
 
 auto OrbitControls::OnMouseEvent(MouseEvent* event) -> void {
