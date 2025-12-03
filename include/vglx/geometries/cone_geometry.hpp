@@ -17,11 +17,12 @@
 namespace vglx {
 
 /**
- * @brief Generates a cone geometry assignable to any mesh.
+ * @brief Generated geometry representing a cone.
  *
- * `ConeGeometry` creates a 3D cone shape with configurable radius, height,
- * and segment subdivisions. It is rendered using triangle primitives and can
- * optionally exclude the bottom cap (open-ended).
+ * ConeGeometry constructs a mesh for a cone aligned along the +Y axis. It is
+ * defined by a radius at the base, a height, optional segmentation along both
+ * radial and vertical directions, and an option to create an open or closed
+ * bottom cap. The geometry is centered in local space with its tip at +Y.
  *
  * @code
  * auto geometry = vglx::ConeGeometry::Create({
@@ -32,46 +33,46 @@ namespace vglx {
  *   .open_ended = false
  * });
  *
- * auto mesh = vglx::Mesh::Create(geometry, UnlitMaterial::Create(0x049EF4));
- * my_scene->Add(mesh);
+ * auto material = vglx::PhongMaterial::Create(0xF2B632);
+ *
+ * my_scene->Add(vglx::Mesh::Create(geometry, material));
  * @endcode
  *
  * @ingroup GeometryGroup
  */
 class VGLX_EXPORT ConeGeometry : public CylinderGeometry {
 public:
-    /// @brief Parameters for constructing a ConeGeometry object.
+    /// @brief Parameters for constructing a @ref ConeGeometry object.
     struct Parameters {
-        float radius {1.0f}; ///< Radius of the cone.
-        float height {1.0f}; ///< Height of the cone.
-        unsigned radial_segments {16}; ///< Subdivisions along the radius.
-        unsigned height_segments {1}; ///< Subdivisions along the height.
-        bool open_ended {false}; ///< Whether the cone is open ended.
+        float radius {1.0f}; ///< Base radius of the cone.
+        float height {1.0f}; ///< Height along the +Y axis.
+        unsigned radial_segments {16}; ///< Number of radial subdivisions.
+        unsigned height_segments {1}; ///< Number of vertical subdivisions.
+        bool open_ended {false}; ///< If true, the bottom cap is omitted.
     };
 
     /**
-     * @brief Constructs a ConeGeometry object.
+     * @brief Constructs a cone geometry.
      *
-     * @param params ConeGeometry::Parameters
+     * @param params @ref ConeGeometry::Parameters "Initialization parameters"
+     * for constructing the geometry.
      */
     explicit ConeGeometry(const Parameters& params);
 
     /**
-     * @brief Creates a shared pointer to a ConeGeometry object with default parameters.
-     *
-     * @return std::shared_ptr<ConeGeometry>
+     * @brief Creates a shared instance of @ref ConeGeometry with default parameters.
      */
-    [[nodiscard]] static auto Create() {
+    [[nodiscard]] static auto Create() -> std::shared_ptr<ConeGeometry> {
         return std::make_shared<ConeGeometry>(Parameters {});
     }
 
     /**
-     * @brief Creates a shared pointer to a ConeGeometry object.
+     * @brief Creates a shared instance of @ref ConeGeometry with custom parameters.
      *
-     * @param params ConeGeometry::Parameters
-     * @return std::shared_ptr<ConeGeometry>
+     * @param params @ref ConeGeometry::Parameters "Initialization parameters"
+     * for constructing the geometry.
      */
-    [[nodiscard]] static auto Create(const Parameters& params) {
+    [[nodiscard]] static auto Create(const Parameters& params) -> std::shared_ptr<ConeGeometry> {
         return std::make_shared<ConeGeometry>(params);
     }
 };

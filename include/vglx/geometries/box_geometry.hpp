@@ -17,7 +17,7 @@
 namespace vglx {
 
 /**
- * @brief Represents a box geometry assignable to any mesh.
+ * @brief Generated geometry representing a box.
  *
  * BoxGeometry generates a mesh for an axis-aligned box defined by its width,
  * height, and depth. Each dimension can be subdivided using segment counts
@@ -63,9 +63,6 @@ public:
 
     /**
      * @brief Creates a shared instance of @ref BoxGeometry with default parameters.
-     *
-     * @param params @ref BoxGeometry::Parameters "Initialization parameters"
-     * for constructing the geometry.
      */
     [[nodiscard]] static auto Create() -> std::shared_ptr<BoxGeometry> {
         return std::make_shared<BoxGeometry>(Parameters {});
