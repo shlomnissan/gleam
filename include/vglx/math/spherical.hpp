@@ -12,8 +12,6 @@
 #include "vglx/math/vector3.hpp"
 #include "vglx/math/utilities.hpp"
 
-constexpr float thetha_limit = vglx::math::pi_over_2 - 0.001f;
-
 namespace vglx {
 
 /**
@@ -51,17 +49,6 @@ struct VGLX_EXPORT Spherical {
      */
     constexpr Spherical(float radius, float phi, float theta)
         : radius(radius), phi(phi), theta(theta) {}
-
-    /**
-     * @brief Clamps the polar angle to avoid degeneracy at the poles.
-     *
-     * Ensures @ref theta stays within a safe range so azimuth calculations
-     * remain well-defined. If @ref phi drifts outside $[-2π, 2π]$ it is
-     * wrapped back into range.
-     */
-    constexpr auto MakeSafe() -> void {
-        theta = math::Clamp(theta, -thetha_limit, thetha_limit);
-    }
 
     /**
      * @brief Converts this spherical coordinate to a @ref Vector3.

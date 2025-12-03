@@ -15,6 +15,12 @@
 
 namespace vglx {
 
+namespace {
+
+constexpr float limit = vglx::math::pi_over_2 - 0.001f;
+
+}
+
 struct OrbitControls::Impl {
     Camera* camera;
 
@@ -49,7 +55,7 @@ struct OrbitControls::Impl {
         if (do_orbit) {
             target_orientation.phi -= offset.x * orbit_speed;
             target_orientation.theta += offset.y * orbit_speed;
-            target_orientation.MakeSafe();
+            target_orientation.theta = math::Clamp(target_orientation.theta, -limit, limit);
         }
 
         if (do_zoom) {
