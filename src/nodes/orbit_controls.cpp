@@ -18,12 +18,16 @@ namespace vglx {
 struct OrbitControls::Impl {
     Camera* camera;
 
-    Spherical spherical {};
+    Spherical curr_orientation {};
+    Spherical target_orientation {};
 
-    Vector3 target = Vector3::Zero();
+    Vector3 curr_center = Vector3::Zero();
+    Vector3 target_center = Vector3::Zero();
+
     Vector2 curr_pos {0.0f, 0.0f};
     Vector2 prev_pos {0.0f, 0.0f};
 
+    float damping_factor {15.0f};
     float orbit_speed {0.0f};
     float pan_speed {0.0f};
     float zoom_speed {0.0f};
@@ -32,8 +36,9 @@ struct OrbitControls::Impl {
     MouseButton curr_button {MouseButton::None};
 
     bool shift_key_pressed {false};
+    bool first_frame {true};
 
-    auto OnUpdate([[maybe_unused]] float delta) {
+    auto OnUpdate(float delta) {
         using enum MouseButton;
 
         const auto offset = curr_pos - prev_pos;
@@ -42,28 +47,38 @@ struct OrbitControls::Impl {
         const auto do_zoom = curr_scroll_offset != 0.0f;
 
         if (do_orbit) {
-            spherical.phi -= offset.x * orbit_speed;
-            spherical.theta += offset.y * orbit_speed;
+            target_orientation.phi -= offset.x * orbit_speed;
+            target_orientation.theta += offset.y * orbit_speed;
+            target_orientation.MakeSafe();
         }
 
         if (do_zoom) {
-            spherical.radius *= std::pow(zoom_speed, curr_scroll_offset);
-            spherical.radius = std::max(0.1f, spherical.radius);
+            target_orientation.radius *= std::pow(zoom_speed, curr_scroll_offset);
+            target_orientation.radius = std::max(0.1f, target_orientation.radius);
             curr_scroll_offset = 0.0f;
         }
 
         if (do_pan) {
-            const auto speed = pan_speed * spherical.radius;
+            const auto speed = pan_speed * target_orientation.radius;
             const auto right = camera->Right();
             const auto up = camera->Up();
-            target -= (right * offset.x - up * offset.y) * speed;
+            target_center -= (right * offset.x - up * offset.y) * speed;
         }
 
         prev_pos = curr_pos;
 
-        spherical.MakeSafe();
-        camera->transform.SetPosition(target + spherical.ToVector3());
-        camera->LookAt(target);
+        if (first_frame) {
+            curr_orientation = target_orientation;
+            curr_center = target_center;
+            first_frame = false;
+        } else {
+            const auto t = 1.0f - std::exp(-damping_factor * delta);
+            curr_orientation = Lerp(curr_orientation, target_orientation, t);
+            curr_center = Lerp(curr_center, target_center, t);
+        }
+
+        camera->transform.SetPosition(curr_center + curr_orientation.ToVector3());
+        camera->LookAt(curr_center);
     }
 };
 
@@ -71,9 +86,9 @@ OrbitControls::OrbitControls(Camera* camera, const Parameters& params)
     : impl_(std::make_unique<Impl>())
 {
     impl_->camera = camera;
-    impl_->spherical.radius = params.radius;
-    impl_->spherical.phi = params.yaw;
-    impl_->spherical.theta = params.pitch;
+    impl_->target_orientation.radius = params.radius;
+    impl_->target_orientation.phi = params.yaw;
+    impl_->target_orientation.theta = params.pitch;
     impl_->orbit_speed = params.orbit_speed;
     impl_->pan_speed = params.pan_speed;
     impl_->zoom_speed = params.zoom_speed;

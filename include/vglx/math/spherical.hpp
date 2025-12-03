@@ -61,9 +61,6 @@ struct VGLX_EXPORT Spherical {
      */
     constexpr auto MakeSafe() -> void {
         theta = math::Clamp(theta, -thetha_limit, thetha_limit);
-        if (phi > math::two_pi || phi < -math::two_pi) {
-            phi = std::fmod(phi, math::two_pi);
-        }
     }
 
     /**
