@@ -16,11 +16,12 @@
 namespace vglx {
 
 /**
- * @brief Generates a flat 2D plane geometry assignable to any mesh.
+ * @brief Generated geometry representing a flat 2D plane.
  *
- * `PlaneGeometry` creates a rectangular surface in the X-Y plane, suitable
- * for ground planes, walls, billboards, or UI backgrounds. It supports width
- * and height segmentation for effects like displacement or tesselation.
+ * PlaneGeometry creates a rectangular, axis-aligned plane centered at the origin
+ * in local space. Its width and height define the plane’s extents along the X and Y
+ * axes, and optional subdivision counts allow the plane to be tessellated for
+ * deformation, smooth shading, or procedural effects.
  *
  * @code
  * auto geometry = vglx::PlaneGeometry::Create({
@@ -30,45 +31,45 @@ namespace vglx {
  *     .height_segments = 2
  * });
  *
- * auto mesh = vglx::Mesh::Create(geometry, UnlitMaterial::Create(0x049EF4));
- * my_scene->Add(mesh);
+ * auto material = vglx::PhongMaterial::Create(0x049EF4);
+ *
+ * my_scene->Add(vglx::Mesh::Create(geometry, material));
  * @endcode
  *
  * @ingroup GeometryGroup
  */
 class VGLX_EXPORT PlaneGeometry : public Geometry {
 public:
-    /// @brief Parameters for constructing a PlaneGeometry object.
+    /// @brief Parameters for constructing a @ref PlaneGeometry object.
     struct Parameters {
-        float width {1.0f}; ///< Width of the plane.
-        float height {1.0f}; ///< Height of the plane.
-        unsigned width_segments {1}; ///< Subdivisions along the width.
-        unsigned height_segments {1}; ///< Subdivisions along the height.
+        float width {1.0f}; ///< Size along the X-axis.
+        float height {1.0f}; ///< Size along the Y-axis.
+        unsigned width_segments {1}; ///< Subdivisions along the plane's width.
+        unsigned height_segments {1}; ///< Subdivisions along the plane's height.
     };
 
     /**
-     * @brief Constructs a PlaneGeometry object.
+     * @brief Constructs a plane geometry.
      *
-     * @param params PlaneGeometry::Parameters
+     * @param params @ref PlaneGeometry::Parameters "Initialization parameters"
+     * used to generate the plane.
      */
     explicit PlaneGeometry(const Parameters& params);
 
     /**
-     * @brief Creates a shared pointer to a PlaneGeometry object with default parameters.
-     *
-     * @return std::shared_ptr<PlaneGeometry>
+     * @brief Creates a shared instance of @ref PlaneGeometry with default parameters.
      */
-    [[nodiscard]] static auto Create() {
+    [[nodiscard]] static auto Create() -> std::shared_ptr<PlaneGeometry> {
         return std::make_shared<PlaneGeometry>(Parameters {});
     }
 
     /**
-     * @brief Creates a shared pointer to a PlaneGeometry object.
+     * @brief Creates a shared instance of @ref PlaneGeometry with custom parameters.
      *
-     * @param params PlaneGeometry::Parameters
-     * @return std::shared_ptr<PlaneGeometry>
+     * @param params @ref PlaneGeometry::Parameters "Initialization parameters"
+     * used to generate the plane.
      */
-    [[nodiscard]] static auto Create(const Parameters& params){
+    [[nodiscard]] static auto Create(const Parameters& params) -> std::shared_ptr<PlaneGeometry> {
         return std::make_shared<PlaneGeometry>(params);
     }
 };
