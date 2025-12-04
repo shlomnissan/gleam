@@ -17,12 +17,12 @@
 namespace vglx {
 
 /**
- * @brief Generates a sphere geometry assignable to any mesh.
+ * @brief Generated geometry representing a sphere.
  *
- * `SphereGeometry` creates a UV sphere composed of triangles, configurable
- * via radius, width segments (longitude), and height segments (latitude).
- * It’s useful for rendering planets, lighting probes, collision volumes,
- * or decorative primitives.
+ * SphereGeometry constructs a UV-parameterized sphere centered at the origin.
+ * The `radius` defines its size, while `width_segments` and `height_segments`
+ * control tessellation along longitude and latitude. Higher segment counts
+ * produce smoother lighting and silhouettes at the cost of additional vertices.
  *
  * @code
  * auto geometry = vglx::SphereGeometry::Create({
@@ -31,42 +31,42 @@ namespace vglx {
  *     .height_segments = 24
  * });
  *
- * auto mesh = vglx::Mesh::Create(geometry, UnlitMaterial::Create(0x049EF4));
- * my_scene->Add(mesh);
+ * auto material = vglx::PhongMaterial::Create(0x049EF4);
+ *
+ * my_scene->Add(vglx::Mesh::Create(geometry, material));
  * @endcode
  *
  * @ingroup GeometryGroup
  */
 class VGLX_EXPORT SphereGeometry : public Geometry {
 public:
-    /// @brief Parameters for constructing a SphereGeometry object.
+    /// @brief Parameters for constructing a @ref SphereGeometry object.
     struct Parameters {
         float radius {1.0f}; ///< Radius of the sphere.
-        unsigned width_segments {32}; ///< Subdivisions along the width.
-        unsigned height_segments {16}; ///< Subdivisions along the height.
+        unsigned width_segments {32}; ///< Segments around the circumference (longitude).
+        unsigned height_segments {16}; ///< Segments from top to bottom (latitude).
     };
 
     /**
-     * @brief Constructs a SphereGeometry object.
+     * @brief Constructs a sphere geometry.
      *
-     * @param params SphereGeometry::Parameters
+     * @param params @ref SphereGeometry::Parameters "Initialization parameters"
+     * that control the size and tessellation of the sphere.
      */
     explicit SphereGeometry(const Parameters& params);
 
     /**
-     * @brief Creates a shared pointer to a SphereGeometry object with default parameters.
-     *
-     * @return std::shared_ptr<SphereGeometry>
+     * @brief Creates a shared instance of @ref SphereGeometry with default parameters.
      */
     [[nodiscard]] static auto Create() {
         return std::make_shared<SphereGeometry>(Parameters {});
     }
 
     /**
-     * @brief Creates a shared pointer to a SphereGeometry object.
+     * @brief Creates a shared instance of @ref SphereGeometry with custom parameters.
      *
-     * @param params SphereGeometry::Parameters
-     * @return std::shared_ptr<SphereGeometry>
+     * @param params @ref SphereGeometry::Parameters "Initialization parameters"
+     * used to generate the sphere.
      */
     [[nodiscard]] static auto Create(const Parameters& params){
         return std::make_shared<SphereGeometry>(params);
