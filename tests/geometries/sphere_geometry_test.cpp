@@ -46,7 +46,7 @@ TEST_F(SphereGeometryTest, ConstructorInitializesName) {
 #pragma region Attributes
 
 TEST_F(SphereGeometryTest, AttributesConfiguredCorrectly) {
-    using enum vglx::VertexAttributeType;
+    using enum vglx::Geometry::VertexAttributeType;
 
     const auto& attrs = sphere_.Attributes();
 

@@ -17,7 +17,7 @@ auto Mesh::SetGeometry(std::shared_ptr<Geometry> geometry) -> void {
 }
 
 auto Mesh::GetWireframeGeometry() -> std::shared_ptr<Geometry> {
-    if (geometry_->primitive != GeometryPrimitiveType::Triangles) {
+    if (geometry_->primitive != Geometry::PrimitiveType::Triangles) {
         return geometry_;
     }
 

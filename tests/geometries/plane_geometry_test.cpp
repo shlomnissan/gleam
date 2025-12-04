@@ -48,7 +48,7 @@ TEST_F(PlaneGeometryTest, ConstructorInitializesName) {
 #pragma region Attributes
 
 TEST_F(PlaneGeometryTest, AttributesConfiguredCorrectly) {
-    using enum vglx::VertexAttributeType;
+    using enum vglx::Geometry::VertexAttributeType;
 
     const auto& attrs = plane_.Attributes();
 

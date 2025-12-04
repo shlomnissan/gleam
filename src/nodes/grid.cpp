@@ -30,11 +30,11 @@ Grid::Grid(const Parameters& params) {
         k += step;
     }
 
-    using enum VertexAttributeType;
+    using enum Geometry::VertexAttributeType;
 
     auto geometry = Geometry::Create(vertices);
     geometry->SetAttribute({.type = Position, .item_size = 3});
-    geometry->primitive = GeometryPrimitiveType::Lines;
+    geometry->primitive = Geometry::PrimitiveType::Lines;
     geometry->SetName("grid");
 
     Add(Mesh::Create(geometry, UnlitMaterial::Create(params.color)));

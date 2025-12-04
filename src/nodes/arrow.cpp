@@ -29,8 +29,8 @@ Arrow::Arrow(const Parameters& params) {
         0.0f, 0.0f, 0.0f,
         0.0f, 0.0f, params.length - cone_height
     });
-    geometry->SetAttribute({VertexAttributeType::Position, 3});
-    geometry->primitive = GeometryPrimitiveType::Lines;
+    geometry->SetAttribute({Geometry::VertexAttributeType::Position, 3});
+    geometry->primitive = Geometry::PrimitiveType::Lines;
     Add(Mesh::Create(geometry, material));
 
     SetOrigin(params.origin);

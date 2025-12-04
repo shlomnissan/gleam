@@ -19,7 +19,7 @@ namespace vglx {
 WireframeGeometry::WireframeGeometry(const Geometry* geometry) :
     Geometry(geometry->VertexData(), {})
 {
-    if (geometry->primitive != GeometryPrimitiveType::Triangles) {
+    if (geometry->primitive != Geometry::PrimitiveType::Triangles) {
         Logger::Log(
             LogLevel::Error,
             "Failed to initialize wireframe geometry with non-triangulated source"
@@ -34,7 +34,7 @@ WireframeGeometry::WireframeGeometry(const Geometry* geometry) :
         return;
     }
 
-    primitive = GeometryPrimitiveType::Lines;
+    primitive = Geometry::PrimitiveType::Lines;
     attributes_ = geometry->Attributes();
 
     auto seen_edges = std::unordered_set<uint64_t> {};

@@ -53,7 +53,7 @@ TEST_F(CylinderGeometryTest, ConstructorInitializesName) {
 #pragma region Attributes
 
 TEST_F(CylinderGeometryTest, AttributesConfiguredCorrectly) {
-    using enum vglx::VertexAttributeType;
+    using enum vglx::Geometry::VertexAttributeType;
 
     const auto& attrs = cylinder_.Attributes();
 

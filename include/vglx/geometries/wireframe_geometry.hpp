@@ -17,7 +17,7 @@ namespace vglx {
  * @brief Converts triangle-based geometry into wireframe-renderable geometry.
  *
  * `WireframeGeometry` takes an existing indexed geometry and generates a new
- * geometry that can be rendered using `GeometryPrimitiveType::Lines`. It
+ * geometry that can be rendered using `Geometry::PrimitiveType::Lines`. It
  * preserves the original vertex data and replaces the index buffer with one
  * that represents the edges of the original triangle mesh.
  *
@@ -49,7 +49,7 @@ public:
      * @param geometry Pointer to the original triangle-based geometry.
      * @return std::shared_ptr<WireframeGeometry>
      */
-    [[nodiscard]] static auto Create(const Geometry* geometry) {
+    [[nodiscard]] static auto Create(const Geometry* geometry) -> std::shared_ptr<WireframeGeometry> {
         return std::make_shared<WireframeGeometry>(geometry);
     }
 };

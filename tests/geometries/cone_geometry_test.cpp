@@ -50,7 +50,7 @@ TEST_F(ConeGeometryTest, ConstructorInitializesName) {
 #pragma endregion
 
 TEST_F(ConeGeometryTest, AttributesConfiguredCorrectly) {
-    using enum vglx::VertexAttributeType;
+    using enum vglx::Geometry::VertexAttributeType;
 
     const auto& attrs = cone_.Attributes();
 

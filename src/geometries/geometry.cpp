@@ -17,8 +17,8 @@
 
 namespace vglx {
 
-auto Geometry::SetAttribute(const GeometryAttribute &attribute) -> void {
-    using enum VertexAttributeType;
+auto Geometry::SetAttribute(const Geometry::VertexAttribute &attribute) -> void {
+    using enum Geometry::VertexAttributeType;
     if (attribute.type == Position) assert(attribute.item_size == 3);
     if (attribute.type == Normal) assert(attribute.item_size == 3);
     if (attribute.type == UV) assert(attribute.item_size == 2);
@@ -36,8 +36,8 @@ auto Geometry::SetAttribute(const GeometryAttribute &attribute) -> void {
     attributes_[std::to_underlying(attribute.type)] = attribute;
 }
 
-auto Geometry::HasAttribute(VertexAttributeType type) const -> bool {
-    return attributes_[std::to_underlying(type)].type != VertexAttributeType::None;
+auto Geometry::HasAttribute(Geometry::VertexAttributeType type) const -> bool {
+    return attributes_[std::to_underlying(type)].type != Geometry::VertexAttributeType::None;
 }
 
 auto Geometry::VertexCount() const -> size_t {
@@ -49,7 +49,7 @@ auto Geometry::VertexCount() const -> size_t {
 
 auto Geometry::Stride() const -> size_t {
     return std::ranges::fold_left(
-        attributes_ | std::views::transform(&GeometryAttribute::item_size),
+        attributes_ | std::views::transform(&Geometry::VertexAttribute::item_size),
         0,
         std::plus {}
     );
@@ -66,7 +66,7 @@ auto Geometry::BoundingSphere() -> Sphere {
 }
 
 auto Geometry::CreateBoundingBox() -> void {
-    using enum VertexAttributeType;
+    using enum Geometry::VertexAttributeType;
     if (VertexCount() == 0 || !HasAttribute(Position)) {
         Logger::Log(LogLevel::Error, "Failed to create a bounding box");
         return;
@@ -84,7 +84,7 @@ auto Geometry::CreateBoundingBox() -> void {
 }
 
 auto Geometry::CreateBoundingSphere() -> void {
-    using enum VertexAttributeType;
+    using enum Geometry::VertexAttributeType;
     if (VertexCount() == 0 || !HasAttribute(Position)) {
         Logger::Log(LogLevel::Error, "Failed to create a bounding sphere");
         return;
@@ -107,6 +107,10 @@ auto Geometry::CreateBoundingSphere() -> void {
     }
 
     bounding_sphere_ = Sphere {center, math::Sqrt(max_distance_squared)};
+}
+
+Geometry::~Geometry() {
+    Dispose();
 }
 
 }

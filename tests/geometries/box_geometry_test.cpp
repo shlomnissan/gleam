@@ -50,7 +50,7 @@ TEST_F(BoxGeometryTest, ConstructorInitializesName) {
 #pragma region Attributes
 
 TEST_F(BoxGeometryTest, AttributesConfiguredCorrectly) {
-    using enum vglx::VertexAttributeType;
+    using enum vglx::Geometry::VertexAttributeType;
 
     const auto& attrs = box_.Attributes();
 

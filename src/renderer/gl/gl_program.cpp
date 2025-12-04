@@ -17,14 +17,14 @@ namespace vglx {
 
 namespace {
 
-const auto VertexAttributesMap = std::unordered_map<std::string, VertexAttributeType> {
-    {"a_Position", VertexAttributeType::Position},
-    {"a_Normal", VertexAttributeType::Normal},
-    {"a_TexCoord", VertexAttributeType::UV},
-    {"a_Tangent", VertexAttributeType::Tangent},
-    {"a_Color", VertexAttributeType::Color},
-    {"a_InstanceColor", VertexAttributeType::InstanceColor},
-    {"a_InstanceTransform", VertexAttributeType::InstanceTransform},
+const auto VertexAttributesMap = std::unordered_map<std::string, Geometry::VertexAttributeType> {
+    {"a_Position", Geometry::VertexAttributeType::Position},
+    {"a_Normal", Geometry::VertexAttributeType::Normal},
+    {"a_TexCoord", Geometry::VertexAttributeType::UV},
+    {"a_Tangent", Geometry::VertexAttributeType::Tangent},
+    {"a_Color", Geometry::VertexAttributeType::Color},
+    {"a_InstanceColor", Geometry::VertexAttributeType::InstanceColor},
+    {"a_InstanceTransform", Geometry::VertexAttributeType::InstanceTransform},
 };
 
 }

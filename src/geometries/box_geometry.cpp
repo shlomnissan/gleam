@@ -155,9 +155,9 @@ BoxGeometry::BoxGeometry(const Parameters& params) {
         params.width_segments, params.height_segments
     }, vertex_counter, vertex_data_, index_data_);
 
-    SetAttribute({.type = VertexAttributeType::Position, .item_size = 3});
-    SetAttribute({.type = VertexAttributeType::Normal, .item_size = 3});
-    SetAttribute({.type = VertexAttributeType::UV, .item_size = 2});
+    SetAttribute({.type = Geometry::VertexAttributeType::Position, .item_size = 3});
+    SetAttribute({.type = Geometry::VertexAttributeType::Normal, .item_size = 3});
+    SetAttribute({.type = Geometry::VertexAttributeType::UV, .item_size = 2});
 }
 
 }

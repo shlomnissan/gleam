@@ -30,17 +30,17 @@ namespace vglx {
 namespace {
 
 auto configure_geometry_attributes(const MeshRecord& h, const std::shared_ptr<Geometry>& geometry) {
-    geometry->SetAttribute({.type = VertexAttributeType::Position, .item_size = 3});
-    geometry->SetAttribute({.type = VertexAttributeType::Normal, .item_size = 3});
+    geometry->SetAttribute({.type = Geometry::VertexAttributeType::Position, .item_size = 3});
+    geometry->SetAttribute({.type = Geometry::VertexAttributeType::Normal, .item_size = 3});
 
     if (h.vertex_flags & VertexAttributeFlags::VertexAttr_HasUV) {
-        geometry->SetAttribute({.type = VertexAttributeType::UV, .item_size = 2});
+        geometry->SetAttribute({.type = Geometry::VertexAttributeType::UV, .item_size = 2});
     }
     if (h.vertex_flags & VertexAttributeFlags::VertexAttr_HasTangent) {
-        geometry->SetAttribute({.type = VertexAttributeType::Tangent, .item_size = 4});
+        geometry->SetAttribute({.type = Geometry::VertexAttributeType::Tangent, .item_size = 4});
     }
     if (h.vertex_flags & VertexAttributeFlags::VertexAttr_HasColor) {
-        geometry->SetAttribute({.type = VertexAttributeType::Color, .item_size = 3});
+        geometry->SetAttribute({.type = Geometry::VertexAttributeType::Color, .item_size = 3});
     }
 }
 

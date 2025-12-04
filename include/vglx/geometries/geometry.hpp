@@ -23,87 +23,112 @@
 namespace vglx {
 
 /**
- * @brief Represents mapping between vertex attributes and locations.
+ * @brief Represents GPU-ready mesh data with vertex and index buffers.
  *
- * @note - InstanceColor and InstanceTransform are internal attributes.
- * @note - InstanceTransform contains Matrix4 entries which span 4 locations.
+ * Geometry is the core unit of renderable mesh data in VGLX. It stores raw
+ * vertex and index buffers along with attribute metadata that describes how
+ * the data should be interpreted by the renderer (positions, normals, UVs,
+ * tangents, per-instance data, and so on).
  *
- * @ingroup GeometryGroup
- */
-enum class VertexAttributeType {
-    Position = 0, ///< Vertex position.
-    Normal = 1, ///< Vertex normal vector.
-    UV = 2, ///< Texture coordinates.
-    Tangent = 3, // Tangent vector with sign.
-    Color = 4, ///< Vertex color.
-    InstanceColor = 5, ///< Instance color.
-    InstanceTransform = 6, ///< Instance transform.
-    None
-};
-
-/**
- * @brief Represents primitive topologies for rendering geometry.
- * @ingroup GeometryGroup
- */
-enum class GeometryPrimitiveType {
-    Triangles, ///< Renders geometry as individual triangles.
-    Lines, ///< Renders geometry as disconnected lines.
-    LineLoop ///< Renders geometry as a connected loop of lines.
-};
-
-/**
- * @brief Represents a vertex attribute layout.
- * @ingroup GeometryGroup
- */
-struct GeometryAttribute {
-    /// @brief Semantic type of the attribute.
-    VertexAttributeType type = VertexAttributeType::None;
-    /// @brief Number of components (e.g., 3 for Vector3).
-    unsigned int item_size = 0;
-};
-
-/**
- * @brief Represents GPU-ready geometry data including vertex and index buffers.
+ * A geometry can be rendered using different primitive types (triangles,
+ * lines, line loops) and provides access to derived bounding volumes such as
+ * axis-aligned bounding boxes and bounding spheres, useful for frustum
+ * culling or collision queries.
  *
- * The `Geometry` class is the fundamental unit of renderable mesh data in VGLX.
- * It contains raw vertex data, optional indices, and layout metadata. Geometry
- * can be rendered using different primitive types (triangles, lines, etc.) and
- * may expose bounds such as bounding boxes and spheres for culling or physics.
- *
- * Instances are typically created using the static `Create()` methods and then
- * configured with attribute metadata via `SetAttribute`.
+ * Instances are usually created via the static @ref Geometry::Create factory
+ * methods and configured with vertex attributes using @ref Geometry::SetAttribute.
  *
  * @code
  * auto geometry = vglx::Geometry::Create({
+ *   // 3 vertices, XYZ position only:
  *   0.5f, -0.5f, 0.0f,
  *   0.0f,  0.5f, 0.0f,
  *  -0.5f, -0.5f, 0.0f,
  * });
  *
- * geometry->SetAttribute({GeometryAttributeType::Position, 3});
- * Add(Mesh::Create(geometry, UnlitMaterial::Create(0xFF0133)));
+ * geometry->SetAttribute({vglx::Geometry::VertexAttributeType::Position, 3});
+ *
+ * auto material = vglx::PhongMaterial::Create(0x049EF4);
+ *
+ * my_scene->Add(vglx::Mesh::Create(geometry, material));
  * @endcode
  *
  * @ingroup GeometryGroup
  */
 class VGLX_EXPORT Geometry : public Disposable, public Identity {
 public:
-    /// @brief Primitive type used for rendering.
-    GeometryPrimitiveType primitive { GeometryPrimitiveType::Triangles };
+    /**
+     * @brief Enumerates supported vertex attribute semantics.
+     *
+     * Each value identifies the purpose of a vertex attribute stream, such as
+     * positions, normals, UVs, or per-instance transforms. Attributes are
+     * described via @ref Geometry::VertexAttribute and stored in the
+     * @ref Geometry::Attributes "attributes array".
+     */
+    enum class VertexAttributeType {
+        Position = 0, ///< Vertex position in object space.
+        Normal = 1, ///< Vertex normal in object space.
+        UV = 2, ///< Texture coordinates.
+        Tangent = 3, ///< Tangent vector for normal mapping.
+        Color = 4, ///< Per-vertex color.
+        InstanceColor = 5, ///< Per-instance color.
+        InstanceTransform = 6, ///< Per-instance transform matrix.
+        None ///< Sentinel value indicating no attribute.
+    };
 
-    /// @brief GPU renderer identifier. Used internally by the renderer.
+    /**
+     * @brief Primitive topology used when rendering this geometry.
+     *
+     * Controls how the vertex and index data are interpreted by the renderer.
+     */
+    enum class PrimitiveType {
+        Triangles, ///< Render as triangle list.
+        Lines, ///< Render as line list.
+        LineLoop ///< Render as a closed line loop.
+    };
+
+    /**
+     * @brief Describes a single vertex attribute stream.
+     *
+     * Each attribute entry specifies the semantic @ref type and the number of
+     * components per vertex `item_size` (for example, 3 for a vec3 position).
+     * Attributes are stored in a fixed-size array indexed by
+     * @ref Geometry::VertexAttributeType.
+     */
+    struct VertexAttribute {
+        VertexAttributeType type {VertexAttributeType::None}; ///< Attribute semantic.
+        unsigned int item_size {0}; ///< Number of float components per vertex.
+    };
+
+    /// @brief Total number of supported attribute slots.
+    static constexpr int AttributesLength = std::to_underlying(VertexAttributeType::None);
+
+    /// @brief Convenience alias for the attribute array type.
+    using AttributesType = std::array<vglx::Geometry::VertexAttribute, AttributesLength>;
+
+    /// @brief Primitive topology used by this geometry (triangles by default).
+    PrimitiveType primitive { PrimitiveType::Triangles };
+
+    /// @brief Renderer-specific identifier for the underlying GPU resource.
     unsigned int renderer_id = 0;
 
     /**
-     * @brief  Constructs a Geometry object.
+     * @brief Constructs an empty geometry.
+     *
+     * The geometry is created without any vertex or index data. Data and
+     * attributes can be assigned later using the appropriate APIs.
      */
     Geometry() = default;
 
     /**
-     * @brief Constructs a Geometry object with vertex and index data.
+     * @brief Constructs a geometry from vertex and index data.
      *
-     * @param vertex_data Flat float array of interleaved vertex attributes.
-     * @param index_data Optional index buffer for indexed rendering.
+     * The vertex buffer is populated from `vertex_data`, and the optional
+     * index buffer from `index_data`. Attribute metadata must be configured
+     * separately using @ref SetAttribute.
+     *
+     * @param vertex_data Interleaved vertex data stored as floats.
+     * @param index_data Optional index buffer (empty for non-indexed geometry).
      */
     Geometry(
         const std::vector<float>& vertex_data,
@@ -111,126 +136,134 @@ public:
     ) : vertex_data_(vertex_data), index_data_(index_data) {}
 
     /**
-     * @brief Creates a shared pointer to a Geometry object.
+     * @brief Creates a shared instance of an empty @ref Geometry.
      *
-     * @return std::shared_ptr<Geometry>
+     * The resulting geometry has no vertex or index data and must be populated
+     * and configured before rendering.
      */
-    [[nodiscard]] static auto Create() {
+    [[nodiscard]] static auto Create() -> std::shared_ptr<Geometry> {
         return std::make_shared<Geometry>();
     }
 
     /**
-     * @brief Creates a shared pointer to a Geometry object with vertex and index data.
+     * @brief Creates a shared instance of @ref Geometry from vertex and index data.
      *
-     * @param vertex_data Flat float array of interleaved vertex attributes.
-     * @param index_data Optional index buffer for indexed rendering.
-     * @return std::shared_ptr<Geometry>
+     * @param vertex_data Interleaved vertex data stored as floats.
+     * @param index_data Optional index data; leave empty for non-indexed geometry.
      */
     [[nodiscard]] static auto Create(
         const std::vector<float>& vertex_data,
         const std::vector<unsigned int>& index_data = {}
-    ){
+    ) -> std::shared_ptr<Geometry> {
         return std::make_shared<Geometry>(vertex_data, index_data);
     }
 
     /**
-     * @brief Returns raw vertex data.
+     * @brief Registers a vertex attribute on this geometry.
      *
-     * @return Reference to the float vector containing vertex buffer data.
+     * The attribute is stored in the internal attribute array and used by the
+     * renderer to interpret the vertex buffer layout. Multiple attributes can
+     * be configured as long as their combined stride matches the vertex data.
+     *
+     * @param attribute Vertex attribute descriptor to add or update.
      */
-    [[nodiscard]] const auto& VertexData() const { return vertex_data_; }
+    auto SetAttribute(const Geometry::VertexAttribute& attribute) -> void;
 
     /**
-     * @brief Returns the number of vertices (size / stride).
+     * @brief Returns a read-only reference to the vertex buffer.
+     *
+     * The data is stored as a flat array of floats, typically interleaved
+     * according to the configured attributes.
+     */
+    [[nodiscard]] auto VertexData() const -> const std::vector<float>& {
+        return vertex_data_;
+    }
+
+    /**
+     * @brief Returns a read-only reference to the index buffer.
+     *
+     * If the geometry is non-indexed, this buffer may be empty.
+     */
+    [[nodiscard]] auto IndexData() const -> const std::vector<unsigned int>& {
+        return index_data_;
+    }
+
+    /**
+     * @brief Returns the number of indices stored in the index buffer.
+     *
+     * For non-indexed geometry, this value is zero.
+     */
+    [[nodiscard]] auto IndexCount() const -> size_t {
+        return index_data_.size();
+    }
+
+    /**
+     * @brief Returns the array of vertex attribute descriptors.
+     *
+     * The array is indexed by @ref Geometry::VertexAttributeType values in the
+     * range `[0, AttributesLength)`.
+     */
+    [[nodiscard]] auto Attributes() const -> const AttributesType& {
+        return attributes_;
+    }
+
+    /**
+     * @brief Returns the number of vertices in the geometry.
+     *
+     * The vertex count is derived from the size of the vertex buffer and the
+     * configured stride.
      */
     [[nodiscard]] auto VertexCount() const -> size_t;
 
     /**
-     * @brief Returns raw index data.
+     * @brief Returns the vertex stride in number of floats.
      *
-     * @return Reference to the vector containing index buffer data.
-     */
-    [[nodiscard]] const auto& IndexData() const { return index_data_; }
-
-    /**
-     * @brief Returns the number of indices.
-     */
-    [[nodiscard]] auto IndexCount() const -> size_t { return index_data_.size(); }
-
-    /**
-     * @brief Returns all defined vertex attributes.
-     *
-     * @return Reference to the vector containing vertex attributes.
-     */
-    [[nodiscard]] const auto& Attributes() const { return attributes_; }
-
-    /**
-     * @brief Returns the vertex stride in floats (sum of all active attribute sizes).
+     * The stride is computed from the active vertex attributes and describes
+     * how many floats form a single vertex in the interleaved buffer.
      */
     [[nodiscard]] auto Stride() const -> size_t;
 
     /**
-     * @brief Adds a vertex attribute.
+     * @brief Checks whether an attribute of the given type is present.
      *
-     * @param attribute The attribute to register.
-     */
-    auto SetAttribute(const GeometryAttribute& attribute) -> void;
-
-    /**
-     * @brief Returns whether a given attribute type is present.
-     *
-     * @param type Attribute type to query.
+     * @param type Attribute semantic to query.
      */
     [[nodiscard]] auto HasAttribute(VertexAttributeType type) const -> bool;
 
     /**
-     * @brief Returns the geometry's bounding box (computed on demand).
+     * @brief Returns an axis-aligned bounding box enclosing the geometry.
      *
-     * If not cached, it will be computed from the position data.
+     * The bounding box is computed lazily from the vertex positions and cached
+     * internally. Subsequent calls reuse the cached result until the geometry
+     * data changes.
      */
     [[nodiscard]] auto BoundingBox() -> Box3;
 
     /**
-     * @brief Returns the geometry's bounding sphere (computed on demand).
+     * @brief Returns a bounding sphere enclosing the geometry.
      *
-     * If not cached, it will be computed from the position data.
+     * The bounding sphere is computed lazily from the vertex positions and
+     * cached internally. Subsequent calls reuse the cached result until the
+     * geometry data changes.
      */
     [[nodiscard]] auto BoundingSphere() -> Sphere;
 
-    /**
-     * @brief Destructor.
-     */
-    virtual ~Geometry() {
-        Dispose();
-    }
+    virtual ~Geometry();
 
 protected:
-    /// @brief Interleaved vertex buffer.
+    /// @cond INTERNAL
     std::vector<float> vertex_data_;
-
-    /// @brief Index buffer.
     std::vector<unsigned int> index_data_;
 
-    /// @brief Cached bounding box.
     std::optional<Box3> bounding_box_;
-
-    /// @brief Cached bounding sphere.
     std::optional<Sphere> bounding_sphere_;
 
-    /// @brief Vertex attribute metadata.
-    std::array<GeometryAttribute, std::to_underlying(
-        VertexAttributeType::None
-    )> attributes_ {};
+    AttributesType attributes_ {};
 
-    /**
-     * @brief Computes and caches the bounding box.
-     */
     auto CreateBoundingBox() -> void;
 
-    /**
-     * @brief Computes and caches the bounding sphere.
-     */
     auto CreateBoundingSphere() -> void;
+    /// @endcond
 };
 
 }

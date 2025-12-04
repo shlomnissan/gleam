@@ -83,10 +83,10 @@ auto Renderer::Impl::RenderObject(Renderable* renderable, Scene* scene, Camera* 
     program->UpdateUniforms();
 
     auto primitive = GL_TRIANGLES;
-    if (geometry->primitive == GeometryPrimitiveType::Lines) {
+    if (geometry->primitive == Geometry::PrimitiveType::Lines) {
         primitive = GL_LINES;
     }
-    if (geometry->primitive == GeometryPrimitiveType::LineLoop) {
+    if (geometry->primitive == Geometry::PrimitiveType::LineLoop) {
         primitive = GL_LINE_LOOP;
     }
 

@@ -64,8 +64,8 @@ ProgramAttributes::ProgramAttributes(
     instancing = renderable->GetNodeType() == Node::Type::InstancedMesh;
     num_lights = lights.directional + lights.point + lights.spot;
     two_sided = material->two_sided;
-    vertex_color = geometry->HasAttribute(VertexAttributeType::Color);
-    tangent = geometry->HasAttribute(VertexAttributeType::Tangent);
+    vertex_color = geometry->HasAttribute(Geometry::VertexAttributeType::Color);
+    tangent = geometry->HasAttribute(Geometry::VertexAttributeType::Tangent);
 
     static_assert(std::to_underlying(Material::Type::Length) <= 15);
 

@@ -62,12 +62,12 @@ auto GLBuffers::GenerateBuffers(Geometry* geometry) -> void {
     auto offset = 0;
     auto stride = 0;
     for (const auto& attr : geometry->Attributes()) {
-        if (attr.type == VertexAttributeType::None) continue;
+        if (attr.type == Geometry::VertexAttributeType::None) continue;
         stride += attr.item_size;
     }
 
     for (const auto& attr : geometry->Attributes()) {
-        if (attr.type == VertexAttributeType::None) continue;
+        if (attr.type == Geometry::VertexAttributeType::None) continue;
         auto loc = std::to_underlying(attr.type);
         glVertexAttribPointer(
             loc,
@@ -110,7 +110,7 @@ auto GLBuffers::BindInstancedMesh(InstancedMesh* mesh) -> void {
         glBindBuffer(GL_ARRAY_BUFFER, mesh->impl_->transforms_buff_id);
 
         for (auto i = 0; i < 4; ++i) {
-            auto loc = std::to_underlying(VertexAttributeType::InstanceTransform) + i;
+            auto loc = std::to_underlying(Geometry::VertexAttributeType::InstanceTransform) + i;
             glEnableVertexAttribArray(loc);
             glVertexAttribPointer(
                 loc,
@@ -140,7 +140,7 @@ auto GLBuffers::BindInstancedMesh(InstancedMesh* mesh) -> void {
         mesh->impl_->colors_buff_id = buffers[BUFF_IDX_INSTANCE_COLOR];
         glBindBuffer(GL_ARRAY_BUFFER, mesh->impl_->colors_buff_id);
 
-        const auto loc = std::to_underlying(VertexAttributeType::InstanceColor);
+        const auto loc = std::to_underlying(Geometry::VertexAttributeType::InstanceColor);
         glEnableVertexAttribArray(loc);
         glVertexAttribPointer(
                 loc,

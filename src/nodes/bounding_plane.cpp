@@ -30,7 +30,7 @@ auto create_wireframe_mesh(const Color& color) {
          1.0f,  1.0f, 0.0f,
          0.0f,  0.0f, 0.0f
     }, { 0, 1, 2, 3, 4, 5, 6, 7, 8 });
-    geometry->SetAttribute({VertexAttributeType::Position, 3});
+    geometry->SetAttribute({Geometry::VertexAttributeType::Position, 3});
 
     auto wireframe_geometry = WireframeGeometry::Create(geometry.get());
     auto wireframe_material = UnlitMaterial::Create(color);
@@ -49,7 +49,7 @@ auto create_solid_mesh(const Color& color) {
          1.0f, -1.0f, 0.0f
     });
 
-    geometry->SetAttribute({VertexAttributeType::Position, 3});
+    geometry->SetAttribute({Geometry::VertexAttributeType::Position, 3});
 
     auto solid_material = UnlitMaterial::Create(color);
     solid_material->opacity = 0.2f;

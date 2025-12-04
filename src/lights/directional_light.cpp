@@ -20,8 +20,8 @@ struct DirectionalLight::Impl {
     std::shared_ptr<UnlitMaterial> material;
 
     auto CreateDebugMesh(DirectionalLight* self) -> void {
-        using enum VertexAttributeType;
-        using enum GeometryPrimitiveType;
+        using enum Geometry::VertexAttributeType;
+        using enum Geometry::PrimitiveType;
 
         material = UnlitMaterial::Create();
         material->two_sided = true;

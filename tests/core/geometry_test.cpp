@@ -12,7 +12,7 @@
 #include <vector>
 #include <utility>
 
-using enum vglx::VertexAttributeType;
+using enum vglx::Geometry::VertexAttributeType;
 
 #pragma region Constructors
 
@@ -59,7 +59,7 @@ TEST(Geometry, AddAttribute) {
 
     const auto& attribs = geometry->Attributes();
 
-    auto idx = std::to_underlying(vglx::VertexAttributeType::Position);
+    auto idx = std::to_underlying(vglx::Geometry::VertexAttributeType::Position);
     EXPECT_EQ(attribs[idx].type, Position);
     EXPECT_EQ(attribs[idx].item_size, 3);
 }

@@ -25,8 +25,8 @@ auto Sprite::SharedGeometry() -> std::shared_ptr<Geometry>& {
             -0.5f, 0.5f, 0.0f, 0.0f, 1.0f
         }, {0, 1, 2, 0, 2, 3});
 
-        g->SetAttribute({VertexAttributeType::Position, 3});
-        g->SetAttribute({VertexAttributeType::UV, 2});
+        g->SetAttribute({Geometry::VertexAttributeType::Position, 3});
+        g->SetAttribute({Geometry::VertexAttributeType::UV, 2});
 
         return g;
     }();
