@@ -15,6 +15,7 @@
 
 #include <memory>
 #include <string>
+#include <utility>
 
 #ifdef VGLX_USE_IMGUI
 #include "core/imgui_integration.hpp"
