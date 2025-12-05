@@ -158,17 +158,15 @@ auto Renderer::Impl::SetUniforms(
     if (auto fog = scene->fog.get()) {
         auto type = fog->GetType();
         program->SetUniform(Uniform::FogType, &type);
-        if (type == FogType::LinearFog) {
-            auto f = static_cast<LinearFog*>(fog);
-            program->SetUniform(Uniform::FogColor, &f->color);
-            program->SetUniform(Uniform::FogNear, &f->near);
-            program->SetUniform(Uniform::FogFar, &f->far);
+        if (type == Fog::Type::Linear) {
+            program->SetUniform(Uniform::FogColor, &fog->color);
+            program->SetUniform(Uniform::FogNear, &fog->near);
+            program->SetUniform(Uniform::FogFar, &fog->far);
         }
 
-        if (type == FogType::ExponentialFog) {
-            auto f = static_cast<ExponentialFog*>(fog);
-            program->SetUniform(Uniform::FogColor, &f->color);
-            program->SetUniform(Uniform::FogDensity, &f->density);
+        if (type == Fog::Type::Exponential) {
+            program->SetUniform(Uniform::FogColor, &fog->color);
+            program->SetUniform(Uniform::FogDensity, &fog->density);
         }
     }
 

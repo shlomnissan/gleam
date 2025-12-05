@@ -44,7 +44,7 @@ ExampleFog::ExampleFog() {
     point_light->transform.Translate({2.0f, 2.0f, 2.0f});
     Add(point_light);
 
-    fog = LinearFog::Create(0x444444, 2.0f, 6.0f);
+    fog = Fog::CreateLinear(0x444444, 2.0f, 6.0f);
 }
 
 auto ExampleFog::OnAttached(SharedContextPointer context) -> void {
@@ -66,18 +66,16 @@ auto ExampleFog::ContextMenu() -> void {
     UIDropDown("function", fog_function, curr_fog_function,
       [this](std::string_view str) {
         curr_fog_function = str;
-        if (str == "linear") fog = LinearFog::Create(fog->color, 2.0f, 6.0f);
-        if (str == "exponential") fog = ExponentialFog::Create(fog->color, 0.2f);
+        if (str == "linear") fog = Fog::CreateLinear(fog->color, 2.0f, 6.0f);
+        if (str == "exponential") fog = Fog::CreateExponential(fog->color, 0.2f);
     });
 
-    if (fog->GetType() == FogType::LinearFog) {
-        auto f = static_cast<LinearFog*>(fog.get());
-        UISliderFloat("near", f->near, 0.0f, 20.0f, _, 160.0f);
-        UISliderFloat("far", f->far, 0.0f, 20.0f, _, 160.0f);
+    if (fog->GetType() == Fog::Type::Linear) {
+        UISliderFloat("near", fog->near, 0.0f, 20.0f, _, 160.0f);
+        UISliderFloat("far", fog->far, 0.0f, 20.0f, _, 160.0f);
     }
 
-    if (fog->GetType() == FogType::ExponentialFog) {
-        auto f = static_cast<ExponentialFog*>(fog.get());
-        UISliderFloat("density", f->density, 0.0f, 1.0f, _, 160.0f);
+    if (fog->GetType() == Fog::Type::Exponential) {
+        UISliderFloat("density", fog->density, 0.0f, 1.0f, _, 160.0f);
     }
 }

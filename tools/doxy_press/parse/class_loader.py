@@ -31,7 +31,7 @@ def _is_constructor(el: ET.Element):
     return len(parts) > 1 and parts[-1] == parts[-2]
 
 def _is_factory(el: ET.Element):
-    return bool_attr(el, "static") and element_text(el.find("name")) == "Create"
+    return bool_attr(el, "static") and element_text(el.find("name")).startswith("Create")
 
 def load_class(inventory: Inventory, id: str, xml_dir: Path, resolver: Resolver, sort_variables = False):
     root = ET.parse(xml_dir / f"{id}.xml").getroot()

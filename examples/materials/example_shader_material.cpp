@@ -60,7 +60,7 @@ ExampleShaderMaterial::ExampleShaderMaterial() {
         .uniforms = {{"u_Time", 0.0f}}
     });
 
-    fog = ExponentialFog::Create(0x444444, 0.3f);
+    fog = Fog::CreateExponential(0x444444, 0.3f);
     material_->fog = false;
 
     mesh_ = Mesh::Create(geometry, material_);

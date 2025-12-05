@@ -16,142 +16,88 @@
 namespace vglx {
 
 /**
- * @brief Represents available fog types.
+ * @brief Describes atmospheric fog applied to a scene.
  *
- * @ingroup NodesGroup
- */
-enum class FogType {
-    LinearFog,
-    ExponentialFog,
-};
-
-/**
- * @brief Abstract base class for fog types.
+ * Fog is a scene-level effect that blends fragment color toward a fog color
+ * based on distance from the camera. It can be used to suggest large scale,
+ * hide distant detail, and soften transitions into the background.
  *
- * Not intended for direct use.
+ * @code
+ * // Adds linear fog to scene
+ * my_scene->fog = Fog::CreateLinear(0x444444, 2.0f, 6.0f);
+ *
+ * // Adds exponential fog to scene
+ * my_scene->fog = Fog::CreateExponential(0x444444, 0.3f);
+ * @endcode
  *
  * @ingroup NodesGroup
  */
 struct Fog {
-    /// @brief Color of the fog.
-    Color color;
-
     /**
-     * @brief Constructs a base Fog object.
+     * @brief Fog attenuation models.
      *
-     * @param color Color of the fog.
+     * Selects how fog intensity increases with distance. Linear fog uses a
+     * depth range, while exponential fog uses a density-based curve that grows
+     * smoothly with distance.
      */
-    explicit Fog(Color color) : color(color) {}
+    enum class Type {
+        Linear, ///< Depth-based fog using a near and far distance range.
+        Exponential, ///< Density-based fog using a continuous falloff curve.
+    };
+
+    Type type; ///< Fog attenuation model.
+    Color color; ///< Fog color applied at full intensity.
+
+    float near; ///< Start distance for linear fog (used when type is Linear).
+    float far; ///< End distance for linear fog (used when type is Linear).
+    float density; ///< Density factor for exponential fog (used when type is Exponential).
 
     /**
-     * @brief Returns fog type.
+     * @brief Constructs a Fog object of the given type and color.
      *
-     * @return FogType
+     * @param type Fog::Type specifying the attenuation model.
+     * @param color Fog color used for fully fogged fragments.
      */
-    [[nodiscard]] virtual auto GetType() const -> FogType = 0;
+    explicit Fog(Type type, const Color& color) : type(type), color(color) {}
 
     /**
-     * @brief Default virtual destructor.
-     */
-    virtual ~Fog() = default;
-};
-
-/**
- * @brief Linearly interpolated fog effect, assignable to a scene.
- *
- * This fog model applies a linear blend between no fog and full fog color
- * based on fragment distance. It is intended to be assigned to a `Scene`'s
- * `fog` field at runtime.
- *
- * @code
- * my_scene->fog = vglx::LinearFog::Create(0x444444, 2.0f, 6.0f);
- * @endcode
- *
- * @ingroup NodesGroup
- */
-struct LinearFog : public Fog {
-    /// @brief Distance at which fog starts.
-    float near;
-    /// @brief Distance at which fog reaches full opacity.
-    float far;
-
-    /**
-     * @brief Constructs a LinearFog object.
+     * @brief Creates a linear fog object.
+     *
+     * Linear fog increases its effect given a distance range along the view
+     * direction, typically using a factor similar to
+     * $f(d) = \\mathrm{clamp}((d - near) / (far - near), 0, 1)$.
      *
      * @param color Fog color.
-     * @param near Start distance of the fog effect.
-     * @param far End distance of the fog effect.
+     * @param near Distance at which fog begins to appear.
+     * @param far Distance at which fog reaches full intensity.
      */
-    LinearFog(Color color, float near, float far)
-        : Fog(color), near(near), far(far) {}
-
-    /**
-     * @brief Creates a shared pointer to a LinearFog object.
-     *
-     * @param color Fog color.
-     * @param near Start distance of the fog effect.
-     * @param far End distance of the fog effect.
-     * @return std::shared_ptr<LinearFog>
-     */
-    [[nodiscard]] static auto Create(Color color, float near, float far) {
-        return std::make_unique<LinearFog>(color, near, far);
+    [[nodiscard]] static auto CreateLinear(const Color& color, float near, float far) -> std::unique_ptr<Fog> {
+        auto out = std::make_unique<Fog>(Type::Linear, color);
+        out->near = near;
+        out->far = far;
+        return out;
     }
 
     /**
-     * @brief Returns fog type.
+     * @brief Creates an exponential fog object.
      *
-     * @return FogType::LinearFog
-     */
-    auto GetType() const -> FogType override {
-        return FogType::LinearFog;
-    }
-};
-
-/**
- * @brief Exponential fog effect, assignable to a scene.
- *
- * This fog model uses an exponential function based on view distance
- * to simulate atmospheric fading. It is intended to be assigned to a
- * `Scene`'s `fog` field at runtime.
- *
- * @code
- * my_scene->fog = vglx::ExponentialFog::Create(0x888888, 0.15f);
- * @endcode
- *
- * @ingroup NodesGroup
- */
-struct ExponentialFog : public Fog {
-    /// @brief Density factor controlling fog steepness.
-    float density;
-
-    /**
-     * @brief Constructs an ExponentialFog object.
+     * Exponential fog increases with distance using a density parameter,
+     * typically with a factor like $f(d) = e^{-\\mathrm{density} \\cdot d}$ or
+     * a related variant, which produces a smooth atmospheric falloff.
      *
      * @param color Fog color.
-     * @param density Density factor.
+     * @param density Exponential density factor (higher values produce thicker fog).
      */
-    explicit ExponentialFog(Color color, float density)
-        : Fog(color), density(density) {}
-
-    /**
-     * @brief Creates a shared pointer to an ExponentialFog object.
-     *
-     * @param color Fog color.
-     * @param density Density factor.
-     * @return std::shared_ptr<ExponentialFog>
-     */
-    [[nodiscard]] static auto Create(Color color, float density) {
-        return std::make_unique<ExponentialFog>(color, density);
+    [[nodiscard]] static auto CreateExponential(const Color& color, float density) -> std::unique_ptr<Fog> {
+        auto out = std::make_unique<Fog>(Type::Exponential, color);
+        out->density = density;
+        return out;
     }
 
     /**
-     * @brief Returns fog type.
-     *
-     * @return FogType::ExponentialFog
+     * @brief Returns the fog type.
      */
-    auto GetType() const -> FogType override {
-        return FogType::ExponentialFog;
-    }
+    [[nodiscard]] auto GetType() const -> Type { return type; }
 };
 
 }
