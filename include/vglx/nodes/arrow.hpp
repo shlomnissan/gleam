@@ -18,13 +18,13 @@
 namespace vglx {
 
 /**
- * @brief Visual debug primitive representing a 3D arrow.
+ * @brief Visual debug primitive representing a 3D directional arrow.
  *
- * `Arrow` is a scene node that renders a directional arrow from a given origin,
- * primarily used for debugging, orientation helpers, or coordinate indicators.
- * It is constructed from a shaft and cone head, scaled based on the provided length.
- *
- * The arrow can be positioned using `SetOrigin()` and oriented using `SetDirection()`.
+ * Arrow is a lightweight scene node used for debugging spatial relationships:
+ * normals, force vectors, light directions, coordinate axes, or any vector-based
+ * visualization. The arrow is defined by an origin point, a direction, a length,
+ * and a color. Its geometry is generated automatically and updates whenever the
+ * direction or origin is changed.
  *
  * @code
  * auto arrow = vglx::Arrow::Create({
@@ -33,49 +33,56 @@ namespace vglx {
  *   .color = 0xFF0000,
  *   .length = 1.0f
  * });
- * scene->Add(arrow);
+ *
+ * my_scene->Add(arrow);
  * @endcode
  *
  * @ingroup NodesGroup
  */
 class VGLX_EXPORT Arrow : public Node {
 public:
-    /// @brief Parameters for constructing an Arrow object.
+    /// @brief Parameters used to construct an @ref Arrow object.
     struct Parameters {
-        Vector3 direction; ///< Direction of the arrow.
-        Vector3 origin; ///< Origin of the arrow.
-        Color color; ///< Color of the arrow.
-        float length; ///< Length of the arrow.
+        Vector3 direction; ///< Direction vector of the arrow.
+        Vector3 origin; ///< World-space origin of the arrow.
+        Color color; ///< Arrow color.
+        float length; ///< Length of the arrow in world units.
     };
 
     /**
-     * @brief Constructs an Arrow object.
+     * @brief Constructs an arrow node from the given parameters.
      *
-     * @param params Arrow::Parameters
+     * @param params @ref Arrow::Parameters "Initialization parameters"
+     * for constructing the arrow.
      */
     explicit Arrow(const Parameters& params);
 
     /**
-     * @brief Creates a shared pointer to an Arrow object.
+     * @brief Creates a shared instance of @ref Arrow.
      *
-     * @param params Arrow::Parameters
-     * @return std::shared_ptr<Arrow>
+     * @param params @ref Arrow::Parameters "Initialization parameters"
+     * for constructing the arrow.
      */
-    [[nodiscard]] static auto Create(const Parameters& params) {
+    [[nodiscard]] static auto Create(const Parameters& params) -> std::shared_ptr<Arrow> {
         return std::make_shared<Arrow>(params);
     }
 
     /**
-     * @brief Sets the direction of the arrow.
+     * @brief Updates the direction of the arrow.
      *
-     * @param direction Direction of the arrow.
+     * Automatically recalculates the internal transform so the arrow points
+     * in the new direction.
+     *
+     * @param direction New direction vector.
      */
     auto SetDirection(const Vector3& direction) -> void;
 
     /**
-     * @brief Sets the origin of the arrow.
+     * @brief Updates the origin of the arrow.
      *
-     * @param origin Origin of the arrow.
+     * Moves the base of the arrow to the given world-space point.
+     *
+     * @param origin New origin position.
      */
     auto SetOrigin(const Vector3& origin) -> void;
 };

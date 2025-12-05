@@ -22,7 +22,7 @@ Arrow::Arrow(const Parameters& params) {
         .height = cone_height
     }), material);
     cone->TranslateZ(params.length - cone_height / 2.0f);
-    cone->RotateX(math::DegToRad(90.0f));
+    cone->RotateX(math::pi_over_2);
     Add(cone);
 
     const auto geometry = Geometry::Create({
