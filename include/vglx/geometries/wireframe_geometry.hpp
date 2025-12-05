@@ -14,22 +14,26 @@
 namespace vglx {
 
 /**
- * @brief Converts triangle-based geometry into wireframe-renderable geometry.
+ * @brief Generated geometry representing the wireframe edges of a triangle mesh.
  *
- * `WireframeGeometry` takes an existing indexed geometry and generates a new
- * geometry that can be rendered using `Geometry::PrimitiveType::Lines`. It
- * preserves the original vertex data and replaces the index buffer with one
- * that represents the edges of the original triangle mesh.
+ * `WireframeGeometry` takes an existing triangle-based geometry and expands its
+ * indexed triangle list into a line list suitable for rendering with
+ * @ref Geometry::PrimitiveType "Geometry::PrimitiveType::Lines". The original vertex buffer is reused,
+ * while the index buffer is replaced with pairs of indices representing each
+ * unique edge of the mesh.
  *
- * This is commonly used for debugging purposes, such as visualizing mesh
- * topology, bounding volumes, or silhouette edges.
+ * This is useful for visual debugging (visualizing topology, silhouette edges,
+ * or bounding structures) without modifying the source geometry.
  *
- * @note The source geometry must be triangle-based and contain valid index data.
+ * @note The input geometry must provide valid triangle indices; non-indexed
+ * or non-triangle primitives are not supported.
  *
  * @code
- * auto original = vglx::BoxGeometry::Create();
- * auto wireframe = std::make_shared<vglx::WireframeGeometry>(original.get());
- * mesh->geometry = wireframe;
+ * auto solid = vglx::BoxGeometry::Create();
+ * auto wireframe  = vglx::WireframeGeometry::Create(solid.get());
+ * auto material = vglx::UnlitMaterial::Create(0xFFFFFF);
+ *
+ * my_scene->Add(vglx::Mesh::Create(wireframe, material));
  * @endcode
  *
  * @ingroup GeometryGroup
@@ -37,17 +41,19 @@ namespace vglx {
 class VGLX_EXPORT WireframeGeometry : public Geometry {
 public:
     /**
-     * @brief Constructs a WireframeGeometry object from an existing geometry.
+     * @brief Constructs a wireframe representation of an existing geometry.
+     *
+     * The vertex data is shared, but the index buffer is rebuilt so that each
+     * triangle contributes three line segments.
      *
      * @param geometry Pointer to the original triangle-based geometry.
      */
     explicit WireframeGeometry(const Geometry* geometry);
 
     /**
-     * @brief Creates a shared pointer to a WireframeGeometry object.
+     * @brief Creates a shared instance of @ref WireframeGeometry.
      *
      * @param geometry Pointer to the original triangle-based geometry.
-     * @return std::shared_ptr<WireframeGeometry>
      */
     [[nodiscard]] static auto Create(const Geometry* geometry) -> std::shared_ptr<WireframeGeometry> {
         return std::make_shared<WireframeGeometry>(geometry);
