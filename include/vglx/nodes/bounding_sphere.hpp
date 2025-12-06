@@ -18,14 +18,12 @@
 namespace vglx {
 
 /**
- * @brief Debug node that renders a bounding sphere.
+ * @brief Visual debug helper that renders the bounds of a spherical volume.
  *
- * `BoundingSphere` is a visual helper used to display a wireframe sphere representing
- * the spatial bounds of an object or volume. It is primarily used for debugging,
- * spatial queries, or visibility testing.
- *
- * The sphere is defined in local space using a `Sphere` object and rendered as
- * a wireframe in the specified color.
+ * BoundingSphere displays a wireframe sphere representing the extents of a
+ * @ref Sphere. It is useful for inspecting spatial queries, validating geometry
+ * bounds, or visualizing collision volumes. The sphere is rendered as a simple
+ * line mesh colored as specified.
  *
  * @code
  * auto geometry = vglx::BoxGeometry::Create();
@@ -33,7 +31,8 @@ namespace vglx {
  *   geometry->BoundingSphere(),
  *   0xFF0000
  * );
- * scene->Add(bounds);
+ *
+ * my_scene->Add(bounds);
  * @endcode
  *
  * @ingroup NodesGroup
@@ -41,21 +40,21 @@ namespace vglx {
 class VGLX_EXPORT BoundingSphere : public Node {
 public:
     /**
-     * @brief Constructs a BoundingSphere object.
+     * @brief Constructs a bounding-sphere debug node.
      *
-     * @param sphere Bounding sphere to visualize.
-     * @param color Color used to render the bounding sphere.
+     * @param sphere Spherical bounds to visualize.
+     * @param color Line color used for rendering the wireframe sphere.
      */
     BoundingSphere(const Sphere& sphere, const Color& color);
 
     /**
-     * @brief Creates a shared pointer to a BoundingSphere object.
+     * @brief Creates a shared instance of @ref BoundingSphere.
      *
-     * @param sphere Bounding sphere to visualize.
-     * @param color Color used to render the bounding sphere.
-     * @return std::shared_ptr<BoundingSphere>
+     * @param sphere Spherical bounds to visualize.
+     * @param color Line color used for rendering.
      */
-    [[nodiscard]] static auto Create(const Sphere& sphere, const Color& color) {
+    [[nodiscard]] static auto
+    Create(const Sphere& sphere, const Color& color) -> std::shared_ptr<BoundingSphere> {
         return std::make_shared<BoundingSphere>(sphere, color);
     }
 };

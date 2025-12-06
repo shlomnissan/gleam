@@ -18,14 +18,12 @@
 namespace vglx {
 
 /**
- * @brief Debug node that renders an axis-aligned bounding box.
+ * @brief Visual debug helper that renders the axis-aligned bounds of an object.
  *
- * `BoundingBox` is a visual helper used to display a wireframe box representing
- * the spatial bounds of an object or region. It is commonly used for debugging,
- * collision visualization, or spatial partitioning diagnostics.
- *
- * The box is defined in local space using a `Box3` volume and rendered as
- * lines in the specified color.
+ * BoundingBox displays a wireframe box representing the extents of a
+ * @ref Box3 volume. It is intended for debugging spatial queries, culling
+ * behavior, and validating geometry bounds. The box is rendered as a simple
+ * line mesh in the color provided.
  *
  * @code
  * auto geometry = vglx::SphereGeometry::Create();
@@ -33,7 +31,7 @@ namespace vglx {
  *   geometry->BoundingBox(),
  *   0xFFFFFF
  * );
- * scene->Add(bounds);
+ * my_scene->Add(bounds);
  * @endcode
  *
  * @ingroup NodesGroup
@@ -41,21 +39,21 @@ namespace vglx {
 class VGLX_EXPORT BoundingBox : public Node {
 public:
     /**
-     * @brief Constructs a BoundingBox object.
+     * @brief Constructs a bounding box debug node.
      *
-     * @param box Axis-aligned bounding box to visualize.
-     * @param color Color used to render the bounding box lines.
+     * @param box Axis-aligned bounds to visualize.
+     * @param color Line color used for rendering the box.
      */
     BoundingBox(const Box3& box, const Color& color);
 
     /**
-     * @brief Creates a shared pointer to a BoundingBox object.
+     * @brief Creates a shared instance of @ref BoundingBox.
      *
-     * @param box Axis-aligned bounding box to visualize.
-     * @param color Color used to render the bounding box lines.
-     * @return std::shared_ptr<BoundingBox>
+     * @param box Axis-aligned bounds to visualize.
+     * @param color Line color used for rendering the box.
      */
-    [[nodiscard]] static auto Create(const Box3& box, const Color& color) {
+    [[nodiscard]] static auto
+    Create(const Box3& box, const Color& color) -> std::shared_ptr<BoundingBox> {
         return std::make_shared<BoundingBox>(box, color);
     }
 };

@@ -18,19 +18,19 @@
 namespace vglx {
 
 /**
- * @brief Debug node that renders a bounding plane.
+ * @brief Visual debug helper that renders a finite preview of an infinite plane.
  *
- * `BoundingPlane` is a visual helper used to display an infinite mathematical plane
- * as a finite square region in the scene. This is particularly useful for visualizing
- * clipping planes, frustum culling boundaries, or geometry intersections during debugging.
- *
- * The plane is rendered as a flat square centered around the origin of the plane,
- * oriented using the plane’s normal vector, and scaled based on the specified size.
+ * BoundingPlane draws a square region aligned with the given @ref Plane.
+ * Since mathematical planes extend infinitely, this helper renders a finite,
+ * centered patch of configurable size, useful for visualizing clipping planes,
+ * ground planes, or intersection tests during debugging. The patch is drawn as
+ * a simple wireframe in the color provided.
  *
  * @code
- * auto plane = vglx::Plane {Vector3::Forward(), 0.0f};
- * auto bounds = vglx::BoundingPlane::Create(plane, 2, 0xFF0000);
- * scene->Add(bounds);
+ * auto plane  = vglx::Plane {vglx::Vector3::Forward(), 0.0f};
+ * auto bounds = vglx::BoundingPlane::Create(plane, 2.0f, 0xFF0000);
+ *
+ * my_scene->Add(bounds);
  * @endcode
  *
  * @ingroup NodesGroup
@@ -38,23 +38,23 @@ namespace vglx {
 class VGLX_EXPORT BoundingPlane : public Node {
 public:
     /**
-     * @brief Constructs a BoundingPlane object.
+     * @brief Constructs a bounding plane debug node.
      *
-     * @param plane Plane definition in 3D space.
-     * @param size Length of the plane's rendered square region.
-     * @param color Color used to render the plane.
+     * @param plane Infinite geometric plane to visualize.
+     * @param size Extent of the rendered square patch, measured from center to edge.
+     * @param color Line color used to draw the patch.
      */
     BoundingPlane(const Plane& plane, float size, const Color& color);
 
     /**
-     * @brief Creates a shared pointer to a BoundingPlane object.
+     * @brief Creates a shared instance of @ref BoundingPlane.
      *
-     * @param plane Plane definition in 3D space.
-     * @param size Length of the plane's rendered square region.
-     * @param color Color used to render the plane.
-     * @return std::shared_ptr<BoundingPlane>
+     * @param plane Infinite geometric plane to visualize.
+     * @param size Extent of the rendered square patch.
+     * @param color Line color used to draw the patch.
      */
-    [[nodiscard]] static auto Create(const Plane& plane, float size, const Color& color) {
+    [[nodiscard]] static auto
+    Create(const Plane& plane, float size, const Color& color) -> std::shared_ptr<BoundingPlane> {
         return std::make_shared<BoundingPlane>(plane, size, color);
     }
 };
