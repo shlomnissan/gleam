@@ -17,9 +17,9 @@ ExampleSprite::ExampleSprite() {
     show_context_menu_ = false;
 
     Add(Grid::Create({
+        .color = 0x333333,
         .size = 4.0f,
-        .divisions = 16,
-        .color = 0x333333
+        .divisions = 16
     }));
 }
 

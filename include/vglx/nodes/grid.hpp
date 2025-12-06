@@ -17,49 +17,51 @@
 namespace vglx {
 
 /**
- * @brief Visual primitive representing a finite reference grid on the XZ plane.
+ * @brief Visual debug helper that renders a ground-aligned reference grid.
  *
- * `Grid` is a scene node used to display a uniform grid, typically for
- * orientation and spatial reference in 3D scenes. It is useful during
- * development to visualize world units and object placement.
- *
- * The grid is centered at the origin and lies flat on the XZ plane.
- * Grid lines are evenly spaced based on the provided size and division count.
+ * Grid draws a square grid centered at the origin, aligned with the XZ-plane.
+ * It is typically used as a spatial reference when inspecting object placement,
+ * world scale, or camera movement. The grid consists of evenly spaced lines
+ * whose extent, color, and subdivision count can be customized.
  *
  * @code
  * auto grid = vglx::Grid::Create({
- *     .size = 4.0f,
- *     .divisions = 16,
- *     .color = 0x333333
+ *   .color = 0x333333,
+ *   .size = 4.0f,
+ *   .divisions = 16
  * });
- * scene->Add(grid);
+ *
+ * my_scene->Add(grid);
  * @endcode
  *
  * @ingroup NodesGroup
  */
 class VGLX_EXPORT Grid : public Node {
 public:
-    /// @brief Parameters for constructing an Grid object.
+    /**
+     * @brief Parameters for constructing a @ref Grid object.
+     */
     struct Parameters {
-        float size; ///< Size of the grid.
-        unsigned divisions; ///< Number of divisions.
-        Color color; ///< Color of the grid.
+        Color color; ///< Line color used for rendering.
+        float size; ///< Half-width of the grid in world units.
+        unsigned int divisions; ///< Number of grid subdivisions along each axis.
     };
 
     /**
-     * @brief Constructs a Grid object.
+     * @brief Constructs a grid node.
      *
-     * @param params Grid::Parameters
+     * @param params @ref Grid::Parameters "Initialization parameters"
+     * for constructing the grid.
      */
     explicit Grid(const Parameters& params);
 
     /**
-     * @brief Creates a shared pointer to a Grid object.
+     * @brief Creates a shared instance of @ref Grid.
      *
-     * @param params Grid::Parameters
-     * @return std::shared_ptr<Grid>
+     * @param params @ref Grid::Parameters "Initialization parameters"
+     * for constructing the grid.
      */
-    [[nodiscard]] static auto Create(const Parameters& params) {
+    [[nodiscard]] static auto Create(const Parameters& params) -> std::shared_ptr<Grid> {
         return std::make_shared<Grid>(params);
     }
 };

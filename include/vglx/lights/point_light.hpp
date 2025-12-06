@@ -32,6 +32,8 @@ namespace vglx {
  *     .quadratic = 0.0f
  *   }
  * });
+ *
+ * my_scene->Add(point);
  * @endcode
  *
  * @ingroup LightsGroup

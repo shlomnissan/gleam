@@ -30,7 +30,7 @@ namespace vglx {
  * material->texture_map = texture;
  *
  * auto mesh = vglx::Mesh::Create(geometry, material);
- * scene->Add(mesh);
+ * my_scene->Add(mesh);
  * @endcode
  *
  * @ingroup MaterialsGroup

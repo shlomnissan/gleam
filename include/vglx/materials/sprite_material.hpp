@@ -29,7 +29,7 @@ namespace vglx {
  * auto material = vglx::SpriteMaterial::Create(texture, 0xFFFFFF);
  * auto sprite = vglx::Sprite::Create(material);
  *
- * scene->Add(sprite);
+ * my_scene->Add(sprite);
  * @endcode
  *
  * @ingroup MaterialsGroup

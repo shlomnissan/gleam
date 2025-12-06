@@ -47,7 +47,7 @@ namespace vglx {
  *      }
  * }
  *
- * scene->Add(boxes);
+ * my_scene->Add(boxes);
  * @endcode
  *
  * @note

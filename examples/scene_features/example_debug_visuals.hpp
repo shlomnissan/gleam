@@ -28,9 +28,9 @@ private:
     std::string curr_visual_ {"arrows"};
 
     vglx::Grid::Parameters grid_params_ {
+        .color = vglx::Color(0x333333),
         .size = 4.0f,
-        .divisions = 16,
-        .color = vglx::Color(0x333333)
+        .divisions = 16
     };
 
     std::shared_ptr<vglx::Node> arrows_;

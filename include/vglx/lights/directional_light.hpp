@@ -33,6 +33,8 @@ namespace vglx {
  *   .intensity = 1.0f,
  *   .target = nullptr
  * });
+ *
+ * my_scene->Add(directional);
  * @endcode
  *
  * @ingroup LightsGroup

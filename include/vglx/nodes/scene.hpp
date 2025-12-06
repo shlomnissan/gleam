@@ -61,7 +61,7 @@ public:
      * atmospheric fading. This is typically done during scene setup.
      *
      * @code
-     * scene->fog = vglx::LinearFog::Create(0x444444, 2.0f, 6.0f);
+     * my_scene->fog = vglx::LinearFog::Create(0x444444, 2.0f, 6.0f);
      * @endcode
      *
      * @see vglx::LinearFog

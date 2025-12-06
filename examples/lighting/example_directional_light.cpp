@@ -16,9 +16,9 @@ using namespace vglx;
 
 ExampleDirectionalLight::ExampleDirectionalLight() {
     Add(Grid::Create({
+        .color = 0x333333,
         .size = 4,
-        .divisions = 16,
-        .color = 0x333333
+        .divisions = 16
     }));
 
     phong_material_ = PhongMaterial::Create(0xCCCCCC);

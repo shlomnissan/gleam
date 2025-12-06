@@ -40,6 +40,8 @@ namespace vglx {
  *     .quadratic = 0.0f
  *   }
  * });
+ *
+ * my_scene->Add(spot);
  * @endcode
  *
  * @ingroup LightsGroup

@@ -30,6 +30,8 @@ namespace vglx {
  *   .color = 0xFFFFFF,
  *   .intensity = 0.3f
  * });
+ *
+ * my_scene->Add(ambient);
  * @endcode
  *
  * @ingroup LightsGroup
