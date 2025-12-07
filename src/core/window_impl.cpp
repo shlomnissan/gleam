@@ -204,7 +204,7 @@ auto glfw_cursor_pos_callback(GLFWwindow* window, double x, double y) -> void {
 
     event->type = MouseEvent::Type::Moved;
     event->button = MouseButton::None;
-    event->mods = glfw_mouse_mods;
+    event->mods = glfw_mouse_mod_map(glfw_mouse_mods);
     event->position = {static_cast<float>(x), static_cast<float>(y)};
     event->scroll = {0.0f, 0.0f};
 
@@ -248,7 +248,7 @@ auto glfw_scroll_callback(GLFWwindow* window, double x, double y) -> void {
 
     event->type = MouseEvent::Type::Scrolled;
     event->button = MouseButton::None;
-    event->mods = glfw_mouse_mods;
+    event->mods = glfw_mouse_mod_map(glfw_mouse_mods);
     event->position = {
         static_cast<float>(instance->mouse_pos_x),
         static_cast<float>(instance->mouse_pos_y)

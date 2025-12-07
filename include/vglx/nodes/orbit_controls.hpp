@@ -49,10 +49,10 @@ public:
         float radius {1.0f}; ///< Distance of the camera from the target point.
         float pitch {0.0f}; ///< Pitch angle in radians, measured from the vertical axis.
         float yaw {0.0f}; ///< Yaw angle in radians, measured from the horizontal axis.
-        float orbit_speed {0.01f}; ///< Rate at which the camera orbits around the target point.
+        float orbit_speed {0.005f}; ///< Rate at which the camera orbits around the target point.
         float pan_speed {0.002f}; ///< Rate at which the camera pans around the target point.
         float zoom_speed {0.95f}; ///< Rate at which the camera zooms in and out.
-        float damping_factor {15.0f}; ///< Higher values increase inertia and slow the rate of decay.
+        float damping_factor {0.3f}; ///< Higher values increase inertia and slow the rate of decay.
     };
 
     /**

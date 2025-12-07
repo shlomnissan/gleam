@@ -17,105 +17,108 @@ namespace vglx {
 
 namespace {
 
-constexpr float limit = vglx::math::pi_over_2 - 0.001f;
+constexpr float kThetaLimit = vglx::math::pi_over_2 - 0.001f;
 
 }
 
 struct OrbitControls::Impl {
     Camera* camera;
+    OrbitControls::Parameters params;
 
-    Spherical curr_orientation {};
-    Spherical target_orientation {};
+    Spherical spherical;
+    Spherical spherical_delta;
 
-    Vector3 curr_center = Vector3::Zero();
-    Vector3 target_center = Vector3::Zero();
+    Vector3 target {Vector3::Zero()};
+    Vector3 pan_delta = {Vector3::Zero()};
 
-    Vector2 curr_pos {0.0f, 0.0f};
-    Vector2 prev_pos {0.0f, 0.0f};
+    Vector2 curr_pos {Vector2::Zero()};
+    Vector2 prev_pos {Vector2::Zero()};
 
-    float damping_factor {0.0f};
-    float orbit_speed {0.0f};
-    float pan_speed {0.0f};
-    float zoom_speed {0.0f};
-    float curr_scroll_offset {0.0f};
+    MouseButton curr_button = {MouseButton::None};
 
-    MouseButton curr_button {MouseButton::None};
+    float damping_factor = 0.0f;
 
-    bool shift_key_pressed {false};
+    Impl(Camera* camera, const Parameters& params) :
+      camera(camera),
+      params(params) {
+        spherical = Spherical {params.radius, params.yaw, params.pitch};
+        spherical_delta = Spherical {0.0f, 0.0f, 0.0f};
+        damping_factor = std::clamp(params.damping_factor, 0.0f, 1.0f);
+    }
 
-    auto OnUpdate(float delta) {
+    auto OnMouseEvent(MouseEvent* event) {
+        using enum MouseEvent::Type;
         using enum MouseButton;
 
-        const auto offset = curr_pos - prev_pos;
-        const auto do_orbit = curr_button == Left && !shift_key_pressed;
-        const auto do_pan = curr_button == Right || curr_button == Left && shift_key_pressed;
-        const auto do_zoom = curr_scroll_offset != 0.0f;
+        const auto shift_mod = !!(event->mods & MouseMod::Shift);
 
-        if (do_orbit) {
-            target_orientation.phi -= offset.x * orbit_speed;
-            target_orientation.theta += offset.y * orbit_speed;
-            target_orientation.theta = math::Clamp(target_orientation.theta, -limit, limit);
+        if (event->type == ButtonPressed && curr_button == MouseButton::None) {
+            curr_button = event->button;
+            prev_pos = event->position;
         }
 
-        if (do_zoom) {
-            target_orientation.radius *= std::pow(zoom_speed, curr_scroll_offset);
-            target_orientation.radius = std::max(0.1f, target_orientation.radius);
-            curr_scroll_offset = 0.0f;
+        if (event->type == ButtonReleased && curr_button == event->button) {
+            curr_button = MouseButton::None;
         }
 
-        if (do_pan) {
-            const auto speed = pan_speed * target_orientation.radius;
-            const auto right = camera->Right();
-            const auto up = camera->Up();
-            target_center -= (right * offset.x - up * offset.y) * speed;
+        if (event->type == Moved) {
+            curr_pos = event->position;
+            auto offset = curr_pos - prev_pos;
+
+            if (curr_button == Left && !shift_mod) {
+                spherical_delta.phi -= offset.x * params.orbit_speed;
+                spherical_delta.theta += offset.y * params.orbit_speed;
+            }
+
+            if (curr_button == Right || (curr_button == Left && shift_mod)) {
+                const auto speed = params.pan_speed * spherical.radius;
+                const auto right = camera->Right();
+                const auto up = camera->Up();
+                pan_delta -= (right * offset.x - up * offset.y) * speed;
+            }
+
+            prev_pos = curr_pos;
         }
 
-        prev_pos = curr_pos;
+        if (event->type == Scrolled) {
+            spherical_delta.radius += params.zoom_speed * event->scroll.y;
+        }
+    }
 
-        const auto t = 1.0f - std::exp(-damping_factor * delta);
-        curr_orientation = Lerp(curr_orientation, target_orientation, t);
-        curr_center = Lerp(curr_center, target_center, t);
+    auto OnUpdate() {
+        spherical.phi += spherical_delta.phi;
+        spherical.theta += spherical_delta.theta;
+        spherical.radius += spherical_delta.radius;
+        target += pan_delta;
 
-        camera->transform.SetPosition(curr_center + curr_orientation.ToVector3());
-        camera->LookAt(curr_center);
+        spherical.theta = math::Clamp(spherical.theta, -kThetaLimit, kThetaLimit);
+        spherical.radius = std::max(0.1f, spherical.radius);
+
+        camera->transform.SetPosition(target + spherical.ToVector3());
+        camera->LookAt(target);
+
+        if (damping_factor > 0.0f) {
+            const auto t = 1.0f - damping_factor;
+            spherical_delta.phi *= t;
+            spherical_delta.theta *= t;
+            spherical_delta.radius *= t;
+            pan_delta *= t;
+        } else {
+            spherical_delta = Spherical {0.0f, 0.0f, 0.0f};
+            pan_delta = Vector3::Zero();
+        }
     }
 };
 
 OrbitControls::OrbitControls(Camera* camera, const Parameters& params)
-    : impl_(std::make_unique<Impl>())
-{
-    impl_->camera = camera;
-    impl_->orbit_speed = params.orbit_speed;
-    impl_->pan_speed = params.pan_speed;
-    impl_->zoom_speed = params.zoom_speed;
-    impl_->damping_factor = params.damping_factor;
-
-    const auto s = Spherical {params.radius, params.yaw, params.pitch};
-    impl_->target_orientation = s;
-    impl_->curr_orientation = s;
-};
+    : impl_(std::make_unique<Impl>(camera, params)) {}
 
 auto OrbitControls::OnMouseEvent(MouseEvent* event) -> void {
-    impl_->curr_pos = event->position;
-    impl_->shift_key_pressed = event->mods & MouseMod::Shift;
-
-    const auto is_pressed = event->type == MouseEvent::Type::ButtonPressed;
-    if (is_pressed && impl_->curr_button == MouseButton::None) {
-        impl_->curr_button = event->button;
-    }
-
-    const auto is_released = event->type == MouseEvent::Type::ButtonReleased;
-    if (is_released && event->button == impl_->curr_button) {
-        impl_->curr_button = MouseButton::None;
-    }
-
-    if (event->type == MouseEvent::Type::Scrolled) {
-        impl_->curr_scroll_offset = event->scroll.y;
-    }
+    impl_->OnMouseEvent(event);
 }
 
-auto OrbitControls::OnUpdate(float delta) -> void {
-    impl_->OnUpdate(delta);
+auto OrbitControls::OnUpdate(float) -> void {
+    impl_->OnUpdate();
 }
 
 OrbitControls::~OrbitControls() = default;
