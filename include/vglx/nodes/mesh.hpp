@@ -107,10 +107,7 @@ public:
      */
     [[nodiscard]] auto GetWireframeGeometry() -> std::shared_ptr<Geometry>;
 
-    /**
-     * @brief Default destructor.
-     */
-    virtual ~Mesh() = default;
+    virtual ~Mesh() override = default;
 
 private:
     /// @brief Geometry data used for rendering this mesh.

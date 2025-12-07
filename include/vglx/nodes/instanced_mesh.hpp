@@ -20,50 +20,46 @@
 namespace vglx {
 
 /**
- * @brief A mesh node that renders many instances of the same geometry efficiently.
+ * @brief Renderable node that draws many copies of the same mesh efficiently.
  *
- * `InstancedMesh` draws multiple copies of a single geometry-material pair using
- * per‑instance transforms and optional per‑instance colors. This is ideal for large
- * numbers of similar objects (e.g., vegetation, crowds, particles) with different
- * positions or tints while keeping draw calls low.
+ * InstancedMesh stores a single geometry/material pair and renders it multiple
+ * times in a single draw call using per-instance transforms and optional colors.
+ * This dramatically improves performance when drawing large numbers of identical
+ * objects by reducing CPU overhead and state changes.
  *
- * Each instance can have:
- * - a transform matrix (model matrix)
- * - a color (for material tinting)
- *
- * Instances are addressed by zero‑based index in the range `[0, Count())`.
+ * Each instance is addressed by a zero-based index in the range $[0, count)$.
+ * Transforms and colors can be queried or updated individually.
  *
  * @code
- * const auto geometry = BoxGeometry::Create({1.0f, 1.0f, 1.0f});
- * const auto material = PhongMaterial::Create(0xFFFFFF);
+ * const auto geometry = vglx::BoxGeometry::Create({1.0f, 1.0f, 1.0f});
+ * const auto material = vglx::PhongMaterial::Create(0xFFFFFF);
  *
  * auto boxes = vglx::InstancedMesh::Create(geometry, material, 2500);
  *
  * for (auto i = 0; i < 50; ++i) {
- *      for (auto j = 0; j < 50; ++j) {
- *          auto t = Transform3 {};
- *          t.SetPosition({i * 2.0f - 49.0f, j * 2.0f - 49.0f, 0.0f});
- *          boxes->SetTransformAt(j * 50 + i, t);
- *      }
+ *   for (auto j = 0; j < 50; ++j) {
+ *     Transform3 t {};
+ *     t.SetPosition({i * 2.0f - 49.0f, j * 2.0f - 49.0f, 0.0f});
+ *     boxes->SetTransformAt(j * 50 + i, t);
+ *   }
  * }
  *
  * my_scene->Add(boxes);
  * @endcode
  *
- * @note
- * - Out-of-range indices are invalid and result in undefined behavior.
- * - Frustum culling is performed once per draw call using a single
- *   bounding sphere that encloses all instances (cluster-level culling).
+ * Out-of-range indices are invalid and result in undefined behavior, and
+ * culling is performed coarsely using a single bounding volume that determines
+ * the visibility of the entire instance set as a whole.
  *
  * @ingroup NodesGroup
  */
 class VGLX_EXPORT InstancedMesh : public Mesh {
 public:
     /**
-     * @brief Constructs an instanced mesh.
+     * @brief Constructs an instanced mesh with a given count.
      *
-     * @param geometry Shared pointer to a geometry for all instances.
-     * @param material Shared pointer to a material for all instances.
+     * @param geometry Shared geometry used for every instance.
+     * @param material Shared material used for every instance.
      * @param count Number of instances to allocate.
      */
     InstancedMesh(
@@ -73,117 +69,94 @@ public:
     );
 
     /**
-     * @brief Creates a shared pointer to an InstancedMesh object.
+     * @brief Creates a shared instance of @ref InstancedMesh.
      *
-     * @param geometry Shared pointer to a geometry for all instances.
-     * @param material Shared pointer to a material for all instances.
+     * @param geometry Shared geometry used across all instances.
+     * @param material Shared material used across all instances.
      * @param count Number of instances to allocate.
-     * @return std::shared_ptr<InstancedMesh>
      */
     [[nodiscard]] static auto Create(
         std::shared_ptr<Geometry> geometry,
         std::shared_ptr<Material> material,
         std::size_t count
-    ) {
+    ) -> std::shared_ptr<InstancedMesh> {
         return std::make_shared<InstancedMesh>(geometry, material, count);
     }
 
     /**
-     * @brief Returns node type.
-     *
-     * @return Node::Type::InstancedMesh
+     * @brief Identifies this light as @ref Node::Type "Node::Type::InstancedMesh".
      */
     [[nodiscard]] auto GetNodeType() const -> Node::Type override {
         return Node::Type::InstancedMesh;
     }
 
-    /**
-     * @brief Returns the number of instances in this mesh.
-     *
-     * @return Instance count.
-     */
-    [[nodiscard]] auto Count() { return count_; }
+    /// @brief Returns the number of allocated instances.
+    [[nodiscard]] auto Count() -> size_t { return count_; }
 
     /**
-     * @brief Returns the color assigned to a specific instance.
+     * @brief Returns the per-instance color at the given index.
      *
-     * @param idx Instance index in [0, Count()).
-     * @return Color of the instance.
+     * @param idx Instance index.
      */
     [[nodiscard]] auto GetColorAt(std::size_t idx) -> const Color;
 
     /**
-     * @brief Returns the transform assigned to a specific instance.
+     * @brief Returns the per-instance transform matrix at the given index.
      *
-     * @param idx Instance index in [0, Count()).
-     * @return Model matrix of the instance.
+     * @param idx Instance index.
      */
     [[nodiscard]] auto GetTransformAt(std::size_t idx) -> const Matrix4;
 
     /**
-     * @brief Sets the color for a specific instance.
+     * @brief Sets the per-instance color at the given index.
      *
-     * This color typically multiplies or tints the base material color.
-     *
-     * @param idx Instance index in [0, Count()).
-     * @param color Color to assign.
+     * @param idx Instance index.
+     * @param color New color for the instance.
      */
     auto SetColorAt(std::size_t idx, const Color& color) -> void;
 
     /**
-     * @brief Sets the model transform for a specific instance.
+     * @brief Sets the per-instance transform at the given index.
      *
-     * @param idx Instance index in [0, Count()).
-     * @param matrix Transform matrix to assign.
+     * @param idx Instance index.
+     * @param matrix A world-space transform matrix for the instance.
      */
     auto SetTransformAt(std::size_t idx, const Matrix4& matrix) -> void;
 
     /**
-     * @brief Sets the model transform for a specific instance from a Transform3.
+     * @brief Convenience overload that accepts a @ref Transform3.
      *
-     * Convenience overload that extracts the matrix from a `Transform3`.
-     *
-     * @param idx Instance index in [0, Count()).
-     * @param transform Transform providing the model matrix.
+     * @param idx Instance index.
+     * @param transform World-space transform object to assign.
      */
     auto SetTransformAt(std::size_t idx, Transform3& transform) -> void;
 
     /**
-     * @brief Returns the instanced mesh cluster bounding box.
+     * @brief Computes a bounding box that encloses all instances.
      */
     auto BoundingBox() -> Box3 override;
 
     /**
-     * @brief Returns the instanced mesh cluster bounding sphere.
+     * @brief Computes a bounding sphere that encloses all instances.
      */
     auto BoundingSphere() -> Sphere override;
 
-    /**
-     * @brief Destructor.
-     */
-    ~InstancedMesh();
+    ~InstancedMesh() override;
 
 private:
-    /// @brief Per-instance colors indexed by instance ID.
-    std::vector<Color> colors_;
-
     /// @cond INTERNAL
+    std::vector<Color> colors_;
+    std::vector<Matrix4> transforms_;
+
+    std::optional<Box3> bounding_box_;
+    std::optional<Sphere> bounding_sphere_;
+
+    std::size_t count_;
+
     friend class GLBuffers;
     class Impl;
     std::unique_ptr<Impl> impl_;
     /// @endcond
-
-     /// @brief Per-instance model matrices indexed by instance ID.
-    std::vector<Matrix4> transforms_;
-
-    /// @brief Cached bounding box.
-    std::optional<Box3> bounding_box_;
-
-    /// @brief Cached bounding sphere.
-    std::optional<Sphere> bounding_sphere_;
-
-    /// @brief Number of instances.
-    std::size_t count_;
 };
 
 }
