@@ -28,7 +28,7 @@ namespace vglx {
  */
 class VGLX_EXPORT Renderable : public Node {
 public:
-    virtual ~Renderable() = default;
+    virtual ~Renderable() override = default;
 
     [[nodiscard]] virtual auto GetGeometry() -> std::shared_ptr<Geometry> = 0;
 

@@ -56,7 +56,7 @@ namespace vglx {
 class VGLX_EXPORT InstancedMesh : public Mesh {
 public:
     /**
-     * @brief Constructs an instanced mesh with a given count.
+     * @brief Constructs an instanced mesh.
      *
      * @param geometry Shared geometry used for every instance.
      * @param material Shared material used for every instance.

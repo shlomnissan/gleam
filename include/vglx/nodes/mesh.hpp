@@ -18,12 +18,13 @@
 namespace vglx {
 
 /**
- * @brief Renderable node that draws a Geometry with a Material.
+ * @brief Renderable node that couples geometry with a material.
  *
- * Mesh is a scene node that owns a geometry and a material and exposes them
- * through the Renderable interface so the renderer can process and draw it.
- *
- * An optional wireframe geometry can be provided for debug rendering.
+ * Mesh represents a draw call in the scene: it owns a shared pointer to a
+ * @ref Geometry and a @ref Material and exposes them through the renderable
+ * interface. The renderer queries meshes for their geometry, material, and
+ * world transform, then issues the appropriate GPU commands. Meshes can also
+ * lazily generate a wireframe representation for debugging.
  *
  * @code
  * auto geometry = vglx::BoxGeometry::Create();
@@ -37,87 +38,78 @@ namespace vglx {
 class VGLX_EXPORT Mesh : public Renderable {
 public:
     /**
-     * @brief Constructs a mesh instance with the given geometry and material.
+     * @brief Constructs a mesh.
      *
-     * @param geometry Shared pointer to a geometry instance.
-     * @param material Shared pointer to a material instance.
+     * @param geometry Shared pointer to the mesh geometry.
+     * @param material Shared pointer to the material used for rendering.
      */
     Mesh(std::shared_ptr<Geometry> geometry, std::shared_ptr<Material> material)
       : geometry_(geometry), material_(material) {}
 
     /**
-     * @brief Creates a shared pointer to a Mesh object.
+     * @brief Creates a shared instance of @ref Mesh.
      *
-     * @param geometry Shared pointer to a geometry instance.
-     * @param material Shared pointer to a material instance.
-     * @return std::shared_ptr<Mesh>
+     * @param geometry Shared pointer to the mesh geometry.
+     * @param material Shared pointer to the material used for rendering.
      */
     [[nodiscard]] static auto Create(
         std::shared_ptr<Geometry> geometry,
         std::shared_ptr<Material> material
-    ) {
+    ) -> std::shared_ptr<Mesh> {
         return std::make_shared<Mesh>(geometry, material);
     }
 
     /**
-     * @brief Returns node type.
-     *
-     * @return Node::Type::Mesh
+     * @brief Identifies this light as @ref Node::Type "Node::Type::Mesh".
      */
     [[nodiscard]] auto GetNodeType() const -> Node::Type override {
         return Node::Type::Mesh;
     }
 
     /**
-     * @brief Returns the geometry associated with this mesh.
-     *
-     * @return Shared pointer to the current geometry.
+     * @brief Returns the geometry used by this mesh.
      */
     [[nodiscard]] auto GetGeometry() -> std::shared_ptr<Geometry> override {
         return geometry_;
     }
 
     /**
-     * @brief Returns the material associated with this mesh.
-     *
-     * @return Shared pointer to the current material.
+     * @brief Returns the material used by this mesh.
      */
     [[nodiscard]] auto GetMaterial() -> std::shared_ptr<Material> override {
         return material_;
     }
 
     /**
-     * @brief Sets the geometry used to render this mesh.
+     * @brief Replaces the geometry used by this mesh.
      *
-     * @param geometry Shared pointer to the new geometry.
+     * @param geometry New geometry to assign.
      */
     auto SetGeometry(std::shared_ptr<Geometry> geometry) -> void;
 
     /**
-     * @brief Sets the material used to render this mesh.
+     * @brief Replaces the material used by this mesh.
      *
-     * @param material Shared pointer to the new material.
+     * @param material New material to assign.
      */
     auto SetMaterial(std::shared_ptr<Material> material) { material_ = material; }
 
     /**
-     * @brief Returns the wireframe version of the mesh geometry.
+     * @brief Returns a wireframe representation of the current geometry.
      *
-     * @return Shared pointer to the wireframe geometry.
+     * The wireframe geometry is generated on first use from the mesh's
+     * triangle-based geometry and cached for subsequent calls.
      */
     [[nodiscard]] auto GetWireframeGeometry() -> std::shared_ptr<Geometry>;
 
     virtual ~Mesh() override = default;
 
 private:
-    /// @brief Geometry data used for rendering this mesh.
+    /// @cond INTERNAL
     std::shared_ptr<Geometry> geometry_;
-
-    /// @brief Wireframe geometry used for debug or line-based rendering.
     std::shared_ptr<Geometry> wireframe_geometry_;
-
-    /// @brief Material that controls how the mesh is shaded.
     std::shared_ptr<Material> material_;
+    /// @endcond
 };
 
 }
