@@ -65,8 +65,6 @@ auto Node::Remove(const std::shared_ptr<Node>& node) -> void {
         node->impl_->parent = nullptr;
         node->impl_->attached = false;
         node->transform.touched = true;
-    } else {
-        Logger::Log(LogLevel::Warning, "Attempting to remove node that is not in scene {}", *node);
     }
 }
 
