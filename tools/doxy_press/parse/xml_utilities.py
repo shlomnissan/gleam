@@ -41,6 +41,11 @@ def read_pieces(el: ET.Element, resolver: Optional[Resolver], strip: bool = True
                     child_id = child.get("refid")
                     label = resolver.id_to_url_with_label(child_id, label)
                 output.append(label)
+            elif tag == "itemizedlist":
+                walk(child)
+            elif tag == "listitem":
+                label = read_pieces(child, resolver) or element_text(child)
+                output.append(f"- {label}\n")
             elif tag == "linebreak":
                 output.append("  \n")
             elif tag == "sp":

@@ -17,22 +17,25 @@
 namespace vglx {
 
 /**
- * @brief Interactive camera controller for orbiting around a target point.
+ * @brief Interactive camera controller for orbit-style navigation.
  *
- * `OrbitControls` enables intuitive camera manipulation using spherical coordinates,
- * allowing users to orbit, zoom, and pan around a fixed target. It is typically
- * attached to a scene node and linked to a `Camera` instance, responding to mouse
- * input and updating camera transforms each frame.
+ * OrbitControls lets the user rotate, pan, and zoom a camera around a
+ * target point using mouse input. It is added to the scene like any other
+ * node and updates the attached camera each frame. The controller maintains
+ * a spherical orbit radius and angular orientation
+ * @ref OrbitControls::Parameters "pitch" and @ref OrbitControls::Parameters "yaw"
+ * and applies smoothing when a non-zero damping factor is set.
  *
- * This controller is useful for editor views, previews, and navigation interfaces.
+ * The control scheme includes:
+ * - Left mouse drag: orbit around the target
+ * - Right mouse drag: pan in view space
+ * - Scroll wheel: zoom in and out
  *
  * @code
  * auto MyScene::OnAttached(SharedContextPointer context) -> void override {
  *   Add(vglx::OrbitControls::Create(
  *     context->camera, {
- *       .radius = 5.0f,
- *       .pitch = math::DegToRad(25.0f),
-*        .yaw = math::DegToRad(45.0f)
+ *       .radius = 5.0f
  *     }
  *   ));
  * }
@@ -42,56 +45,51 @@ namespace vglx {
  */
 class VGLX_EXPORT OrbitControls : public Node {
 public:
-    /**
-     * @brief Parameters for constructing a CameraOrbit object.
-     */
+    /// @brief Parameters for constructing an @ref OrbitControls object.
     struct Parameters {
-        float radius {1.0f}; ///< Distance of the camera from the target point.
-        float pitch {0.0f}; ///< Pitch angle in radians, measured from the vertical axis.
-        float yaw {0.0f}; ///< Yaw angle in radians, measured from the horizontal axis.
-        float orbit_speed {0.005f}; ///< Rate at which the camera orbits around the target point.
-        float pan_speed {0.002f}; ///< Rate at which the camera pans around the target point.
-        float zoom_speed {0.95f}; ///< Rate at which the camera zooms in and out.
-        float damping_factor {0.3f}; ///< Higher values increase inertia and slow the rate of decay.
+        float radius {1.0f}; ///< Initial distance of the camera from its target.
+        float pitch {0.0f}; ///< Initial pitch angle in radians.
+        float yaw {0.0f}; ///< Initial yaw angle in radians.
+        float orbit_speed {0.005f}; ///< Mouse sensitivity when orbiting.
+        float pan_speed {0.002f}; ///< Mouse sensitivity when panning.
+        float zoom_speed {0.95f}; ///< Scroll wheel zoom factor.
+        float damping_factor {0.3f}; ///< Set to 1 for instant response.
     };
 
     /**
-     * @brief Constructs a CameraOrbit object.
+     * @brief Constructs orbit controls.
      *
-     * @param camera Pointer to the camera to orbit around.
-     * @param params OrbitControls::Parameters
+     * @param camera Camera the controller manipulates.
+     * @param params Configuration parameters.
      */
     OrbitControls(Camera* camera, const Parameters& params);
 
     /**
-     * @brief Creates a shared pointer to a OrbitCamera object.
+     * @brief Creates a shared instance of @ref OrbitControls.
      *
-     * @param camera Pointer to the camera to orbit around.
-     * @param params OrbitControls::Parameters
-     * @return std::shared_ptr<OrbitControls>
+     * @param camera Camera the controller manipulates.
+     * @param params Configuration parameters.
      */
-    [[nodiscard]] static auto Create(Camera* camera, const Parameters& params) {
+    [[nodiscard]] static auto
+    Create(Camera* camera, const Parameters& params) -> std::shared_ptr<OrbitControls> {
         return std::make_shared<OrbitControls>(camera, params);
     }
 
     /**
-     * @brief Mouse event handler.
+     * @brief Responds to mouse input for orbiting, panning, and zooming.
      *
-     * @param event Pointer to the mouse event.
+     * @param event Mouse event pointer.
      */
     auto OnMouseEvent(MouseEvent* event) -> void override;
 
     /**
-     * @brief Updates the camera control each frame.
+     * @brief Updates camera position each frame, applying damping if enabled.
      *
-     * @param delta Time in seconds since the last update.
+     * @param delta Time step in seconds.
      */
     auto OnUpdate(float delta) -> void override;
 
-    /**
-     * @brief Destructor.
-     */
-    ~OrbitControls();
+    ~OrbitControls() override;
 
 private:
     /// @cond INTERNAL
