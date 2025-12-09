@@ -1,8 +1,8 @@
-# Creating a Scene
+# Creating an Application
 
-If you followed the [installation guide](/manual/installation) and verified your setup you are ready to build your first scene. This page walks you through writing a minimal VGLX application and assembling a simple world from a few core pieces. The example is small on purpose. It introduces the fundamentals without burying you in details.
+If you followed the [installation guide](/manual/installation) and verified your setup you are ready to start building. This page walks you through writing a minimal VGLX application and assembling a simple world from a few core pieces. The example is small on purpose. It introduces the fundamentals without burying you in details.
 
-By the end you’ll have a working scene and a clear sense of how the engine fits together, enough to [start exploring](/reference/core/application) and building on your own.
+By the end you’ll have a working application and a clear sense of how the engine fits together, enough to [start exploring](/reference/core/application) on your own.
 
 ## Creating a Project
 
@@ -43,9 +43,10 @@ The file starts by declaring the minimum CMake version, the project name and the
 
 If you followed the installation guide you can import VGLX with two commands. `find_package(vglx REQUIRED)` asks CMake to locate the library. If it is missing or incorrectly installed, configuration fails. `target_link_libraries` links our application to the VGLX binaries.
 
-The Windows-only section copies the VGLX DLL next to the executable after the build step. CMake selects the correct binary automatically based on your build type.
+The Windows-only section copies the VGLX DLL next to the executable after the build step. CMake selects the correct binary automatically based on your build type. Without this the application
+may fail to compile on Window unless you add the binaries to your system path.
 
-This setup looks simple, but CMake is doing a lot behind the scenes. It verifies the installation, loads the correct configuration and handles platform-specific details for us.
+This setup looks simple but CMake is doing a lot behind the scenes. It verifies the installation, loads the correct configuration and handles platform-specific details for us.
 
 Before we move on, let’s add a minimal `main.cpp` to test that the project builds correctly:
 
@@ -81,8 +82,6 @@ The preferred way to create a VGLX application is using the application runtime.
 We can add a runtime instance to our bare-bones `main.cpp` file:
 
 ```cpp
-// main.cpp
-
 #include <vglx/vglx.hpp>
 
 struct MyApp : public vglx::Application {
@@ -114,12 +113,12 @@ auto main() -> int {
 }
 ```
 
-Our class overrides three functions that initialize the runtime. `Configure` is optional but you will often implement it. It returns a small data object that describes how the application should start up. Using designated initializers keeps each field clear and easy to read.
+Our class overrides three functions that initialize the runtime. [Configure](/reference/core/application#function-configure-0192d125) is optional but you will often implement it. It returns a small data object that describes how the application should start up. Using designated initializers keeps each field clear and easy to read.
 
-`CreateScene` is required and returns the scene you want to render. At this stage we simply return an empty scene using its factory. VGLX uses shared pointers to store nodes in the scene graph and built-in nodes provide `Create()` helpers to construct them correctly.
+[CreateScene](/reference/core/application#function-create-scene-2b0beeb4) is required and returns the scene you want to render. At this stage we simply return an empty scene using its factory. VGLX uses shared pointers to store nodes in the scene graph and built-in nodes provide [Create](/reference/nodes/scene#function-create-a8164366) helpers to construct them correctly.
 
-The last function, `Update`, is also required. It is called once per frame and is where you add per-frame logic at the application level. Returning `true` keeps the application running. Returning `false` exits the main loop.
+The last function, [Update](/reference/core/application#function-update-d40fe494), is also required. It is called once per frame and is where you add per-frame logic at the application level. Returning `true` keeps the application running. Returning `false` exits the main loop.
 
-In `main` we create an instance of the app and call `Start` to launch it. If you build and run the project again you should see a window for your new VGLX application.
+In `main` we create an instance of the app and call [Start](/reference/core/application#function-start-28ef28d7) to launch it. If you build and run the project again you should see a window for your new VGLX application.
 
 ## Your First Scene

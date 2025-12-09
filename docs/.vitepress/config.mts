@@ -41,7 +41,7 @@ export default defineConfig({
           items: [
             { text: 'Introduction', link: '/manual/' },
             { text: 'Installation', link: '/manual/installation' },
-            { text: 'Creating a Scene', link: '/manual/creating_scene' },
+            { text: 'Creating an Application', link: '/manual/creating_application' },
           ]
         },
         { text: 'Reference', link: '/reference/core/application' }
