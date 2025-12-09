@@ -22,22 +22,22 @@ namespace vglx {
 /**
  * @brief Billboarded quad that always faces the active camera.
  *
- * Sprite is a flat, unit-sized quad oriented toward the camera at all times.
- * It is usually textured (often with transparency) and exposes the minimal
- * Renderable interface so it can be submitted to the renderer.
- *
- * Common use cases include particles, labels, icons, and world-space markers.
+ * Sprite is a flat unit-sized quad oriented toward the camera at all times.
+ * It is usually textured and exposes the minimal Renderable interface so it
+ * can be submitted to the renderer. Common use cases include particles,
+ * labels, icons, and world-space markers.
  *
  * @code
  * auto MyNode::OnAttached(SharedContextPointer context) -> void override {
- *   context->texture_loader->LoadAsync(
- *     "assets/sprite.tex",
+ *   context->texture_loader->LoadAsync("assets/sprite.tex",
  *     [this](auto result) {
  *       if (result) {
- *         auto mat = vglx::SpriteMaterial::Create();
- *         mat->albedo_map = result.value();
+ *         auto material = vglx::SpriteMaterial::Create();
+ *         material->albedo_map = result.value();
+ *
  *         auto sprite = Sprite::Create(mat);
  *         sprite->SetScale(0.5f);
+ *
  *         Add(sprite);
  *       } else {
  *         std::println(stderr, "{}", result.error());
@@ -54,16 +54,16 @@ public:
     /**
      * @brief View-space rotation angle in radians applied to the sprite.
      */
-    float rotation = 0.0f;
+    float rotation {0.0f};
 
     /**
      * @brief Normalized anchor point inside the sprite.
      *
      * Defines the pivot used for placement and rotation of the sprite.
      *
-     * - `(0.0f, 0.0f)` = lower-left corner of the sprite.
-     * - `(0.5f, 0.5f)` = center of the sprite (default).
-     * - `(1.0f, 1.0f)` = upper-right corner of the sprite.
+     * - $(0.0, 0.0)$ lower-left corner of the sprite.
+     * - $(0.5, 0.5)$ center of the sprite (default).
+     * - $(1.0, 1.0)$ upper-right corner of the sprite.
      *
      * The sprite's world-space position corresponds to this anchor point.
      * Rotation is applied around this pivot.
@@ -71,43 +71,33 @@ public:
     Vector2 anchor = Vector2 {0.5f, 0.5f};
 
     /**
-     * @brief Constructs a sprite with an optional material.
+     * @brief Constructs a sprite.
      *
-     * If @p material is null, a new instance of SpriteMaterial will be created.
+     * If material is `null` a new instance of @ref SpriteMaterial will be created.
      *
-     * @param material Material used to render the sprite (may be null).
+     * @param material Material used to render the sprite.
      */
     Sprite(std::shared_ptr<SpriteMaterial> material);
 
     /**
-     * @brief Creates a shared pointer to a Sprite object with material.
+     * @brief Creates a shared instance of @ref Sprite.
      *
-     * @param material Shared pointer to a sprite material.
-     * @return std::shared_ptr<Sprite>
+     * @param material Shared sprite material.
      */
-    [[nodiscard]] static auto Create(std::shared_ptr<SpriteMaterial> material = nullptr) {
+    [[nodiscard]] static auto
+    Create(std::shared_ptr<SpriteMaterial> material = nullptr) -> std::shared_ptr<Sprite> {
         return std::make_shared<Sprite>(material);
     }
 
     /**
-     * @brief Returns node type.
-     *
-     * @return Node::Type::Sprite
+     * @brief Identifies this node as @return Node::Type::Sprite
      */
     [[nodiscard]] auto GetNodeType() const -> Node::Type override {
         return Node::Type::Sprite;
     }
 
-    /// @cond INTERNAL
-    [[nodiscard]] auto GetGeometry() -> std::shared_ptr<Geometry> override {
-        return geometry_;
-    }
-    /// @endcond
-
     /**
      * @brief Returns the material associated with the sprite.
-     *
-     * @return Shared pointer to the current material.
      */
     [[nodiscard]] auto GetMaterial() -> std::shared_ptr<Material> override {
         return material_;
@@ -122,14 +112,19 @@ public:
         material_ = material;
     }
 
+    /// @cond INTERNAL
+    [[nodiscard]] auto GetGeometry() -> std::shared_ptr<Geometry> override {
+        return geometry_;
+    }
+    /// @endcond
+
 private:
     /// @cond INTERNAL
     std::shared_ptr<Geometry> geometry_;
+    std::shared_ptr<Material> material_;
+
     static auto SharedGeometry() -> std::shared_ptr<Geometry>&;
     /// @endcond
-
-    /// @brief Material used to render the sprite.
-    std::shared_ptr<Material> material_;
 };
 
 }
