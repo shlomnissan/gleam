@@ -53,7 +53,7 @@ struct Fog {
     float density; ///< Density factor for exponential fog (used when type is Exponential).
 
     /**
-     * @brief Constructs a Fog object of the given type and color.
+     * @brief Constructs a fog object.
      *
      * @param type Fog::Type specifying the attenuation model.
      * @param color Fog color used for fully fogged fragments.

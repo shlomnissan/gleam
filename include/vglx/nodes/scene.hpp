@@ -17,69 +17,68 @@
 namespace vglx {
 
 /**
- * @brief Root node and entry point for a scene graph.
+ * @brief Root node of a renderable scene graph.
  *
- * `Scene` is the top-level container for all nodes in a VGLX application. It acts as the
- * root of the scene graph and is responsible for propagating update and input events
- * throughout the hierarchy. Each application has one active scene at a time, which is
- * managed by the `Application`.
- *
- * A custom scene can be created by inheriting from this class and overriding behavior
- * or adding initial nodes. The scene must be provided to the application during startup:
+ * Scene is the top-level container for all nodes that participate in
+ * rendering and updates. It owns the scene graph hierarchy, optional global
+ * fog settings, and a shared runtime context. Create a scene by overriding
+ * the application runtime @ref Application::CreateScene. The runtime will
+ * attach it to the active context, and advances it once per frame.
  *
  * @code
  * class MyApp : public vglx::Application {
  * public:
- *   auto Configure() -> void override {
- *     params.title = "My App";
+ *   auto Configure() -> Application::Parameters override {
+ *     return {
+ *       .title = "Hello VGLX",
+ *       .clear_color = {0x000000},
+ *       .width = 1024,
+ *       .height = 768,
+ *       .antialiasing = 4,
+ *     };
  *   }
  *
  *   auto CreateScene() -> std::shared_ptr<vglx::Scene> override {
  *     auto scene = vglx::Scene::Create();
- *     // Add nodes to the scene
+ *     scene->fog = vglx::Fog::CreateExponential(0x444444, 0.3f);
+ *
+ *     // Add nodes to the scene...
+ *
  *     return scene;
  *   }
  *
  *   auto Update(float delta) -> bool override {
- *     // Called every frame
  *     return true;
  *   }
  * };
  * @endcode
  *
- * @note Only one scene can be attached to the application context at a time.
- * Attaching a new scene using vglx::Application::SetScene replaces the current one.
- *
  * @ingroup NodesGroup
  */
 class VGLX_EXPORT Scene : public Node {
 public:
-    /**
-     * @brief Fog settings applied to the entire scene.
-     *
-     * Set this to a `LinearFog` or `ExponentialFog` instance to enable distance-based
-     * atmospheric fading. This is typically done during scene setup.
-     *
-     * @code
-     * my_scene->fog = vglx::LinearFog::Create(0x444444, 2.0f, 6.0f);
-     * @endcode
-     *
-     * @see vglx::LinearFog
-     * @see vglx::ExponentialFog
-     */
+    /// @brief Optional global fog settings applied during rendering.
     std::unique_ptr<Fog> fog;
 
     /**
-     * @brief Constructs an Scene instance.
+     * @brief Constructs a scene object.
      */
     Scene();
 
     /**
+     * @brief Creates a shared instance of @ref Scene.
+     */
+    [[nodiscard]] static auto Create() -> std::shared_ptr<Scene> {
+        return std::make_shared<Scene>();
+    }
+
+    /**
      * @brief Advances the scene by one frame.
      *
-     * Propagates the per-frame update through the scene graph, calling
-     * `Node::Update(float delta)` on all attached nodes in depth-first order.
-     * This is invoked automatically by the runtime each frame.
+     * Propagates per-frame updates through the scene graph, calling
+     * @ref Node::OnUpdate "OnUpdate" on the scene and all attached nodes in
+     * depth-first order. This is invoked automatically by the runtime once
+     * per frame.
      *
      * @param delta Elapsed time in seconds since the last frame.
      */
@@ -87,38 +86,24 @@ public:
 
     /**
      * @brief Attaches a shared context to the scene.
-     * @deprecated
      *
-     * The context provides runtime parameters (e.g., window size, active camera)
-     * and resource loaders. This is normally called by the runtime during
-     * initialization. All nodes added to the scene will receive the context
-     * via `Node::OnAttached`.
+     * Stores the active shared context and propagates it to all nodes in the
+     * scene graph via @ref Node::OnAttached. The context provides access to
+     * runtime state such as the active camera, window parameters, and renderer
+     * resources. This is normally called by the application runtime during
+     * initialization.
      *
-     * @param context Pointer to the active SharedContext instance (const).
+     * @param context Pointer to the active SharedContext instance.
      */
     auto SetContext(SharedContextPointer context) -> void;
 
     /**
-     * @brief Creates a shared pointer to a Scene object.
-     *
-     * @return std::shared_ptr<Scene>
-     */
-    [[nodiscard]] static auto Create() {
-        return std::make_shared<Scene>();
-    }
-
-    /**
-     * @brief Returns node type.
-     *
-     * @return Node::Type::Scene
+     * @brief Identifies this node as @ref Node::Type "Node::Type::Scene".
      */
     [[nodiscard]] auto GetNodeType() const -> Node::Type override {
         return Node::Type::Scene;
     }
 
-    /**
-     * @brief Destructor.
-     */
     ~Scene() override;
 
 private:

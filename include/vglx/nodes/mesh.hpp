@@ -60,7 +60,7 @@ public:
     }
 
     /**
-     * @brief Identifies this light as @ref Node::Type "Node::Type::Mesh".
+     * @brief Identifies this node as @ref Node::Type "Node::Type::Mesh".
      */
     [[nodiscard]] auto GetNodeType() const -> Node::Type override {
         return Node::Type::Mesh;

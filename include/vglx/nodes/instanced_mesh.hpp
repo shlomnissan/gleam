@@ -84,7 +84,7 @@ public:
     }
 
     /**
-     * @brief Identifies this light as @ref Node::Type "Node::Type::InstancedMesh".
+     * @brief Identifies this node as @ref Node::Type "Node::Type::InstancedMesh".
      */
     [[nodiscard]] auto GetNodeType() const -> Node::Type override {
         return Node::Type::InstancedMesh;
