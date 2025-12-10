@@ -84,6 +84,8 @@ We can add a runtime instance to our bare-bones `main.cpp` file:
 ```cpp
 #include <vglx/vglx.hpp>
 
+#include <memory>
+
 struct MyApp : public vglx::Application {
     auto Configure() ->  Application::Parameters override {
         return {
@@ -121,4 +123,30 @@ The last function, [Update](/reference/core/application#function-update-d40fe494
 
 In `main` we create an instance of the app and call [Start](/reference/core/application#function-start-28ef28d7) to launch it. If you build and run the project again you should see a window for your new VGLX application.
 
-## Your First Scene
+## Creating a Scene
+
+Before you can put anything in your world you need a [Scene](/reference/nodes/scene). The scene is the root of your graph: every node hangs from it, inherits its state, and contributes to the final frame. It’s the anchor that ties cameras, lights, and geometry into a coherent world the renderer can walk.
+
+In the earlier example we returned an empty [Scene](/reference/nodes/scene) from [CreateScene](/reference/core/application#function-create-scene-2b0beeb4). You can attach nodes directly to that instance but it’s often cleaner to subclass [Scene](/reference/nodes/scene). A custom scene gives you access to lifecycle hooks without cluttering the graph.
+
+Add the following class definition above `MyApp`:
+
+```cpp
+struct MyScene : public vglx::Scene {
+    MyScene() {}
+
+    auto OnAttached(vglx::SharedContextPointer context) -> void override {}
+
+    auto OnUpdate(float delta) -> void override {}
+};
+```
+
+This defines a `MyScene` type with an empty constructor and two hooks: [OnAttached](/reference/nodes/node#function-on-attached-ff71adbb), called when the scene enters the runtime, and [OnUpdate](/reference/nodes/node#function-on-update-86a04f9c), called once per frame. We’ll fill these in shortly. First, tell the runtime to use `MyScene`:
+
+```cpp
+auto CreateScene() -> std::shared_ptr<vglx::Scene> override {
+    return std::make_shared<MyScene>();
+}
+```
+
+Build and run the application again. If you still see an empty window, everything is working as intended. Now we can start putting things on screen.
