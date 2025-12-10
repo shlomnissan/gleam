@@ -150,3 +150,83 @@ auto CreateScene() -> std::shared_ptr<vglx::Scene> override {
 ```
 
 Build and run the application again. If you still see an empty window, everything is working as intended. Now we can start putting things on screen.
+
+## Populating the Scene
+
+In this guide we’ll build a small scene: a 3D box, a couple of lights, basic camera controls so we can navigate, and a simple animation to make things interesting.
+
+A scene is built from nodes: cameras, meshes, lights, and anything else you place in the world. To see anything on screen you need at least one of each and VGLX provides simple helpers to create and configure them. We’ll start with the camera.
+
+The runtime gives you a default 3D camera unless you override [CreateCamera](/reference/core/application#function-create-camera-62e68470) so we’ll use that for now. What we do want is the ability to move through the scene so let’s attach basic mouse-driven controls to it:
+
+## The Result
+
+```cpp
+#include <vglx/vglx.hpp>
+
+#include <memory>
+
+constexpr static float kRotationSpeed = vglx::math::pi_over_2;
+
+struct MyScene : public vglx::Scene {
+    std::shared_ptr<vglx::Mesh> mesh = vglx::Mesh::Create(
+        vglx::BoxGeometry::Create(),
+        vglx::PhongMaterial::Create(0x049EF4)
+    );
+
+    MyScene() {
+        auto ambient_light = vglx::AmbientLight::Create({
+            .color = 0xFFFFFF,
+            .intensity = 0.5f
+        });
+
+        auto point_light = vglx::PointLight::Create({
+            .color = 0xFFFFFF,
+            .intensity = 1.0f
+        });
+
+        point_light->transform.Translate({2.0f, 2.5f, 4.0f});
+
+        Add(ambient_light);
+        Add(point_light);
+        Add(mesh);
+    }
+
+    auto OnAttached(vglx::SharedContextPointer context) -> void override {
+        context->camera->TranslateZ(3.0f);
+    }
+
+    auto OnUpdate(float delta) -> void override {
+        mesh->RotateX(kRotationSpeed * delta);
+        mesh->RotateY(kRotationSpeed * delta);
+    }
+};
+
+struct MyApp : public vglx::Application {
+    auto Configure() ->  Application::Parameters override {
+        return {
+            .title = "Hello VGLX",
+            .clear_color = {0x000000},
+            .width = 1024,
+            .height = 768,
+            .antialiasing = 4,
+            .vsync = false,
+            .show_stats = true,
+        };
+    }
+
+    auto CreateScene() -> std::shared_ptr<vglx::Scene> override {
+        return std::make_shared<MyScene>();
+    }
+
+    auto Update([[maybe_unused]] float dt) -> bool override {
+        return true;
+    }
+};
+
+auto main() -> int {
+    auto app = MyApp {};
+    app.Start();
+    return 0;
+}
+```
