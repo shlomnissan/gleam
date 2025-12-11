@@ -153,11 +153,50 @@ Build and run the application again. If you still see an empty window, everythin
 
 ## Populating the Scene
 
-In this guide we’ll build a small scene: a 3D box, a couple of lights, basic camera controls so we can navigate, and a simple animation to make things interesting.
+In this guide we’ll build a small scene: a 3D box, a couple of lights, and a simple animation to make things interesting.
 
 A scene is built from nodes: cameras, meshes, lights, and anything else you place in the world. To see anything on screen you need at least one of each and VGLX provides simple helpers to create and configure them. We’ll start with the camera.
 
-The runtime gives you a default 3D camera unless you override [CreateCamera](/reference/core/application#function-create-camera-62e68470) so we’ll use that for now. What we do want is the ability to move through the scene so let’s attach basic mouse-driven controls to it:
+The runtime gives you a default 3D camera unless you override [CreateCamera](/reference/core/application#function-get-camera-5f2d1639) so we’ll use that for now. By default the camera starts at the world origin $(0, 0, 0)$. We want our box to sit at the origin, not the camera, so we need to push the camera back and have it look toward the center of the scene.
+
+Once a node is attached to the graph it can access the active camera through the shared context passed to [OnAttached](/reference/nodes/node#function-on-attached-ff71adbb):
+
+```cpp
+struct MyScene : public vglx::Scene {
+    MyScene() {}
+
+    auto OnAttached(vglx::SharedContextPointer context) -> void override {
+        context->camera->TranslateZ(3.0f); // push the camera back
+    }
+
+    auto OnUpdate(float delta) -> void override {}
+};
+```
+VGLX uses a right-handed coordinate system so moving the camera along `+Z` pushes it back toward the viewer while leaving the origin in front of it. With the camera in place we can add something to look at.
+
+To render anything we need a renderable node. The most common one is a [Mesh](/reference/nodes/mesh). A mesh combines two pieces: a [Geometry](/reference/geometries/geometry) which defines what to draw and a [Material](/reference/materials/material) which defines how it should be drawn.
+
+For a simple 3D box we can use the built-in [BoxGeometry](/reference/geometries/box_geometry) primitive, and because we want lighting in the scene we’ll pair it with a [PhongMaterial](/reference/materials/phong_material):
+
+```cpp
+struct MyScene : public vglx::Scene {
+    // create a new mesh
+    std::shared_ptr<vglx::Mesh> mesh = vglx::Mesh::Create(
+        vglx::BoxGeometry::Create(),
+        vglx::PhongMaterial::Create(0x049EF4)
+    );
+
+    MyScene() {
+        Add(mesh); // add mesh to the scene
+    }
+
+    auto OnAttached(vglx::SharedContextPointer context) -> void override {
+        context->camera->TranslateZ(3.0f);
+    }
+
+    auto OnUpdate(float delta) -> void override {}
+};
+```
 
 ## The Result
 
