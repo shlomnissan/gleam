@@ -205,52 +205,63 @@ If we ran the application now we still wouldn’t see anything, because the scen
 We can add and configure both lights in our scene’s constructor:
 
 ```cpp
-struct MyScene : public vglx::Scene {
-    std::shared_ptr<vglx::Mesh> mesh = vglx::Mesh::Create(
-        vglx::BoxGeometry::Create(),
-        vglx::PhongMaterial::Create(0x049EF4)
-    );
+MyScene() {
+    auto ambient_light = vglx::AmbientLight::Create({
+        .color = 0xFFFFFF,
+        .intensity = 0.5f
+    });
 
-    MyScene() {
-        auto ambient_light = vglx::AmbientLight::Create({
-            .color = 0xFFFFFF,
-            .intensity = 0.5f
-        });
+    auto point_light = vglx::PointLight::Create({
+        .color = 0xFFFFFF,
+        .intensity = 1.0f
+    });
 
-        auto point_light = vglx::PointLight::Create({
-            .color = 0xFFFFFF,
-            .intensity = 1.0f
-        });
+    point_light->transform.Translate({2.0f, 2.5f, 4.0f});
 
-        point_light->transform.Translate({2.0f, 2.5f, 4.0f});
-
-        Add(ambient_light);
-        Add(point_light);
-        Add(mesh);
-    }
-
-    auto OnAttached(vglx::SharedContextPointer context) -> void override {
-        context->camera->TranslateZ(3.0f);
-    }
-
-    auto OnUpdate(float delta) -> void override {}
-};
+    Add(ambient_light);
+    Add(point_light);
+    Add(mesh);
+}
 ```
 
 Both light sources need a color and an intensity. Unlike the ambient light, the point light is positional so we move it slightly up, to the right, and back to give the scene some depth.
 
 If you run the application now you should see a blue square in the center of the window. That’s the front face of the box viewed straight on. Next we’ll animate it so the 3D shape becomes obvious.
 
-![Window displaying a blue box](/guide_static_cube.png "Window displaying a blue box")
+![Window showing a blue box](/guide_static_cube.png "Window showing a blue box")
 
-## The Result
+## Basic Animation
+
+To keep things simple we’ll animate the scene by rotating the box around the `X` and `Y` axes. All animation in VGLX happens inside a node’s update hook. In our case that’s the scene’s [OnUpdate](/reference/nodes/node#function-on-update-86a04f9c) function, which is called once per frame.
+
+```cpp
+auto OnUpdate(float delta) -> void override {
+    const auto rotation_speed = vglx::math::pi_over_2;
+    mesh->RotateX(rotation_speed * delta);
+    mesh->RotateY(rotation_speed * delta);
+}
+```
+
+The `delta` parameter represents the time, in seconds, since the previous frame. By scaling the rotation by delta the animation becomes time-based rather than frame-based. This ensures the cube rotates at the same speed regardless of frame rate.
+
+If you run the application now, the square becomes a rotating cube, making the 3D nature of the scene clear.
+
+![Window showing a rotating 3D cube](/guide_rotating_cube.png "Window showing a rotating 3D cube box")
+
+## Conclusion
+
+In this guide we built a minimal VGLX application from scratch. We created a project, set up the application runtime, defined a custom scene, and populated it with a mesh, lights, and a camera. Finally, we added a simple animation to bring the scene to life.
+
+This small example touches most of the core concepts you’ll use in any VGLX project: the application lifecycle, the scene graph, renderable nodes, lighting, transforms, and per-frame updates.
+
+From here you can start experimenting. Try adding more meshes, changing materials, or introducing different types of lights. When you’re ready to go further, take a look at camera controls, input handling, and custom materials in the [reference documentation](/reference/core/application).
+
+The complete source code for this example is shown below for reference:
 
 ```cpp
 #include <vglx/vglx.hpp>
 
 #include <memory>
-
-constexpr static float kRotationSpeed = vglx::math::pi_over_2;
 
 struct MyScene : public vglx::Scene {
     std::shared_ptr<vglx::Mesh> mesh = vglx::Mesh::Create(
@@ -281,8 +292,9 @@ struct MyScene : public vglx::Scene {
     }
 
     auto OnUpdate(float delta) -> void override {
-        mesh->RotateX(kRotationSpeed * delta);
-        mesh->RotateY(kRotationSpeed * delta);
+        const auto rotation_speed = vglx::math::pi_over_2;
+        mesh->RotateX(rotation_speed * delta);
+        mesh->RotateY(rotation_speed * delta);
     }
 };
 
