@@ -123,6 +123,8 @@ The last function, [Update](/reference/core/application#function-update-d40fe494
 
 In `main` we create an instance of the app and call [Start](/reference/core/application#function-start-28ef28d7) to launch it. If you build and run the project again you should see a window for your new VGLX application.
 
+![Empty VGLX application window](/guide_empty_window.png "Empty VGLX application window")
+
 ## Creating a Scene
 
 Before you can put anything in your world you need a [Scene](/reference/nodes/scene). The scene is the root of your graph: every node hangs from it, inherits its state, and contributes to the final frame. It’s the anchor that ties cameras, lights, and geometry into a coherent world the renderer can walk.
@@ -197,6 +199,49 @@ struct MyScene : public vglx::Scene {
     auto OnUpdate(float delta) -> void override {}
 };
 ```
+
+If we ran the application now we still wouldn’t see anything, because the scene has no light sources. For this demo we’ll add two: an [AmbientLight](/reference/lights/ambient_light) which illuminates everything uniformly from all directions, and a [PointLight](/reference/lights/point_light) which represents a light source at a specific position that emits light in all directions like a small bulb.
+
+We can add and configure both lights in our scene’s constructor:
+
+```cpp
+struct MyScene : public vglx::Scene {
+    std::shared_ptr<vglx::Mesh> mesh = vglx::Mesh::Create(
+        vglx::BoxGeometry::Create(),
+        vglx::PhongMaterial::Create(0x049EF4)
+    );
+
+    MyScene() {
+        auto ambient_light = vglx::AmbientLight::Create({
+            .color = 0xFFFFFF,
+            .intensity = 0.5f
+        });
+
+        auto point_light = vglx::PointLight::Create({
+            .color = 0xFFFFFF,
+            .intensity = 1.0f
+        });
+
+        point_light->transform.Translate({2.0f, 2.5f, 4.0f});
+
+        Add(ambient_light);
+        Add(point_light);
+        Add(mesh);
+    }
+
+    auto OnAttached(vglx::SharedContextPointer context) -> void override {
+        context->camera->TranslateZ(3.0f);
+    }
+
+    auto OnUpdate(float delta) -> void override {}
+};
+```
+
+Both light sources need a color and an intensity. Unlike the ambient light, the point light is positional so we move it slightly up, to the right, and back to give the scene some depth.
+
+If you run the application now you should see a blue square in the center of the window. That’s the front face of the box viewed straight on. Next we’ll animate it so the 3D shape becomes obvious.
+
+![Window displaying a blue box](/guide_static_cube.png "Window displaying a blue box")
 
 ## The Result
 
