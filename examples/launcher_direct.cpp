@@ -19,7 +19,7 @@ auto main() -> int {
         .width = 1024,
         .height = 768,
         .antialiasing = 4,
-        .vsync = true
+        .vsync = false
     }};
     auto init_window = window.Initialize();
     if (!init_window) {

@@ -22,7 +22,7 @@ public:
             .width = 1024,
             .height = 768,
             .antialiasing = 4,
-            .vsync = true,
+            .vsync = false,
             .show_stats = true
         };
     }
