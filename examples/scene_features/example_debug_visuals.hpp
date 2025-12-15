@@ -12,6 +12,8 @@
 #include <memory>
 #include <string>
 
+#include <vglx/helpers.hpp>
+
 #include "example_scene.hpp"
 
 class ExampleDebugVisuals : public ExampleScene {

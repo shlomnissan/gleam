@@ -34,7 +34,7 @@ namespace vglx {
  * my_scene->Add(grid);
  * @endcode
  *
- * @ingroup NodesGroup
+ * @ingroup HelpersGroup
  */
 class VGLX_EXPORT Grid : public Node {
 public:

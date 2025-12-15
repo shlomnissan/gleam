@@ -7,7 +7,7 @@
 
 #include "example_sprite.hpp"
 
-#include "vglx/nodes/orbit_controls.hpp"
+#include <vglx/helpers.hpp>
 
 #include <print>
 

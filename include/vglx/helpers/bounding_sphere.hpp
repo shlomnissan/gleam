@@ -35,7 +35,7 @@ namespace vglx {
  * my_scene->Add(bounds);
  * @endcode
  *
- * @ingroup NodesGroup
+ * @ingroup HelpersGroup
  */
 class VGLX_EXPORT BoundingSphere : public Node {
 public:

@@ -5,7 +5,7 @@
 ===========================================================================
 */
 
-#include "vglx/nodes/orbit_controls.hpp"
+#include "vglx/helpers/orbit_controls.hpp"
 
 #include "vglx/math/spherical.hpp"
 #include "vglx/math/vector2.hpp"

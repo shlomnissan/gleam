@@ -37,7 +37,7 @@ namespace vglx {
  * my_scene->Add(arrow);
  * @endcode
  *
- * @ingroup NodesGroup
+ * @ingroup HelpersGroup
  */
 class VGLX_EXPORT Arrow : public Node {
 public:

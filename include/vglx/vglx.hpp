@@ -11,6 +11,7 @@
 #include "vglx/core.hpp"
 #include "vglx/events.hpp"
 #include "vglx/geometries.hpp"
+#include "vglx/helpers.hpp"
 #include "vglx/lights.hpp"
 #include "vglx/loaders.hpp"
 #include "vglx/materials.hpp"

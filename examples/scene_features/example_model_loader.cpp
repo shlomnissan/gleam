@@ -9,6 +9,7 @@
 
 #include "ui_helpers.hpp"
 
+#include <vglx/helpers.hpp>
 #include <vglx/lights.hpp>
 
 #include <print>

@@ -41,7 +41,7 @@ namespace vglx {
  * }
  * @endcode
  *
- * @ingroup NodesGroup
+ * @ingroup HelpersGroup
  */
 class VGLX_EXPORT OrbitControls : public Node {
 public:

@@ -5,7 +5,7 @@
 ===========================================================================
 */
 
-#include "vglx/nodes/bounding_box.hpp"
+#include "vglx/helpers/bounding_box.hpp"
 
 #include "vglx/geometries/geometry.hpp"
 #include "vglx/materials/unlit_material.hpp"

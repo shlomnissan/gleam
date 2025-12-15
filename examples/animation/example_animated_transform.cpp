@@ -8,6 +8,7 @@
 #include "example_animated_transform.hpp"
 
 #include <vglx/geometries.hpp>
+#include <vglx/helpers.hpp>
 #include <vglx/lights.hpp>
 
 #include <cmath>

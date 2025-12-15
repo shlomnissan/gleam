@@ -5,7 +5,7 @@
 ===========================================================================
 */
 
-#include "vglx/nodes/grid.hpp"
+#include "vglx/helpers/grid.hpp"
 
 #include "vglx/materials/unlit_material.hpp"
 #include "vglx/nodes/mesh.hpp"

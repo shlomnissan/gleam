@@ -5,7 +5,7 @@
 ===========================================================================
 */
 
-#include "vglx/nodes/arrow.hpp"
+#include "vglx/helpers/arrow.hpp"
 
 #include "vglx/geometries/cone_geometry.hpp"
 #include "vglx/geometries/geometry.hpp"

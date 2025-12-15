@@ -10,6 +10,7 @@
 #include "ui_helpers.hpp"
 
 #include <vglx/geometries.hpp>
+#include <vglx/helpers.hpp>
 
 using namespace vglx;
 

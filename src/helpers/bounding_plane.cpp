@@ -5,7 +5,7 @@
 ===========================================================================
 */
 
-#include "vglx/nodes/bounding_plane.hpp"
+#include "vglx/helpers/bounding_plane.hpp"
 
 #include "vglx/geometries/geometry.hpp"
 #include "vglx/geometries/wireframe_geometry.hpp"
