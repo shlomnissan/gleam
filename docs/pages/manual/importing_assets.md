@@ -16,9 +16,11 @@ This approach mirrors how integrated engines handle assets. Source files are fle
 
 The asset builder converts source assets into VGLX runtime formats. It runs offline and produces files that the engine can load directly. The interface is intentionally simple. A single input asset produces one or more runtime files depending on what is being imported.
 
-The easiest way to get the asset builder is through the VGLX installer. During installation you are prompted to install it alongside the engine. If enabled the binary is placed next to the other VGLX tools and is ready to use immediately.
+The easiest way to get the asset builder is through the VGLX installer. During installation you are prompted to install it alongside the engine. If enabled the installation directory you selected will contain a `bin` folder with the `asset_builder` executable.
 
 The asset builder is also included in the repository. When building VGLX from source you must enable the `VGLX_BUILD_ASSET_BUILDER` option to include it. This option is disabled by default in the project presets. Once built the executable can be run from the build output directory or copied into your project’s toolchain.
+
+It is recommended to add the directory containing `asset_builder` to your system’s `PATH` so the tool can be invoked from anywhere. On Linux and macOS this usually means updating your shell configuration. On Windows the directory can be added through the system environment variables.
 
 #### Supported File Formats
 
@@ -40,3 +42,9 @@ The asset builder exposes a small set of command-line options. Output paths and 
 | `-i`, `--input`  | Input file to convert (e.g. PNG or OBJ).          |
 | `-o`, `--output` | Output file path. If omitted a default is chosen. |
 | `-h`, `--help`   | Show help and exit.                               |
+
+## Importing Textures
+
+In this section we import a texture into VGLX. We start by converting a PNG file into a `.tex` asset then load it at runtime and apply it to a simple primitive.
+
+The source image used in this example is a downsampled version of a free UV checker map by Maurus Kamehameha. You can [download it here](/checker_map_maurus_downsampled.png) or find the [original source files here](https://drive.google.com/drive/folders/1K_G_hbFyohR8-xCCAlYx8xhsd_a7Ir7G).
