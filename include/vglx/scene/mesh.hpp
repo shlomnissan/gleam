@@ -33,7 +33,7 @@ namespace vglx {
  * my_scene->Add(mesh);
  * @endcode
  *
- * @ingroup NodesGroup
+ * @ingroup SceneGroup
  */
 class VGLX_EXPORT Mesh : public Renderable {
 public:

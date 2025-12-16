@@ -30,7 +30,7 @@ namespace vglx {
  * my_scene->fog = Fog::CreateExponential(0x444444, 0.3f);
  * @endcode
  *
- * @ingroup NodesGroup
+ * @ingroup SceneGroup
  */
 struct Fog {
     /**
