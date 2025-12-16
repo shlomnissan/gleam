@@ -10,7 +10,7 @@
 #include "vglx_export.h"
 
 #include "vglx/cameras/camera.hpp"
-#include "vglx/nodes/node.hpp"
+#include "vglx/scene/node.hpp"
 
 #include <memory>
 

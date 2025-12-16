@@ -5,7 +5,7 @@
 ===========================================================================
 */
 
-#include "vglx/nodes/mesh.hpp"
+#include "vglx/scene/mesh.hpp"
 
 #include "vglx/geometries/wireframe_geometry.hpp"
 

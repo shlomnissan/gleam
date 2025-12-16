@@ -8,7 +8,7 @@
 #pragma once
 
 #include <vglx/materials.hpp>
-#include <vglx/nodes.hpp>
+#include <vglx/scene.hpp>
 #include <vglx/textures.hpp>
 
 #include <memory>

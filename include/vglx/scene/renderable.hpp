@@ -12,7 +12,7 @@
 #include "vglx/geometries/geometry.hpp"
 #include "vglx/materials/material.hpp"
 #include "vglx/math/frustum.hpp"
-#include "vglx/nodes/node.hpp"
+#include "vglx/scene/node.hpp"
 
 #include <memory>
 

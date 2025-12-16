@@ -8,7 +8,7 @@
 #pragma once
 
 #include <vglx/core.hpp>
-#include <vglx/nodes.hpp>
+#include <vglx/scene.hpp>
 
 #include "example_scene.hpp"
 

@@ -11,8 +11,8 @@
 
 #include <vglx/helpers.hpp>
 #include <vglx/lights.hpp>
-#include <vglx/nodes.hpp>
 #include <vglx/primitives.hpp>
+#include <vglx/scene.hpp>
 
 using namespace vglx;
 

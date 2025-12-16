@@ -8,7 +8,7 @@
 #include "vglx/lights/directional_light.hpp"
 
 #include "vglx/materials/unlit_material.hpp"
-#include "vglx/nodes/mesh.hpp"
+#include "vglx/scene/mesh.hpp"
 
 namespace vglx {
 

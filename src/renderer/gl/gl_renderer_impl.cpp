@@ -12,9 +12,9 @@
 #include "vglx/materials/sprite_material.hpp"
 #include "vglx/materials/unlit_material.hpp"
 #include "vglx/math/vector3.hpp"
-#include "vglx/nodes/fog.hpp"
-#include "vglx/nodes/instanced_mesh.hpp"
-#include "vglx/nodes/sprite.hpp"
+#include "vglx/scene/fog.hpp"
+#include "vglx/scene/instanced_mesh.hpp"
+#include "vglx/scene/sprite.hpp"
 
 #include "core/program_attributes.hpp"
 #include "core/render_lists.hpp"

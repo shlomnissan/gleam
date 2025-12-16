@@ -9,8 +9,8 @@
 
 #include "vglx_export.h"
 
-#include "vglx/nodes/fog.hpp"
-#include "vglx/nodes/node.hpp"
+#include "vglx/scene/fog.hpp"
+#include "vglx/scene/node.hpp"
 
 #include <memory>
 

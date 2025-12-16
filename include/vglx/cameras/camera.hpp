@@ -12,7 +12,7 @@
 #include "vglx/math/frustum.hpp"
 #include "vglx/math/matrix4.hpp"
 #include "vglx/math/vector3.hpp"
-#include "vglx/nodes/node.hpp"
+#include "vglx/scene/node.hpp"
 
 namespace vglx {
 

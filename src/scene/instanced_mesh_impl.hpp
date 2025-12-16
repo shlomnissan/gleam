@@ -9,7 +9,7 @@
 
 #include "vglx/math/box3.hpp"
 #include "vglx/math/sphere.hpp"
-#include "vglx/nodes/instanced_mesh.hpp"
+#include "vglx/scene/instanced_mesh.hpp"
 
 namespace vglx {
 

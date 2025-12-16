@@ -9,8 +9,8 @@
 #include <test_helpers.hpp>
 
 #include <vglx/cameras/perspective_camera.hpp>
-#include <vglx/nodes/mesh.hpp>
-#include <vglx/nodes/node.hpp>
+#include <vglx/scene/mesh.hpp>
+#include <vglx/scene/node.hpp>
 
 #pragma region Node Operations
 

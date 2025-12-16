@@ -11,7 +11,7 @@
 
 #include "vglx/math/color.hpp"
 #include "vglx/math/plane.hpp"
-#include "vglx/nodes/node.hpp"
+#include "vglx/scene/node.hpp"
 
 #include <memory>
 

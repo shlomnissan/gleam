@@ -11,7 +11,7 @@
 
 #include "vglx/geometries/geometry.hpp"
 #include "vglx/materials/material.hpp"
-#include "vglx/nodes/renderable.hpp"
+#include "vglx/scene/renderable.hpp"
 
 #include <memory>
 

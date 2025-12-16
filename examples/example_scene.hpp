@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include <vglx/nodes.hpp>
 #include <vglx/cameras.hpp>
+#include <vglx/scene.hpp>
 
 class ExampleScene : public vglx::Scene {
 public:

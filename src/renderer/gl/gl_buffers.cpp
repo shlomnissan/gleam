@@ -9,7 +9,7 @@
 
 #include "vglx/math/vector4.hpp"
 
-#include "nodes/instanced_mesh_impl.hpp"
+#include "scene/instanced_mesh_impl.hpp"
 #include "utilities/logger.hpp"
 
 #include <cstdint>

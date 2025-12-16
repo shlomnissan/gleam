@@ -5,9 +5,9 @@
 ===========================================================================
 */
 
-#include "vglx/nodes/renderable.hpp"
+#include "vglx/scene/renderable.hpp"
 
-#include "vglx/nodes/mesh.hpp"
+#include "vglx/scene/mesh.hpp"
 
 #include "utilities/logger.hpp"
 

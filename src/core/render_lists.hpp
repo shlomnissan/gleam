@@ -10,9 +10,9 @@
 #include "vglx/cameras/camera.hpp"
 #include "vglx/lights/light.hpp"
 #include "vglx/math/frustum.hpp"
-#include "vglx/nodes/node.hpp"
-#include "vglx/nodes/renderable.hpp"
-#include "vglx/nodes/scene.hpp"
+#include "vglx/scene/node.hpp"
+#include "vglx/scene/renderable.hpp"
+#include "vglx/scene/scene.hpp"
 
 #include <memory>
 #include <span>

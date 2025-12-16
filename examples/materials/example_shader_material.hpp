@@ -9,7 +9,7 @@
 
 #include <vglx/core.hpp>
 #include <vglx/materials.hpp>
-#include <vglx/nodes.hpp>
+#include <vglx/scene.hpp>
 #include <vglx/utilities.hpp>
 
 #include <memory>

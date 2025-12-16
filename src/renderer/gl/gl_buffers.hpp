@@ -8,7 +8,7 @@
 #pragma once
 
 #include "vglx/geometries/geometry.hpp"
-#include "vglx/nodes/instanced_mesh.hpp"
+#include "vglx/scene/instanced_mesh.hpp"
 
 #include <array>
 #include <memory>

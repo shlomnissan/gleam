@@ -9,9 +9,9 @@
 
 #include "vglx_export.h"
 
-#include "vglx/nodes/mesh.hpp"
 #include "vglx/math/color.hpp"
 #include "vglx/math/matrix4.hpp"
+#include "vglx/scene/mesh.hpp"
 
 #include <memory>
 #include <optional>

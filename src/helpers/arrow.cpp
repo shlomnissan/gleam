@@ -9,8 +9,8 @@
 
 #include "vglx/geometries/geometry.hpp"
 #include "vglx/materials/unlit_material.hpp"
-#include "vglx/nodes/mesh.hpp"
 #include "vglx/primitives/cone_geometry.hpp"
+#include "vglx/scene/mesh.hpp"
 
 namespace vglx {
 

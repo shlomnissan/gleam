@@ -5,9 +5,9 @@
 ===========================================================================
 */
 
-#include "vglx/nodes/instanced_mesh.hpp"
+#include "vglx/scene/instanced_mesh.hpp"
 
-#include "nodes/instanced_mesh_impl.hpp"
+#include "scene/instanced_mesh_impl.hpp"
 
 #include <cassert>
 

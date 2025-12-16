@@ -9,7 +9,7 @@
 
 #include "example_scene.hpp"
 
-#include "vglx/nodes/sprite.hpp"
+#include "vglx/scene/sprite.hpp"
 
 #include <memory>
 

@@ -10,7 +10,7 @@
 #include "vglx/geometries/geometry.hpp"
 #include "vglx/geometries/wireframe_geometry.hpp"
 #include "vglx/materials/unlit_material.hpp"
-#include "vglx/nodes/mesh.hpp"
+#include "vglx/scene/mesh.hpp"
 
 #include <vector>
 

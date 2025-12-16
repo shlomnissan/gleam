@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "vglx/nodes/renderable.hpp"
-#include "vglx/nodes/scene.hpp"
+#include "vglx/scene/renderable.hpp"
+#include "vglx/scene/scene.hpp"
 
 #include <cstdint>
 #include <string_view>

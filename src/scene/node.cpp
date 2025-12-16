@@ -5,7 +5,7 @@
 ===========================================================================
 */
 
-#include "vglx/nodes/node.hpp"
+#include "vglx/scene/node.hpp"
 
 #include "vglx/cameras/camera.hpp"
 

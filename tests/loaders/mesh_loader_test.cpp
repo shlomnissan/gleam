@@ -9,7 +9,7 @@
 
 #include <vglx/geometries/geometry.hpp>
 #include <vglx/loaders/mesh_loader.hpp>
-#include <vglx/nodes/mesh.hpp>
+#include <vglx/scene/mesh.hpp>
 
 #include <future>
 #include <thread>

@@ -7,12 +7,11 @@
 
 #pragma once
 
-#include <vglx/nodes.hpp>
-
 #include <memory>
 #include <string>
 
 #include <vglx/helpers.hpp>
+#include <vglx/scene.hpp>
 
 #include "example_scene.hpp"
 

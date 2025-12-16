@@ -10,7 +10,7 @@
 #include <vglx/core.hpp>
 #include <vglx/materials.hpp>
 #include <vglx/math.hpp>
-#include <vglx/nodes.hpp>
+#include <vglx/scene.hpp>
 
 #include "example_scene.hpp"
 

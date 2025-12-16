@@ -11,7 +11,7 @@
 
 #include "vglx/cameras/camera.hpp"
 #include "vglx/math/color.hpp"
-#include "vglx/nodes/scene.hpp"
+#include "vglx/scene/scene.hpp"
 
 #include <memory>
 #include <string>

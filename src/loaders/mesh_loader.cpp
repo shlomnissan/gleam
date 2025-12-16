@@ -11,8 +11,8 @@
 #include "vglx/geometries/geometry.hpp"
 #include "vglx/materials/phong_material.hpp"
 #include "vglx/math/color.hpp"
-#include "vglx/nodes/mesh.hpp"
-#include "vglx/nodes/node.hpp"
+#include "vglx/scene/mesh.hpp"
+#include "vglx/scene/node.hpp"
 #include "vglx/textures/texture_2d.hpp"
 
 #include "utilities/logger.hpp"

@@ -8,8 +8,8 @@
 #include "vglx/lights/point_light.hpp"
 
 #include "vglx/materials/unlit_material.hpp"
-#include "vglx/nodes/mesh.hpp"
 #include "vglx/primitives/sphere_geometry.hpp"
+#include "vglx/scene/mesh.hpp"
 
 namespace vglx {
 

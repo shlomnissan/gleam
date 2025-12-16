@@ -5,7 +5,7 @@
 ===========================================================================
 */
 
-#include "vglx/nodes/sprite.hpp"
+#include "vglx/scene/sprite.hpp"
 
 namespace vglx {
 

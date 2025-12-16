@@ -13,7 +13,7 @@
 #include "vglx/materials/material.hpp"
 #include "vglx/materials/sprite_material.hpp"
 #include "vglx/math/vector2.hpp"
-#include "vglx/nodes/renderable.hpp"
+#include "vglx/scene/renderable.hpp"
 
 #include <memory>
 

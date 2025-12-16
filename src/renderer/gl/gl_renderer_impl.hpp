@@ -8,7 +8,7 @@
 #pragma once
 
 #include "vglx/core/renderer.hpp"
-#include "vglx/nodes/renderable.hpp"
+#include "vglx/scene/renderable.hpp"
 
 #include "renderer/gl/gl_buffers.hpp"
 #include "renderer/gl/gl_camera.hpp"
