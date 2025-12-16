@@ -17,5 +17,6 @@
 #include "vglx/materials.hpp"
 #include "vglx/math.hpp"
 #include "vglx/nodes.hpp"
+#include "vglx/primitives.hpp"
 #include "vglx/textures.hpp"
 #include "vglx/utilities.hpp"

@@ -5,7 +5,7 @@
 ===========================================================================
 */
 
-#include "vglx/geometries/cylinder_geometry.hpp"
+#include "vglx/primitives/cylinder_geometry.hpp"
 
 #include "vglx/math/utilities.hpp"
 #include "vglx/math/vector3.hpp"

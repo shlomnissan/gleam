@@ -5,7 +5,7 @@
 ===========================================================================
 */
 
-#include "vglx/geometries/sphere_geometry.hpp"
+#include "vglx/primitives/sphere_geometry.hpp"
 
 #include "vglx/math/vector3.hpp"
 #include "vglx/math/utilities.hpp"

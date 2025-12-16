@@ -5,7 +5,7 @@
 ===========================================================================
 */
 
-#include "vglx/geometries/box_geometry.hpp"
+#include "vglx/primitives/box_geometry.hpp"
 
 #include <cassert>
 

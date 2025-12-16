@@ -7,11 +7,11 @@
 
 #include "example_mesh_instancing.hpp"
 
-#include <vglx/geometries.hpp>
 #include <vglx/helpers.hpp>
 #include <vglx/lights.hpp>
 #include <vglx/materials.hpp>
 #include <vglx/math.hpp>
+#include <vglx/primitives.hpp>
 
 #include <array>
 

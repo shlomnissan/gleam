@@ -9,9 +9,9 @@
 
 #include "ui_helpers.hpp"
 
-#include <vglx/geometries.hpp>
 #include <vglx/helpers.hpp>
 #include <vglx/loaders.hpp>
+#include <vglx/primitives.hpp>
 #include <vglx/textures.hpp>
 
 #include <print>

@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include <vglx/geometries.hpp>
 #include <vglx/nodes.hpp>
+#include <vglx/primitives.hpp>
 
 #include <memory>
 #include <string>

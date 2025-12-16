@@ -11,6 +11,7 @@
 
 #include <vglx/helpers.hpp>
 #include <vglx/lights.hpp>
+#include <vglx/primitives.hpp>
 
 #include <print>
 

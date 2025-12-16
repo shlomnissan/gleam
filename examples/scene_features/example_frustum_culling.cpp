@@ -7,10 +7,10 @@
 
 #include "example_frustum_culling.hpp"
 
-#include <vglx/geometries.hpp>
 #include <vglx/helpers.hpp>
 #include <vglx/lights.hpp>
 #include <vglx/materials.hpp>
+#include <vglx/primitives.hpp>
 
 using namespace vglx;
 

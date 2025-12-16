@@ -178,7 +178,7 @@ VGLX uses a right-handed coordinate system so moving the camera along `+Z` pushe
 
 To render anything we need a renderable node. The most common one is a [Mesh](/reference/nodes/mesh). A mesh combines two pieces: a [Geometry](/reference/geometries/geometry) which defines what to draw and a [Material](/reference/materials/material) which defines how it should be drawn.
 
-For a simple 3D box we can use the built-in [BoxGeometry](/reference/geometries/box_geometry) primitive, and because we want lighting in the scene we’ll pair it with a [PhongMaterial](/reference/materials/phong_material):
+For a simple 3D box we can use the built-in [BoxGeometry](/reference/primitives/box_geometry) primitive, and because we want lighting in the scene we’ll pair it with a [PhongMaterial](/reference/materials/phong_material):
 
 ```cpp
 struct MyScene : public vglx::Scene {

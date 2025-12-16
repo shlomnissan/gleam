@@ -36,7 +36,7 @@ namespace vglx {
  * my_scene->Add(vglx::Mesh::Create(geometry, material));
  * @endcode
  *
- * @ingroup GeometryGroup
+ * @ingroup PrimitivesGroup
  */
 class VGLX_EXPORT PlaneGeometry : public Geometry {
 public:

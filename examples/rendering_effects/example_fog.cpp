@@ -10,11 +10,11 @@
 #include "ui_helpers.hpp"
 
 #include <vglx/core.hpp>
-#include <vglx/geometries.hpp>
 #include <vglx/helpers.hpp>
 #include <vglx/lights.hpp>
 #include <vglx/materials.hpp>
 #include <vglx/nodes.hpp>
+#include <vglx/primitives.hpp>
 
 using namespace vglx;
 

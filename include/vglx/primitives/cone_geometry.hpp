@@ -9,8 +9,8 @@
 
 #include "vglx_export.h"
 
-#include "vglx/geometries/cylinder_geometry.hpp"
 #include "vglx/geometries/geometry.hpp"
+#include "vglx/primitives/cylinder_geometry.hpp"
 
 #include <memory>
 
@@ -38,7 +38,7 @@ namespace vglx {
  * my_scene->Add(vglx::Mesh::Create(geometry, material));
  * @endcode
  *
- * @ingroup GeometryGroup
+ * @ingroup PrimitivesGroup
  */
 class VGLX_EXPORT ConeGeometry : public CylinderGeometry {
 public:

@@ -9,9 +9,9 @@
 
 #include "ui_helpers.hpp"
 
-#include <vglx/geometries.hpp>
 #include <vglx/helpers.hpp>
 #include <vglx/nodes.hpp>
+#include <vglx/primitives.hpp>
 
 using namespace vglx;
 
