@@ -12,13 +12,14 @@
 #include "events/event_dispatcher.hpp"
 #include "utilities/logger.hpp"
 
+#include <algorithm>
 #include <queue>
 #include <ranges>
 
 namespace vglx {
 
 struct Node::Impl {
-    std::vector<std::shared_ptr<Node>> children;
+    std::vector<std::unique_ptr<Node>> children;
 
     Node* parent {nullptr};
 
@@ -31,36 +32,46 @@ struct Node::Impl {
 
 Node::Node() : impl_(std::make_unique<Impl>()) {};
 
-auto Node::Add(const std::shared_ptr<Node>& node) -> void {
+auto Node::AddImpl(const std::unique_ptr<Node> node) -> Node* {
     if (node == nullptr) {
         Logger::Log(LogLevel::Error, "Attempting to add invalid node");
-        return;
+        return nullptr;
     }
 
     if (node->impl_->parent) {
-        node->impl_->parent->Remove(node);
+        node->impl_->parent->Remove(node.get());
     }
     node->impl_->parent = this;
     impl_->children.emplace_back(node);
 
     EventDispatcher::Get().Dispatch(
         "node_added",
-        std::make_unique<SceneEvent>(SceneEvent::Type::NodeAdded, node)
+        std::make_unique<SceneEvent>(SceneEvent::Type::NodeAdded, node.get())
     );
 }
 
-auto Node::Remove(const std::shared_ptr<Node>& node) -> void {
+auto Node::Detach(Node* node) -> std::unique_ptr<Node> {
+    return nullptr;
+}
+
+auto Node::Remove(Node* node) -> void {
     if (node == nullptr) {
         Logger::Log(LogLevel::Error, "Attempting to remove invalid node");
         return;
     }
 
-    auto it = std::ranges::find(impl_->children, node);
+    auto it = std::ranges::find_if(impl_->children,
+        [node](const auto& unique_ptr_node) {
+            return unique_ptr_node.get() == node;
+        }
+    );
+
     if (it != impl_->children.end()) {
         EventDispatcher::Get().Dispatch(
             "node_removed",
             std::make_unique<SceneEvent>(SceneEvent::Type::NodeRemoved, node)
         );
+
         impl_->children.erase(it);
         node->impl_->parent = nullptr;
         node->impl_->attached = false;
@@ -81,8 +92,10 @@ auto Node::RemoveAllChildren() -> void {
     impl_->children.clear();
 }
 
-auto Node::Children() const -> const std::vector<std::shared_ptr<Node>>& {
-    return impl_->children;
+auto Node::Children() const -> std::span<Node* const> {
+    return impl_->children
+        | std::views::transform([](const auto& uptr) { return uptr.get(); })
+        | std::ranges::to<std::vector<Node* const>>();
 }
 
 auto Node::IsChild(const Node* node) const -> bool {
@@ -91,8 +104,8 @@ auto Node::IsChild(const Node* node) const -> bool {
         return false;
     }
 
-    auto to_process = std::queue<std::shared_ptr<Node>>();
-    for (const auto& child : impl_->children) {
+    auto to_process = std::queue<Node*> {};
+    for (auto child : Children()) {
         to_process.push(child);
     }
 
@@ -101,8 +114,8 @@ auto Node::IsChild(const Node* node) const -> bool {
         for (auto i = 0; i < len; ++i) {
             const auto current = to_process.front();
             to_process.pop();
-            if (current.get() == node) return true;
-            for (const auto& child : current->impl_->children) {
+            if (current == node) return true;
+            for (auto child : current->Children()) {
                 to_process.push(child);
             }
         }
@@ -124,7 +137,7 @@ auto Node::UpdateTransformHierarchy() -> void {
         impl_->world_transform_touched = true;
     }
 
-    for (const auto child : impl_->children) {
+    for (const auto child : Children()) {
         if (child != nullptr) {
             child->UpdateTransformHierarchy();
         }

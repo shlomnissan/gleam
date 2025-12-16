@@ -45,10 +45,10 @@ struct VGLX_EXPORT SceneEvent : public Event {
     /**
      * @brief The node that was added or removed.
      *
-     * Holds a shared reference to the affected node at the time the event
+     * Holds a non-owning reference to the affected node at the time the event
      * was generated.
      */
-    std::shared_ptr<Node> node;
+    Node* node;
 
     /// @brief The @ref SceneEvent::Type "type" of this event.
     SceneEvent::Type type;
@@ -59,11 +59,8 @@ struct VGLX_EXPORT SceneEvent : public Event {
      * @param type The @ref SceneEvent::Type "type" of scene change.
      * @param node The @ref Node "node" that was affected.
      */
-    SceneEvent(Type type, std::shared_ptr<Node> node) : type(type), node(node) {}
+    SceneEvent(Type type, Node* node) : type(type), node(node) {}
 
-    /**
-     * @brief Identifies this event as @ref Event::Type "Event::Type::Scene".
-     */
     auto GetType() const -> Event::Type override {
         return Event::Type::Scene;
     }

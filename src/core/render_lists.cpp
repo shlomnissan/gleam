@@ -12,15 +12,12 @@
 
 namespace vglx {
 
-// Compare function for sorting meshes based on their z position.
-
-
 auto RenderLists::ProcessScene(Scene* scene, Camera* camera) -> void {
     Reset();
 
     const auto frustum = camera->GetFrustum();
     for (const auto& child : scene->Children()) {
-        ProcessNode(child.get(), frustum);
+        ProcessNode(child, frustum);
     }
 
     const auto c = camera->GetWorldPosition();
@@ -57,7 +54,7 @@ auto RenderLists::ProcessNode(Node* node, const Frustum& frustum) -> void {
     }
 
     for (const auto& child : node->Children()) {
-        ProcessNode(child.get(), frustum);
+        ProcessNode(child, frustum);
     }
 }
 
