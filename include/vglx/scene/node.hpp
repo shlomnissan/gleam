@@ -40,7 +40,7 @@ namespace vglx {
  * Nodes can opt out of automatic transform updates via @ref transform_auto_update
  * or disable visibility tests using @ref frustum_culled when needed.
  *
- * @ingroup NodesGroup
+ * @ingroup SceneGroup
  */
 class VGLX_EXPORT Node : public Identity {
 public:

@@ -47,7 +47,7 @@ namespace vglx {
  * }
  * @endcode
  *
- * @ingroup NodesGroup
+ * @ingroup SceneGroup
  */
 class VGLX_EXPORT Sprite : public Renderable {
 public:

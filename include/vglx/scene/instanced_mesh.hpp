@@ -51,7 +51,7 @@ namespace vglx {
  * culling is performed coarsely using a single bounding volume that determines
  * the visibility of the entire instance set as a whole.
  *
- * @ingroup NodesGroup
+ * @ingroup SceneGroup
  */
 class VGLX_EXPORT InstancedMesh : public Mesh {
 public:

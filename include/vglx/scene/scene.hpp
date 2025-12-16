@@ -53,7 +53,7 @@ namespace vglx {
  * };
  * @endcode
  *
- * @ingroup NodesGroup
+ * @ingroup SceneGroup
  */
 class VGLX_EXPORT Scene : public Node {
 public:
