@@ -19,7 +19,7 @@
 #include "vglx/math/vector3.hpp"
 
 #include <memory>
-#include <vector>
+#include <span>
 
 namespace vglx {
 
@@ -80,10 +80,10 @@ public:
     Node();
 
     /**
-     * @brief Creates a shared instance of @ref Node.
+     * @brief Creates an instance of @ref Node.
      */
-    [[nodiscard]] static auto Create() -> std::shared_ptr<Node> {
-        return std::make_shared<Node>();
+    [[nodiscard]] static auto Create() -> std::unique_ptr<Node> {
+        return std::make_unique<Node>();
     }
 
     /**
@@ -112,29 +112,54 @@ public:
      */
 
     /**
-     * @brief Adds a child node to this node.
+     * @brief Adds a child node to this node and return a non-owning reference.
      *
-     * If the node already has a parent, it is automatically removed from its
-     * previous parent before being attached here. The new child receives this
-     * node as its parent, is appended to the children list, and a
+     * This overload transfers ownership of `node` into this node’s children list.
+     * The scene graph is the sole owner of all nodes. The returned pointer is a
+     * non-owning reference that remains valid only while the node is attached to
+     * the scene graph. If the node already has a parent it is first detached from
+     * its previous parent and then reattached here. A
      * @ref SceneEvent::Type "SceneEvent::NodeAdded" event is dispatched.
-     * Adding a null pointer logs an error and has no effect.
      *
-     * @param node Child node to attach.
+     * @tparam T Concrete node type. Must derive from @ref Node.
+     * @param node Child node to attach. Ownership is transferred.
+     *
+     * @warning The returned pointer becomes invalid if the node is removed from the
+     * scene graph or if the owning scene is destroyed.
      */
-    auto Add(const std::shared_ptr<Node>& node) -> void;
+    template <typename T>
+    requires std::derived_from<T, Node>
+    [[nodiscard]] auto Add(std::unique_ptr<T> node) -> T* {
+        return static_cast<T*>(AddImpl(std::unique_ptr<Node>(std::move(node))));
+    }
 
     /**
-     * @brief Removes a specific child node from this node.
+     * @brief Detaches a direct child node from this node and returns ownership.
      *
-     * If the node exists in the children list, it is detached: its parent pointer
-     * is cleared, its `attached` flag is reset, and its local transform is marked
+     * Removes `node` from this node’s children list without destroying it and
+     * returns the owned subtree as a `std::unique_ptr`. The detached node’s parent
+     * pointer is cleared, its attached state is reset, and its transform is marked
      * dirty. A @ref SceneEvent::Type "SceneEvent::NodeRemoved" event is dispatched.
-     * Removing a null pointer logs an error and does nothing.
      *
-     * @param node Child node to detach.
+     * @param node Direct child node to detach.
      */
-    auto Remove(const std::shared_ptr<Node>& node) -> void;
+    [[nodiscard]] auto Detach(Node* node) -> std::unique_ptr<Node>;
+
+    /**
+     * @brief Removes a direct child node from this node and destroys it.
+     *
+     * If `node` exists in the children list it is detached and destroyed as part
+     * of removing its owning `std::unique_ptr`. The node is first marked as
+     * detached (parent cleared, attached reset, transform marked dirty) and a
+     * @ref SceneEvent::Type "SceneEvent::NodeRemoved" event is dispatched before
+     * destruction occurs.
+     *
+     * @param node Direct child node to remove.
+     *
+     * @warning Any external pointers or references to the removed node become invalid
+     * immediately after this call.
+     */
+    auto Remove(Node* node) -> void;
 
     /**
      * @brief Removes all children from this node.
@@ -172,9 +197,12 @@ public:
     auto UpdateWorldTransform() -> void;
 
     /**
-     * @brief Returns the list of direct children of this node.
+     * @brief Returns a view of this node’s direct children.
+     *
+     * The returned span contains non-owning pointers to child nodes. The pointers
+     * remain valid only while the children remain attached to this node.
      */
-    [[nodiscard]] auto Children() const -> const std::vector<std::shared_ptr<Node>>&;
+    [[nodiscard]] auto Children() const -> std::span<Node* const>;
 
     /**
      * @brief Checks whether the given node exists anywhere in this node’s subtree.
@@ -335,6 +363,8 @@ private:
     /// @cond INTERNAL
     class Impl;
     std::unique_ptr<Impl> impl_;
+
+    [[nodiscard]] auto AddImpl(std::unique_ptr<Node> node) -> Node*;
 
     friend class Scene;
     auto AttachRecursive(SharedContextPointer context) -> void;
