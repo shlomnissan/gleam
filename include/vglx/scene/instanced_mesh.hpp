@@ -148,9 +148,6 @@ private:
     std::vector<Color> colors_;
     std::vector<Matrix4> transforms_;
 
-    std::optional<Box3> bounding_box_;
-    std::optional<Sphere> bounding_sphere_;
-
     std::size_t count_;
 
     friend class GLBuffers;

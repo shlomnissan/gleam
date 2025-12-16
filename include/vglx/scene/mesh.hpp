@@ -69,14 +69,14 @@ public:
     /**
      * @brief Returns the geometry used by this mesh.
      */
-    [[nodiscard]] auto GetGeometry() -> std::shared_ptr<Geometry> override {
+    [[nodiscard]] auto GetGeometry() const -> std::shared_ptr<Geometry> override {
         return geometry_;
     }
 
     /**
      * @brief Returns the material used by this mesh.
      */
-    [[nodiscard]] auto GetMaterial() -> std::shared_ptr<Material> override {
+    [[nodiscard]] auto GetMaterial() const -> std::shared_ptr<Material> override {
         return material_;
     }
 

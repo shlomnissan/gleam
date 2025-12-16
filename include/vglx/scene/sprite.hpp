@@ -99,7 +99,7 @@ public:
     /**
      * @brief Returns the material associated with the sprite.
      */
-    [[nodiscard]] auto GetMaterial() -> std::shared_ptr<Material> override {
+    [[nodiscard]] auto GetMaterial() const -> std::shared_ptr<Material> override {
         return material_;
     }
 
@@ -113,7 +113,7 @@ public:
     }
 
     /// @cond INTERNAL
-    [[nodiscard]] auto GetGeometry() -> std::shared_ptr<Geometry> override {
+    [[nodiscard]] auto GetGeometry() const -> std::shared_ptr<Geometry> override {
         return geometry_;
     }
     /// @endcond

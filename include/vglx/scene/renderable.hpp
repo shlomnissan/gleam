@@ -30,9 +30,9 @@ class VGLX_EXPORT Renderable : public Node {
 public:
     virtual ~Renderable() override = default;
 
-    [[nodiscard]] virtual auto GetGeometry() -> std::shared_ptr<Geometry> = 0;
+    [[nodiscard]] virtual auto GetGeometry() const -> std::shared_ptr<Geometry> = 0;
 
-    [[nodiscard]] virtual auto GetMaterial() -> std::shared_ptr<Material> = 0;
+    [[nodiscard]] virtual auto GetMaterial() const -> std::shared_ptr<Material> = 0;
 
     [[nodiscard]] virtual auto BoundingBox() -> Box3;
 
