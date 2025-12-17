@@ -60,13 +60,13 @@ public:
     explicit DirectionalLight(const Parameters& params);
 
     /**
-     * @brief Creates a shared instance of @ref DirectionalLight.
+     * @brief Creates an instance of @ref DirectionalLight.
      *
      * @param params @ref DirectionalLight::Parameters "Initialization parameters"
      * for constructing the light.
      */
-    [[nodiscard]] static auto Create(const Parameters& params) -> std::shared_ptr<DirectionalLight> {
-        return std::make_shared<DirectionalLight>(params);
+    [[nodiscard]] static auto Create(const Parameters& params) -> std::unique_ptr<DirectionalLight> {
+        return std::make_unique<DirectionalLight>(params);
     }
 
     /**

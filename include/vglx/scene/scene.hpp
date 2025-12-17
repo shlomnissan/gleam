@@ -66,10 +66,10 @@ public:
     Scene();
 
     /**
-     * @brief Creates a shared instance of @ref Scene.
+     * @brief Creates an instance of @ref Scene.
      */
-    [[nodiscard]] static auto Create() -> std::shared_ptr<Scene> {
-        return std::make_shared<Scene>();
+    [[nodiscard]] static auto Create() -> std::unique_ptr<Scene> {
+        return std::make_unique<Scene>();
     }
 
     /**

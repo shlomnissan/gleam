@@ -59,13 +59,13 @@ public:
     PointLight(const Parameters& params);
 
     /**
-     * @brief Creates a shared instance of @ref PointLight.
+     * @brief Creates an instance of @ref PointLight.
      *
      * @param params @ref PointLight::Parameters "Initialization parameters"
      * for constructing the light.
      */
-    [[nodiscard]] static auto Create(const Parameters& params) -> std::shared_ptr<PointLight> {
-        return std::make_shared<PointLight>(params);
+    [[nodiscard]] static auto Create(const Parameters& params) -> std::unique_ptr<PointLight> {
+        return std::make_unique<PointLight>(params);
     }
 
     /**

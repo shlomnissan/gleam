@@ -47,15 +47,15 @@ public:
     BoundingPlane(const Plane& plane, float size, const Color& color);
 
     /**
-     * @brief Creates a shared instance of @ref BoundingPlane.
+     * @brief Creates an instance of @ref BoundingPlane.
      *
      * @param plane Infinite geometric plane to visualize.
      * @param size Extent of the rendered square patch.
      * @param color Line color used to draw the patch.
      */
     [[nodiscard]] static auto
-    Create(const Plane& plane, float size, const Color& color) -> std::shared_ptr<BoundingPlane> {
-        return std::make_shared<BoundingPlane>(plane, size, color);
+    Create(const Plane& plane, float size, const Color& color) -> std::unique_ptr<BoundingPlane> {
+        return std::make_unique<BoundingPlane>(plane, size, color);
     }
 };
 

@@ -55,13 +55,13 @@ public:
     }
 
     /**
-     * @brief Creates a shared instance of @ref AmbientLight.
+     * @brief Creates an instance of @ref AmbientLight.
      *
      * @param params @ref AmbientLight::Parameters "Initialization parameters"
      * for constructing the light.
      */
-    [[nodiscard]] static auto Create(const Parameters& params) -> std::shared_ptr<AmbientLight> {
-        return std::make_shared<AmbientLight>(params);
+    [[nodiscard]] static auto Create(const Parameters& params) -> std::unique_ptr<AmbientLight> {
+        return std::make_unique<AmbientLight>(params);
     }
 
     /**

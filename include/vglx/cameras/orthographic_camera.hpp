@@ -85,13 +85,13 @@ public:
     explicit OrthographicCamera(const Parameters& params);
 
     /**
-     * @brief Creates a shared instance of @ref OrthographicCamera.
+     * @brief Creates an instance of @ref OrthographicCamera.
      *
      * @param params @ref OrthographicCamera::Parameters "Initialization parameters"
      * for constructing the camera.
      */
-    [[nodiscard]] static auto Create(const Parameters& params) -> std::shared_ptr<OrthographicCamera> {
-        return std::make_shared<OrthographicCamera>(params);
+    [[nodiscard]] static auto Create(const Parameters& params) -> std::unique_ptr<OrthographicCamera> {
+        return std::make_unique<OrthographicCamera>(params);
     }
 
     /**

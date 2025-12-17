@@ -79,13 +79,13 @@ public:
     explicit SpotLight(const Parameters& params);
 
     /**
-     * @brief Creates a shared instance of @ref SpotLight.
+     * @brief Creates an instance of @ref SpotLight.
      *
      * @param params @ref SpotLight::Parameters "Initialization parameters"
      * for constructing the light.
      */
-    [[nodiscard]] static auto Create(const Parameters& params) -> std::shared_ptr<SpotLight> {
-        return std::make_shared<SpotLight>(params);
+    [[nodiscard]] static auto Create(const Parameters& params) -> std::unique_ptr<SpotLight> {
+        return std::make_unique<SpotLight>(params);
     }
 
     /**
