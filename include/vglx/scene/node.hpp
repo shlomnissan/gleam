@@ -127,7 +127,7 @@ public:
      */
     template <typename T>
     requires std::derived_from<T, Node>
-    [[nodiscard]] auto Add(std::unique_ptr<T> node) -> T* {
+    auto Add(std::unique_ptr<T> node) -> T* {
         return static_cast<T*>(AddImpl(std::unique_ptr<Node>(std::move(node))));
     }
 

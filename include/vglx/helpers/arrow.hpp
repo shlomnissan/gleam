@@ -58,13 +58,13 @@ public:
     explicit Arrow(const Parameters& params);
 
     /**
-     * @brief Creates a shared instance of @ref Arrow.
+     * @brief Creates an instance of @ref Arrow.
      *
      * @param params @ref Arrow::Parameters "Initialization parameters"
      * for constructing the arrow.
      */
-    [[nodiscard]] static auto Create(const Parameters& params) -> std::shared_ptr<Arrow> {
-        return std::make_shared<Arrow>(params);
+    [[nodiscard]] static auto Create(const Parameters& params) -> std::unique_ptr<Arrow> {
+        return std::make_unique<Arrow>(params);
     }
 
     /**
