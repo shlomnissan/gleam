@@ -18,6 +18,7 @@
 #include "vglx/math/transform3.hpp"
 #include "vglx/math/vector3.hpp"
 
+#include <concepts>
 #include <memory>
 #include <span>
 
@@ -112,17 +113,14 @@ public:
      */
 
     /**
-     * @brief Adds a child node to this node and return a non-owning reference.
+     * @brief Adds a child node to this node and returns a non-owning reference.
      *
      * This overload transfers ownership of `node` into this node’s children list.
      * The scene graph is the sole owner of all nodes. The returned pointer is a
      * non-owning reference that remains valid only while the node is attached to
-     * the scene graph. If the node already has a parent it is first detached from
-     * its previous parent and then reattached here. A
-     * @ref SceneEvent::Type "SceneEvent::NodeAdded" event is dispatched.
+     * the scene graph.
      *
-     * @tparam T Concrete node type. Must derive from @ref Node.
-     * @param node Child node to attach. Ownership is transferred.
+     * @param node Node to attach. Ownership is transferred.
      *
      * @warning The returned pointer becomes invalid if the node is removed from the
      * scene graph or if the owning scene is destroyed.
@@ -138,8 +136,7 @@ public:
      *
      * Removes `node` from this node’s children list without destroying it and
      * returns the owned subtree as a `std::unique_ptr`. The detached node’s parent
-     * pointer is cleared, its attached state is reset, and its transform is marked
-     * dirty. A @ref SceneEvent::Type "SceneEvent::NodeRemoved" event is dispatched.
+     * pointer is cleared, its attached state is reset, and its transform is marked dirty.
      *
      * @param node Direct child node to detach.
      */
@@ -149,10 +146,7 @@ public:
      * @brief Removes a direct child node from this node and destroys it.
      *
      * If `node` exists in the children list it is detached and destroyed as part
-     * of removing its owning `std::unique_ptr`. The node is first marked as
-     * detached (parent cleared, attached reset, transform marked dirty) and a
-     * @ref SceneEvent::Type "SceneEvent::NodeRemoved" event is dispatched before
-     * destruction occurs.
+     * of removing its owning `std::unique_ptr`.
      *
      * @param node Direct child node to remove.
      *
@@ -199,10 +193,15 @@ public:
     /**
      * @brief Returns a view of this node’s direct children.
      *
-     * The returned span contains non-owning pointers to child nodes. The pointers
-     * remain valid only while the children remain attached to this node.
+     * The returned span exposes read-only access to the owning
+     * @ref Node "std::unique_ptr<Node>" objects for each child. Ownership
+     * is retained by the scene graph.
+     *
+     * @note This function exposes the internal storage type used
+     * by the scene graph. It is intended for inspection and
+     * iteration only.
      */
-    [[nodiscard]] auto Children() const -> std::span<Node* const>;
+    [[nodiscard]] auto Children() const -> std::span<const std::unique_ptr<Node>>;
 
     /**
      * @brief Checks whether the given node exists anywhere in this node’s subtree.

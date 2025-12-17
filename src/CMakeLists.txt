@@ -61,6 +61,7 @@ set(SOURCE_CODE
     "renderer/gl/gl_uniform.hpp"
     "renderer/gl/gl_uniform_buffer.cpp"
     "renderer/gl/gl_uniform_buffer.hpp"
+    "utilities/assert.hpp"
     "utilities/data_series.hpp"
     "utilities/file.hpp"
     "utilities/logger.cpp"
