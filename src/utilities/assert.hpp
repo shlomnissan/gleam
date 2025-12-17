@@ -7,9 +7,8 @@
 
 #pragma once
 
-#include "utilities/logger.hpp"
-
 #include <cstdlib>
+#include <print>
 #include <source_location>
 #include <string_view>
 
@@ -23,12 +22,19 @@
 
 namespace vglx {
 
-[[noreturn]] inline auto AssertFail(
+[[noreturn]] auto AssertFail(
     std::string_view expr,
     std::string_view msg,
     const std::source_location& loc
 ) -> void {
-    Logger::Log(LogLevel::Error, "{} ({})", msg, expr, loc);
+    std::println(
+        stderr,
+        "[VGLX_ASSERT]: {} ({}) -> {}:{}",
+        msg,
+        expr,
+        loc.file_name(),
+        loc.line()
+    );
     std::abort();
 }
 
