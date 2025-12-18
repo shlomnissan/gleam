@@ -13,4 +13,3 @@
  */
 #include "vglx/events/keyboard_event.hpp"
 #include "vglx/events/mouse_event.hpp"
-#include "vglx/events/scene_event.hpp"

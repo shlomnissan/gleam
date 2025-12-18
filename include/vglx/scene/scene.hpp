@@ -97,6 +97,8 @@ public:
      */
     auto SetContext(SharedContextPointer context) -> void;
 
+    auto GetContext() const -> SharedContextPointer;
+
     /**
      * @brief Identifies this node as @ref Node::Type "Node::Type::Scene".
      */

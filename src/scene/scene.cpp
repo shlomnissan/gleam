@@ -59,17 +59,8 @@ Scene::Scene() : impl_(std::make_unique<Impl>()) {
                 handle_input_event(child.get(), event);
             }
         }
-
-        if (type == Event::Type::Scene) {
-            auto e = static_cast<SceneEvent*>(event);
-            if (e->type == SceneEvent::Type::NodeAdded && IsChild(e->node)) {
-                e->node->AttachRecursive(impl_->context);
-            }
-        }
     });
 
-    EventDispatcher::Get().AddEventListener("node_added", impl_->event_listener);
-    EventDispatcher::Get().AddEventListener("node_removed", impl_->event_listener);
     EventDispatcher::Get().AddEventListener("keyboard_event", impl_->event_listener);
     EventDispatcher::Get().AddEventListener("mouse_event", impl_->event_listener);
 }
@@ -83,12 +74,14 @@ auto Scene::Advance(float delta) -> void {
 
 auto Scene::SetContext(SharedContextPointer context) -> void {
     impl_->context = context;
-    this->AttachRecursive(context);
+    this->AttachSubtree(this, impl_->context);
+}
+
+auto Scene::GetContext() const -> SharedContextPointer {
+    return impl_->context;
 }
 
 Scene::~Scene() {
-    EventDispatcher::Get().RemoveEventListener("node_added", impl_->event_listener);
-    EventDispatcher::Get().RemoveEventListener("node_removed", impl_->event_listener);
     EventDispatcher::Get().RemoveEventListener("keyboard_event", impl_->event_listener);
     EventDispatcher::Get().RemoveEventListener("mouse_event", impl_->event_listener);
 }

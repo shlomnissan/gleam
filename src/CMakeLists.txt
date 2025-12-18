@@ -84,7 +84,6 @@ set(PUBLIC_HEADERS
     "${PUBLIC_HEADERS_DIR}/events/event.hpp"
     "${PUBLIC_HEADERS_DIR}/events/keyboard_event.hpp"
     "${PUBLIC_HEADERS_DIR}/events/mouse_event.hpp"
-    "${PUBLIC_HEADERS_DIR}/events/scene_event.hpp"
     "${PUBLIC_HEADERS_DIR}/geometries/geometry.hpp"
     "${PUBLIC_HEADERS_DIR}/geometries/wireframe_geometry.hpp"
     "${PUBLIC_HEADERS_DIR}/helpers/arrow.hpp"

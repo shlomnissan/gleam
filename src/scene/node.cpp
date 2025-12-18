@@ -8,6 +8,7 @@
 #include "vglx/scene/node.hpp"
 
 #include "vglx/cameras/camera.hpp"
+#include "vglx/scene/scene.hpp"
 
 #include "events/event_dispatcher.hpp"
 #include "utilities/assert.hpp"
@@ -21,6 +22,8 @@ namespace vglx {
 
 struct Node::Impl {
     std::vector<std::unique_ptr<Node>> children;
+
+    Scene* scene {nullptr};
 
     Node* parent {nullptr};
 
@@ -59,10 +62,9 @@ auto Node::AddImpl(std::unique_ptr<Node> node) -> Node* {
     raw->impl_->parent = this;
     impl_->children.emplace_back(std::move(node));
 
-    EventDispatcher::Get().Dispatch(
-        "node_added",
-        std::make_unique<SceneEvent>(SceneEvent::Type::NodeAdded, raw)
-    );
+    if (impl_->attached && impl_->scene) {
+        raw->AttachSubtree(impl_->scene, impl_->scene->GetContext());
+    }
 
     return raw;
 }
@@ -93,16 +95,11 @@ auto Node::DetachImpl(Node* node) -> std::unique_ptr<Node> {
         "Child list contains node with mismatched parent pointer"
     );
 
-    EventDispatcher::Get().Dispatch(
-        "node_removed",
-        std::make_unique<SceneEvent>(SceneEvent::Type::NodeRemoved, node)
-    );
-
     auto out_node = std::move(*it);
     impl_->children.erase(it);
 
+    out_node->DetachSubtree();
     out_node->impl_->parent = nullptr;
-    out_node->impl_->attached = false;
     out_node->transform.touched = true;
 
     return out_node;
@@ -113,14 +110,10 @@ auto Node::Remove(Node* node) -> void {
 }
 
 auto Node::RemoveAllChildren() -> void {
-    for (const auto& node : impl_->children) {
-        EventDispatcher::Get().Dispatch(
-            "node_removed",
-            std::make_unique<SceneEvent>(SceneEvent::Type::NodeRemoved, node.get())
-        );
-        node->impl_->parent = nullptr;
-        node->impl_->attached = false;
-        node->transform.touched = true;
+    for (auto& child : impl_->children) {
+        child->DetachSubtree();
+        child->impl_->parent = nullptr;
+        child->transform.touched = true;
     }
     impl_->children.clear();
 }
@@ -136,16 +129,18 @@ auto Node::IsChild(const Node* node) const -> bool {
 
     auto to_process = std::queue<Node*> {};
     for (const auto& child : Children()) {
+        VGLX_ASSERT(child != nullptr, "Null child in children list");
         to_process.push(child.get());
     }
 
     while (!to_process.empty()) {
         auto len = to_process.size();
-        for (auto i = 0; i < len; ++i) {
+        for (size_t i = 0; i < len; ++i) {
             const auto current = to_process.front();
             to_process.pop();
             if (current == node) return true;
             for (const auto& child : current->Children()) {
+                VGLX_ASSERT(child != nullptr, "Null child in children list");
                 to_process.push(child.get());
             }
         }
@@ -168,9 +163,8 @@ auto Node::UpdateTransformHierarchy() -> void {
     }
 
     for (const auto& child : Children()) {
-        if (child) {
-            child->UpdateTransformHierarchy();
-        }
+        VGLX_ASSERT(child != nullptr, "Null child in children list");
+        child->UpdateTransformHierarchy();
     }
 
     impl_->world_transform_touched = false;
@@ -206,23 +200,33 @@ auto Node::GetWorldTransform() -> Matrix4 {
     return impl_->world_transform;
 }
 
-Node::~Node() = default;
+auto Node::GetScene() const -> const Scene* {
+    return impl_->scene;
+}
 
 auto Node::LookAt(const Vector3& target) -> void {
     transform.LookAt(GetWorldPosition(), target, up);
 }
 
-auto Node::AttachRecursive(SharedContextPointer context) -> void {
+auto Node::AttachSubtree(Scene* scene, SharedContextPointer context) -> void {
     if (impl_->attached) return;
-
-    OnAttached(context);
     impl_->attached = true;
-
+    impl_->scene = scene;
+    OnAttached(context);
     for (const auto& child : impl_->children) {
-        if (child != nullptr) {
-            child->AttachRecursive(context);
-        }
+        VGLX_ASSERT(child != nullptr, "Null child in children list");
+        child->AttachSubtree(scene, context);
     }
 }
+
+auto Node::DetachSubtree() -> void {
+    if (!impl_->attached) return;
+    impl_->attached = false;
+    impl_->scene = nullptr;
+    transform.touched = true;
+    for (auto& child : impl_->children) child->DetachSubtree();
+}
+
+Node::~Node() = default;
 
 }

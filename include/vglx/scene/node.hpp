@@ -13,7 +13,6 @@
 #include "vglx/core/shared_context.hpp"
 #include "vglx/events/keyboard_event.hpp"
 #include "vglx/events/mouse_event.hpp"
-#include "vglx/events/scene_event.hpp"
 #include "vglx/math/matrix4.hpp"
 #include "vglx/math/transform3.hpp"
 #include "vglx/math/vector3.hpp"
@@ -23,6 +22,8 @@
 #include <span>
 
 namespace vglx {
+
+class Scene;
 
 /**
  * @brief Base class for all scene graph nodes.
@@ -223,6 +224,8 @@ public:
      */
     [[nodiscard]] auto Parent() const -> const Node*;
 
+    [[nodiscard]] auto GetScene() const -> const Scene*;
+
     /**
      * @brief Returns whether this node’s world transform must be recomputed.
      *
@@ -372,7 +375,8 @@ private:
     [[nodiscard]] auto DetachImpl(Node* node) -> std::unique_ptr<Node>;
 
     friend class Scene;
-    auto AttachRecursive(SharedContextPointer context) -> void;
+    auto AttachSubtree(Scene* scene, SharedContextPointer context) -> void;
+    auto DetachSubtree() -> void;
     /// @endcond
 };
 
