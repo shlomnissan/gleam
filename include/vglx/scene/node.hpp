@@ -198,8 +198,8 @@ public:
     /**
      * @brief Returns a view of this node’s direct children.
      *
-     * The returned span exposes read-only access to the owning
-     * @ref Node "std::unique_ptr<Node>" objects for each child. Ownership
+     * The returned span exposes read-only access to the owning node's
+     * `std::unique_ptr<Node>` objects for each child. Ownership
      * is retained by the scene graph.
      *
      * @note This function exposes the internal storage type used
