@@ -177,7 +177,7 @@ TEST(Node, RemoveNonexistentChild) {
     parent->Remove(child.get());
 
     EXPECT_TRUE(parent->Children().empty());
-    EXPECT_EQ(child->Parent(), nullptr);
+    EXPECT_EQ(child->GetParent(), nullptr);
 }
 
 #pragma endregion

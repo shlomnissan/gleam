@@ -149,7 +149,7 @@ auto Node::IsChild(const Node* node) const -> bool {
     return false;
 }
 
-auto Node::Parent() const -> const Node* {
+auto Node::GetParent() const -> const Node* {
     return impl_->parent;
 }
 

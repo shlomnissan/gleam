@@ -11,6 +11,8 @@
 #include "vglx/math/utilities.hpp"
 #include "vglx/scene/mesh.hpp"
 
+#include "utilities/assert.hpp"
+
 #include <vector>
 
 namespace {
@@ -101,10 +103,16 @@ SpotLight::SpotLight(const Parameters& params) :
 }
 
 auto SpotLight::Direction() -> Vector3 {
-    if (target != nullptr) {
-        return Normalize(GetWorldPosition() - target->GetWorldPosition());
+    if (target == nullptr) {
+        return Normalize(GetWorldPosition());
     }
-    return Normalize(GetWorldPosition());
+
+    VGLX_ASSERT(
+        target->GetScene() == GetScene(),
+        "SpotLight target must belong to the same scene"
+    );
+
+    return Normalize(GetWorldPosition() - target->GetWorldPosition());
 }
 
 auto SpotLight::SetDebugMode(bool is_debug_mode) -> void {

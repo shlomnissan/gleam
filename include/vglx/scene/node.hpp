@@ -222,8 +222,14 @@ public:
     /**
      * @brief Returns this node’s parent.
      */
-    [[nodiscard]] auto Parent() const -> const Node*;
+    [[nodiscard]] auto GetParent() const -> const Node*;
 
+    /**
+     * @brief Returns the scene that owns this node.
+     *
+     * Returns the scene this node is currently attached to, or `nullptr`
+     * if the node is not attached to any scene.
+     */
     [[nodiscard]] auto GetScene() const -> const Scene*;
 
     /**

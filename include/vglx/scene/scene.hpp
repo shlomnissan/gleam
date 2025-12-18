@@ -97,6 +97,12 @@ public:
      */
     auto SetContext(SharedContextPointer context) -> void;
 
+    /**
+     * @brief Returns the active shared context.
+     *
+     * Returns the context previously set via @ref SetContext, or `nullptr`
+     * if the scene has not been attached to a context yet.
+     */
     auto GetContext() const -> SharedContextPointer;
 
     /**

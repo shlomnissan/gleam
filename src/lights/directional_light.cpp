@@ -10,6 +10,8 @@
 #include "vglx/materials/unlit_material.hpp"
 #include "vglx/scene/mesh.hpp"
 
+#include "utilities/assert.hpp"
+
 namespace {
 
 auto line_geometry() {
@@ -92,10 +94,16 @@ DirectionalLight::DirectionalLight(const Parameters& params) :
 }
 
 auto DirectionalLight::Direction() -> Vector3 {
-    if (target != nullptr) {
-        return Normalize(GetWorldPosition() - target->GetWorldPosition());
+    if (target == nullptr) {
+        return Normalize(GetWorldPosition());
     }
-    return Normalize(GetWorldPosition());
+
+    VGLX_ASSERT(
+        target->GetScene() == GetScene(),
+        "SpotLight target must belong to the same scene"
+    );
+
+    return Normalize(GetWorldPosition() - target->GetWorldPosition());
 }
 
 auto DirectionalLight::SetDebugMode(bool is_debug_mode) -> void {
