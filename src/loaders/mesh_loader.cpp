@@ -110,7 +110,7 @@ auto load_materials(const fs::path& path, std::ifstream& file, const MeshHeader&
     return materials;
 }
 
-auto load_mesh(const fs::path& path, std::ifstream& file, const MeshHeader& mesh_header) -> LoaderResult<Node> {
+auto load_mesh(const fs::path& path, std::ifstream& file, const MeshHeader& mesh_header) -> LoaderResult<std::unique_ptr<Node>> {
     auto materials = load_materials(path, file, mesh_header);
     auto root = Node::Create();
 
@@ -146,7 +146,7 @@ auto load_mesh(const fs::path& path, std::ifstream& file, const MeshHeader& mesh
 
 } // unnamed namespace
 
-auto MeshLoader::LoadImpl(const fs::path& path) const -> LoaderResult<Node> {
+auto MeshLoader::LoadImpl(const fs::path& path) const -> LoaderResult<std::unique_ptr<Node>> {
     auto file = std::ifstream {path, std::ios::binary};
     auto path_s = path.string();
     if (!file) {

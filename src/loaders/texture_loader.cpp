@@ -33,7 +33,7 @@ auto load_texture(const fs::path& path, std::ifstream& file, const TextureHeader
 
 }
 
-auto TextureLoader::LoadImpl(const fs::path& path) const -> LoaderResult<Texture2D> {
+auto TextureLoader::LoadImpl(const fs::path& path) const -> LoaderResult<std::shared_ptr<Texture2D>> {
     auto file = std::ifstream {path, std::ios::binary};
     auto path_s = path.string();
     if (!file) {
