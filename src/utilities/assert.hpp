@@ -22,7 +22,7 @@
 
 namespace vglx {
 
-[[noreturn]] auto AssertFail(
+[[noreturn]] inline auto AssertFail(
     std::string_view expr,
     std::string_view msg,
     const std::source_location& loc
