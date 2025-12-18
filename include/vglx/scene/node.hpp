@@ -140,7 +140,12 @@ public:
      *
      * @param node Direct child node to detach.
      */
-    [[nodiscard]] auto Detach(Node* node) -> std::unique_ptr<Node>;
+    template <typename T>
+    requires std::derived_from<T, Node>
+    [[nodiscard]] auto Detach(T* node) -> std::unique_ptr<T> {
+        std::unique_ptr<Node> base = DetachImpl(node);
+        return std::unique_ptr<T>(static_cast<T*>(base.release()));
+    }
 
     /**
      * @brief Removes a direct child node from this node and destroys it.
@@ -364,6 +369,7 @@ private:
     std::unique_ptr<Impl> impl_;
 
     [[nodiscard]] auto AddImpl(std::unique_ptr<Node> node) -> Node*;
+    [[nodiscard]] auto DetachImpl(Node* node) -> std::unique_ptr<Node>;
 
     friend class Scene;
     auto AttachRecursive(SharedContextPointer context) -> void;

@@ -67,7 +67,7 @@ auto Node::AddImpl(std::unique_ptr<Node> node) -> Node* {
     return raw;
 }
 
-auto Node::Detach(Node* node) -> std::unique_ptr<Node> {
+auto Node::DetachImpl(Node* node) -> std::unique_ptr<Node> {
     if (node == nullptr) {
         Logger::Log(
             LogLevel::Error,
@@ -109,7 +109,7 @@ auto Node::Detach(Node* node) -> std::unique_ptr<Node> {
 }
 
 auto Node::Remove(Node* node) -> void {
-    (void)Detach(node);
+    (void)DetachImpl(node);
 }
 
 auto Node::RemoveAllChildren() -> void {
@@ -131,10 +131,6 @@ auto Node::Children() const -> std::span<const std::unique_ptr<Node>> {
 
 auto Node::IsChild(const Node* node) const -> bool {
     if (node == nullptr) {
-        Logger::Log(
-            LogLevel::Error,
-            "Attempting to check child relationship of invalid node"
-        );
         return false;
     }
 

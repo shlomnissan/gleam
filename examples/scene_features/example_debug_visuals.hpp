@@ -34,6 +34,9 @@ private:
         .divisions = 16
     };
 
-    std::shared_ptr<vglx::Node> arrows_;
-    std::shared_ptr<vglx::Grid> grid_;
+    vglx::Node* arrows_ {nullptr};
+    std::unique_ptr<vglx::Node> arrows_ptr_ {};
+
+    vglx::Grid* grid_ {nullptr};
+    std::unique_ptr<vglx::Grid> grid_ptr_ {};
 };
