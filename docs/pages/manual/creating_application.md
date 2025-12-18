@@ -246,7 +246,7 @@ The `delta` parameter represents the time, in seconds, since the previous frame.
 
 If you run the application now, the square becomes a rotating cube, making the 3D nature of the scene clear.
 
-![Window showing a rotating 3D cube](/guide_rotating_cube.png "Window showing a rotating 3D cube box")
+![Window showing a rotating 3D box](/guide_rotating_cube.png "Window showing a rotating 3D box")
 
 ## Conclusion
 
