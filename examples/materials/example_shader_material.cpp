@@ -64,8 +64,7 @@ ExampleShaderMaterial::ExampleShaderMaterial() {
     fog = Fog::CreateExponential(0x444444, 0.3f);
     material_->fog = false;
 
-    mesh_ = Mesh::Create(geometry, material_);
-    Add(mesh_);
+    mesh_ = Add(Mesh::Create(geometry, material_));
 }
 
 auto ExampleShaderMaterial::OnAttached(SharedContextPointer context) -> void {

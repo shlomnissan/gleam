@@ -47,14 +47,14 @@ public:
     BoundingBox(const Box3& box, const Color& color);
 
     /**
-     * @brief Creates a shared instance of @ref BoundingBox.
+     * @brief Creates an instance of @ref BoundingBox.
      *
      * @param box Axis-aligned bounds to visualize.
      * @param color Line color used for rendering the box.
      */
     [[nodiscard]] static auto
-    Create(const Box3& box, const Color& color) -> std::shared_ptr<BoundingBox> {
-        return std::make_shared<BoundingBox>(box, color);
+    Create(const Box3& box, const Color& color) -> std::unique_ptr<BoundingBox> {
+        return std::make_unique<BoundingBox>(box, color);
     }
 };
 

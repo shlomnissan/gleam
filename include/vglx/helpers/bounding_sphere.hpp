@@ -48,14 +48,14 @@ public:
     BoundingSphere(const Sphere& sphere, const Color& color);
 
     /**
-     * @brief Creates a shared instance of @ref BoundingSphere.
+     * @brief Creates an instance of @ref BoundingSphere.
      *
      * @param sphere Spherical bounds to visualize.
      * @param color Line color used for rendering.
      */
     [[nodiscard]] static auto
-    Create(const Sphere& sphere, const Color& color) -> std::shared_ptr<BoundingSphere> {
-        return std::make_shared<BoundingSphere>(sphere, color);
+    Create(const Sphere& sphere, const Color& color) -> std::unique_ptr<BoundingSphere> {
+        return std::make_unique<BoundingSphere>(sphere, color);
     }
 };
 

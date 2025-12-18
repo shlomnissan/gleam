@@ -21,25 +21,22 @@ using namespace vglx::math;
 ExampleModelLoader::ExampleModelLoader() {
     show_context_menu_ = true;
 
-    sphere_ = Mesh::Create(
+    sphere_ = Add(Mesh::Create(
         SphereGeometry::Create({.radius = 5.0f}),
         PhongMaterial::Create(0x000011)
-    );
+    ));
     sphere_->GetMaterial()->two_sided = true;
-    Add(sphere_);
 
     sphere_->Add(AmbientLight::Create({
         .color = 0xFFFFFF,
         .intensity = 0.3f
     }));
 
-    auto light_0 = PointLight::Create({.color = 0xFFFFFF, .intensity = 1.0f});
+    auto light_0 = Add(PointLight::Create({.color = 0xFFFFFF, .intensity = 1.0f}));
     light_0->transform.Translate({2.0f, 2.5f, 4.0f});
-    sphere_->Add(light_0);
 
-    auto light_1 = PointLight::Create({.color = 0xFAA916, .intensity = 1.0f});
+    auto light_1 = Add(PointLight::Create({.color = 0xFAA916, .intensity = 1.0f}));
     light_1->transform.Translate({-2.0f, 2.5f, -3.0f});
-    sphere_->Add(light_1);
 }
 
 auto ExampleModelLoader::OnAttached(SharedContextPointer context) -> void {
@@ -53,9 +50,8 @@ auto ExampleModelLoader::OnAttached(SharedContextPointer context) -> void {
         "assets/lps_head/lps_head.msh",
         [this](auto result) {
             if (result) {
-                model_ = result.value();
+                model_ = sphere_->Add(std::move(result.value()));
                 model_->RotateY(math::pi_over_2);
-                sphere_->Add(model_);
 
                 auto mesh = static_cast<Mesh*>(model_->Children().front().get());
                 material_ = static_cast<PhongMaterial*>(mesh->GetMaterial().get());

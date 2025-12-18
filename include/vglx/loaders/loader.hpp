@@ -29,7 +29,7 @@ namespace fs = std::filesystem;
  * @related Loader
  */
 template <typename T>
-using LoaderResult = std::expected<std::shared_ptr<T>, std::string>;
+using LoaderResult = std::expected<T, std::string>;
 
 /**
  * @brief Callback type used by asynchronous loaders.
@@ -99,7 +99,7 @@ public:
         auto self = this->shared_from_this();
         std::thread([self, path, callback]() {
             auto result = self->LoadImpl(path);
-            callback(result);
+            callback(std::move(result));
         }).detach();
     }
 

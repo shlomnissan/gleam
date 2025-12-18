@@ -11,12 +11,47 @@
 #include "vglx/math/utilities.hpp"
 #include "vglx/scene/mesh.hpp"
 
+#include "utilities/assert.hpp"
+
 #include <vector>
+
+namespace {
+
+auto lines_geometry() {
+    // lines for the cone
+    auto points = std::vector<float> {
+        0, 0, 0,  0,  0, 1,
+        0, 0, 0,  1,  0, 1,
+        0, 0, 0, -1,  0, 1,
+        0, 0, 0,  0,  1, 1,
+        0, 0, 0,  0, -1, 1,
+    };
+
+    // circle for the cone base
+    static constexpr auto circle_line_segments = 64;
+    for (unsigned i = 0, j = 1, l = circle_line_segments; i < l; i++, j++) {
+        const auto p1 = (static_cast<float>(i) / static_cast<float>(l)) * vglx::math::two_pi;
+        const auto p2 = (static_cast<float>(j) / static_cast<float>(l)) * vglx::math::two_pi;
+        points.insert(points.end(), {
+            vglx::math::Cos(p1), vglx::math::Sin(p1), 1.0f,
+            vglx::math::Cos(p2), vglx::math::Sin(p2), 1.0f
+        });
+    }
+
+    auto geometry = vglx::Geometry::Create(points);
+    geometry->SetName("directional light line");
+    geometry->SetAttribute({vglx::Geometry::VertexAttributeType::Position, 3});
+    geometry->primitive = vglx::Geometry::PrimitiveType::Lines;
+    return geometry;
+}
+
+}
 
 namespace vglx {
 
 struct SpotLight::Impl {
-    std::shared_ptr<Mesh> cone;
+    Mesh* cone {nullptr};
+
     std::shared_ptr<UnlitMaterial> material;
 
     auto CreateDebugMesh(SpotLight* self) -> void {
@@ -28,35 +63,8 @@ struct SpotLight::Impl {
         material->color = self->color;
         material->fog = false;
 
-        // lines for the cone
-        auto points = std::vector<float> {
-            0, 0, 0,  0,  0, 1,
-            0, 0, 0,  1,  0, 1,
-            0, 0, 0, -1,  0, 1,
-            0, 0, 0,  0,  1, 1,
-            0, 0, 0,  0, -1, 1,
-        };
+        cone = self->Add(Mesh::Create(lines_geometry(), material));
 
-        // circle for the cone base
-        static constexpr auto circle_line_segments = 64;
-        for (unsigned i = 0, j = 1, l = circle_line_segments; i < l; i++, j++) {
-            const auto p1 = (static_cast<float>(i) / static_cast<float>(l)) * math::two_pi;
-            const auto p2 = (static_cast<float>(j) / static_cast<float>(l)) * math::two_pi;
-            points.insert(points.end(), {
-                math::Cos(p1), math::Sin(p1), 1.0f,
-                math::Cos(p2), math::Sin(p2), 1.0f
-            });
-        }
-
-        auto cone_geometry = Geometry::Create(points);
-        cone_geometry->SetName("directional light line");
-        cone_geometry->SetAttribute({Position, 3});
-        cone_geometry->primitive = Lines;
-
-        cone = Mesh::Create(cone_geometry, material);
-        cone->transform_auto_update = false;
-
-        self->Add(cone);
         UpdateDebugMesh(self);
     }
 
@@ -74,8 +82,11 @@ struct SpotLight::Impl {
     }
 
     auto RemoveDebugMesh(SpotLight* self) -> void {
-        if (cone != nullptr) self->Remove(cone);
-        cone.reset();
+        if (cone != nullptr) {
+            self->Remove(cone);
+            cone = nullptr;
+        }
+
         material.reset();
     }
 };
@@ -92,10 +103,16 @@ SpotLight::SpotLight(const Parameters& params) :
 }
 
 auto SpotLight::Direction() -> Vector3 {
-    if (target != nullptr) {
-        return Normalize(GetWorldPosition() - target->GetWorldPosition());
+    if (target == nullptr) {
+        return Normalize(GetWorldPosition());
     }
-    return Normalize(GetWorldPosition());
+
+    VGLX_ASSERT(
+        target->GetScene() == GetScene(),
+        "SpotLight target must belong to the same scene"
+    );
+
+    return Normalize(GetWorldPosition() - target->GetWorldPosition());
 }
 
 auto SpotLight::SetDebugMode(bool is_debug_mode) -> void {

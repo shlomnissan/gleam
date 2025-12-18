@@ -10,10 +10,9 @@
 #include <ranges>
 #include <limits>
 
+#include "utilities/assert.hpp"
+
 namespace vglx {
-
-// Compare function for sorting meshes based on their z position.
-
 
 auto RenderLists::ProcessScene(Scene* scene, Camera* camera) -> void {
     Reset();
@@ -37,6 +36,13 @@ auto RenderLists::ProcessScene(Scene* scene, Camera* camera) -> void {
 }
 
 auto RenderLists::ProcessNode(Node* node, const Frustum& frustum) -> void {
+    VGLX_ASSERT(
+        node != nullptr,
+        "RenderLists::ProcessNode received null node"
+    );
+
+    if (node == nullptr) return;
+
     const auto type = node->GetNodeType();
 
     if (node->IsRenderable()) {

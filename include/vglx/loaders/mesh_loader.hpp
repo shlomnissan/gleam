@@ -25,7 +25,7 @@ namespace fs = std::filesystem;
  *
  * @related MeshLoader
  */
-using MeshCallback = std::function<void(std::shared_ptr<Node>)>;
+using MeshCallback = std::function<void(std::unique_ptr<Node>)>;
 
 /**
  * @brief Loads mesh data from engine-optimized files.
@@ -72,7 +72,7 @@ using MeshCallback = std::function<void(std::shared_ptr<Node>)>;
  *
  * @ingroup LoadersGroup
  */
-class VGLX_EXPORT MeshLoader : public Loader<Node> {
+class VGLX_EXPORT MeshLoader : public Loader<std::unique_ptr<Node>> {
 public:
     /**
      * @brief Creates a shared instance of @ref MeshLoader.
@@ -90,7 +90,7 @@ private:
     /// @cond INTERNAL
     MeshLoader() = default;
 
-    [[nodiscard]] auto LoadImpl(const fs::path& path) const -> LoaderResult<Node> override;
+    [[nodiscard]] auto LoadImpl(const fs::path& path) const -> LoaderResult<std::unique_ptr<Node>> override;
     /// @endcond
 };
 

@@ -14,31 +14,29 @@ namespace vglx {
 
 namespace {
 
-auto handle_node_updates(std::weak_ptr<Node> node, float delta) -> void {
-    if (const auto n = node.lock()) {
-        n->OnUpdate(delta);
-        for (const auto& child : n->Children()) {
-            handle_node_updates(child, delta);
-        }
+auto handle_node_updates(Node* node, float delta) -> void {
+    node->OnUpdate(delta);
+    for (const auto& child : node->Children()) {
+        handle_node_updates(child.get(), delta);
     }
 }
 
-auto handle_input_event(std::weak_ptr<Node> node, Event* event) -> void {
+auto handle_input_event(Node* node, Event* event) -> void {
     using enum Event::Type;
 
     // Events are propagated from the bottom of the scene graph to the top.
     // This allows nodes at the bottom of the graph to mark events as handled
     // and prevent them from being processed by parent nodes.
-    if (const auto n = node.lock()) {
-        for (const auto& child : n->Children()) {
-            if (event->handled) return;
-            handle_input_event(child, event);
-        }
-
-        const auto type = event->GetType();
-        if (type == Keyboard) n->OnKeyboardEvent(static_cast<KeyboardEvent*>(event));
-        if (type == Mouse) n->OnMouseEvent(static_cast<MouseEvent*>(event));
+    for (const auto& child : node->Children()) {
+        if (event->handled) return;
+        handle_input_event(child.get(), event);
     }
+
+    const auto type = event->GetType();
+    if (type == Keyboard)
+        node->OnKeyboardEvent(static_cast<KeyboardEvent*>(event));
+    if (type == Mouse)
+        node->OnMouseEvent(static_cast<MouseEvent*>(event));
 }
 
 }
@@ -58,20 +56,11 @@ Scene::Scene() : impl_(std::make_unique<Impl>()) {
             if (type == Keyboard) OnKeyboardEvent(static_cast<KeyboardEvent*>(event));
             if (type == Mouse) OnMouseEvent(static_cast<MouseEvent*>(event));
             for (const auto& child : Children()) {
-                handle_input_event(child, event);
-            }
-        }
-
-        if (type == Event::Type::Scene) {
-            auto e = static_cast<SceneEvent*>(event);
-            if (e->type == SceneEvent::Type::NodeAdded && IsChild(e->node.get())) {
-                e->node->AttachRecursive(impl_->context);
+                handle_input_event(child.get(), event);
             }
         }
     });
 
-    EventDispatcher::Get().AddEventListener("node_added", impl_->event_listener);
-    EventDispatcher::Get().AddEventListener("node_removed", impl_->event_listener);
     EventDispatcher::Get().AddEventListener("keyboard_event", impl_->event_listener);
     EventDispatcher::Get().AddEventListener("mouse_event", impl_->event_listener);
 }
@@ -79,18 +68,20 @@ Scene::Scene() : impl_(std::make_unique<Impl>()) {
 auto Scene::Advance(float delta) -> void {
     OnUpdate(delta);
      for (const auto& child : Children()) {
-        handle_node_updates(child, delta);
+        handle_node_updates(child.get(), delta);
     }
 }
 
 auto Scene::SetContext(SharedContextPointer context) -> void {
     impl_->context = context;
-    this->AttachRecursive(context);
+    this->AttachSubtree(this, impl_->context);
+}
+
+auto Scene::GetContext() const -> SharedContextPointer {
+    return impl_->context;
 }
 
 Scene::~Scene() {
-    EventDispatcher::Get().RemoveEventListener("node_added", impl_->event_listener);
-    EventDispatcher::Get().RemoveEventListener("node_removed", impl_->event_listener);
     EventDispatcher::Get().RemoveEventListener("keyboard_event", impl_->event_listener);
     EventDispatcher::Get().RemoveEventListener("mouse_event", impl_->event_listener);
 }

@@ -23,5 +23,5 @@ public:
     auto OnUpdate(float delta) -> void override;
 
 private:
-    std::array<std::shared_ptr<vglx::Mesh>, 2500> boxes_;
+    std::array<vglx::Mesh*, 2500> boxes_;
 };

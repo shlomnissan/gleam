@@ -67,14 +67,14 @@ public:
     explicit PerspectiveCamera(const Parameters& params);
 
     /**
-     * @brief Creates a shared instance of @ref PerspectiveCamera.
+     * @brief Creates an instance of @ref PerspectiveCamera.
      *
      * @param params @ref PerspectiveCamera::Parameters "Initialization parameters"
      * for constructing the camera.
      */
     [[nodiscard]] static auto
-    Create(const Parameters& params) -> std::shared_ptr<PerspectiveCamera> {
-        return std::make_shared<PerspectiveCamera>(params);
+    Create(const Parameters& params) -> std::unique_ptr<PerspectiveCamera> {
+        return std::make_unique<PerspectiveCamera>(params);
     }
 
     /**

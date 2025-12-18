@@ -21,8 +21,7 @@ using namespace vglx;
 ExampleUnlitMaterial::ExampleUnlitMaterial() {
     auto geometry = BoxGeometry::Create();
     material_ = UnlitMaterial::Create(0x049EF4);
-    mesh_ = Mesh::Create(geometry, material_);
-    Add(mesh_);
+    mesh_ = Add(Mesh::Create(geometry, material_));
 }
 
 auto ExampleUnlitMaterial::OnAttached(SharedContextPointer context) -> void {

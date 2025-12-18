@@ -14,24 +14,32 @@
 
 namespace vglx {
 
+namespace {
+
+static constexpr auto kConeHeight = 0.1f;
+
+auto line_geometry(float length) {
+    const auto line_geometry = Geometry::Create({
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f, length
+    });
+    line_geometry->SetAttribute({Geometry::VertexAttributeType::Position, 3});
+    line_geometry->primitive = Geometry::PrimitiveType::Lines;
+    return line_geometry;
+}
+
+}
+
 Arrow::Arrow(const Parameters& params) {
     const auto material = UnlitMaterial::Create(params.color);
-    const auto cone_height = 0.1f;
-    const auto cone = Mesh::Create(ConeGeometry::Create({
-        .radius = 0.03f,
-        .height = cone_height
-    }), material);
-    cone->TranslateZ(params.length - cone_height / 2.0f);
-    cone->RotateX(math::pi_over_2);
-    Add(cone);
+    const auto cone = Add(Mesh::Create(
+        ConeGeometry::Create({.radius = 0.03f, .height = kConeHeight}),
+        material
+    ));
 
-    const auto geometry = Geometry::Create({
-        0.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, params.length - cone_height
-    });
-    geometry->SetAttribute({Geometry::VertexAttributeType::Position, 3});
-    geometry->primitive = Geometry::PrimitiveType::Lines;
-    Add(Mesh::Create(geometry, material));
+    Add(Mesh::Create(line_geometry(params.length - kConeHeight), material));
+
+    cone->TranslateZ(params.length - kConeHeight / 2.0f);
+    cone->RotateX(math::pi_over_2);
 
     SetOrigin(params.origin);
     SetDirection(params.direction);

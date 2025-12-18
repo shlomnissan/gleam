@@ -16,7 +16,8 @@ namespace vglx {
 static constexpr auto debug_mesh_size = 0.2f;
 
 struct PointLight::Impl {
-    std::shared_ptr<Mesh> sphere;
+    Mesh* sphere {nullptr};
+
     std::shared_ptr<UnlitMaterial> material;
 
     auto CreateDebugMesh(PointLight* self) -> void {
@@ -25,13 +26,15 @@ struct PointLight::Impl {
         material->color = self->color;
         material->wireframe = true;
         material->fog = false;
-        sphere = Mesh::Create(SphereGeometry::Create({
-            .radius = 1,
-            .width_segments = 4,
-            .height_segments = 2
-        }), material);
 
-        self->Add(sphere);
+        sphere = self->Add(
+            Mesh::Create(SphereGeometry::Create({
+                .radius = 1,
+                .width_segments = 4,
+                .height_segments = 2
+            }), material)
+        );
+
         UpdateDebugMesh(self);
     }
 
@@ -41,8 +44,11 @@ struct PointLight::Impl {
     }
 
     auto RemoveDebugMesh(PointLight* self) -> void {
-        if (sphere != nullptr) self->Remove(sphere);
-        sphere.reset();
+        if (sphere != nullptr) {
+            self->Remove(sphere);
+            sphere = nullptr;
+        }
+
         material.reset();
     }
 };

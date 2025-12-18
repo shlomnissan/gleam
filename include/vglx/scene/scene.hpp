@@ -66,10 +66,10 @@ public:
     Scene();
 
     /**
-     * @brief Creates a shared instance of @ref Scene.
+     * @brief Creates an instance of @ref Scene.
      */
-    [[nodiscard]] static auto Create() -> std::shared_ptr<Scene> {
-        return std::make_shared<Scene>();
+    [[nodiscard]] static auto Create() -> std::unique_ptr<Scene> {
+        return std::make_unique<Scene>();
     }
 
     /**
@@ -96,6 +96,14 @@ public:
      * @param context Pointer to the active SharedContext instance.
      */
     auto SetContext(SharedContextPointer context) -> void;
+
+    /**
+     * @brief Returns the active shared context.
+     *
+     * Returns the context previously set via @ref SetContext, or `nullptr`
+     * if the scene has not been attached to a context yet.
+     */
+    auto GetContext() const -> SharedContextPointer;
 
     /**
      * @brief Identifies this node as @ref Node::Type "Node::Type::Scene".

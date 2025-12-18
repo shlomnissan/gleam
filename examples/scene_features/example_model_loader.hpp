@@ -28,8 +28,9 @@ public:
     auto ContextMenu() -> void override;
 
 private:
-    std::shared_ptr<vglx::Mesh> sphere_;
-    std::shared_ptr<vglx::Node> model_;
+    vglx::Mesh* sphere_ {nullptr};
+    vglx::Node* model_ {nullptr};
+
     std::shared_ptr<vglx::Texture2D> albedo_map_;
     std::shared_ptr<vglx::Texture2D> normal_map_;
     std::shared_ptr<vglx::Texture2D> specular_map_;

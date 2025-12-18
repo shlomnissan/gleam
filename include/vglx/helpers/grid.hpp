@@ -56,13 +56,13 @@ public:
     explicit Grid(const Parameters& params);
 
     /**
-     * @brief Creates a shared instance of @ref Grid.
+     * @brief Creates an instance of @ref Grid.
      *
      * @param params @ref Grid::Parameters "Initialization parameters"
      * for constructing the grid.
      */
-    [[nodiscard]] static auto Create(const Parameters& params) -> std::shared_ptr<Grid> {
-        return std::make_shared<Grid>(params);
+    [[nodiscard]] static auto Create(const Parameters& params) -> std::unique_ptr<Grid> {
+        return std::make_unique<Grid>(params);
     }
 };
 

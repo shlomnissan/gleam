@@ -25,7 +25,7 @@ ExamplePrimitives::ExamplePrimitives() {
         .intensity = 0.3f
     }));
 
-    auto point_light = PointLight::Create({
+    Add(PointLight::Create({
         .color = 0xFFFFFF,
         .intensity = 1.0f,
         .attenuation = {
@@ -33,23 +33,19 @@ ExamplePrimitives::ExamplePrimitives() {
             .linear = 0.0f,
             .quadratic = 0.0f
         }
-    });
-    point_light->transform.Translate({2.0f, 2.0f, 4.0f});
-    Add(point_light);
+    }))->transform.Translate({2.0f, 2.0f, 4.0f});
 
     auto geometry = BoxGeometry::Create(box_params_);
     auto base_material = PhongMaterial::Create(0x049EF4);
     base_material->polygon_offset_factor = 1.0f;
     base_material->polygon_offset_units = 1.0f;
 
-    mesh_ = Mesh::Create(geometry, base_material);
-    Add(mesh_);
+    mesh_ = Add(Mesh::Create(geometry, base_material));
 
     auto wireframe_geometry = WireframeGeometry::Create(geometry.get());
     auto wireframe_material = UnlitMaterial::Create();
     wireframe_material->fog = false;
-    wireframes_ = Mesh::Create(wireframe_geometry, wireframe_material);
-    mesh_->Add(wireframes_);
+    wireframes_ = Add(Mesh::Create(wireframe_geometry, wireframe_material));
 }
 
 auto ExamplePrimitives::OnAttached(SharedContextPointer context) -> void {

@@ -66,7 +66,7 @@ using TextureCallback = std::function<void(std::shared_ptr<Texture2D>)>;
  *
  * @ingroup LoadersGroup
  */
-class VGLX_EXPORT TextureLoader : public Loader<Texture2D> {
+class VGLX_EXPORT TextureLoader : public Loader<std::shared_ptr<Texture2D>> {
 public:
     /**
      * @brief Creates a shared instance of @ref TextureLoader.
@@ -84,7 +84,7 @@ private:
     /// @cond INTERNAL
     TextureLoader() = default;
 
-    [[nodiscard]] auto LoadImpl(const fs::path& path) const -> LoaderResult<Texture2D> override;
+    [[nodiscard]] auto LoadImpl(const fs::path& path) const -> LoaderResult<std::shared_ptr<Texture2D>> override;
     /// @endcond
 };
 

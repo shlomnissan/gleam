@@ -26,20 +26,18 @@ ExampleSpotLight::ExampleSpotLight() {
     phong_material_->polygon_offset_factor = -1.0f;
     phong_material_->polygon_offset_units = 1.0f;
 
-    auto mesh = Mesh::Create(
+    auto mesh = Add(Mesh::Create(
         PlaneGeometry::Create({.width = 3, .height = 3}),
         phong_material_
-    );
-
+    ));
     mesh->transform.Rotate(Vector3::Right(), math::DegToRad(-90.0f));
-    Add(mesh);
 
     Add(AmbientLight::Create({
         .color = 0xFFFFFF,
         .intensity = 0.15f
     }));
 
-    spot_light_ = SpotLight::Create({
+    spot_light_ = Add(SpotLight::Create({
         .color = 0xFFFFFF,
         .intensity = 1.0f,
         .angle = math::DegToRad(10.0f),
@@ -50,11 +48,10 @@ ExampleSpotLight::ExampleSpotLight() {
             .linear = 0.0f,
             .quadratic = 0.0f
         }
-    });
+    }));
 
     spot_light_->transform.Translate({2.0f, 2.0f, -1.0f});
     spot_light_->SetDebugMode(true);
-    Add(spot_light_);
 }
 
 auto ExampleSpotLight::OnAttached(SharedContextPointer context) -> void {

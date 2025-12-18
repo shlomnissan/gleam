@@ -80,13 +80,13 @@ public:
     Sprite(std::shared_ptr<SpriteMaterial> material);
 
     /**
-     * @brief Creates a shared instance of @ref Sprite.
+     * @brief Creates an instance of @ref Sprite.
      *
      * @param material Shared sprite material.
      */
     [[nodiscard]] static auto
-    Create(std::shared_ptr<SpriteMaterial> material = nullptr) -> std::shared_ptr<Sprite> {
-        return std::make_shared<Sprite>(material);
+    Create(std::shared_ptr<SpriteMaterial> material = nullptr) -> std::unique_ptr<Sprite> {
+        return std::make_unique<Sprite>(material);
     }
 
     /**

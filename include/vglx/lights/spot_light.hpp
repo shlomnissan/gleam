@@ -54,7 +54,7 @@ public:
         float intensity; ///< Light intensity multiplier.
         float angle; ///< Cone angle (in radians) for spotlight cutoff.
         float penumbra; ///< Softness of the spotlight edge.
-        std::shared_ptr<Node> target; ///< Node the light is directed toward.
+        Node* target; ///< Node the light is directed toward.
         Attenuation attenuation; ///< Attenuation parameters controlling distance-based falloff.
     };
 
@@ -65,7 +65,7 @@ public:
     float penumbra;
 
     /// @brief Node that the light is oriented toward.
-    std::shared_ptr<Node> target {nullptr};
+    Node* target {nullptr};
 
     /// @brief Attenuation parameters controlling distance-based falloff.
     Attenuation attenuation;
@@ -79,13 +79,13 @@ public:
     explicit SpotLight(const Parameters& params);
 
     /**
-     * @brief Creates a shared instance of @ref SpotLight.
+     * @brief Creates an instance of @ref SpotLight.
      *
      * @param params @ref SpotLight::Parameters "Initialization parameters"
      * for constructing the light.
      */
-    [[nodiscard]] static auto Create(const Parameters& params) -> std::shared_ptr<SpotLight> {
-        return std::make_shared<SpotLight>(params);
+    [[nodiscard]] static auto Create(const Parameters& params) -> std::unique_ptr<SpotLight> {
+        return std::make_unique<SpotLight>(params);
     }
 
     /**

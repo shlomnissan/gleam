@@ -23,35 +23,29 @@ ExamplePointLight::ExamplePointLight() {
     }));
 
     phong_material_ = PhongMaterial::Create(0xCCCCCC);
-    const auto mesh = Mesh::Create(
+    auto mesh = Add(Mesh::Create(
         SphereGeometry::Create({
             .radius = 0.5f,
             .width_segments = 32,
             .height_segments = 32
         }),
         phong_material_
-    );
+    ));
 
     mesh->transform.Translate({0.0f, 0.5f, 0.0f});
-    Add(mesh);
 
     Add(AmbientLight::Create({
         .color = 0xFFFFFF,
         .intensity = .15f
     }));
 
-    point_light_ = PointLight::Create({
+    point_light_ = Add(PointLight::Create({
         .color = 0xFFFFFF,
         .intensity = 1.0f,
-        .attenuation = {
-            .base = 1.0f,
-            .linear = 0.0f,
-            .quadratic = 0.0f
-        }
-    });
+    }));
+
     point_light_->transform.Translate({1.0f, 2.0f, -2.0f});
     point_light_->SetDebugMode(true);
-    Add(point_light_);
 }
 
 auto ExamplePointLight::OnAttached(SharedContextPointer context) -> void {

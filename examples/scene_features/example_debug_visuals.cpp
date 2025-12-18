@@ -14,7 +14,7 @@
 using namespace vglx;
 
 ExampleDebugVisuals::ExampleDebugVisuals() {
-    arrows_ = Node::Create();
+    arrows_ = Add(Node::Create());
     arrows_->Add(Arrow::Create({
         .direction = {0.5f, 0.0f, 0.0f},
         .origin = {0.0f, 0.0f, 0.0f},
@@ -37,7 +37,7 @@ ExampleDebugVisuals::ExampleDebugVisuals() {
     }));
     arrows_->TranslateY(0.1f);
 
-    grid_ = Grid::Create(grid_params_);
+    grid_ptr_ = Grid::Create(grid_params_);
 }
 
 auto ExampleDebugVisuals::OnAttached(SharedContextPointer context) -> void {
@@ -49,14 +49,18 @@ auto ExampleDebugVisuals::OnAttached(SharedContextPointer context) -> void {
 }
 
 auto ExampleDebugVisuals::OnUpdate(float _) -> void {
-    if (curr_visual_ == "arrows" && !IsChild(arrows_.get())) {
-        if (IsChild(grid_.get())) Remove(grid_);
-        Add(arrows_);
+    if (curr_visual_ == "arrows" && !IsChild(arrows_)) {
+        if (IsChild(grid_)) {
+            grid_ptr_ = Detach(grid_);
+        }
+        arrows_ = Add(std::move(arrows_ptr_));
     }
 
-    if (curr_visual_ == "grid" && !IsChild(grid_.get())) {
-        if (IsChild(arrows_.get())) Remove(arrows_);
-        Add(grid_);
+    if (curr_visual_ == "grid" && !IsChild(grid_)) {
+        if (IsChild(arrows_)) {
+            arrows_ptr_ = Detach(arrows_);
+        }
+        grid_ = Add(std::move(grid_ptr_));
     }
 }
 
@@ -75,11 +79,8 @@ auto ExampleDebugVisuals::ContextMenu() -> void {
 
         if (dirty) {
             dirty = false;
-            auto grid = Grid::Create(grid_params_);
-            auto grid_mesh = grid->Children().front();
-
-            grid_->RemoveAllChildren();
-            grid_->Add(grid_mesh);
+            Remove(grid_);
+            grid_ = Add(Grid::Create(grid_params_));
         }
     }
 }

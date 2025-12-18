@@ -23,32 +23,31 @@ ExampleDirectionalLight::ExampleDirectionalLight() {
     }));
 
     phong_material_ = PhongMaterial::Create(0xCCCCCC);
-    const auto mesh = Mesh::Create(
-        SphereGeometry::Create({
+
+    auto mesh = Add(
+        Mesh::Create(SphereGeometry::Create({
             .radius = 0.5f,
             .width_segments = 32,
             .height_segments = 32
         }),
         phong_material_
-    );
+    ));
 
     mesh->transform.Translate({0.0f, 0.5f, 0.0f});
-    Add(mesh);
 
     Add(AmbientLight::Create({
         .color = 0xFFFFFF,
         .intensity = 0.15f
     }));
 
-    directional_light_ = DirectionalLight::Create({
+    directional_light_ = Add(DirectionalLight::Create({
         .color = 0xFFFFFF,
         .intensity = 1.0f,
         .target = mesh
-    });
+    }));
 
     directional_light_->transform.Translate({2.0f, 2.0f, -2.0f});
     directional_light_->SetDebugMode(true);
-    Add(directional_light_);
 }
 
 auto ExampleDirectionalLight::OnAttached(SharedContextPointer context) -> void {

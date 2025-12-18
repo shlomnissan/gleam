@@ -23,9 +23,9 @@ ExampleFog::ExampleFog() {
     auto material = PhongMaterial::Create(0x049EF4);
 
     for (auto i = 0; i < 10; ++i) {
-        auto box = Mesh::Create(geometry, material);
-        box->TranslateZ(-1.5f * static_cast<float>(i));
-        Add(box);
+        Add(
+            Mesh::Create(geometry, material)
+        )->TranslateZ(-1.5f * static_cast<float>(i));
     }
 
     Add(AmbientLight::Create({
@@ -33,17 +33,10 @@ ExampleFog::ExampleFog() {
         .intensity = 0.3f
     }));
 
-    auto point_light = PointLight::Create({
+    Add(PointLight::Create({
         .color = 0xFFFFFF,
         .intensity = 1.0f,
-        .attenuation = {
-            .base = 1.0f,
-            .linear = 0.0f,
-            .quadratic = 0.0f
-        }
-    });
-    point_light->transform.Translate({2.0f, 2.0f, 2.0f});
-    Add(point_light);
+    }))->transform.Translate({2.0f, 2.0f, 2.0f});
 
     fog = Fog::CreateLinear(0x444444, 2.0f, 6.0f);
 }
