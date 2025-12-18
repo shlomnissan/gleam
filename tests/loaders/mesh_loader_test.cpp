@@ -24,8 +24,8 @@ auto RunAsyncTest(const std::string& file_path, Callback callback) {
     auto promise = std::promise<void> {};
     auto future = promise.get_future();
 
-    mesh_loader->LoadAsync(file_path, [&](const auto& result) {
-        callback(result, main_thread_id);
+    mesh_loader->LoadAsync(file_path, [&](auto result) {
+        callback(std::move(result), main_thread_id);
         promise.set_value();
     });
 
@@ -33,7 +33,7 @@ auto RunAsyncTest(const std::string& file_path, Callback callback) {
     EXPECT_EQ(status, std::future_status::ready);
 }
 
-auto VerifyMesh(std::shared_ptr<vglx::Node> root) {
+auto VerifyMesh(std::unique_ptr<vglx::Node> root) {
     EXPECT_NE(root, nullptr);
     EXPECT_EQ(root->Children().size(), 1);
 
@@ -53,7 +53,7 @@ auto VerifyMesh(std::shared_ptr<vglx::Node> root) {
 TEST(MeshLoader, LoadMeshSynchronous) {
     auto result = mesh_loader->Load("assets/plane.msh");
     EXPECT_TRUE(result);
-    VerifyMesh(result.value());
+    VerifyMesh(std::move(result.value()));
 }
 
 TEST(MeshLoader, LoadMeshSynchronousInvalidFileType) {
@@ -73,14 +73,14 @@ TEST(MeshLoader, LoadMeshSynchronousInvalidFile) {
 #pragma region Load Mesh Asynchronously
 
 TEST(MeshLoader, LoadMeshAsynchronous) {
-    RunAsyncTest("assets/plane.msh", [](const auto& result, const auto& main_thread_id) {
-        VerifyMesh(result.value());
+    RunAsyncTest("assets/plane.msh", [](auto result, const auto& main_thread_id) {
+        VerifyMesh(std::move(result.value()));
         EXPECT_NE(std::this_thread::get_id(), main_thread_id);
     });
 }
 
 TEST(MeshLoader, LoadMeshAsynchronousInvalidFileType) {
-    RunAsyncTest("assets/plane.obj", [](const auto& result, const auto& main_thread_id) {
+    RunAsyncTest("assets/plane.obj", [](auto result, const auto& main_thread_id) {
         EXPECT_FALSE(result);
         EXPECT_EQ(result.error(), "Invalid mesh file 'assets/plane.obj'");
         EXPECT_NE(std::this_thread::get_id(), main_thread_id);
