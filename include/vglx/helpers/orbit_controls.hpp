@@ -65,14 +65,14 @@ public:
     OrbitControls(Camera* camera, const Parameters& params);
 
     /**
-     * @brief Creates a shared instance of @ref OrbitControls.
+     * @brief Creates an instance of @ref OrbitControls.
      *
      * @param camera Camera the controller manipulates.
      * @param params Configuration parameters.
      */
     [[nodiscard]] static auto
-    Create(Camera* camera, const Parameters& params) -> std::shared_ptr<OrbitControls> {
-        return std::make_shared<OrbitControls>(camera, params);
+    Create(Camera* camera, const Parameters& params) -> std::unique_ptr<OrbitControls> {
+        return std::make_unique<OrbitControls>(camera, params);
     }
 
     /**

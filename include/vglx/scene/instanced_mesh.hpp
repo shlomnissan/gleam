@@ -69,7 +69,7 @@ public:
     );
 
     /**
-     * @brief Creates a shared instance of @ref InstancedMesh.
+     * @brief Creates an instance of @ref InstancedMesh.
      *
      * @param geometry Shared geometry used across all instances.
      * @param material Shared material used across all instances.
@@ -79,8 +79,8 @@ public:
         std::shared_ptr<Geometry> geometry,
         std::shared_ptr<Material> material,
         std::size_t count
-    ) -> std::shared_ptr<InstancedMesh> {
-        return std::make_shared<InstancedMesh>(geometry, material, count);
+    ) -> std::unique_ptr<InstancedMesh> {
+        return std::make_unique<InstancedMesh>(geometry, material, count);
     }
 
     /**

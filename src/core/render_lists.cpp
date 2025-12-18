@@ -10,6 +10,8 @@
 #include <ranges>
 #include <limits>
 
+#include "utilities/assert.hpp"
+
 namespace vglx {
 
 auto RenderLists::ProcessScene(Scene* scene, Camera* camera) -> void {
@@ -17,7 +19,7 @@ auto RenderLists::ProcessScene(Scene* scene, Camera* camera) -> void {
 
     const auto frustum = camera->GetFrustum();
     for (const auto& child : scene->Children()) {
-        ProcessNode(child, frustum);
+        ProcessNode(child.get(), frustum);
     }
 
     const auto c = camera->GetWorldPosition();
@@ -34,6 +36,13 @@ auto RenderLists::ProcessScene(Scene* scene, Camera* camera) -> void {
 }
 
 auto RenderLists::ProcessNode(Node* node, const Frustum& frustum) -> void {
+    VGLX_ASSERT(
+        node != nullptr,
+        "RenderLists::ProcessNode received null node"
+    );
+
+    if (node == nullptr) return;
+
     const auto type = node->GetNodeType();
 
     if (node->IsRenderable()) {
@@ -54,7 +63,7 @@ auto RenderLists::ProcessNode(Node* node, const Frustum& frustum) -> void {
     }
 
     for (const auto& child : node->Children()) {
-        ProcessNode(child, frustum);
+        ProcessNode(child.get(), frustum);
     }
 }
 

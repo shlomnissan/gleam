@@ -10,13 +10,32 @@
 #include "vglx/materials/unlit_material.hpp"
 #include "vglx/scene/mesh.hpp"
 
+namespace {
+
+auto line_geometry() {
+    auto geometry = vglx::Geometry::Create({0, 0, 0, 0, 0, 1});
+    geometry->SetAttribute({vglx::Geometry::VertexAttributeType::Position, 3});
+    geometry->primitive = vglx::Geometry::PrimitiveType::Lines;
+    return geometry;
+}
+
+auto plane_geometry() {
+    auto geometry = vglx::Geometry::Create({-1,  1, 0, 1,  1, 0, 1, -1, 0, -1, -1, 0});
+    geometry->SetAttribute({vglx::Geometry::VertexAttributeType::Position, 3});
+    geometry->primitive = vglx::Geometry::PrimitiveType::LineLoop;
+    return geometry;
+}
+
+}
+
 namespace vglx {
 
 static constexpr auto debug_mesh_size = 0.5f;
 
 struct DirectionalLight::Impl {
-    std::shared_ptr<Mesh> line;
-    std::shared_ptr<Mesh> plane;
+    Mesh* line {nullptr};
+    Mesh* plane {nullptr};
+
     std::shared_ptr<UnlitMaterial> material;
 
     auto CreateDebugMesh(DirectionalLight* self) -> void {
@@ -28,29 +47,9 @@ struct DirectionalLight::Impl {
         material->color = self->color;
         material->fog = false;
 
-        auto line_geometry = Geometry::Create({
-            0, 0, 0,
-            0, 0, 1
-        });
-        line_geometry->SetAttribute({Position, 3});
-        line_geometry->primitive = Lines;
-
-        line = Mesh::Create(line_geometry, material);
-        line->transform_auto_update = false;
-        self->Add(line);
-
-        auto plane_geometry = Geometry::Create({
-            -1,  1, 0,
-             1,  1, 0,
-             1, -1, 0,
-            -1, -1, 0
-        });
-        plane_geometry->SetAttribute({Position, 3});
-        plane_geometry->primitive = LineLoop;
-
-        plane = Mesh::Create(plane_geometry, material);
+        line = self->Add(Mesh::Create(line_geometry(), material));
+        plane = self->Add(Mesh::Create(plane_geometry(), material));
         plane->transform_auto_update = false;
-        self->Add(plane);
 
         UpdateDebugMesh(self);
     }
@@ -70,10 +69,16 @@ struct DirectionalLight::Impl {
     }
 
     auto RemoveDebugMesh(DirectionalLight* self) -> void {
-        if (line != nullptr) self->Remove(line);
-        if (plane != nullptr) self->Remove(plane);
-        line.reset();
-        plane.reset();
+        if (line != nullptr) {
+            self->Remove(line);
+            line = nullptr;
+        }
+
+        if (plane != nullptr) {
+            self->Remove(plane);
+            plane = nullptr;
+        }
+
         material.reset();
     }
 };

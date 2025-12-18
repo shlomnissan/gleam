@@ -47,7 +47,7 @@ public:
       : geometry_(geometry), material_(material) {}
 
     /**
-     * @brief Creates a shared instance of @ref Mesh.
+     * @brief Creates an instance of @ref Mesh.
      *
      * @param geometry Shared pointer to the mesh geometry.
      * @param material Shared pointer to the material used for rendering.
@@ -55,8 +55,8 @@ public:
     [[nodiscard]] static auto Create(
         std::shared_ptr<Geometry> geometry,
         std::shared_ptr<Material> material
-    ) -> std::shared_ptr<Mesh> {
-        return std::make_shared<Mesh>(geometry, material);
+    ) -> std::unique_ptr<Mesh> {
+        return std::make_unique<Mesh>(geometry, material);
     }
 
     /**
