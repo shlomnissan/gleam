@@ -54,7 +54,7 @@ public:
         float intensity; ///< Light intensity multiplier.
         float angle; ///< Cone angle (in radians) for spotlight cutoff.
         float penumbra; ///< Softness of the spotlight edge.
-        std::shared_ptr<Node> target; ///< Node the light is directed toward.
+        Node* target; ///< Node the light is directed toward.
         Attenuation attenuation; ///< Attenuation parameters controlling distance-based falloff.
     };
 
@@ -65,7 +65,7 @@ public:
     float penumbra;
 
     /// @brief Node that the light is oriented toward.
-    std::shared_ptr<Node> target {nullptr};
+    Node* target {nullptr};
 
     /// @brief Attenuation parameters controlling distance-based falloff.
     Attenuation attenuation;

@@ -23,6 +23,7 @@ public:
     auto ContextMenu() -> void override;
 
 private:
+    vglx::PointLight* point_light_ {nullptr};
+
     std::shared_ptr<vglx::PhongMaterial> phong_material_;
-    std::shared_ptr<vglx::PointLight> point_light_;
 };

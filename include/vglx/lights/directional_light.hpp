@@ -45,11 +45,11 @@ public:
     struct Parameters {
         Color color; ///< Light color.
         float intensity; ///< Light intensity multiplier.
-        std::shared_ptr<Node> target; ///< Node the light is directed toward.
+        Node* target; ///< Node the light is directed toward.
     };
 
     /// @brief Node that the light is oriented toward.
-    std::shared_ptr<Node> target;
+    Node* target {nullptr};
 
     /**
      * @brief Constructs a directional light.

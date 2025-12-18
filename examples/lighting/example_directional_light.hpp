@@ -23,6 +23,7 @@ public:
     auto ContextMenu() -> void override;
 
 private:
-    std::shared_ptr<vglx::DirectionalLight> directional_light_;
+    vglx::DirectionalLight* directional_light_ {nullptr};
+
     std::shared_ptr<vglx::PhongMaterial> phong_material_;
 };

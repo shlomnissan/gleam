@@ -25,7 +25,8 @@ public:
     auto OnUpdate(float delta) -> void override;
 
 private:
-    std::shared_ptr<vglx::Mesh> active_point_;
+    vglx::Mesh* active_point_ {nullptr};
+
     std::shared_ptr<vglx::PhongMaterial> active_material_;
 
     vglx::Vector3 start_pos_ {-1.5f, 0.0f, 0.0f};

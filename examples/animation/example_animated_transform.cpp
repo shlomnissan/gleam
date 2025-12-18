@@ -23,18 +23,15 @@ ExampleAnimatedTransform::ExampleAnimatedTransform() {
         .intensity = 0.3f
     }));
 
-    auto point_light = PointLight::Create({
-        .color = 0xFFFFFF,
-        .intensity = 1.0f,
-        .attenuation = {
-            .base = 1.0f,
-            .linear = 0.0f,
-            .quadratic = 0.0f
-        }
-    });
+    auto point_light = Add(
+        PointLight::Create({
+            .color = 0xFFFFFF,
+            .intensity = 1.0f
+        })
+    );
+
     point_light->transform.Translate({0.0f, 0.0f, 30.0f});
     point_light->SetDebugMode(true);
-    Add(point_light);
 
     auto sphere = SphereGeometry::Create({
         .radius = 0.3f,
@@ -45,19 +42,16 @@ ExampleAnimatedTransform::ExampleAnimatedTransform() {
     auto background_material = PhongMaterial::Create(0x777777);
     background_material->depth_test = false;
 
-    auto start_point = Mesh::Create(sphere, background_material);
+    auto start_point = Add(Mesh::Create(sphere, background_material));
     start_point->transform.Translate(start_pos_);
-    Add(start_point);
 
-    auto end_point = Mesh::Create(sphere, background_material);
+    auto end_point = Add(Mesh::Create(sphere, background_material));
     end_point->transform.Translate(end_pos_);
     end_point->SetScale(0.5f);
-    Add(end_point);
 
     active_material_ = PhongMaterial::Create(start_color_);
-    active_point_ = Mesh::Create(sphere, active_material_);
+    active_point_ = Add(Mesh::Create(sphere, active_material_));
     active_point_->transform.Translate(end_pos_);
-    Add(active_point_);
 }
 
 auto ExampleAnimatedTransform::OnAttached(SharedContextPointer context) -> void {
