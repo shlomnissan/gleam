@@ -16,19 +16,16 @@
 
 TEST(Node, AddChild) {
     auto parent = vglx::Node::Create();
-    auto child = vglx::Node::Create();
-
-    parent->Add(child);
+    auto child = parent->Add(vglx::Node::Create());
 
     EXPECT_EQ(parent->Children().size(), 1);
-    EXPECT_EQ(parent->Children()[0], child);
+    EXPECT_EQ(parent->Children()[0].get(), child);
 }
 
 TEST(Node, RemoveChild) {
     auto parent = vglx::Node::Create();
-    auto child = vglx::Node::Create();
+    auto child = parent->Add(vglx::Node::Create());
 
-    parent->Add(child);
     parent->Remove(child);
 
     EXPECT_TRUE(parent->Children().empty());
@@ -36,11 +33,9 @@ TEST(Node, RemoveChild) {
 
 TEST(Node, RemoveAllChildren) {
     auto parent = vglx::Node::Create();
-    auto child1 = vglx::Node::Create();
-    auto child2 = vglx::Node::Create();
 
-    parent->Add(child1);
-    parent->Add(child2);
+    parent->Add(vglx::Node::Create());
+    parent->Add(vglx::Node::Create());
     parent->RemoveAllChildren();
 
     EXPECT_TRUE(parent->Children().empty());
@@ -51,29 +46,27 @@ TEST(Node, RemoveAllChildren) {
 #pragma region Hierarchy Queries
 
 TEST(Node, IsChild) {
-    auto node_1 = vglx::Node::Create();
-    auto node_2 = vglx::Node::Create();
-    auto node_3 = vglx::Node::Create();
+    auto parent_0 = vglx::Node::Create();
+    auto child_0 = parent_0->Add(vglx::Node::Create());
 
-    node_1->Add(node_2);
-    node_2->Add(node_3);
+    auto parent_1 = vglx::Node::Create();
+    auto child_1 = parent_1->Add(vglx::Node::Create());
 
-    EXPECT_TRUE(node_1->IsChild(node_2.get()));
-    EXPECT_TRUE(node_1->IsChild(node_3.get()));
-    EXPECT_TRUE(node_2->IsChild(node_3.get()));
-    EXPECT_FALSE(node_2->IsChild(node_1.get()));
-    EXPECT_FALSE(node_3->IsChild(node_1.get()));
+    EXPECT_TRUE(parent_0->IsChild(child_0));
+    EXPECT_FALSE(parent_0->IsChild(child_1));
+
+    EXPECT_TRUE(parent_1->IsChild(child_1));
+    EXPECT_FALSE(parent_1->IsChild(child_0));
 }
 
 TEST(Node, IsChildAfterRemoval) {
     auto parent = vglx::Node::Create();
-    auto child = vglx::Node::Create();
+    auto child = parent->Add(vglx::Node::Create());
 
-    parent->Add(child);
-    EXPECT_TRUE(parent->IsChild(child.get()));
+    EXPECT_TRUE(parent->IsChild(child));
 
     parent->Remove(child);
-    EXPECT_FALSE(parent->IsChild(child.get()));
+    EXPECT_FALSE(parent->IsChild(child));
 }
 
 TEST(Node, IsChildSelf) {
@@ -91,7 +84,7 @@ TEST(Node, IsChildWithNullptr) {
 #pragma region Update Transforms
 
 TEST(Node, UpdateTransformsWithoutParent) {
-    auto node = std::make_shared<vglx::Node>();
+    auto node = vglx::Node::Create();
     node->SetScale(2.0f);
 
     node->UpdateTransformHierarchy();
@@ -106,11 +99,9 @@ TEST(Node, UpdateTransformsWithoutParent) {
 
 TEST(Node, UpdateTransformsWithParent) {
     auto parent = vglx::Node::Create();
-    auto child = vglx::Node::Create();
+    auto child = parent->Add(vglx::Node::Create());
 
     parent->SetScale(2.0f);
-    parent->Add(child);
-
     parent->UpdateTransformHierarchy();
 
     EXPECT_MAT4_EQ(child->GetWorldTransform(), {
@@ -123,11 +114,10 @@ TEST(Node, UpdateTransformsWithParent) {
 
 TEST(Node, DisableTransformAutoUpdate) {
     auto parent = vglx::Node::Create();
-    auto child = vglx::Node::Create();
+    auto child = parent->Add(vglx::Node::Create());
     child->transform_auto_update = false;
 
     parent->SetScale(2.0f);
-    parent->Add(child);
     parent->UpdateTransformHierarchy();
 
     EXPECT_MAT4_EQ(parent->GetWorldTransform(), {
@@ -147,9 +137,8 @@ TEST(Node, DisableTransformAutoUpdate) {
 
 TEST(Node, MarkTransformedNodeAsUntouched) {
     auto parent = vglx::Node::Create();
-    auto child = vglx::Node::Create();
+    auto child = parent->Add(vglx::Node::Create());
 
-    parent->Add(child);
     parent->UpdateTransformHierarchy();
 
     EXPECT_FALSE(child->ShouldUpdateWorldTransform());
@@ -157,14 +146,13 @@ TEST(Node, MarkTransformedNodeAsUntouched) {
 
 TEST(Node, MarkDetachedNodesAsTouched) {
     auto parent = vglx::Node::Create();
-    auto child = vglx::Node::Create();
+    auto child = parent->Add(vglx::Node::Create());
 
-    parent->Add(child);
     parent->UpdateTransformHierarchy();
 
-    parent->Remove(child);
+    auto detached = parent->Detach(child);
 
-    EXPECT_TRUE(child->ShouldUpdateWorldTransform());
+    EXPECT_TRUE(detached->ShouldUpdateWorldTransform());
 }
 
 #pragma endregion
@@ -182,24 +170,11 @@ TEST(Node, ShouldUpdateTransformWhenDirty) {
 
 #pragma region Edge Cases
 
-TEST(Node, AddChildWithExistingParent) {
-    auto parent1 = vglx::Node::Create();
-    auto parent2 = vglx::Node::Create();
-    auto child = vglx::Node::Create();
-
-    parent1->Add(child);
-    parent2->Add(child);
-
-    EXPECT_EQ(parent1->Children().size(), 0);
-    EXPECT_EQ(parent2->Children().size(), 1);
-    EXPECT_EQ(child->Parent(), parent2.get());
-}
-
 TEST(Node, RemoveNonexistentChild) {
     auto parent = vglx::Node::Create();
     auto child = vglx::Node::Create();
 
-    parent->Remove(child);
+    parent->Remove(child.get());
 
     EXPECT_TRUE(parent->Children().empty());
     EXPECT_EQ(child->Parent(), nullptr);
