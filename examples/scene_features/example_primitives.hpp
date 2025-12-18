@@ -31,8 +31,9 @@ private:
     vglx::SphereGeometry::Parameters sphere_params_;
 
     std::string curr_primitive_  {"box"};
-    std::shared_ptr<vglx::Mesh> mesh_;
-    std::shared_ptr<vglx::Mesh> wireframes_;
+
+    vglx::Mesh* mesh_ {nullptr};
+    vglx::Mesh* wireframes_ {nullptr};
 
     auto InitializeParams() -> void;
     auto BoxContextMenu(bool& dirty) -> void;

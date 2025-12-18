@@ -34,10 +34,9 @@ auto ExampleSprite::OnAttached(SharedContextPointer context) -> void {
         [this](auto result) {
             if (result) {
                 auto material = SpriteMaterial::Create(result.value());
-                sprite_ = Sprite::Create(material);
+                sprite_ = Add(Sprite::Create(material));
                 sprite_->SetScale(0.15f);
                 sprite_->TranslateY(1.0f);
-                Add(sprite_);
             } else {
                 std::println(stderr, "{}", result.error());
             }

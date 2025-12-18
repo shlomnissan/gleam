@@ -21,5 +21,5 @@ public:
     auto OnUpdate(float delta) -> void override;
 
 private:
-    std::shared_ptr<vglx::InstancedMesh> boxes_ {};
+    vglx::InstancedMesh* boxes_ {nullptr};
 };

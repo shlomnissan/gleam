@@ -26,7 +26,8 @@ public:
     auto ContextMenu() -> void override;
 
 private:
+    vglx::Mesh* mesh_ {nullptr};
+
     std::shared_ptr<vglx::UnlitMaterial> material_;
-    std::shared_ptr<vglx::Mesh> mesh_;
     std::shared_ptr<vglx::Texture2D> texture_;
 };

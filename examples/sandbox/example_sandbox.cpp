@@ -25,13 +25,8 @@ auto plane_material = PhongMaterial::Create();
 ExampleSandbox::ExampleSandbox() {
     show_context_menu_ = false;
 
-    auto point_light = PointLight::Create({0xFFFFFF, 1.0f});
-    point_light->transform.Translate({0.5f, 0.5f, 0.8f});
-    Add(point_light);
-
-    auto mesh = Mesh::Create(plane_geometry, plane_material);
-    mesh->SetScale(2.0f);
-    Add(mesh);
+    Add(PointLight::Create({0xFFFFFF, 1.0f}))->transform.Translate({0.5f, 0.5f, 0.8f});
+    Add(Mesh::Create(plane_geometry, plane_material))->SetScale(2.0f);
 }
 
 auto ExampleSandbox::OnAttached(SharedContextPointer context) -> void {

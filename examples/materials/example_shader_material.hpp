@@ -29,6 +29,7 @@ public:
 private:
     vglx::Timer timer_ {true};
 
+    vglx::Mesh* mesh_ {nullptr};
+
     std::shared_ptr<vglx::ShaderMaterial> material_;
-    std::shared_ptr<vglx::Mesh> mesh_;
 };

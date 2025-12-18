@@ -24,15 +24,14 @@ ExamplePhongMaterial::ExamplePhongMaterial() {
     material_ = PhongMaterial::Create(0x049EF4);
     material_->specular = {0.3f, 0.3, 0.3f};
     material_->shininess = 32.0f;
-    mesh_ = Mesh::Create(geometry, material_);
-    Add(mesh_);
+    mesh_ = Add(Mesh::Create(geometry, material_));
 
     Add(AmbientLight::Create({
         .color = 0xFFFFFF,
         .intensity = 0.3f
     }));
 
-    auto point_light = PointLight::Create({
+    Add(PointLight::Create({
         .color = 0xFFFFFF,
         .intensity = 1.0f,
         .attenuation = {
@@ -40,9 +39,7 @@ ExamplePhongMaterial::ExamplePhongMaterial() {
             .linear = 0.0f,
             .quadratic = 0.0f
         }
-    });
-    point_light->transform.Translate({2.0f, 2.0f, 2.0f});
-    Add(point_light);
+    }))->transform.Translate({2.0f, 2.0f, 2.0f});
 }
 
 auto ExamplePhongMaterial::OnAttached(SharedContextPointer context) -> void {

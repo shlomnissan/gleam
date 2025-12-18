@@ -37,17 +37,12 @@ auto colors = std::array<Color, 10> {
 ExampleMeshInstancing::ExampleMeshInstancing() {
     show_context_menu_ = false;
 
-    auto ambient_light = AmbientLight::Create({.color = 0xFFFFFF, .intensity = .3f});
-    Add(ambient_light);
-
-    auto point_light = PointLight::Create({.color = 0xFFFFFF, .intensity = 1.0f});
-    point_light->transform.Translate({0.0f, 0.0f, 30.0f});
-    Add(point_light);
+    Add(AmbientLight::Create({.color = 0xFFFFFF, .intensity = .3f}));
+    Add(PointLight::Create({.color = 0xFFFFFF, .intensity = 1.0f}))->TranslateZ(30.0f);
 
     const auto geometry = BoxGeometry::Create({1.0f, 1.0f, 1.0f});
     const auto material = PhongMaterial::Create(0xFFFFFF);
-    boxes_ = InstancedMesh::Create(geometry, material, 2500);
-    Add(boxes_);
+    boxes_ = Add(InstancedMesh::Create(geometry, material, 2500));
 
     for (auto i = 0; i < 50; ++i) {
         for (auto j = 0; j < 50; ++j) {

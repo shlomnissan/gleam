@@ -22,5 +22,5 @@ public:
     auto OnUpdate(float delta) -> void override;
 
 private:
-    std::shared_ptr<vglx::Sprite> sprite_;
+    vglx::Sprite* sprite_ {nullptr};
 };
