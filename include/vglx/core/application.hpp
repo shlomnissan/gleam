@@ -124,7 +124,7 @@ public:
      * This method **must be implemented** by the user and returns the primary
      * scene used for rendering and updates.
      */
-    virtual auto CreateScene() -> std::shared_ptr<Scene> = 0;
+    virtual auto CreateScene() -> std::unique_ptr<Scene> = 0;
 
     /**
      * @brief Creates the main camera.
@@ -132,7 +132,7 @@ public:
      * This method can be optionally overridden. If null is returned, a default
      * @ref PerspectiveCamera "perspective camera" will be created automatically.
      */
-    virtual auto CreateCamera() -> std::shared_ptr<Camera> { return nullptr; }
+    virtual auto CreateCamera() -> std::unique_ptr<Camera> { return nullptr; }
 
     /**
      * @brief Per-frame update callback.
@@ -171,16 +171,16 @@ public:
     /**
      * @brief Sets the active scene.
      *
-     * @param scene Shared pointer to the new scene.
+     * @param scene Unique pointer to the new scene.
      */
-    auto SetScene(std::shared_ptr<Scene> scene) -> void;
+    auto SetScene(std::unique_ptr<Scene> scene) -> void;
 
     /**
      * @brief Sets the active camera.
      *
-     * @param camera Shared pointer to the new camera.
+     * @param camera Unique pointer to the new camera.
      */
-    auto SetCamera(std::shared_ptr<Camera> camera) -> void;
+    auto SetCamera(std::unique_ptr<Camera> camera) -> void;
 
     virtual ~Application();
 

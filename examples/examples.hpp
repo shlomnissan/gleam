@@ -59,15 +59,14 @@ namespace {
 
 }
 
-using SceneChangeCallback = std::function<void(std::shared_ptr<vglx::Scene>)>;
+using SceneChangeCallback = std::function<void(std::unique_ptr<vglx::Scene>)>;
 
 class Examples {
 public:
-    std::shared_ptr<ExampleScene> scene;
+    ExampleScene* scene_ptr {nullptr};
 
     Examples(SceneChangeCallback cb) : scene_change_cb_ {std::move(cb)} {
         Theme();
-        LoadScene(examples[current_scene_]);
     }
 
     auto Draw() -> void {
@@ -95,42 +94,46 @@ public:
                         && current_scene_ != i
                     ) {
                         current_scene_ = i;
-                        LoadScene(name);
+                        scene_change_cb_(GetScene());
                     }
                 }
                 ImGui::EndListBox();
             }
         }
 
-        if (scene->show_context_menu_) {
+        if (scene_ptr != nullptr && scene_ptr->show_context_menu_) {
             if (ImGui::CollapsingHeader("Settings", ImGuiTreeNodeFlags_DefaultOpen)) {
-                scene->ContextMenu();
+                scene_ptr->ContextMenu();
             }
         }
 
         ImGui::End();
     }
 
-    auto LoadScene(const std::string_view scene_name) -> void {
-        if (current_scene_ == 0) scene.reset(new ExampleSandbox());
+    auto GetScene() -> std::unique_ptr<ExampleScene> {
+        auto scene = std::unique_ptr<ExampleScene> {nullptr};
+        auto name = std::string_view {examples[current_scene_]};
 
-        if (scene_name == "Unlit Material") scene.reset(new ExampleUnlitMaterial());
-        if (scene_name == "Phong Material") scene.reset(new ExamplePhongMaterial());
-        if (scene_name == "Shader Material") scene.reset(new ExampleShaderMaterial());
-        if (scene_name == "Directional Light") scene.reset(new ExampleDirectionalLight());
-        if (scene_name == "Point Light") scene.reset(new ExamplePointLight());
-        if (scene_name == "Spot Light") scene.reset(new ExampleSpotLight());
-        if (scene_name == "Transparency & Blending") scene.reset(new ExampleBlending());
-        if (scene_name == "Fog Effect") scene.reset(new ExampleFog());
-        if (scene_name == "Frustum Culling") scene.reset(new ExampleFrustumCulling());
-        if (scene_name == "Mesh Instancing") scene.reset(new ExampleMeshInstancing());
-        if (scene_name == "Model Loader") scene.reset(new ExampleModelLoader());
-        if (scene_name == "Primitives") scene.reset(new ExamplePrimitives());
-        if (scene_name == "Sprite") scene.reset(new ExampleSprite());
-        if (scene_name == "Debug Visuals") scene.reset(new ExampleDebugVisuals());
-        if (scene_name == "Animated Transform") scene.reset(new ExampleAnimatedTransform());
+        if (name == "Unlit Material") scene = std::make_unique<ExampleUnlitMaterial>();
+        if (name == "Phong Material") scene = std::make_unique<ExamplePhongMaterial>();
+        if (name == "Shader Material") scene = std::make_unique<ExampleShaderMaterial>();
+        if (name == "Directional Light") scene = std::make_unique<ExampleDirectionalLight>();
+        if (name == "Point Light") scene = std::make_unique<ExamplePointLight>();
+        if (name == "Spot Light") scene = std::make_unique<ExampleSpotLight>();
+        if (name == "Transparency & Blending") scene = std::make_unique<ExampleBlending>();
+        if (name == "Fog Effect") scene = std::make_unique<ExampleFog>();
+        if (name == "Frustum Culling") scene = std::make_unique<ExampleFrustumCulling>();
+        if (name == "Mesh Instancing") scene = std::make_unique<ExampleMeshInstancing>();
+        if (name == "Model Loader") scene = std::make_unique<ExampleModelLoader>();
+        if (name == "Primitives") scene = std::make_unique<ExamplePrimitives>();
+        if (name == "Sprite") scene = std::make_unique<ExampleSprite>();
+        if (name == "Debug Visuals") scene = std::make_unique<ExampleDebugVisuals>();
+        if (name == "Animated Transform") scene = std::make_unique<ExampleAnimatedTransform>();;
+        if (scene == nullptr) scene = std::make_unique<ExampleSandbox>();
 
-        scene_change_cb_(scene);
+        scene_ptr = scene.get();
+
+        return scene;
     }
 
 private:

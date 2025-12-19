@@ -27,17 +27,17 @@ public:
         };
     }
 
-    auto CreateScene() -> std::shared_ptr<Scene> override {
+    auto CreateScene() -> std::unique_ptr<Scene> override {
         if (examples_ == nullptr) {
             auto context = GetContext();
             examples_ = std::make_unique<Examples>(
-                [this](std::shared_ptr<Scene> scene) { SetScene(scene); }
+                [this](std::unique_ptr<Scene> scene) { SetScene(std::move(scene)); }
             );
         }
-        return examples_->scene;
+        return examples_->GetScene();
     }
 
-    auto CreateCamera() -> std::shared_ptr<Camera> override {
+    auto CreateCamera() -> std::unique_ptr<Camera> override {
         auto camera = PerspectiveCamera::Create({
             .fov = math::DegToRad(60.0f),
             .aspect = GetContext()->aspect_ratio,

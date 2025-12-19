@@ -54,11 +54,14 @@ auto main() -> int {
         window.Height()
     );
 
-    auto timer = FrameTimer {true}; // auto-start
-    auto stats = Stats {};
-    auto examples = Examples {[&context](std::shared_ptr<Scene> scene){
+    auto scene = std::unique_ptr<vglx::Scene> {};
+    auto examples = Examples {[&scene, &context](std::unique_ptr<Scene> sc){
+        scene = std::move(sc);
         scene->SetContext(context.get());
     }};
+
+    scene = examples.GetScene();
+    scene->SetContext(context.get());
 
     window.OnResize([&](const ResizeParameters& params){
         context->framebuffer_width = params.framebuffer_width;
@@ -73,18 +76,21 @@ auto main() -> int {
         camera->Resize(params.window_width, params.window_height);
     });
 
+    auto timer = FrameTimer {true}; // auto-start
+    auto stats = Stats {};
+
     while(!window.ShouldClose()) {
         window.PollEvents();
 
         const auto dt = timer.Tick();
-        examples.scene->Advance(dt);
+        scene->Advance(dt);
 
         window.BeginUIFrame();
         examples.Draw();
         stats.Draw();
 
         stats.BeforeRender();
-        renderer.Render(examples.scene.get(), camera.get());
+        renderer.Render(scene.get(), camera.get());
         window.EndUIFrame();
 
         stats.AfterRender(renderer.RenderedObjectsPerFrame());

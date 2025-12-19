@@ -37,8 +37,8 @@ auto create_default_camera(int width, int height) {
 }
 
 struct Application::Impl {
-    std::shared_ptr<Scene> scene;
-    std::shared_ptr<Camera> camera;
+    std::unique_ptr<Scene> scene;
+    std::unique_ptr<Camera> camera;
     std::unique_ptr<Window> window;
     std::unique_ptr<Renderer> renderer;
     std::unique_ptr<SharedContext> context;
@@ -76,8 +76,8 @@ struct Application::Impl {
         );
     }
 
-    auto SetCamera(std::shared_ptr<Camera> camera) -> void {
-        this->camera = camera;
+    auto SetCamera(std::unique_ptr<Camera> camera) -> void {
+        this->camera = std::move(camera);
         if (!this->camera) {
             this->camera = create_default_camera(
                 context->window_width,
@@ -87,8 +87,8 @@ struct Application::Impl {
         context->camera = this->camera.get();
     }
 
-    auto SetScene(std::shared_ptr<Scene> scene) -> void {
-        this->scene = scene;
+    auto SetScene(std::unique_ptr<Scene> scene) -> void {
+        this->scene = std::move(scene);
         this->scene->SetContext(context.get());
     }
 };
@@ -171,12 +171,12 @@ auto Application::GetCamera() const -> Camera* {
     return impl_->camera.get();
 }
 
-auto Application::SetScene(std::shared_ptr<Scene> scene) -> void {
-    impl_->SetScene(scene);
+auto Application::SetScene(std::unique_ptr<Scene> scene) -> void {
+    impl_->SetScene(std::move(scene));
 }
 
-auto Application::SetCamera(std::shared_ptr<Camera> camera) -> void {
-    impl_->SetCamera(camera);
+auto Application::SetCamera(std::unique_ptr<Camera> camera) -> void {
+    impl_->SetCamera(std::move(camera));
 }
 
 Application::~Application() = default;
