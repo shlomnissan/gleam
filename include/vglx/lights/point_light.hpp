@@ -23,7 +23,7 @@ namespace vglx {
  * parameters.
  *
  * @code
- * auto point = vglx::PointLight::Create({
+ * my_scene->Add(vglx::PointLight::Create({
  *   .color = 0xFFFFFF,
  *   .intensity = 1.0f,
  *   .attenuation = {
@@ -31,9 +31,7 @@ namespace vglx {
  *     .linear = 0.0f,
  *     .quadratic = 0.0f
  *   }
- * });
- *
- * my_scene->Add(point);
+ * }));
  * @endcode
  *
  * @ingroup LightsGroup

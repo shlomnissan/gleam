@@ -26,12 +26,10 @@ namespace vglx {
  * illumination and to prevent completely unlit regions in the scene.
  *
  * @code
- * auto ambient = vglx::AmbientLight::Create({
+ * my_scene->Add(vglx::AmbientLight::Create({
  *   .color = 0xFFFFFF,
  *   .intensity = 0.3f
- * });
- *
- * my_scene->Add(ambient);
+ * }));
  * @endcode
  *
  * @ingroup LightsGroup

@@ -20,9 +20,9 @@ namespace vglx {
  * @brief Generated geometry representing a sphere.
  *
  * SphereGeometry constructs a UV-parameterized sphere centered at the origin.
- * The `radius` defines its size, while `width_segments` and `height_segments`
- * control tessellation along longitude and latitude. Higher segment counts
- * produce smoother lighting and silhouettes at the cost of additional vertices.
+ * The radius defines its size, while segmentation properties control tessellation
+ * along longitude and latitude. Higher segment counts produce smoother lighting
+ * and silhouettes at the cost of additional vertices.
  *
  * @code
  * auto geometry = vglx::SphereGeometry::Create({

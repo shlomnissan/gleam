@@ -22,7 +22,7 @@ namespace vglx {
  * It supports differing top and bottom radii (allowing tapered shapes), an
  * adjustable height, optional subdivision along both radial and vertical
  * directions, and the option to render the cylinder with or without end caps.
- * The geometry is centered in local space, with its midpoint at the origin.
+ * The geometry is centered with its midpoint at the origin.
  *
  * @code
  * auto geometry = vglx::CylinderGeometry::Create({

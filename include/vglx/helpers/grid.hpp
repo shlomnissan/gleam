@@ -25,13 +25,11 @@ namespace vglx {
  * whose extent, color, and subdivision count can be customized.
  *
  * @code
- * auto grid = vglx::Grid::Create({
+ * my_scene->Add(vglx::Grid::Create({
  *   .color = 0x333333,
  *   .size = 4.0f,
  *   .divisions = 16
- * });
- *
- * my_scene->Add(grid);
+ * }));
  * @endcode
  *
  * @ingroup HelpersGroup

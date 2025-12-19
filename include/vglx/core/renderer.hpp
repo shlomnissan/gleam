@@ -19,11 +19,15 @@
 namespace vglx {
 
 /**
- * @brief Renderer object for drawing a scene from a given camera.
+ * @brief Renderer interface for drawing a scene with a given camera.
  *
  * The renderer owns GPU state and draw logic for rendering a @ref Scene with a
  * specified @ref Camera. It is typically constructed and driven by the
- * @ref Application runtime, but can also be used directly in manual setups.
+ * @ref Application runtime but can also be used directly in manual setups.
+ *
+ * This class defines the rendering interface only. The actual rendering
+ * implementation is provided by a backend, and multiple backends (for example,
+ * OpenGL or Vulkan) may exist behind this interface.
  *
  * @code
  * vglx::Renderer renderer({
@@ -36,12 +40,9 @@ namespace vglx {
  * if (!ok) {
  *   HandleError(ok.error());
  * }
- *
- * // Per-frame:
- * renderer.Render(scene.get(), camera.get());
  * @endcode
  *
- * @note The renderer assumes a valid graphics context is current on the
+ * The renderer assumes a valid graphics context is current on the
  * calling thread. When the window is resized, call @ref SetViewport to adjust
  * the render area (or recreate with new parameters if you manage your own
  * framebuffers).

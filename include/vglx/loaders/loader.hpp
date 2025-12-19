@@ -23,8 +23,7 @@ namespace fs = std::filesystem;
 /**
  * @brief Result type returned by resource loaders.
  *
- * Contains either a shared pointer to the loaded resource or an error message
- * describing why loading failed.
+ * Contains a pointer to the loaded resource or an error message.
  *
  * @related Loader
  */
@@ -90,7 +89,7 @@ public:
      * @param callback Callback that receives the result of the loading
      * operation.
      */
-    auto LoadAsync(const fs::path& path, LoaderCallback<Resource> callback) const {
+    auto LoadAsync(const fs::path& path, LoaderCallback<Resource> callback) const -> void {
         if (!fs::exists(path)) {
             callback(std::unexpected("File not found '" + path.string() + "'"));
             return;

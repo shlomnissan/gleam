@@ -27,11 +27,10 @@ namespace vglx {
  *
  * @code
  * auto geometry = vglx::SphereGeometry::Create();
- * auto bounds = vglx::BoundingBox::Create(
+ * my_scene->Add(vglx::BoundingBox::Create(
  *   geometry->BoundingBox(),
  *   0xFFFFFF
- * );
- * my_scene->Add(bounds);
+ * ));
  * @endcode
  *
  * @ingroup HelpersGroup

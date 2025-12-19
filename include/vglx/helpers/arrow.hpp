@@ -27,14 +27,12 @@ namespace vglx {
  * direction or origin is changed.
  *
  * @code
- * auto arrow = vglx::Arrow::Create({
+ * my_scene->Add(vglx::Arrow::Create({
  *   .direction = {1.0f, 0.0f, 0.0f},
  *   .origin = Vector3::Zero(),
  *   .color = 0xFF0000,
  *   .length = 1.0f
- * });
- *
- * my_scene->Add(arrow);
+ * }));
  * @endcode
  *
  * @ingroup HelpersGroup

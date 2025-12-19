@@ -35,10 +35,10 @@ using TextureCallback = std::function<void(std::shared_ptr<Texture2D>)>;
  * base class API.
  *
  * You can convert standard image formats (for example PNG or JPG) into `.tex`
- * files using the `asset_builder` tool located in the engine's `tools`
+ * files using the `asset_builder` CLI located in the engine's `tools`
  * directory. The `.tex` format stores texture data and metadata in a layout
  * optimized for fast loading at runtime.
- * See [Importing Assets](/manual/importing_assets) to learn more.
+ * See [Importing Assets Guide](/manual/importing_assets) to learn more.
  *
  * Explicit instantiation of this class is discouraged due to lifetime concerns
  * in the current architecture, particularly when used with asynchronous

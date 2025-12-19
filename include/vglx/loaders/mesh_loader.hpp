@@ -34,17 +34,17 @@ using MeshCallback = std::function<void(std::unique_ptr<Node>)>;
  * engine's custom `.msh` format from disk and constructs a node hierarchy
  * containing one or more static mesh objects and their associated materials.
  * It exposes both synchronous and asynchronous loading through the base
- * class API.
+ * class API. You can learn more about importing meshes
  *
  * The returned resource is a @ref Node that acts as a group container for all
  * meshes encoded within the `.msh` file. This node can be attached directly to
  * the scene graph or inserted under an existing node.
  *
  * You can convert common 3D model formats (for example OBJ or glTF) into `.msh`
- * files using the `asset_builder` tool located in the engine's `tools`
+ * files using the `asset_builder` CLI located in the engine's `tools`
  * directory. The `.msh` format stores geometry, materials, and metadata in a
  * compact layout optimized for fast loading at runtime.
- * See [Importing Assets](/manual/importing_assets) to learn more.
+ * See [Importing Assets Guide](/manual/importing_assets) to learn more.
  *
  * Explicit instantiation of this class is discouraged due to lifetime concerns
  * in the current architecture, particularly when used with asynchronous
@@ -61,7 +61,8 @@ using MeshCallback = std::function<void(std::unique_ptr<Node>)>;
  *     "assets/my_model.msh",
  *     [this](auto result) {
  *       if (result) {
- *         this->Add(result.value());
+ *         // Use std::move to transfer ownership
+ *         this->Add(std::move(result.value()));
  *       } else {
  *         std::println(stderr, "{}", result.error());
  *       }

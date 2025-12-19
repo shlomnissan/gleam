@@ -22,18 +22,18 @@ enum class Key;
  * the base @ref Event with data specific to keyboard input: the @ref
  * KeyboardEvent::Type "interaction type" and the @ref KeyboardEvent::key "key code".
  *
- * Events are dispatched through the @ref Scene hierarchy where
+ * Keyboard events are dispatched through the @ref Scene hierarchy where
  * nodes can override the @ref Node::OnKeyboardEvent handler and optionally
  * mark the event as @ref Event::handled "handled". When handled
- * is set to `true`, the event stops propagating to other nodes.
+ * is set to `true` the event stops propagating to other nodes.
  *
  * @code
  * class MyNode : public vglx::Node {
  * public:
  *   auto OnKeyboardEvent(vglx::KeyboardEvent* event) -> void override {
  *     if (event->type == vglx::KeyboardEvent::Type::Pressed) {
- *       if (event->key == vglx::Key::Sapce) {
- *         // do something...
+ *       if (event->key == vglx::Key::Space) {
+ *         // Do something...
  *         event->handled = true; // stop propagation
  *       }
  *     }

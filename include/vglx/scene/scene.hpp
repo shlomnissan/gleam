@@ -23,7 +23,7 @@ namespace vglx {
  * rendering and updates. It owns the scene graph hierarchy, optional global
  * fog settings, and a shared runtime context. Create a scene by overriding
  * the application runtime @ref Application::CreateScene. The runtime will
- * attach it to the active context, and advances it once per frame.
+ * attach it to the active context and advance it once per frame.
  *
  * @code
  * class MyApp : public vglx::Application {
@@ -38,7 +38,7 @@ namespace vglx {
  *     };
  *   }
  *
- *   auto CreateScene() -> std::shared_ptr<vglx::Scene> override {
+ *   auto CreateScene() -> std::unique_ptr<vglx::Scene> override {
  *     auto scene = vglx::Scene::Create();
  *     scene->fog = vglx::Fog::CreateExponential(0x444444, 0.3f);
  *

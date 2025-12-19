@@ -34,7 +34,9 @@ namespace vglx {
  * const auto geometry = vglx::BoxGeometry::Create({1.0f, 1.0f, 1.0f});
  * const auto material = vglx::PhongMaterial::Create(0xFFFFFF);
  *
- * auto boxes = vglx::InstancedMesh::Create(geometry, material, 2500);
+ * auto boxes = my_scene->Add(vglx::InstancedMesh::Create(
+ *   geometry, material, 2500
+ * );
  *
  * for (auto i = 0; i < 50; ++i) {
  *   for (auto j = 0; j < 50; ++j) {
@@ -43,13 +45,11 @@ namespace vglx {
  *     boxes->SetTransformAt(j * 50 + i, t);
  *   }
  * }
- *
- * my_scene->Add(boxes);
  * @endcode
  *
- * Out-of-range indices are invalid and result in undefined behavior, and
- * culling is performed coarsely using a single bounding volume that determines
- * the visibility of the entire instance set as a whole.
+ * Out-of-range indices are invalid and result in undefined behavior. Culling
+ * is performed using a single bounding volume that determines visibility of
+ * the instance set as a whole.
  *
  * @ingroup SceneGroup
  */

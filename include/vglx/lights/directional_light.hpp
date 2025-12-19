@@ -26,15 +26,16 @@ namespace vglx {
  *
  * When the @ref DirectionalLight::Parameters "target" parameter is
  * set to `nullptr`, the light will point toward the world origin.
+ * The target must belong to the same @ref Scene as this object. Attaching
+ * or referencing a target from a different scene results in undefined behavior
+ * and is not supported.
  *
  * @code
- * auto directional = vglx::DirectionalLight::Create({
+ * my_scene->Add(vglx::DirectionalLight::Create({
  *   .color = 0xFFFFFF,
  *   .intensity = 1.0f,
  *   .target = nullptr
- * });
- *
- * my_scene->Add(directional);
+ * }));
  * @endcode
  *
  * @ingroup LightsGroup

@@ -35,10 +35,7 @@ namespace vglx {
  *         auto material = vglx::SpriteMaterial::Create();
  *         material->albedo_map = result.value();
  *
- *         auto sprite = Sprite::Create(mat);
- *         sprite->SetScale(0.5f);
- *
- *         Add(sprite);
+ *         Add(Sprite::Create(material))->SetScale(0.5f);
  *       } else {
  *         std::println(stderr, "{}", result.error());
  *       }

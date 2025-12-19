@@ -49,8 +49,7 @@ namespace vglx {
  * // Update a uniform each frame
  * material->uniforms["u_Time"] = timer.GetElapsedSeconds();
  *
- * auto mesh = vglx::Mesh::Create(geometry, material);
- * my_scene->Add(mesh);
+ * my_scene->Add(vglx::Mesh::Create(geometry, material));
  * @endcode
  *
  * @ingroup MaterialsGroup

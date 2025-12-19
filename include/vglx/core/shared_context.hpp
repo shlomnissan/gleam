@@ -23,27 +23,20 @@ class Camera;
  * The shared context encapsulates common runtime state and services accessible
  * throughout the scene graph. It is constructed and propagated automatically
  * by the runtime, which also keeps its values synchronized as rendering
- * parameters change — such as window size, framebuffer dimensions, or the
+ * parameters change, such as window size, framebuffer dimensions, or the
  * active camera.
  *
  * Nodes can access the shared context via the @ref Node::OnAttached
  * callback, which is invoked when the node joins an active scene hierarchy.
  * Override this method in your node subclass to perform initialization
- * that depends on the context — such as loading resources, querying the
+ * that depends on the context, such as loading resources, querying the
  * active camera, or accessing other global services.
  *
  * @code
-  * auto MyNode::OnAttached(SharedContextPointer context) -> void {
- *   context->texture_loader->LoadAsync(
- *     "assets/my_texture.tex",
- *     [this](auto result) {
- *       if (result) {
- *         texture_ = result.value();
- *       } else {
- *         std::println(stderr, "{}", result.error());
- *       }
- *     }
- *   );
+ * auto MyNode::OnAttached(SharedContextPointer context) -> void {
+ *   // It's common for the scene to use the OnAttached hook to
+ *   // configure the camera position
+ *   context->camera->TranslateZ(3.0f);
  * }
  * @endcode
  *

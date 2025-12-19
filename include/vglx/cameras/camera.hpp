@@ -27,10 +27,10 @@ namespace vglx {
  */
 class VGLX_EXPORT Camera : public Node {
 public:
-    /// @brief Projection matrix that maps camera-space coordinates to clip space.
+    /// @brief Projection matrix that maps camera space coordinates to clip space.
     Matrix4 projection_matrix {Matrix4::Identity()};
 
-    /// @brief View matrix that maps world space to camera space.
+    /// @brief View matrix that maps world space coordinates to camera space.
     Matrix4 view_matrix {Matrix4::Identity()};
 
     /**
@@ -66,11 +66,11 @@ public:
     [[nodiscard]] auto GetFrustum() -> Frustum;
 
     /**
-     * @brief Overrides @ref Node::LookAt to orient the camera toward a world-space target.
+     * @brief Overrides @ref Node::LookAt to orient the camera toward a world space target.
      *
      * Accounts for the camera’s -Z viewing direction so the camera faces the given point.
      *
-     * @param target World-space position for the camera to look at.
+     * @param target World space position for the camera to look at.
      */
     auto LookAt(const Vector3& target) -> void override;
 

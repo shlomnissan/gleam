@@ -20,8 +20,8 @@ namespace vglx {
  * @brief Abstract base class for all light types.
  *
  * This class is not intended to be used directly. Use one of the concrete
- * light types such as @ref DirectionalLight, @ref PointLight, or
- * @ref SpotLight unless defining a custom light implementation.
+ * light types such as @ref AmbientLight, @ref DirectionalLight, @ref PointLight, or
+ * @ref SpotLight.
  *
  * @ingroup LightsGroup
  */

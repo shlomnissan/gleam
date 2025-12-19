@@ -99,7 +99,7 @@ struct MyApp : public vglx::Application {
         };
     }
 
-    auto CreateScene() -> std::shared_ptr<vglx::Scene> override {
+    auto CreateScene() -> std::unique_ptr<vglx::Scene> override {
         return vglx::Scene::Create();
     }
 
@@ -111,25 +111,24 @@ struct MyApp : public vglx::Application {
 auto main() -> int {
     auto app = MyApp {};
     app.Start();
+
     return 0;
 }
 ```
 
 Our class overrides three functions that initialize the runtime. [Configure](/reference/core/application#function-configure-0192d125) is optional but you will often implement it. It returns a small data object that describes how the application should start up. Using designated initializers keeps each field clear and easy to read.
 
-[CreateScene](/reference/core/application#function-create-scene-2b0beeb4) is required and returns the scene you want to render. At this stage we simply return an empty scene using its factory. VGLX uses shared pointers to store nodes in the scene graph and built-in nodes provide [Create](/reference/scene/scene#function-create-a8164366) helpers to construct them correctly.
+[CreateScene](/reference/core/application#function-create-scene-2b0beeb4) is required and returns the scene you want to render. At this stage we simply return an empty scene using its factory. VGLX uses unique pointers to manage nodes in the scene graph. The scene graph owns all nodes for their entire lifetime and built-in node types provide [Create](/reference/scene/scene#function-create-a8164366) helpers to construct them correctly.
 
 The last function, [Update](/reference/core/application#function-update-d40fe494), is also required. It is called once per frame and is where you add per-frame logic at the application level. Returning `true` keeps the application running. Returning `false` exits the main loop.
 
 In `main` we create an instance of the app and call [Start](/reference/core/application#function-start-28ef28d7) to launch it. If you build and run the project again you should see a window for your new VGLX application.
 
-![Empty VGLX application window](/guide_empty_window.png "Empty VGLX application window")
-
 ## Creating a Scene
 
 Before you can put anything in your world you need a [Scene](/reference/scene/scene). The scene is the root of your graph: every node hangs from it, inherits its state, and contributes to the final frame. It’s the anchor that ties cameras, lights, and geometry into a coherent world the renderer can walk.
 
-In the earlier example we returned an empty [Scene](/reference/scene/scene) from [CreateScene](/reference/core/application#function-create-scene-2b0beeb4). You can attach nodes directly to that instance but it’s often cleaner to subclass [Scene](/reference/scene/scene). A custom scene gives you access to lifecycle hooks without cluttering the graph.
+In the earlier example we returned an empty scene. You can attach nodes directly to that instance but it’s often cleaner to subclass [Scene](/reference/scene/scene). A custom scene gives you access to lifecycle hooks without cluttering the graph.
 
 Add the following class definition above `MyApp`:
 
@@ -146,8 +145,8 @@ struct MyScene : public vglx::Scene {
 This defines a `MyScene` type with an empty constructor and two hooks: [OnAttached](/reference/scene/node#function-on-attached-ff71adbb), called when the scene enters the runtime, and [OnUpdate](/reference/scene/node#function-on-update-86a04f9c), called once per frame. We’ll fill these in shortly. First, tell the runtime to use `MyScene`:
 
 ```cpp
-auto CreateScene() -> std::shared_ptr<vglx::Scene> override {
-    return std::make_shared<MyScene>();
+auto CreateScene() -> std::unique_ptr<vglx::Scene> override {
+    return std::make_unique<MyScene>();
 }
 ```
 
@@ -168,7 +167,7 @@ struct MyScene : public vglx::Scene {
     MyScene() {}
 
     auto OnAttached(vglx::SharedContextPointer context) -> void override {
-        context->camera->TranslateZ(3.0f); // push the camera back
+        context->camera->TranslateZ(2.5f); // push the camera back
     }
 
     auto OnUpdate(float delta) -> void override {}
@@ -182,53 +181,53 @@ For a simple 3D box we can use the built-in [BoxGeometry](/reference/primitives/
 
 ```cpp
 struct MyScene : public vglx::Scene {
-    // create a new mesh
-    std::shared_ptr<vglx::Mesh> mesh = vglx::Mesh::Create(
-        vglx::BoxGeometry::Create(),
-        vglx::PhongMaterial::Create(0x049EF4)
-    );
+    vglx::Mesh* mesh {nullptr};
 
     MyScene() {
-        Add(mesh); // add mesh to the scene
+        mesh = Add(vglx::Mesh::Create(
+            vglx::BoxGeometry::Create(),
+            vglx::PhongMaterial::Create(0x049EF4)
+        ));
     }
 
     auto OnAttached(vglx::SharedContextPointer context) -> void override {
-        context->camera->TranslateZ(3.0f);
+        context->camera->TranslateZ(2.5f);
     }
 
     auto OnUpdate(float delta) -> void override {}
 };
 ```
 
-If we ran the application now we still wouldn’t see anything, because the scene has no light sources. For this demo we’ll add two: an [AmbientLight](/reference/lights/ambient_light) which illuminates everything uniformly from all directions, and a [PointLight](/reference/lights/point_light) which represents a light source at a specific position that emits light in all directions like a small bulb.
+Note that [Mesh::Create](/reference/scene/mesh#function-create-e5ed840e) returns a [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr.html) that is transferred to and owned by the scene graph. Calling [Add](/reference/scene/node#function-add-f20d5ae5) returns a non-owning raw pointer which you may store and use for convenience. This pointer remains valid only while the node is attached to the scene graph; once the node is removed, the reference must no longer be used.
+
+If we ran the application now we still wouldn’t see anything because the scene has no light sources. For this demo we’ll add two: an [AmbientLight](/reference/lights/ambient_light) which illuminates everything uniformly from all directions, and a [PointLight](/reference/lights/point_light) which represents a light source at a specific position that emits light in all directions like a small bulb.
 
 We can add and configure both lights in our scene’s constructor:
 
 ```cpp
 MyScene() {
-    auto ambient_light = vglx::AmbientLight::Create({
+    Add(vglx::AmbientLight::Create({
         .color = 0xFFFFFF,
         .intensity = 0.5f
-    });
+    }));
 
-    auto point_light = vglx::PointLight::Create({
+    Add(vglx::PointLight::Create({
         .color = 0xFFFFFF,
         .intensity = 1.0f
-    });
+    }))->transform.Translate({2.0f, 2.5f, 4.0f});
 
-    point_light->transform.Translate({2.0f, 2.5f, 4.0f});
-
-    Add(ambient_light);
-    Add(point_light);
-    Add(mesh);
+    mesh = Add(vglx::Mesh::Create(
+        vglx::BoxGeometry::Create(),
+        vglx::PhongMaterial::Create(0x049EF4)
+    ));
 }
 ```
 
 Both light sources need a color and an intensity. Unlike the ambient light, the point light is positional so we move it slightly up, to the right, and back to give the scene some depth.
 
-If you run the application now you should see a blue square in the center of the window. That’s the front face of the box viewed straight on. Next we’ll animate it so the 3D shape becomes obvious.
+If you run the application now you should see a blue square in the center of the window. That’s the front face of the box viewed straight on.
 
-![Window showing a blue box](/guide_static_cube.png "Window showing a blue box")
+Next we’ll animate it so the 3D shape becomes obvious.
 
 ## Basic Animation
 
@@ -264,31 +263,27 @@ The complete source code for this example is shown below for reference:
 #include <memory>
 
 struct MyScene : public vglx::Scene {
-    std::shared_ptr<vglx::Mesh> mesh = vglx::Mesh::Create(
-        vglx::BoxGeometry::Create(),
-        vglx::PhongMaterial::Create(0x049EF4)
-    );
+    vglx::Mesh* mesh {nullptr};
 
     MyScene() {
-        auto ambient_light = vglx::AmbientLight::Create({
+        Add(vglx::AmbientLight::Create({
             .color = 0xFFFFFF,
             .intensity = 0.5f
-        });
+        }));
 
-        auto point_light = vglx::PointLight::Create({
+        Add(vglx::PointLight::Create({
             .color = 0xFFFFFF,
             .intensity = 1.0f
-        });
+        }))->transform.Translate({2.0f, 2.5f, 4.0f});
 
-        point_light->transform.Translate({2.0f, 2.5f, 4.0f});
-
-        Add(ambient_light);
-        Add(point_light);
-        Add(mesh);
+        mesh = Add(vglx::Mesh::Create(
+            vglx::BoxGeometry::Create(),
+            vglx::PhongMaterial::Create(0x049EF4)
+        ));
     }
 
     auto OnAttached(vglx::SharedContextPointer context) -> void override {
-        context->camera->TranslateZ(3.0f);
+        context->camera->TranslateZ(2.5f);
     }
 
     auto OnUpdate(float delta) -> void override {
@@ -311,8 +306,8 @@ struct MyApp : public vglx::Application {
         };
     }
 
-    auto CreateScene() -> std::shared_ptr<vglx::Scene> override {
-        return std::make_shared<MyScene>();
+    auto CreateScene() -> std::unique_ptr<vglx::Scene> override {
+        return std::make_unique<MyScene>();
     }
 
     auto Update([[maybe_unused]] float dt) -> bool override {
@@ -323,6 +318,7 @@ struct MyApp : public vglx::Application {
 auto main() -> int {
     auto app = MyApp {};
     app.Start();
+
     return 0;
 }
 ```

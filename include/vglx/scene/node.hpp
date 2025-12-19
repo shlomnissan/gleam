@@ -116,7 +116,7 @@ public:
     /**
      * @brief Adds a child node to this node and returns a non-owning reference.
      *
-     * This overload transfers ownership of `node` into this node’s children list.
+     * This overload transfers ownership of a node into this node’s children list.
      * The scene graph is the sole owner of all nodes. The returned pointer is a
      * non-owning reference that remains valid only while the node is attached to
      * the scene graph.
@@ -135,8 +135,8 @@ public:
     /**
      * @brief Detaches a direct child node from this node and returns ownership.
      *
-     * Removes `node` from this node’s children list without destroying it and
-     * returns the owned subtree as a `std::unique_ptr`. The detached node’s parent
+     * Removes a node from this node’s children list without destroying it and
+     * returns the owned subtree as a `std\::unique_ptr`. The detached node’s parent
      * pointer is cleared, its attached state is reset, and its transform is marked dirty.
      *
      * @param node Direct child node to detach.
@@ -151,8 +151,7 @@ public:
     /**
      * @brief Removes a direct child node from this node and destroys it.
      *
-     * If `node` exists in the children list it is detached and destroyed as part
-     * of removing its owning `std::unique_ptr`.
+     * If the node exists in the children list it is detached and destroyed.
      *
      * @param node Direct child node to remove.
      *
@@ -164,17 +163,16 @@ public:
     /**
      * @brief Removes all children from this node.
      *
-     * Each child receives a @ref SceneEvent::Type "SceneEvent::NodeRemoved"
-     * event, has its parent pointer cleared, its `attached` flag reset, and
-     * its transform marked dirty. After all children are processed, the
-     * children list is emptied.
+     * Each child is detached from the scene graph, has its parent pointer
+     * cleared, its attached state reset, and its transform marked dirty.
+     * After all children are processed, the children list is emptied.
      */
     auto RemoveAllChildren() -> void;
 
     /**
      * @brief Recursively updates world transforms for this node and its descendants.
      *
-     * If `transform_auto_update` is enabled and the node’s world transform is
+     * If @ref transform_auto_update is enabled and the node’s world transform is
      * dirty, it is recomputed from the parent’s world transform (or from the local
      * transform if this node is a root). The world transform is then marked clean
      * for this update cycle. The method then recurses into each child.
@@ -200,7 +198,7 @@ public:
      * @brief Returns a view of this node’s direct children.
      *
      * The returned span exposes read-only access to the owning node's
-     * `std::unique_ptr<Node>` objects for each child. Ownership
+     * `std\::unique_ptr<Node>` objects for each child. Ownership
      * is retained by the scene graph.
      *
      * @note This function exposes the internal storage type used
@@ -212,8 +210,7 @@ public:
     /**
      * @brief Checks whether the given node exists anywhere in this node’s subtree.
      *
-     * The search is breadth-first: all descendants (not just direct children) are
-     * examined.
+     * The search is breadth-first. All descendants are examined.
      *
      * @param node Node to test for membership in the subtree.
      */

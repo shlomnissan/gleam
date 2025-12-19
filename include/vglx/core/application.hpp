@@ -25,8 +25,6 @@ namespace vglx {
  * your hooks. Subclass it and override @ref Configure, @ref CreateScene, and
  * @ref Update to define behavior.
  *
- * This is the preferred way to initialize a new app. If you need
- * complete control, you can also assemble a program manually.
  *
  * @code
  * class MyApp : public vglx::Application {
@@ -42,31 +40,24 @@ namespace vglx {
  *     };
  *   }
  *
- *   auto CreateScene() -> std::shared_ptr<vglx::Scene> override {
+ *   auto CreateScene() -> std::unique_ptr<vglx::Scene> override {
  *     auto scene = vglx::Scene::Create();
  *     // Add nodes to the scene...
  *     return scene;
  *   }
  *
- *   // Optional: override CreateCamera() to provide your own camera.
- *   // Returning nullptr creates a default perspective camera.
- *   // auto CreateCamera() -> std::shared_ptr<vglx::Camera> override { ... }
+ *   // Optional: override CreateCamera() to configure your own camera.
+ *   // auto CreateCamera() -> std::unique_ptr<vglx::Camera> override { ... }
  *
  *   auto Update(float delta) -> bool override {
  *     // Per-frame logic. Return false to exit the main loop.
  *     return true;
  *   }
  * };
- *
- * int main() {
- *   MyApp app;
- *   app.Start();
- *   return 0;
- * }
  * @endcode
  *
- * Calling @ref Start initializes the runtime, sets the active user scene and
- * camera, then runs the main loop while invoking @ref Update each frame.
+ * This is the preferred way to initialize a new app. If you need
+ * complete control, you can also assemble a program manually.
  *
  * @ingroup CoreGroup
  */
@@ -157,16 +148,6 @@ public:
      * @return SharedContext::SharedContextPointer
      */
     [[nodiscard]] auto GetContext() const -> SharedContextPointer;
-
-    /**
-     * @brief Returns the current scene pointer.
-     */
-    [[nodiscard]] auto GetScene() const -> Scene*;
-
-    /**
-     * @brief Returns the current camera pointer.
-     */
-    [[nodiscard]] auto GetCamera() const -> Camera*;
 
     /**
      * @brief Sets the active scene.

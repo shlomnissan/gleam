@@ -18,7 +18,7 @@ namespace vglx {
 /**
  * @brief Represents a camera that uses orthographic projection.
  *
- * In this projection mode, an object's size in the rendered image stays
+ * In this projection mode an object's size in the rendered image stays
  * constant regardless of its distance from the camera. This can be useful for
  * rendering 2D scenes and UI elements, amongst other things.
  *
@@ -31,17 +31,19 @@ namespace vglx {
  * public:
  *   auto Configure() -> void override {}
  *
- *   auto Setup() -> void override {
- *     SetCamera(
- *       vglx::OrthographicCamera::Create({
- *         .left = 0.0f,
- *         .right = 1024.0f,
- *         .top = 0.0f,
- *         .bottom = 768.0f,
- *         .near = 0.1f,
- *         .far = 100.0f
- *       })
- *     );
+ *   auto CreateScene() -> std::unique_ptr<vglx::Scene> override {
+ *     return vglx::Scene::Create();
+ *   }
+ *
+ *   auto CreateCamera() -> std::unique_ptr<vglx::Camera> override {
+ *     return vglx::OrthographicCamera::Create({
+ *       .left = 0.0f,
+ *       .right = 1024.0f,
+ *       .top = 0.0f,
+ *       .bottom = 768.0f,
+ *       .near = 0.1f,
+ *       .far = 100.0f
+ *     });
  *   }
  *
  *   auto Update(float delta) -> bool override {

@@ -27,10 +27,8 @@ namespace vglx {
  * a simple wireframe in the color provided.
  *
  * @code
- * auto plane  = vglx::Plane {vglx::Vector3::Forward(), 0.0f};
- * auto bounds = vglx::BoundingPlane::Create(plane, 2.0f, 0xFF0000);
- *
- * my_scene->Add(bounds);
+ * auto plane = vglx::Plane {vglx::Vector3::Forward(), 0.0f};
+ * my_scene->Add(vglx::BoundingPlane::Create(plane, 2.0f, 0xFF0000));
  * @endcode
  *
  * @ingroup HelpersGroup

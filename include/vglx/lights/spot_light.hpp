@@ -26,9 +26,12 @@ namespace vglx {
  *
  * When the @ref SpotLight::Parameters::target "target" parameter is set to
  * `nullptr`, the light will point toward the world origin.
+ * The target must belong to the same @ref Scene as this object. Attaching
+ * or referencing a target from a different scene results in undefined behavior
+ * and is not supported.
  *
  * @code
- * auto spot = vglx::SpotLight::Create({
+ * my_scene->Add(vglx::SpotLight::Create({
  *   .color = 0xFFFFFF,
  *   .intensity = 1.0f,
  *   .angle = vglx::math::DegToRad(10.0f),
@@ -39,9 +42,7 @@ namespace vglx {
  *     .linear = 0.0f,
  *     .quadratic = 0.0f
  *   }
- * });
- *
- * my_scene->Add(spot);
+ * }));
  * @endcode
  *
  * @ingroup LightsGroup

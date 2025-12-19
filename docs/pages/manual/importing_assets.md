@@ -65,11 +65,13 @@ struct MyScene : public vglx::Scene {
     std::shared_ptr<vglx::UnlitMaterial> material =
         vglx::UnlitMaterial::Create();
 
-    std::shared_ptr<vglx::Mesh> mesh =
-        vglx::Mesh::Create(vglx::BoxGeometry::Create(), material);
+    vglx::Mesh* mesh {nullptr};
 
     MyScene() {
-        Add(mesh);
+        mesh = Add(vglx::Mesh::Create(
+            vglx::BoxGeometry::Create(),
+            material
+        ));
     }
 
     auto OnAttached(vglx::SharedContextPointer context) -> void override {
@@ -86,7 +88,7 @@ struct MyScene : public vglx::Scene {
 };
 ```
 
-If this setup is unfamiliar refer back to the [Creating an Application](/manual/creating_application) guide.
+If this setup is unfamiliar refer back to [Creating an Application](/manual/creating_application).
 
 To apply a texture to the cube, load the `.tex` asset inside the `OnAttached` hook. Once the texture is loaded, assign it to the mesh material:
 

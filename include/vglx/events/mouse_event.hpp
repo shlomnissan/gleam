@@ -25,9 +25,9 @@ enum class MouseButton;
  * the @ref MouseEvent::position "cursor position", and optional
  * @ref MouseEvent::button "button information".
  *
- * Events are dispatched through the @ref Scene hierarchy where nodes can
+ * Mouse events are dispatched through the @ref Scene hierarchy where nodes can
  * override the @ref Node::OnMouseEvent handler and optionally mark the event
- * as @ref Event::handled "handled". When handled is set to `true`, the event
+ * as @ref Event::handled "handled". When handled is set to `true` the event
  * stops propagating to other nodes.
  *
  * @code
@@ -36,7 +36,7 @@ enum class MouseButton;
  *   auto OnMouseEvent(vglx::MouseEvent* event) -> void override {
  *     if (event->type == vglx::MouseEvent::Type::ButtonPressed) {
  *       if (event->button == vglx::MouseButton::Left) {
- *         // do something...
+ *         // Do something...
  *         event->handled = true; // stop propagation
  *       }
  *     }

@@ -62,6 +62,10 @@ using ResizeCallback = std::function<void(const ResizeParameters& params)>;
  * }
  * @endcode
  *
+ * This class defines the windowing interface only. The actual
+ * implementation may be platform-specific or provided by an external
+ * dependency such as GLFW.
+ *
  * @ingroup CoreGroup
  */
 class VGLX_EXPORT Window {

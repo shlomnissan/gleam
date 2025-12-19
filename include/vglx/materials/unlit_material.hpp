@@ -29,8 +29,7 @@ namespace vglx {
  * auto material = vglx::UnlitMaterial::Create(0xFFFFFF);
  * material->texture_map = texture;
  *
- * auto mesh = vglx::Mesh::Create(geometry, material);
- * my_scene->Add(mesh);
+ * my_scene->Add(vglx::Mesh::Create(geometry, material));
  * @endcode
  *
  * @ingroup MaterialsGroup

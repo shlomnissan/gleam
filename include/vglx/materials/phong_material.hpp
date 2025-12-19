@@ -34,8 +34,7 @@ namespace vglx {
  * material->shininess = 64.0f;
  * material->albedo_map = texture;
  *
- * auto mesh = vglx::Mesh::Create(geometry, material);
- * my_scene->Add(mesh);
+ * my_scene->Add(vglx::Mesh::Create(geometry, material));
  * @endcode
  *
  * @ingroup MaterialsGroup

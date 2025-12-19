@@ -163,14 +163,6 @@ auto Application::GetContext() const -> SharedContextPointer {
     return impl_->context.get();
 }
 
-auto Application::GetScene() const -> Scene* {
-    return impl_->scene.get();
-}
-
-auto Application::GetCamera() const -> Camera* {
-    return impl_->camera.get();
-}
-
 auto Application::SetScene(std::unique_ptr<Scene> scene) -> void {
     impl_->SetScene(std::move(scene));
 }
