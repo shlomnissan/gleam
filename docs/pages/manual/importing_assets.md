@@ -14,13 +14,13 @@ This approach mirrors how integrated engines handle assets. Source files are fle
 
 ## Asset Builder
 
-The asset builder CLI converts source assets into VGLX runtime formats that the engine can load directly.. The interface is intentionally simple. A single input asset produces one or more runtime files depending on what is being imported.
+The asset builder CLI converts source assets into VGLX runtime formats that the engine can load directly. The interface is intentionally simple. A single input asset produces one or more runtime files depending on what is being imported.
 
 The easiest way to get the asset builder is through the VGLX installer. During installation you are prompted to install it alongside the engine. If enabled the installation directory you selected will contain a `bin` folder with the `asset_builder` executable.
 
 It is recommended to add this directory to your system’s `PATH` so the tool can be invoked from anywhere. On Linux and macOS this usually means updating your shell configuration. On Windows the directory can be added through the system environment variables.
 
-The asset builder is also included in the repository. When building VGLX from source you must enable the `VGLX_BUILD_ASSET_BUILDER` option to include it. This option is disabled by default in project presets. Once built the executable can be run from the build output directory or copied into your project’s toolchain.
+The asset builder is included in the VGLX repository. When building the project from source you must enable the `VGLX_BUILD_ASSET_BUILDER` option to include it. This option is disabled by default in project presets. Once built the executable can be run from the build output directory or copied into your project’s toolchain.
 
 #### Supported File Formats
 
@@ -98,6 +98,7 @@ auto OnAttached(vglx::SharedContextPointer context) -> void override {
 
     context->texture_loader->LoadAsync(
         "crate_texture_low.tex", [this](auto result) {
+            // Always handle the case where result doesn't contain a value
             if (result) {
                 material->texture_map = result.value();
             } else {
