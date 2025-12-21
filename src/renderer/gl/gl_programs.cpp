@@ -24,7 +24,7 @@ auto GLPrograms::GetProgram(const ProgramAttributes& attrs) -> GLProgram* {
         programs_[key] = std::make_unique<GLProgram>(sources);
 
         Logger::Log(
-            LogLevel::Info,
+            LogLevel::Debug,
             "Created a new shader program {}:{}",
             key, Material::TypeToString(attrs.type)
         );

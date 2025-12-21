@@ -71,7 +71,7 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
 
     texture->OnDispose([this](Disposable* target) {
         glDeleteTextures(1, &(static_cast<Texture*>(target)->renderer_id));
-        Logger::Log(LogLevel::Info, "Texture buffer cleared {}", *static_cast<Texture*>(target));
+        Logger::Log(LogLevel::Debug, "Texture buffer cleared {}", *static_cast<Texture*>(target));
     });
 
     return tex_id;

@@ -15,6 +15,7 @@
 
 #include <memory>
 #include <string>
+#include <thread>
 #include <utility>
 
 #ifdef VGLX_USE_IMGUI
@@ -156,6 +157,7 @@ auto Window::Impl::LogContextInfo() const -> void {
     Logger::Log(LogLevel::Info, "Renderer: {}", getString(GL_RENDERER));
     Logger::Log(LogLevel::Info, "Version: {}", getString(GL_VERSION));
     Logger::Log(LogLevel::Info, "GLSL Version: {}", getString(GL_SHADING_LANGUAGE_VERSION));
+    Logger::Log(LogLevel::Info, "Hardware Threads: {}", std::thread::hardware_concurrency());
 }
 
 Window::Impl::~Impl() {

@@ -98,7 +98,7 @@ auto GLBuffers::GenerateBuffers(Geometry* geometry) -> void {
         const auto vao = static_cast<Geometry*>(target)->renderer_id;
         auto& buffers = this->bindings_[vao];
         glDeleteBuffers(buffers.size(), buffers.data());
-        Logger::Log(LogLevel::Info, "Geometry buffer cleared {}", *static_cast<Geometry*>(target));
+        Logger::Log(LogLevel::Debug, "Geometry buffer cleared {}", *static_cast<Geometry*>(target));
         this->bindings_.erase(vao);
     });
 }
