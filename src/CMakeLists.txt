@@ -66,6 +66,8 @@ set(SOURCE_CODE
     "utilities/file.hpp"
     "utilities/logger.cpp"
     "utilities/logger.hpp"
+    "utilities/thread_pool.cpp"
+    "utilities/thread_pool.hpp"
     "utilities/scoped_timer.hpp"
     "utilities/stats.cpp"
     "utilities/timer.cpp"
