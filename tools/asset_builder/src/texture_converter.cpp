@@ -41,10 +41,16 @@ auto convert_texture(
     header.mip_levels = 1;
     header.pixel_data_size = static_cast<uint64_t>(width) * height * 4;
 
+    if (output_path.has_parent_path()) {
+        auto err = std::error_code {};
+        fs::create_directories(output_path.parent_path(), err);
+        if (err) return std::unexpected("Failed to create output directory");
+    }
+
     auto out_stream = std::ofstream {output_path, std::ios::binary};
     if (!out_stream) {
         stbi_image_free(data);
-        return std::unexpected("Failed to open output file: " + output_path.string());
+        return std::unexpected("Failed to create output file: " + output_path.string());
     }
 
     out_stream.write(reinterpret_cast<const char*>(&header), sizeof(header));

@@ -333,25 +333,27 @@ auto generate_tangents(
 
 auto convert_texture(
     const std::string& tex_name,
-    const fs::path& input_path
+    const fs::path& input_path,
+    const fs::path& output_path
 ) -> std::expected<std::string, std::string> {
     auto tex_init_path = fs::path {tex_name};
-    auto tex_full_path = tex_init_path;
+    auto tex_input_path = tex_init_path;
+    auto tex_output_path = tex_init_path;
 
     if (!fs::exists(tex_init_path)) {
-        tex_full_path = input_path.parent_path() / tex_name;
-        if (!fs::exists(tex_full_path)) {
-            return std::unexpected("Failed to load texture " + tex_full_path.string());
+        tex_input_path = input_path.parent_path() / tex_name;
+        tex_output_path = output_path.parent_path() / tex_name;
+        if (!fs::exists(tex_input_path)) {
+            return std::unexpected("Failed to load texture " + tex_input_path.string());
         }
     }
 
-    auto tex_output = tex_full_path;
-    tex_output.replace_extension(".tex");
-    if (auto result = ::convert_texture(tex_full_path, tex_output); !result) {
+    tex_output_path.replace_extension(".tex");
+    if (auto result = ::convert_texture(tex_input_path, tex_output_path); !result) {
         return std::unexpected(result.error());
     }
 
-    std::println("Generated texture {}", tex_output.string());
+    std::println("Generated texture {}", tex_output_path.string());
 
     // always return filenames relative to the asset
     return tex_init_path.replace_extension(".tex").string();
@@ -360,9 +362,10 @@ auto convert_texture(
 auto parse_texture(
     const std::string& tex_name,
     MaterialTextureMapType tex_type,
-    const fs::path& input_path
+    const fs::path& input_path,
+    const fs::path& output_path
 ) -> std::expected<MaterialTextureMapRecord, std::string> {
-    auto tex_converted_path = convert_texture(tex_name, input_path);
+    auto tex_converted_path = convert_texture(tex_name, input_path, output_path);
     if (!tex_converted_path) {
         return std::unexpected(tex_converted_path.error());
     }
@@ -376,6 +379,7 @@ auto parse_texture(
 auto parse_materials(
     const std::vector<tinyobj::material_t> &materials,
     const fs::path& input_path,
+    const fs::path& output_path,
     std::ofstream& out_stream
 ) {
     for (const auto& material : materials) {
@@ -410,7 +414,7 @@ auto parse_materials(
 
         for (const auto& [tex_name, tex_type] : available_textures) {
             if (!tex_name.empty()) {
-                auto tex_record = parse_texture(tex_name, tex_type, input_path);
+                auto tex_record = parse_texture(tex_name, tex_type, input_path, output_path);
                 if (tex_record) {
                     texture_records.emplace_back(tex_record.value());
                     material_record.texture_count++;
@@ -551,6 +555,12 @@ auto convert_mesh(
     header.material_count = static_cast<uint32_t>(materials.size());
     header.mesh_count = static_cast<uint32_t>(shapes.size());
 
+    if (output_path.has_parent_path()) {
+        auto err = std::error_code {};
+        fs::create_directories(output_path.parent_path(), err);
+        if (err) return std::unexpected("Failed to create output directory");
+    }
+
     auto out_stream = std::ofstream {output_path, std::ios::binary};
     if (!out_stream) {
         return std::unexpected("Failed to open output file: " + output_path.string());
@@ -558,7 +568,7 @@ auto convert_mesh(
 
     out_stream.write(reinterpret_cast<const char*>(&header), sizeof(header));
 
-    parse_materials(materials, input_path, out_stream);
+    parse_materials(materials, input_path, output_path, out_stream);
     parse_shapes(shapes, attrib, out_stream);
 
     return {};

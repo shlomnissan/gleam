@@ -50,7 +50,7 @@ auto main(int argc, char** argv) -> int {
 
     opts.add_options()
         ("i,input", "Input file (e.g. .png, .obj)", cxxopts::value<std::string>())
-        ("o,output", "Output file path", cxxopts::value<std::string>()->default_value(""))
+        ("o,output", "Output directory", cxxopts::value<std::string>()->default_value(""))
         ("h,help", "Show help");
 
     auto options = opts.parse(argc, argv);
@@ -73,15 +73,23 @@ auto main(int argc, char** argv) -> int {
     }
 
     auto output = fs::path(options["output"].as<std::string>());
-    if (output.empty()) {
-        output = input;
+    if (output.has_filename() && output.filename().has_extension()) {
+        std::println(stderr, "Error: output must be a directory not a file: {}", output.string());
+        return 1;
     }
+
+    output = output.empty()
+        ? input
+        : input.parent_path() / output / input.filename();
+
+    output = fs::absolute(output).lexically_normal();
 
     auto asset_type = get_asset_type(input);
     auto result = std::expected<void, std::string>{};
+
     switch (asset_type) {
         case AssetType::Texture:
-            output.replace_extension(".tex");
+            output.replace_extension("tex");
             result = convert_texture(input, output);
             break;
         case AssetType::Mesh:
