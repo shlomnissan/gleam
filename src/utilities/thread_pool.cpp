@@ -77,6 +77,9 @@ struct ThreadPool::Impl {
 ThreadPool::ThreadPool(size_t thread_count)
   : impl_(std::make_unique<Impl>(thread_count)) {}
 
+ThreadPool::ThreadPool(ThreadPool&&) noexcept = default;
+auto ThreadPool::operator=(ThreadPool&&) noexcept -> ThreadPool& = default;
+
 auto ThreadPool::Enqueue(std::function<void()> job) -> bool {
     if (!job) return false;
     return impl_->Enqueue(std::move(job));

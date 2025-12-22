@@ -17,8 +17,8 @@ class ThreadPool {
 public:
     explicit ThreadPool(size_t thread_count = 0);
 
-    ThreadPool(ThreadPool&&) noexcept = default;
-    ThreadPool& operator=(ThreadPool&&) noexcept = default;
+    ThreadPool(ThreadPool&&) noexcept;
+    auto operator=(ThreadPool&&) noexcept -> ThreadPool&;
 
     ThreadPool(const ThreadPool&) = delete;
     auto operator=(const ThreadPool&) -> ThreadPool& = delete;

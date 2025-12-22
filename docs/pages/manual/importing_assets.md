@@ -169,7 +169,7 @@ If you followed the steps above using the same source files, your application sh
 
 Loading a `.msh` file at runtime produces a fully constructed renderable node. The mesh geometry is uploaded to the GPU lazily, material parameters are initialized from the imported metadata, and any referenced .tex files are loaded and bound to the appropriate material slots. No additional setup is required by the application.
 
-## Import Pipeline Overview
+## Pipeline Overview
 
 VGLX focuses on the graphics layer. The asset builder and runtime formats exist to provide a clear and predictable path from source data to GPU-ready resources. They are designed to remove format parsing and asset ambiguity from the runtime without imposing a heavy asset management system.
 
