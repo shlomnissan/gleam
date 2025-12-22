@@ -116,3 +116,55 @@ If you used the same source image and followed the steps above, your application
 If your application prints a `file not found` error, make sure the texture asset is located in a directory that the application can access at runtime. By default assets are loaded using paths relative to the executable. If your assets live elsewhere, provide an explicit relative path when calling the loader.
 
 ## Importing Meshes
+
+In this section we import a mesh from an OBJ file. Unlike textures, meshes typically reference additional data such as material definitions and multiple textures. In this example the OBJ references an accompanying MTL file, which defines a color map, a normal map, and a specular map.
+
+When importing a mesh, `asset_builder` treats the OBJ as the root of the asset. Geometry, material definitions, and all referenced textures are processed together. Each referenced image is converted to a `.tex` file, while the mesh geometry, material metadata, and texture paths are stored in a single `.msh` file.
+
+The mesh used in this example is a [human head scan](/lps_head.zip) by Lee Perry-Smith. After downloading the archive, unzip it and navigate to the extracted directory. From there, run the asset builder on the OBJ file:
+
+```bash
+asset_builder -i lps_head.obj -o output
+```
+
+After the command completes, the output directory will contain one `.msh` file and several `.tex` files corresponding to the referenced textures. When loading the mesh at runtime, these files must remain co-located so the engine can resolve material references correctly.
+
+Meshes are loaded at runtime using the [MeshLoader](/reference/loaders/mesh_loader). As with textures, the loader is accessed through the shared context and is only available once a node is attached.
+
+The following snippet defines a custom scene that loads the imported mesh, resolves its materials and textures, and renders it with basic lighting:
+
+```cpp
+struct MyScene : public vglx::Scene {
+    MyScene() {
+        Add(vglx::AmbientLight::Create({
+            .color = 0xFFFFFF,
+            .intensity = 0.5f
+        }));
+
+        Add(vglx::PointLight::Create({
+            .color = 0xFFFFFF,
+            .intensity = 1.0f
+        }))->transform.Translate({-2.0f, 2.5f, 4.0f});
+    }
+
+    auto OnAttached(vglx::SharedContextPointer context) -> void override {
+        context->camera->TranslateZ(2.5f);
+
+        context->mesh_loader->LoadAsync(
+            "lps_head.msh", [this](auto result){
+                if (result) {
+                    Add(std::move(result.value()));
+                } else {
+                    std::println(std::cerr, "{}", result.error());
+                }
+            }
+        );
+    }
+};
+```
+
+If you followed the steps above using the same source files, your application should produce a result similar to the image below.
+
+![Window showing a human head scan](/importing_mesh.png "Window showing a human head scan")
+
+Loading a `.msh` file at runtime produces a fully constructed renderable node. The mesh geometry is uploaded to the GPU lazily, material parameters are initialized from the imported metadata, and any referenced .tex files are loaded and bound to the appropriate material slots. No additional setup is required by the application.
