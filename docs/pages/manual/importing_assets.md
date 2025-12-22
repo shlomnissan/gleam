@@ -168,3 +168,11 @@ If you followed the steps above using the same source files, your application sh
 ![Window showing a human head scan](/importing_mesh.png "Window showing a human head scan")
 
 Loading a `.msh` file at runtime produces a fully constructed renderable node. The mesh geometry is uploaded to the GPU lazily, material parameters are initialized from the imported metadata, and any referenced .tex files are loaded and bound to the appropriate material slots. No additional setup is required by the application.
+
+## Import Pipeline Overview
+
+VGLX focuses on the graphics layer. The asset builder and runtime formats exist to provide a clear and predictable path from source data to GPU-ready resources. They are designed to remove format parsing and asset ambiguity from the runtime without imposing a heavy asset management system.
+
+Asset loading in VGLX is explicit and ownership is clear. Loaders construct GPU-backed resources and return them to the call-site where they are owned and managed by the application. VGLX does not introduce global caches, registries, or lifetime management beyond this handoff. You load an asset, attach it, and use it.
+
+This model keeps the engine small and composable. Applications that require caching, streaming, or higher-level asset systems are free to build those layers on top, while applications that do not need them are not forced to pay for their complexity.
