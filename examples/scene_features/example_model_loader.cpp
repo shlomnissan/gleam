@@ -32,11 +32,15 @@ ExampleModelLoader::ExampleModelLoader() {
         .intensity = 0.3f
     }));
 
-    auto light_0 = Add(PointLight::Create({.color = 0xFFFFFF, .intensity = 1.0f}));
-    light_0->transform.Translate({2.0f, 2.5f, 4.0f});
+    Add(PointLight::Create({
+        .color = 0xFFFFFF,
+        .intensity = 1.0f
+    }))->transform.Translate({2.0f, 2.5f, 4.0f});
 
-    auto light_1 = Add(PointLight::Create({.color = 0xFAA916, .intensity = 1.0f}));
-    light_1->transform.Translate({-2.0f, 2.5f, -3.0f});
+    Add(PointLight::Create({
+        .color = 0xFAA916,
+        .intensity = 1.0f
+    }))->transform.Translate({-2.0f, 2.5f, -3.0f});
 }
 
 auto ExampleModelLoader::OnAttached(SharedContextPointer context) -> void {
