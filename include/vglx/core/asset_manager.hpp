@@ -67,8 +67,8 @@ public:
     AssetManager(const AssetManager&) = delete;
     auto operator=(const AssetManager&) -> AssetManager& = delete;
 
-    AssetManager(AssetManager&&) noexcept = default;
-    auto operator=(AssetManager&&) noexcept -> AssetManager& = default;
+    AssetManager(AssetManager&&) noexcept;
+    auto operator=(AssetManager&&) noexcept -> AssetManager&;
 
     [[nodiscard]] auto LoadTexture(const fs::path& path) -> TextureHandle;
 
