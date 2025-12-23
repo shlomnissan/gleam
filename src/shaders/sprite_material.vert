@@ -13,7 +13,7 @@ uniform vec2 u_Anchor;
 void main() {
     #include "snippets/vert_main_varyings.glsl"
 
-    vec4 position = model_view[3];
+    vec4 position = u_ModelView[3];
     vec2 scale = vec2(length(u_Model[0].xyz), length(u_Model[1].xyz));
 
     bool is_perspective = isPerspectiveMatrix(u_Projection);
