@@ -9,15 +9,15 @@
 
 #include "vglx_export.h"
 
-#include "vglx/scene/node.hpp"
-#include "vglx/textures/texture_2d.hpp"
-
 #include <filesystem>
 #include <memory>
 #include <optional>
 #include <string>
 
 namespace vglx {
+
+class Node;
+class Texture2D;
 
 namespace fs = std::filesystem;
 
@@ -26,7 +26,7 @@ class VGLX_EXPORT Handle {
 public:
     Handle() = default;
 
-    [[nodiscard]] auto IsValid() const -> bool { return static_cast<bool>(state_); }
+    auto Handled() -> void { state_.reset(); }
 
     [[nodiscard]] auto IsReady() const -> bool { return state_ && state_->ready; }
 
@@ -37,7 +37,7 @@ public:
         return state_ ? state_->error : kEmpty;
     }
 
-    [[nodiscard]] auto Get() -> T {
+    [[nodiscard]] auto Value() -> T {
         if (!state_ || !state_->value) return T {};
         T out = std::move(*state_->value);
         state_->value.reset();

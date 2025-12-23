@@ -51,9 +51,11 @@ auto main() -> int {
         window.FramebufferWidth(),
         window.FramebufferHeight(),
         window.Width(),
-        window.Height()
+        window.Height(),
+        std::make_unique<AssetManager>()
     );
 
+    auto asset_manager = context->asset_manager.get();
     auto scene = std::unique_ptr<vglx::Scene> {};
     auto examples = Examples {[&scene, &context](std::unique_ptr<Scene> sc){
         scene = std::move(sc);
@@ -81,6 +83,7 @@ auto main() -> int {
 
     while(!window.ShouldClose()) {
         window.PollEvents();
+        asset_manager->Pump();
 
         const auto dt = timer.Tick();
         scene->Advance(dt);

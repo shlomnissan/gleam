@@ -10,6 +10,7 @@
 #include "vglx_export.h"
 
 #include "vglx/loaders.hpp"
+#include "vglx/core/asset_manager.hpp"
 
 #include <memory>
 
@@ -89,6 +90,10 @@ public:
      * Represents window dimensions in OS coordinate space.
      */
     int window_height;
+
+    /// @cond INTERNAL
+    std::unique_ptr<AssetManager> asset_manager;
+    /// @endcond
 
     /**
      * @brief Shared texture loader.

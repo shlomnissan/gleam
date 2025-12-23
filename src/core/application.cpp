@@ -72,7 +72,8 @@ struct Application::Impl {
             window->FramebufferWidth(),
             window->FramebufferHeight(),
             window->Width(),
-            window->Height()
+            window->Height(),
+            std::make_unique<AssetManager>()
         );
     }
 
@@ -138,6 +139,7 @@ auto Application::Start() -> void {
 
     while (!impl_->window->ShouldClose()) {
         impl_->window->PollEvents();
+        impl_->context->asset_manager->Pump();
 
         const auto dt = frame_timer.Tick();
         impl_->scene->Advance(dt);

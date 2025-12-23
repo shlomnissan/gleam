@@ -13,6 +13,7 @@
  */
 
 #include "vglx/core/application.hpp"
+#include "vglx/core/asset_manager.hpp"
 #include "vglx/core/renderer.hpp"
 #include "vglx/core/shared_context.hpp"
 #include "vglx/core/window.hpp"
