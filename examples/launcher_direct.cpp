@@ -51,8 +51,7 @@ auto main() -> int {
         window.FramebufferWidth(),
         window.FramebufferHeight(),
         window.Width(),
-        window.Height(),
-        std::make_unique<AssetManager>()
+        window.Height()
     );
 
     auto asset_manager = context->asset_manager.get();

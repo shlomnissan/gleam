@@ -92,7 +92,7 @@ public:
     int window_height;
 
     /// @cond INTERNAL
-    std::unique_ptr<AssetManager> asset_manager;
+    std::unique_ptr<AssetManager> asset_manager = std::make_unique<AssetManager>();
     /// @endcond
 
     /**

@@ -72,8 +72,7 @@ struct Application::Impl {
             window->FramebufferWidth(),
             window->FramebufferHeight(),
             window->Width(),
-            window->Height(),
-            std::make_unique<AssetManager>()
+            window->Height()
         );
     }
 

@@ -16,8 +16,6 @@
 #include <string>
 #include <thread>
 
-#include "utilities/thread_pool.hpp"
-
 namespace vglx {
 
 namespace fs = std::filesystem;
@@ -98,10 +96,10 @@ public:
         }
 
         auto self = this->shared_from_this();
-        pool.Enqueue([self, path, callback] {
+        std::thread([self, path, callback] {
             auto result = self->LoadImpl(path);
             callback(std::move(result));
-        });
+        }).detach();
     }
 
     /**
@@ -114,9 +112,6 @@ public:
      * @param path File system path to the resource.
      */
     [[nodiscard]] virtual auto LoadImpl(const fs::path& path) const -> LoaderResult<Resource> = 0;
-
-private:
-    mutable ThreadPool pool;
 };
 
 }
