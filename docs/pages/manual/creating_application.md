@@ -154,11 +154,11 @@ Build and run the application again. If you still see an empty window, everythin
 
 ## Populating the Scene
 
-In this guide we’ll build a small scene: a 3D box, a couple of lights, and a simple animation to make things interesting.
+In this guide we’ll build a small scene: a 3D cube, a couple of lights, and a simple animation to make things interesting.
 
 A scene is built from nodes: cameras, meshes, lights, and anything else you place in the world. To see anything on screen you need at least one of each and VGLX provides simple helpers to create and configure them. We’ll start with the camera.
 
-The runtime gives you a default 3D camera unless you override [CreateCamera](/reference/core/application#function-get-camera-5f2d1639) so we’ll use that for now. By default the camera starts at the world origin $(0, 0, 0)$. We want our box to sit at the origin, not the camera, so we need to push the camera back and have it look toward the center of the scene.
+The runtime gives you a default 3D camera unless you override [CreateCamera](/reference/core/application#function-get-camera-5f2d1639) so we’ll use that for now. By default the camera starts at the world origin $(0, 0, 0)$. We want our cube to sit at the origin, not the camera, so we need to push the camera back and have it look toward the center of the scene.
 
 Once a node is attached to the graph it can access the active camera through the shared context passed to [OnAttached](/reference/scene/node#function-on-attached-ff71adbb):
 
@@ -177,7 +177,7 @@ VGLX uses a right-handed coordinate system so moving the camera along `+Z` pushe
 
 To render anything we need a renderable node. The most common one is a [Mesh](/reference/scene/mesh). A mesh combines two pieces: a [Geometry](/reference/geometries/geometry) which defines what to draw and a [Material](/reference/materials/material) which defines how it should be drawn.
 
-For a simple 3D box we can use the built-in [BoxGeometry](/reference/primitives/box_geometry) primitive, and because we want lighting in the scene we’ll pair it with a [PhongMaterial](/reference/materials/phong_material):
+For a simple cube we can use the built-in [BoxGeometry](/reference/primitives/box_geometry) primitive, and because we want lighting in the scene we’ll pair it with a [PhongMaterial](/reference/materials/phong_material):
 
 ```cpp
 struct MyScene : public vglx::Scene {
@@ -225,13 +225,13 @@ MyScene() {
 
 Both light sources need a color and an intensity. Unlike the ambient light, the point light is positional so we move it slightly up, to the right, and back to give the scene some depth.
 
-If you run the application now you should see a blue square in the center of the window. That’s the front face of the box viewed straight on.
+If you run the application now you should see a blue square in the center of the window. That’s the front face of the cube viewed straight on.
 
 Next we’ll animate it so the 3D shape becomes obvious.
 
 ## Basic Animation
 
-To keep things simple we’ll animate the scene by rotating the box around the `X` and `Y` axes. All animation in VGLX happens inside a node’s update hook. In our case that’s the scene’s [OnUpdate](/reference/scene/node#function-on-update-86a04f9c) function, which is called once per frame.
+To keep things simple we’ll animate the scene by rotating the cube around the `X` and `Y` axes. All animation in VGLX happens inside a node’s update hook. In our case that’s the scene’s [OnUpdate](/reference/scene/node#function-on-update-86a04f9c) function, which is called once per frame.
 
 ```cpp
 auto OnUpdate(float delta) -> void override {
@@ -245,7 +245,7 @@ The `delta` parameter represents the time, in seconds, since the previous frame.
 
 If you run the application now, the square becomes a rotating cube, making the 3D nature of the scene clear.
 
-![Window showing a rotating 3D box](/guide_rotating_cube.png "Window showing a rotating 3D box")
+![Window showing a rotating cube](/guide_rotating_cube.png "Window showing a rotating cube")
 
 ## Conclusion
 

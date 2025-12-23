@@ -111,7 +111,7 @@ auto OnAttached(vglx::SharedContextPointer context) -> void override {
 
 If you used the same source image and followed the steps above, your application should produce a result similar to the image below:
 
-![Window showing a textured 3D box](/importing_texture.png "Window showing a textured 3D box")
+![Window showing a textured cube](/importing_texture.png "Window showing a textured cube")
 
 If your application prints a `file not found` error, make sure the texture asset is located in a directory that the application can access at runtime. By default assets are loaded using paths relative to the executable. If your assets live elsewhere, provide an explicit relative path when calling the loader.
 
