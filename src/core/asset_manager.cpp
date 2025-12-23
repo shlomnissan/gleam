@@ -7,6 +7,7 @@
 
 #include "vglx/core/asset_manager.hpp"
 
+#include <cstring>
 #include <format>
 #include <fstream>
 #include <functional>
