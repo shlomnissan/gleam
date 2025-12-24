@@ -30,6 +30,8 @@ public:
 
     [[nodiscard]] auto IsReady() const -> bool { return state_ && state_->ready; }
 
+    [[nodiscard]] auto HasValue() const -> bool { return state_ && state_->value; }
+
     [[nodiscard]] auto HasError() const -> bool { return state_ && !state_->error.empty(); }
 
     [[nodiscard]] auto Error() const -> const std::string& {

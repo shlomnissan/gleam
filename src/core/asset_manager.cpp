@@ -7,20 +7,17 @@
 
 #include "vglx/core/asset_manager.hpp"
 
-#include <cstring>
-#include <format>
-#include <fstream>
 #include <functional>
 #include <mutex>
 #include <queue>
-#include <string>
 
-#include "utilities/file.hpp"
 #include "utilities/thread_pool.hpp"
 
 #include "vglx/asset_format.hpp"
-#include "vglx/textures/texture_2d.hpp"
 #include "vglx/scene/node.hpp"
+#include "vglx/textures/texture_2d.hpp"
+
+#include "loaders/texture_loader_xyz.hpp"
 
 namespace vglx {
 
@@ -59,29 +56,17 @@ auto AssetManager::LoadTexture(const fs::path& path) -> TextureHandle {
     auto handle = TextureHandle {state};
 
     impl_->pool.Enqueue([this, state, path] {
-        auto header = TextureHeader {};
-        auto file = std::ifstream {path, std::ios::binary};
+        auto result = load_texture(path);
         auto err = std::string {};
 
-        if (err.empty() && !file) {
-            err = std::format("Unable to open image '{}'", path.string());
+        if (result) {
+            state->value = result.value();
         } else {
-            read_binary(file, header);
+            err = result.error();
         }
-
-        if (err.empty() && std::memcmp(header.magic, "TEX0", 4) != 0) {
-            err = std::format("Invalid texture file '{}'", path.string());
-        }
-
-        if (err.empty() && header.version != VGLX_TEX_VER) {
-            err = std::format("Unsupported file version '{}'", path.string());
-        }
-
-        // TODO: load image data
 
         impl_->Post([state = std::move(state), err = std::move(err)]() {
             if (!state) return;
-
             state->error = std::move(err);
             state->ready = true;
         });
@@ -95,32 +80,7 @@ auto AssetManager::LoadMesh(const fs::path& path) -> MeshHandle {
     auto handle = MeshHandle {state};
 
     impl_->pool.Enqueue([this, state, path] {
-        auto header = MeshHeader {};
-        auto file = std::ifstream {path, std::ios::binary};
-        auto err = std::string {};
-
-        if (err.empty() && !file) {
-            err = std::format("Unable to open mesh '{}'", path.string());
-        } else {
-            read_binary(file, header);
-        }
-
-        if (err.empty() && std::memcmp(header.magic, "MSH0", 4) != 0) {
-            err = std::format("Invalid mesh file '{}'", path.string());
-        }
-
-        if (err.empty() && header.version != VGLX_MSH_VER) {
-            err = std::format("Unsupported file version '{}'", path.string());
-        }
-
-        // TODO: load mesh data
-
-        impl_->Post([state = std::move(state), err = std::move(err)]() {
-            if (!state) return;
-
-            state->error = std::move(err);
-            state->ready = true;
-        });
+        // TODO: implement
     });
 
     return handle;

@@ -31,6 +31,8 @@ set(SOURCE_CODE
     "lights/spot_light.cpp"
     "loaders/mesh_loader.cpp"
     "loaders/texture_loader.cpp"
+    "loaders/texture_loader_xyz.cpp"
+    "loaders/texture_loader_xyz.hpp"
     "scene/instanced_mesh.cpp"
     "scene/instanced_mesh_impl.hpp"
     "scene/mesh.cpp"
