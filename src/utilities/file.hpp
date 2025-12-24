@@ -5,20 +5,22 @@
 ===========================================================================
 */
 
-#include <type_traits>
+#pragma once
 
 namespace vglx {
 
+#include <concepts>
+
 template <typename T>
-std::enable_if_t<std::is_trivially_copyable_v<T>, bool>
-read_binary(std::istream& in, T& value) {
+requires std::is_trivially_copyable_v<T>
+auto read_binary(std::istream& in, T& value) -> bool {
     in.read(reinterpret_cast<char*>(&value), sizeof(T));
     return in.gcount() == static_cast<std::streamsize>(sizeof(T));
 }
 
 template <typename T>
-std::enable_if_t<std::is_trivially_copyable_v<T>, bool>
-read_binary(std::istream& in, std::vector<T>& vec, std::size_t count) {
+requires std::is_trivially_copyable_v<T>
+auto read_binary(std::istream& in, std::vector<T>& vec, std::size_t count) -> bool {
     vec.resize(count);
     in.read(reinterpret_cast<char*>(vec.data()), count * sizeof(T));
     return in.gcount() == static_cast<std::streamsize>(count * sizeof(T));
