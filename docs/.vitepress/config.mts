@@ -42,7 +42,8 @@ export default defineConfig({
             { text: 'Introduction', link: '/manual/' },
             { text: 'Installation', link: '/manual/installation' },
             { text: 'Creating an Application', link: '/manual/creating_application' },
-            { text: 'Importing Assets', link: '/manual/importing_assets' }
+            { text: 'Importing Assets', link: '/manual/importing_assets' },
+            { text: 'Custom Shaders', link: '/manual/custom_shaders' }
           ]
         },
         { text: 'Reference', link: '/reference/core/application' }
