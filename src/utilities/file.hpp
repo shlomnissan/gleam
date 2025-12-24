@@ -7,9 +7,9 @@
 
 #pragma once
 
-namespace vglx {
-
 #include <concepts>
+
+namespace vglx {
 
 template <typename T>
 requires std::is_trivially_copyable_v<T>
@@ -21,9 +21,8 @@ auto read_binary(std::istream& in, T& value) -> bool {
 template <typename T>
 requires std::is_trivially_copyable_v<T>
 auto read_binary(std::istream& in, std::vector<T>& vec, std::size_t count) -> bool {
-    vec.resize(count);
-    in.read(reinterpret_cast<char*>(vec.data()), count * sizeof(T));
-    return in.gcount() == static_cast<std::streamsize>(count * sizeof(T));
+    in.read(reinterpret_cast<char*>(vec.data()), count);
+    return in.gcount() == static_cast<std::streamsize>(count);
 }
 
 }
