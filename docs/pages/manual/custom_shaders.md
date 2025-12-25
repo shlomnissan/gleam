@@ -16,7 +16,7 @@ You can do a lot with VGLX without writing custom shaders but if you want full f
 
 A [ShaderMaterial](/reference/materials/shader_material) is a material backed by user-defined shaders. Unlike built-in materials, shader materials do not come with a predefined shader program. Instead, you provide code for both the vertex and fragment shaders when constructing the material.
 
-VGLX keeps the structure around custom shaders intentionally light. Beyond a small set of built-in attributes, uniforms, and common varyings the engine does not impose a framework or shading model. This keeps shader materials flexible and makes it easy to integrate custom rendering techniques without fighting the engine.
+VGLX keeps the structure around custom shaders intentionally light. It provides only a small set of injected symbols. Everything else is your shader. This makes shader materials flexible and allows custom rendering techniques to integrate cleanly without fighting the engine.
 
 To demonstrate how shader materials work we will start from the rotating cube scene introduced in the [previous guide](/manual/creating_application). This version uses a built-in unlit material that colors the cube with a single constant color:
 
@@ -201,3 +201,23 @@ The following table lists accepted uniform value types and the GLSL types they m
 | `Vector4`        | `vec4`    | `vglx::Vector4 {1.0f, 0.0f, 1.0f, 0.0f}` |
 
 Uniform values can be updated after creation by mutating the material’s uniform map. Uniform updates take effect the next time the material is rendered.
+
+## Debugging Shaders
+
+Shaders can be difficult to debug. A single mistake may result in a black screen, incorrect colors, or missing geometry. When you run into problems start from the smallest shader that works and add features back incrementally.
+
+During iteration, begin with simple checks inside the shader:
+- Output a constant color to confirm the fragment shader is running.
+- Visualize inputs such as normals, UVs, or depth by writing them as colors.
+- Clamp or normalize intermediate values before displaying them.
+- Temporarily bypass complex math and reintroduce it step by step.
+
+For deeper issues the most effective tool is [RenderDoc](https://renderdoc.org/). Capture a frame and inspect the draw call that renders your mesh to verify the full GPU state:
+
+- Shader stages: Ensure the expected vertex and fragment shaders are bound.
+- Vertex input: Verify attribute bindings and formats match the shader declarations.
+- Uniforms: Inspect uniform values and confirm names and types are correct.
+- Textures: Check that the correct textures are bound and sampled.
+- Outputs: Confirm the fragment shader writes to the intended render target.
+
+Most shader issues in VGLX come from mismatches between what the shader declares and what the engine provides. If a shader compiles but renders incorrectly, RenderDoc is the fastest way to verify attribute, uniform, and texture bindings.
