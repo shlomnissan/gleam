@@ -16,7 +16,7 @@ You can do a lot with VGLX without writing custom shaders but if you want full f
 
 A [ShaderMaterial](/reference/materials/shader_material) is a material backed by user-defined shaders. Unlike built-in materials, shader materials do not come with a predefined shader program. Instead, you provide code for both the vertex and fragment shaders when constructing the material.
 
-VGLX keeps the structure around custom shaders intentionally light. Beyond a small set of built-in attributes and common varyings the engine does not impose a framework or shading model. This keeps shader materials flexible and makes it easy to integrate custom rendering techniques without fighting the engine.
+VGLX keeps the structure around custom shaders intentionally light. Beyond a small set of built-in attributes, uniforms, and common varyings the engine does not impose a framework or shading model. This keeps shader materials flexible and makes it easy to integrate custom rendering techniques without fighting the engine.
 
 To demonstrate how shader materials work we will start from the rotating cube scene introduced in the [previous guide](/manual/creating_application). This version uses a built-in unlit material that colors the cube with a single constant color:
 
@@ -116,7 +116,7 @@ void main() {
 
 VGLX targets GLSL 4.10 core and every shader must begin with the corresponding version directive. Immediately after that is the `#pragma inject_attributes` directive. This is a VGLX-specific pragma that injects preprocessor definitions based on the material and program configuration. Like the version directive it should always appear at the top of the shader.
 
-Shader code in VGLX is organized into reusable snippets. These snippets declare commonly used attributes, varyings, and uniforms. They are brought into the shader using standard `#include` directives. In the vertex shader we include `vert_global_params.glsl` to gain access to built-in vertex attributes and camera-related uniforms.
+Shader code in VGLX is organized into reusable snippets. These snippets declare commonly used attributes, uniforms, and varyings. They are brought into the shader using standard `#include` directives. In the vertex shader we include `vert_global_params.glsl` to gain access to built-in vertex attributes and camera-related uniforms.
 
 Inside `main` we include `vert_main_varyings.glsl` which defines varyings that are passed from the vertex stage to the fragment stage. Together, these snippets provide access to the vertex position attribute `a_Position` and the transformation matrices `u_Projection` and `u_ModelView`, which are required to transform vertices into clip space.
 
@@ -152,3 +152,33 @@ material->uniforms["color"] = vglx::Color {0xFF0000};
 ```
 
 With this minimal example we implemented a complete custom shader program and integrated it into VGLX. While the shader itself is simple the same structure scales to complex techniques. Shaders are the foundation of everything rendered on screen and shader materials provide the entry point for extending VGLX beyond its built-in materials.
+
+## Shader Interface
+
+VGLX shader programs rely on a small set of built-in attributes, uniforms, and varyings. These symbols are injected into shader code using the `#pragma inject_attributes` directive and standard include snippets, and provide access to common data.
+
+The following tables list the symbols that are available in shader snippets.
+
+#### Vertex Attributes
+
+Vertex attributes describe per-vertex data supplied by the geometry. These attributes available in the vertex shader stage.
+
+| Name         | Type   | Defined In                | Description                    |
+| ------------ | ------ | ------------------------- | ------------------------------ |
+| `a_Position` | `vec3` | `vert_global_params.glsl` | Vertex position in local-space |
+
+#### Uniforms
+
+Built-in uniforms provide per-draw or per-frame state supplied by the engine. These uniforms are declared in shader snippets and are populated automatically.
+
+| Name         | Type   | Defined In                | Description                    |
+| ------------ | ------ | ------------------------- | ------------------------------ |
+| `u_Model` | `mat4` | `vert_global_params.glsl` | World-space transform |
+
+#### Varyings
+
+Varyings are interpolated values produced by the vertex shader and consumed by the fragment shader. They are declared by including the appropriate varyings snippets.
+
+| Name         | Type   | Defined In                | Description                    |
+| ------------ | ------ | ------------------------- | ------------------------------ |
+| `v_ViewDepth` | `float` | `vert_main_varyings.glsl` | View-space depth |
