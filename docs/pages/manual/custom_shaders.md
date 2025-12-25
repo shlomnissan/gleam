@@ -182,3 +182,22 @@ Varyings are interpolated values produced by the vertex shader and consumed by t
 | Name         | Type   | Defined In                | Description                    |
 | ------------ | ------ | ------------------------- | ------------------------------ |
 | `v_ViewDepth` | `float` | `vert_main_varyings.glsl` | View-space depth |
+
+## Custom Uniforms
+
+Custom uniforms are values defined by the application and consumed by shader programs. Unlike built-in uniforms, custom uniforms must be declared explicitly in GLSL and provided through the [ShaderMaterial](/reference/materials/shader_material) uniform map. Uniforms are bound by name, and the type provided by the application must match the type declared in the shader.
+
+The following table lists accepted uniform value types and the GLSL types they map to.
+
+| Application Type | GLSL Type | Example |
+| ---------------- | --------- | ------- |
+| `int`            | `int`     | `{1}` |
+| `float`          | `float`   | `{1.5f}` |
+| `Color`          | `vec3`    | `vglx::Color {0xFF00FF}` |
+| `Matrix3`        | `mat3`    | `vglx::Matrix3 {1.0f}` |
+| `Matrix4`        | `mat4`    | `vglx::Matrix4 {1.0f}` |
+| `Vector2`        | `vec2`    | `vglx::Vector2 {1.0f, 0.0f}` |
+| `Vector3`        | `vec3`    | `vglx::Vector3 {1.0f, 0.0f, 1.0f}` |
+| `Vector4`        | `vec4`    | `vglx::Vector4 {1.0f, 0.0f, 1.0f, 0.0f}` |
+
+Uniform values can be updated after creation by mutating the material’s uniform map. Uniform updates take effect the next time the material is rendered.
