@@ -161,25 +161,52 @@ The following tables list the symbols that are available in shader snippets.
 
 Vertex attributes describe per-vertex data supplied by the geometry. These are the attributes available in the vertex shader stage:
 
-| Name         | Type   | Defined In                | Description                    |
-| ------------ | ------ | ------------------------- | ------------------------------ |
-| `a_Position` | `vec3` | `vert_global_params.glsl` | Vertex position in local-space |
+| Name                  | Type   | Defined In                 | Description                     |
+| --------------------- | ------ | -------------------------- | ------------------------------- |
+| `a_Position`          | `vec3` | `vert_global_params.glsl`  | Vertex position in local space  |
+| `a_Normal`            | `vec3` | `vert_global_params.glsl`  | Vertex normal in local space    |
+| `a_TexCoord`          | `vec2` | `vert_global_params.glsl`  | Primary texture coordinates     |
+| `a_Tangent`           | `vec4` | `vert_global_params.glsl`  | Tangent and handedness          |
+| `a_Color`             | `vec3` | `vert_global_params.glsl`  | Per-vertex color attribute      |
+| `a_InstanceColor`     | `vec3` | `vert_global_params.glsl`  | Per-instance color modifier     |
+| `a_InstanceTransform` | `mat4` | `vert_global_params.glsl`  | Per-instance model transform    |
+
 
 #### Uniforms
 
 Built-in uniforms provide per-draw or per-frame state supplied by the engine. These uniforms are declared in shader snippets and are populated automatically:
 
-| Name         | Type   | Defined In                | Description                    |
-| ------------ | ------ | ------------------------- | ------------------------------ |
-| `u_Model` | `mat4` | `vert_global_params.glsl` | World-space transform |
+| Name                 | Type    | Defined In                 | Description                     |
+| -------------------- | ------- | -------------------------- | ------------------------------- |
+| `u_Model`            | `mat4`  | `vert_global_params.glsl`  | World transform                 |
+| `u_View`             | `mat4`  | `vert_global_params.glsl`  | View transform                  |
+| `u_Projection`       | `mat4`  | `vert_global_params.glsl`  | Projection transform            |
+| `u_ModelView`        | `mat4`  | `vert_main_varyings.glsl`  | Model-view transform            |
+| `u_TextureTransform` | `mat3`  | `vert_global_params.glsl`  | Texture transform               |
+| `u_Opacity`          | `float` | `frag_global_params.glsl`  | Alpha factor                    |
+| `u_Color`            | `vec3`  | `frag_global_params.glsl`  | Base color                      |
+| `u_Fog`              | `Fog`   | `frag_global_fog.glsl`     | Fog parameters                  |
 
 #### Varyings
 
 Varyings are interpolated values produced by the vertex shader and consumed by the fragment shader. They are declared by including the appropriate snippets:
 
-| Name         | Type   | Defined In                | Description                    |
-| ------------ | ------ | ------------------------- | ------------------------------ |
-| `v_ViewDepth` | `float` | `vert_main_varyings.glsl` | View-space depth |
+| Name              | Type    | Defined In                 | Description                     |
+| ----------------- | ------- | -------------------------- | ------------------------------- |
+| `v_Position`      | `vec4`  | `vert_main_varyings.glsl`  | View space position             |
+| `v_TexCoord`      | `vec2`  | `vert_main_varyings.glsl`  | Transformed UVs                 |
+| `v_Normal`        | `vec3`  | `vert_main_varyings.glsl`  | View-space normal               |
+| `v_ViewDir`       | `vec3`  | `vert_main_varyings.glsl`  | View direction                  |
+| `v_ViewDepth`     | `float` | `vert_main_varyings.glsl`  | View space depth                |
+| `v_Color`         | `vec3`  | `vert_main_varyings.glsl`  | Interpolated color              |
+| `v_InstanceColor` | `vec3`  | `vert_main_varyings.glsl`  | Instance color                  |
+| `v_TBN`           | `mat3`  | `vert_main_varyings.glsl`  | Tangent basis matrix            |
+
+All varyings are defined and written in the vertex stage. To access them in the fragment shader the corresponding attributes must be declared and the required global shader snippets must be injected in both stages.
+
+- `vert_global_params.glsl` at the top of the vertex shader
+- `vert_main_varyings.glsl` inside the vertex shader `main` function
+- `frag_global_params.glsl` at the top of the fragment shader
 
 ## Custom Uniforms
 
