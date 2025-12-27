@@ -24,14 +24,23 @@
   --vp-c-brand-soft: #0C2A3A;
 }
 
+.VPNavBar.home {
+    .title {
+        display: none;
+    }
+    .search {
+        padding-left: 0px;
+    }
+}
+
 .VPHomeHero .name::before {
   content: "";
   display: inline-block;
-  width: 1.55em;
-  height: 1.45em;
-  -webkit-mask: url('/logo_flat.svg') no-repeat center / contain;
+  width: 4em;
+  height: 1.5em;
+  -webkit-mask: url('/logo.svg') no-repeat center / contain;
   background-color: var(--vp-c-text-1);
-  mask: url('/logo_flat.svg') no-repeat center / contain;
+  mask: url('/logo.svg') no-repeat center / contain;
   vertical-align: middle;
   margin-bottom: 0.15em;
   margin-right: 0.6rem;
