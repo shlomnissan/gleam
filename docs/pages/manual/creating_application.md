@@ -2,7 +2,7 @@
 
 If you followed the [installation guide](/manual/installation) and verified your setup you are ready to start building. This page walks you through writing a minimal VGLX application and assembling a simple world from a few core pieces. The example is small on purpose. It introduces the fundamentals without burying you in details.
 
-By the end you’ll have a working application and a clear sense of how the engine fits together, enough to [start exploring](/reference/core/application) on your own.
+By the end you’ll have a working application and a clear sense of how the engine fits together, enough to [start exploring](/reference/) on your own.
 
 ## Creating a Project
 

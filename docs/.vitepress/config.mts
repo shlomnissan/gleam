@@ -31,8 +31,8 @@ export default defineConfig({
       dark: '/logo-dark.svg'
     },
     nav: [
-      { text: 'Manual', link: '/manual/' },
-      { text: 'Reference', link: '/reference/core/application' },
+      { text: 'Manual', link: '/manual/', activeMatch: '^/manual/' },
+      { text: 'Reference', link: '/reference/', activeMatch: '^/reference/' },
     ],
     sidebar: {
       '/manual/': [
@@ -46,7 +46,7 @@ export default defineConfig({
             { text: 'Custom Shaders', link: '/manual/custom_shaders' }
           ]
         },
-        { text: 'Reference', link: '/reference/core/application' }
+        { text: 'Reference', link: '/reference/' }
       ],
       '/reference/': referenceSidebar,
     },

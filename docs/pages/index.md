@@ -8,10 +8,10 @@ hero:
   actions:
     - theme: brand
       text: Manual
-      link: /manual
+      link: /manual/
     - theme: alt
       text: Reference
-      link: /reference/core/application
+      link: /reference/
     - theme: alt
       text: GitHub
       link: https://github.com/shlomnissan/vglx
