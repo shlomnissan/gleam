@@ -3,8 +3,8 @@
 layout: home
 
 hero:
-  name: ' '
-  tagline: Cross-Platform 3D Rendering Engine,<br/>Built for Performance in Modern C++
+  name: VGLX
+  tagline: Cross-Platform 3D Rendering Engine<br/>Built for Performance in Modern C++
   actions:
     - theme: brand
       text: Manual

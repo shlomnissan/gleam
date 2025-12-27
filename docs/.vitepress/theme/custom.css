@@ -1,15 +1,4 @@
-@font-face {
-  font-family: "logo";
-  src: url("/logo.woff2") format("woff2");
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-  ascent-override: 85%;
-  descent-override: 15%;
-}
-
 :root {
-  --vp-font-family-heading: 'logo', sans-serif;
   --vp-home-hero-name-color: var(--vp-c-text-1);
   --vp-c-brand-1: #0FA0F0;
   --vp-c-brand-2: #0B8CD6;
@@ -28,9 +17,30 @@
     .title {
         display: none;
     }
+
     .search {
         padding-left: 0px;
     }
+}
+
+@media (max-width: 768px) {
+  .VPNavBar.home .content-body {
+    flex: 1;
+    justify-content: space-between;
+  }
+
+  .search button {
+    padding-left: 0px;
+  }
+}
+
+.VPNavBar img.VPImage.logo {
+    height: 30px;
+}
+
+.VPHomeHero .name.clip {
+    color: transparent;
+    -webkit-text-fill-color: transparent;
 }
 
 .VPHomeHero .name::before {
@@ -49,16 +59,14 @@
 
 .VPNavBarTitle {
   .title {
-    font-family: var(--vp-font-family-heading);
-    font-size: 1.25rem;
-    font-weight: 800;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
   }
 }
 
 .heading {
   .name {
     color: var(--vp-c-text-1);
-    font-family: var(--vp-font-family-heading);
     font-weight: 800;
     font-size: 3.8rem;
 

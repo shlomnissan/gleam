@@ -6,7 +6,7 @@ const year = new Date().getFullYear();
 
 export default defineConfig({
   srcDir: 'pages',
-  title: ' ',
+  title: 'VGLX',
   description: '3D Rendering in Modern C++',
   cleanUrls: true,
   markdown: {
