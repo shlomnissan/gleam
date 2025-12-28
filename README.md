@@ -4,7 +4,7 @@
     </b>
 </h1>
 
-<p align="center">A fast cross-platform 3D rendering engine for modern C++
+<p align="center">A cross-platform scene-oriented 3D rendering engine for modern C++</p>
 
 <div align="center">
 
@@ -45,6 +45,58 @@ python3 -m tools.installer.main
 ```
 
 The installer checks for CMake, detects your compiler, and asks for an installation prefix. If you plan to import textures or models, enable the asset builder when prompted. It converts source assets into GPU-ready formats.
+
+## Hello VGLX (minimal example)
+
+```cpp
+struct MyApp : public vglx::Application {
+    auto Configure() -> Application::Parameters override {
+        return {
+            .title = "Hello VGLX",
+            .clear_color = {0x000000},
+            .width = 1024,
+            .height = 768,
+            .antialiasing = 4,
+            .vsync = true,
+            .show_stats = false,
+        };
+    }
+
+    auto CreateScene() -> std::unique_ptr<vglx::Scene> override {
+        auto scene = vglx::Scene::Create();
+
+        scene->Add(vglx::AmbientLight::Create({
+            .color = 0xFFFFFF,
+            .intensity = 0.5f
+        }));
+
+        scene->Add(vglx::PointLight::Create({
+            .color = 0xFFFFFF,
+            .intensity = 1.0f
+        }))->transform.Translate({2.0f, 2.5f, 4.0f});
+
+        scene->Add(vglx::Mesh::Create(
+            vglx::BoxGeometry::Create(),
+            vglx::PhongMaterial::Create(0x049EF4)
+        ))->RotateY(vglx::math::DegToRad(45.0f));
+
+        GetContext()->camera->TranslateZ(2.5f);
+
+        return scene;
+    }
+
+    auto Update([[maybe_unused]] float dt) -> bool override {
+        return true;
+    }
+};
+
+auto main() -> int {
+    auto app = MyApp {};
+    app.Start();
+
+    return 0;
+}
+```
 
 ## Contributions
 

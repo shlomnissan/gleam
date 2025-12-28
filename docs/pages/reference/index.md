@@ -1,4 +1,4 @@
-# API Reference <Badge type="info">0.0.1</Badge> {.badged-header}
+# API Reference <Badge type="info">version 0.0.1</Badge> {.badged-header}
 
 This section documents the public API of VGLX. It is generated directly from source and reflects the current state of the engine.
 

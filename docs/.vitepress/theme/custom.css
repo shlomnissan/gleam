@@ -91,7 +91,11 @@
 .badged-header {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 16px;
+
+    .VPBadge {
+        margin-top: 8px !important;
+    }
 }
 
 .VPBadge {

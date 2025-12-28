@@ -47,10 +47,10 @@ The asset builder exposes a small set of command-line options. Output paths and 
 
 In this section we import a texture into VGLX. We start by converting a JPG file into a `.tex` asset, then load it at runtime and apply it to a simple primitive.
 
-The image used in this example is a simple [wooden crate texture](/crate_texture_low.jpg). To convert this image or any other into a `.tex` asset, run the asset builder from the command line and pass the image file using the `-i` flag:
+The image used in this example is a simple [wooden crate texture](/manual_crate_texture_low.jpg). To convert this image or any other into a `.tex` asset, run the asset builder from the command line and pass the image file using the `-i` flag:
 
 ```bash
-asset_builder -i crate_texture_low.jpg
+asset_builder -i manual_crate_texture_low.jpg
 ```
 If the conversion succeeds the asset builder prints the output path.
 
@@ -111,7 +111,7 @@ auto OnAttached(vglx::SharedContextPointer context) -> void override {
 
 If you used the same source image and followed the steps above, your application should produce a result similar to the image below:
 
-![Window showing a textured cube](/importing_texture.png "Window showing a textured cube")
+![Textured Cube](/manual_02.webp)
 
 If your application prints a `file not found` error, make sure the texture asset is located in a directory that the application can access at runtime. By default assets are loaded using paths relative to the executable. If your assets live elsewhere, provide an explicit relative path when calling the loader.
 
@@ -121,7 +121,7 @@ In this section we import a mesh from an OBJ file. Unlike textures, meshes typic
 
 When importing a mesh, `asset_builder` treats the OBJ as the root of the asset. Geometry, material definitions, and all referenced textures are processed together. Each referenced image is converted to a `.tex` file, while the mesh geometry, material metadata, and texture paths are stored in a single `.msh` file.
 
-The mesh used in this example is a [human head scan](/lps_head.zip) by Lee Perry-Smith. After downloading the archive, unzip it and navigate to the extracted directory. From there, run the asset builder on the OBJ file:
+The mesh used in this example is a [human head scan](/manual_lps_head.zip) by Lee Perry-Smith. After downloading the archive, unzip it and navigate to the extracted directory. From there, run the asset builder on the OBJ file:
 
 ```bash
 asset_builder -i lps_head.obj -o output
@@ -165,7 +165,7 @@ struct MyScene : public vglx::Scene {
 
 If you followed the steps above using the same source files, your application should produce a result similar to the image below.
 
-![Window showing a human head scan](/importing_mesh.png "Window showing a human head scan")
+![Human Head Scan](/manual_03.webp)
 
 Loading a `.msh` file at runtime produces a fully constructed renderable node. The mesh geometry is uploaded to the GPU lazily, material parameters are initialized from the imported metadata, and any referenced .tex files are loaded and bound to the appropriate material slots. No additional setup is required by the application.
 

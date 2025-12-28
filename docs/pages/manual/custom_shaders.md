@@ -97,6 +97,8 @@ MyScene() {
 
 Running the application now produces the same visual result as before. The difference is that the color is now applied by a custom shader program rather than a built-in material.
 
+![Rotating Cube Unlit](/manual_04.webp)
+
 The [Shader Material factory](/reference/materials/shader_material#function-create-54e37359) expects valid GLSL source code for both shader stages. Uniforms can be provided at construction time as a name/value map. These values are uploaded and bound automatically when the material is used for rendering.
 
 If you have experience writing GLSL you may notice that the shader code contains a few elements that are specific to VGLX. Let’s break down the vertex shader first:
