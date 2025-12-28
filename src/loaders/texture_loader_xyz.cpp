@@ -23,11 +23,14 @@ namespace vglx {
 auto load_texture(const fs::path& path) -> std::expected<std::shared_ptr<Texture2D>, std::string> {
     auto file = std::ifstream {path, std::ios::binary};
     if (!file) {
-        return std::unexpected(std::format("Unable to open image '{}'", path.string()));
+        return std::unexpected(std::format("Unable to open texture '{}'", path.string()));
     }
 
     auto header = TextureHeader {};
-    read_binary(file, header);
+    if (!read_binary(file, header)) {
+        return std::unexpected(std::format("Failed to read header from '{}'", path.string()));
+    }
+
     if (std::memcmp(header.magic, "TEX0", 4) != 0) {
         return std::unexpected(std::format("Invalid texture file '{}'", path.string()));
     }
