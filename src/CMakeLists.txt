@@ -30,6 +30,8 @@ set(SOURCE_CODE
     "lights/point_light.cpp"
     "lights/spot_light.cpp"
     "loaders/mesh_loader.cpp"
+    "loaders/mesh_loader_xyz.cpp"
+    "loaders/mesh_loader_xyz.hpp"
     "loaders/texture_loader.cpp"
     "loaders/texture_loader_xyz.cpp"
     "loaders/texture_loader_xyz.hpp"

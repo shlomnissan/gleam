@@ -18,6 +18,7 @@
 #include "vglx/scene/node.hpp"
 #include "vglx/textures/texture_2d.hpp"
 
+#include "loaders/mesh_loader_xyz.hpp"
 #include "loaders/texture_loader_xyz.hpp"
 
 namespace vglx {
@@ -82,7 +83,21 @@ auto AssetManager::LoadMesh(const fs::path& path) -> MeshHandle {
     auto handle = MeshHandle {state};
 
     impl_->pool.Enqueue([this, state, path] {
-        // TODO: implement
+        auto result = load_mesh(path);
+        auto err = std::string {};
+
+        if (result) {
+            state->value = std::move(result.value());
+        } else {
+            err = result.error();
+            Logger::Log(LogLevel::Error, "{}", err);
+        }
+
+        impl_->Post([state = std::move(state), err = std::move(err)]() {
+            if (!state) return;
+            state->error = std::move(err);
+            state->ready = true;
+        });
     });
 
     return handle;
