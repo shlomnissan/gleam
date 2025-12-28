@@ -9,6 +9,7 @@
 
 #include "ui_helpers.hpp"
 
+#include <vglx/core.hpp>
 #include <vglx/helpers.hpp>
 #include <vglx/lights.hpp>
 #include <vglx/loaders.hpp>
@@ -18,6 +19,12 @@
 #include <print>
 
 using namespace vglx;
+
+namespace {
+
+auto handle = TextureHandle {};
+
+}
 
 ExamplePhongMaterial::ExamplePhongMaterial() {
     auto geometry = BoxGeometry::Create();
@@ -45,19 +52,16 @@ ExamplePhongMaterial::ExamplePhongMaterial() {
 auto ExamplePhongMaterial::OnAttached(SharedContextPointer context) -> void {
     Add(OrbitControls::Create(context->camera, {.radius = 3.0f}));
 
-    context->texture_loader->LoadAsync(
-        "assets/checker/checker.tex",
-        [this](auto result) {
-            if (result) {
-                texture_ = result.value();
-            } else {
-                std::println(stderr, "{}", result.error());
-            }
-        }
+    handle = context->asset_manager->LoadTexture(
+        "assets/checker/checker.tex"
     );
 }
 
 auto ExamplePhongMaterial::OnUpdate(float delta) -> void {
+    if (auto tex = handle.TryTake()) {
+        texture_ = tex.value();
+    }
+
     mesh_->transform.Rotate(Vector3::Up(), 1.0f * delta);
     mesh_->transform.Rotate(Vector3::Right(), 1.0f * delta);
 }

@@ -17,6 +17,8 @@ public:
 
     auto OnAttached(vglx::SharedContextPointer context) -> void override;
 
+    auto OnUpdate([[maybe_unused]] float delta) -> void override;
+
 private:
     std::shared_ptr<vglx::Node> model_;
 };

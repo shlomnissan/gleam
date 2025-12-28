@@ -7,6 +7,7 @@
 
 #include "example_sandbox.hpp"
 
+#include <vglx/core.hpp>
 #include <vglx/helpers.hpp>
 #include <vglx/lights.hpp>
 #include <vglx/materials.hpp>
@@ -19,6 +20,7 @@ namespace {
 
 auto plane_geometry = PlaneGeometry::Create();
 auto plane_material = PhongMaterial::Create();
+auto handle = TextureHandle {};
 
 }
 
@@ -30,13 +32,8 @@ ExampleSandbox::ExampleSandbox() {
 }
 
 auto ExampleSandbox::OnAttached(SharedContextPointer context) -> void {
-    context->texture_loader->LoadAsync(
-        "assets/checker/checker.tex",
-        [this](auto result) {
-            if (result) {
-                plane_material->albedo_map = result.value();
-            }
-        }
+    handle = context->asset_manager->LoadTexture(
+        "assets/checker/checker.tex"
     );
 
     Add(OrbitControls::Create(
@@ -46,4 +43,10 @@ auto ExampleSandbox::OnAttached(SharedContextPointer context) -> void {
             .yaw = math::pi_over_6
         })
     );
+}
+
+auto ExampleSandbox::OnUpdate(float delta) -> void {
+    if (auto tex = handle.TryTake()) {
+        plane_material->albedo_map = tex.value();
+    }
 }
