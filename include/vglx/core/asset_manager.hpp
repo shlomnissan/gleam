@@ -22,27 +22,27 @@ class Texture2D;
 namespace fs = std::filesystem;
 
 template <typename T>
-class VGLX_EXPORT Handle {
+class VGLX_EXPORT AssetHandle {
 public:
-    Handle() = default;
+    AssetHandle() = default;
 
-    auto Handled() -> void { state_.reset(); }
-
-    [[nodiscard]] auto IsReady() const -> bool { return state_ && state_->ready; }
-
-    [[nodiscard]] auto HasValue() const -> bool { return state_ && state_->value; }
-
-    [[nodiscard]] auto HasError() const -> bool { return state_ && !state_->error.empty(); }
-
-    [[nodiscard]] auto Error() const -> const std::string& {
-        static const std::string kEmpty {};
-        return state_ ? state_->error : kEmpty;
+    [[nodiscard]] auto TryError() -> std::optional<std::string> {
+        if (!state_ || !state_->ready || state_->error.empty()) {
+            return std::nullopt;
+        }
+        auto out = std::move(state_->error);
+        state_->value.reset();
+        state_->error.clear();
+        return out;
     }
 
-    [[nodiscard]] auto Value() -> T {
-        if (!state_ || !state_->value) return T {};
-        T out = std::move(*state_->value);
+    [[nodiscard]] auto TryValue() -> std::optional<T> {
+        if (!state_ || !state_->ready || !state_->value) {
+            return std::nullopt;
+        }
+        auto out = std::move(*state_->value);
         state_->value.reset();
+        state_->error.clear();
         return out;
     }
 
@@ -56,14 +56,14 @@ private:
     std::shared_ptr<State> state_;
 
     friend class AssetManager;
-    explicit Handle(std::shared_ptr<State> s) : state_(std::move(s)) {}
+    explicit AssetHandle(std::shared_ptr<State> s) : state_(std::move(s)) {}
 };
+
+using TextureHandle = AssetHandle<std::shared_ptr<Texture2D>>;
+using MeshHandle = AssetHandle<std::unique_ptr<Node>>;
 
 class VGLX_EXPORT AssetManager {
 public:
-    using TextureHandle = Handle<std::shared_ptr<Texture2D>>;
-    using MeshHandle = Handle<std::unique_ptr<Node>>;
-
     AssetManager();
 
     AssetManager(const AssetManager&) = delete;
