@@ -42,14 +42,10 @@ auto ExampleSprite::OnAttached(SharedContextPointer context) -> void {
 }
 
 auto ExampleSprite::OnUpdate(float delta) -> void {
-    if (!sprite_) {
-        if (auto tex = handle.TryValue()) {
-            sprite_ = Add(Sprite::Create(SpriteMaterial::Create(tex.value())));
-            sprite_->SetScale(0.15f);
-            sprite_->TranslateY(1.0f);
-        } else if (auto err = handle.TryError()) {
-            std::println(stderr, "{}", err.value());
-        }
+    if (auto tex = handle.TryTake()) {
+        sprite_ = Add(Sprite::Create(SpriteMaterial::Create(tex.value())));
+        sprite_->SetScale(0.15f);
+        sprite_->TranslateY(1.0f);
     }
 
     if (sprite_) {

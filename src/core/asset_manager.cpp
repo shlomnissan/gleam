@@ -11,6 +11,7 @@
 #include <mutex>
 #include <queue>
 
+#include "utilities/logger.hpp"
 #include "utilities/thread_pool.hpp"
 
 #include "vglx/asset_format.hpp"
@@ -63,6 +64,7 @@ auto AssetManager::LoadTexture(const fs::path& path) -> TextureHandle {
             state->value = result.value();
         } else {
             err = result.error();
+            Logger::Log(LogLevel::Error, "{}", err);
         }
 
         impl_->Post([state = std::move(state), err = std::move(err)]() {

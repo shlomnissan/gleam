@@ -36,7 +36,7 @@ public:
         return out;
     }
 
-    [[nodiscard]] auto TryValue() -> std::optional<T> {
+    [[nodiscard]] auto TryTake() -> std::optional<T> {
         if (!state_ || !state_->ready || !state_->value) {
             return std::nullopt;
         }
