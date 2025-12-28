@@ -12,6 +12,8 @@
 
 #include "utilities/file.hpp"
 
+#include <format>
+
 namespace vglx {
 
 auto load_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>, std::string> {
