@@ -9,6 +9,7 @@
 
 #include "ui_helpers.hpp"
 
+#include <vglx/core.hpp>
 #include <vglx/helpers.hpp>
 #include <vglx/lights.hpp>
 #include <vglx/primitives.hpp>
@@ -16,7 +17,12 @@
 #include <print>
 
 using namespace vglx;
-using namespace vglx::math;
+
+namespace {
+
+auto handle = MeshHandle {};
+
+}
 
 ExampleModelLoader::ExampleModelLoader() {
     show_context_menu_ = true;
@@ -46,30 +52,27 @@ ExampleModelLoader::ExampleModelLoader() {
 auto ExampleModelLoader::OnAttached(SharedContextPointer context) -> void {
     Add(OrbitControls::Create(context->camera, {
         .radius = 4.0f,
-        .pitch = DegToRad(20.0f),
-        .yaw = DegToRad(15.0f)
+        .pitch = math::DegToRad(20.0f),
+        .yaw = math::DegToRad(15.0f)
     }));
 
-    context->mesh_loader->LoadAsync(
-        "assets/lps_head/lps_head.msh",
-        [this](auto result) {
-            if (result) {
-                model_ = sphere_->Add(std::move(result.value()));
-                model_->RotateY(math::pi_over_2);
-
-                auto mesh = static_cast<Mesh*>(model_->Children().front().get());
-                material_ = static_cast<PhongMaterial*>(mesh->GetMaterial().get());
-                albedo_map_ = material_->albedo_map;
-                normal_map_ = material_->normal_map;
-                specular_map_ = material_->specular_map;
-            } else {
-                std::println(stderr, "{}", result.error());
-            }
-        }
+    handle = context->asset_manager->LoadMesh(
+        "assets/lps_head/lps_head.msh"
     );
 }
 
 auto ExampleModelLoader::OnUpdate(float delta) -> void {
+    if (auto mesh = handle.TryTake()) {
+        model_ = sphere_->Add(std::move(mesh.value()));
+        model_->RotateY(math::pi_over_2);
+
+        auto ptr = static_cast<Mesh*>(model_->Children().front().get());
+        material_ = static_cast<PhongMaterial*>(ptr->GetMaterial().get());
+        albedo_map_ = material_->albedo_map;
+        normal_map_ = material_->normal_map;
+        specular_map_ = material_->specular_map;
+    }
+
     if (albedo_map_ != nullptr && !!material_->albedo_map != show_albedo_map_) {
         material_->albedo_map = show_albedo_map_ ? albedo_map_ : nullptr;
     }
