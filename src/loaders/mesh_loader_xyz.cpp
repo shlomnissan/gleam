@@ -164,7 +164,7 @@ auto load_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>, std
     }
 
     if (std::memcmp(header.magic, "MSH0", 4) != 0) {
-        return std::unexpected(std::format("Invalid texture file '{}'", path.string()));
+        return std::unexpected(std::format("Invalid mesh file '{}'", path.string()));
     }
 
     if (header.version != VGLX_MSH_VER) {

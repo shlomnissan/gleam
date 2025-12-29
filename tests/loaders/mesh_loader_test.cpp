@@ -8,83 +8,33 @@
 #include <gtest/gtest.h>
 
 #include <vglx/geometries/geometry.hpp>
-#include <vglx/loaders/mesh_loader.hpp>
 #include <vglx/scene/mesh.hpp>
 
-#include <future>
-#include <thread>
+#include "loaders/mesh_loader_xyz.hpp"
 
-const auto mesh_loader = vglx::MeshLoader::Create();
+TEST(MeshLoader, LoadMesh) {
+    auto result = vglx::load_mesh("assets/plane.msh");
+    EXPECT_TRUE(result.has_value());
 
-#pragma region Helpers
-
-template <typename Callback>
-auto RunAsyncTest(const std::string& file_path, Callback callback) {
-    auto main_thread_id = std::this_thread::get_id();
-    auto promise = std::promise<void> {};
-    auto future = promise.get_future();
-
-    mesh_loader->LoadAsync(file_path, [&](auto result) {
-        callback(std::move(result), main_thread_id);
-        promise.set_value();
-    });
-
-    auto status = future.wait_for(std::chrono::seconds(1));
-    EXPECT_EQ(status, std::future_status::ready);
-}
-
-auto VerifyMesh(std::unique_ptr<vglx::Node> root) {
-    EXPECT_NE(root, nullptr);
+    auto root = std::move(result.value());
     EXPECT_EQ(root->Children().size(), 1);
 
-    if (auto mesh = static_cast<vglx::Mesh*>(root->Children()[0].get())) {
-        auto geometry = mesh->GetGeometry();
-        EXPECT_NE(geometry, nullptr);
-        EXPECT_NE(geometry, nullptr);
-        EXPECT_EQ(geometry->VertexCount(), 4);
-        EXPECT_EQ(geometry->IndexCount(), 6);
-    }
+    auto mesh = static_cast<vglx::Mesh*>(root->Children().front().get());
+    auto geometry = mesh->GetGeometry();
+    EXPECT_EQ(geometry->VertexCount(), 4);
+    EXPECT_EQ(geometry->IndexCount(), 6);
 }
 
-#pragma endregion
+TEST(MeshLoader, LoadMeshInvalidFileFormat) {
+    auto result = vglx::load_mesh("assets/plane.obj");
 
-#pragma region Load Mesh Synchronously
-
-TEST(MeshLoader, LoadMeshSynchronous) {
-    auto result = mesh_loader->Load("assets/plane.msh");
-    EXPECT_TRUE(result);
-    VerifyMesh(std::move(result.value()));
-}
-
-TEST(MeshLoader, LoadMeshSynchronousInvalidFileType) {
-    auto result = mesh_loader->Load("assets/plane.obj");
-    EXPECT_FALSE(result);
+    EXPECT_EQ(false, result.has_value());
     EXPECT_EQ(result.error(), "Invalid mesh file 'assets/plane.obj'");
 }
 
-TEST(MeshLoader, LoadMeshSynchronousInvalidFile) {
-    auto result = mesh_loader->Load("assets/invalid_plane.msh");
-    EXPECT_FALSE(result);
-    EXPECT_EQ(result.error(), "File not found 'assets/invalid_plane.msh'");
+TEST(MeshLoader, LoadMeshInvalidPath) {
+    auto result = vglx::load_mesh("assets/invalid_path.msh");
+
+    EXPECT_EQ(false, result.has_value());
+    EXPECT_EQ(result.error(), "Unable to open file 'assets/invalid_path.msh'");
 }
-
-#pragma endregion
-
-#pragma region Load Mesh Asynchronously
-
-TEST(MeshLoader, LoadMeshAsynchronous) {
-    RunAsyncTest("assets/plane.msh", [](auto result, const auto& main_thread_id) {
-        VerifyMesh(std::move(result.value()));
-        EXPECT_NE(std::this_thread::get_id(), main_thread_id);
-    });
-}
-
-TEST(MeshLoader, LoadMeshAsynchronousInvalidFileType) {
-    RunAsyncTest("assets/plane.obj", [](auto result, const auto& main_thread_id) {
-        EXPECT_FALSE(result);
-        EXPECT_EQ(result.error(), "Invalid mesh file 'assets/plane.obj'");
-        EXPECT_NE(std::this_thread::get_id(), main_thread_id);
-    });
-}
-
-#pragma endregion
