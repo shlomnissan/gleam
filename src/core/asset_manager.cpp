@@ -49,10 +49,6 @@ struct AssetManager::Impl {
 
 AssetManager::AssetManager() : impl_(std::make_unique<Impl>()) {}
 
-AssetManager::AssetManager(AssetManager&&) noexcept = default;
-
-auto AssetManager::operator=(AssetManager&&) noexcept -> AssetManager& = default;
-
 auto AssetManager::LoadTexture(const fs::path& path) -> TextureHandle {
     auto state = std::make_shared<TextureHandle::State>();
     auto handle = TextureHandle {state};

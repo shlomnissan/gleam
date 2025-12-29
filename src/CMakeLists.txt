@@ -83,6 +83,7 @@ set(PUBLIC_HEADERS
     "${PUBLIC_HEADERS_DIR}/cameras/orthographic_camera.hpp"
     "${PUBLIC_HEADERS_DIR}/cameras/perspective_camera.hpp"
     "${PUBLIC_HEADERS_DIR}/core/application.hpp"
+    "${PUBLIC_HEADERS_DIR}/core/asset_handle.hpp"
     "${PUBLIC_HEADERS_DIR}/core/asset_manager.hpp"
     "${PUBLIC_HEADERS_DIR}/core/disposable.hpp"
     "${PUBLIC_HEADERS_DIR}/core/identity.hpp"
