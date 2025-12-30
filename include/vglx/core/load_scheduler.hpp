@@ -7,9 +7,7 @@
 
 #pragma once
 
-#include "vglx_export.h"
-
-#include "vglx/core/asset_handle.hpp"
+#include "vglx/loaders/load_handle.hpp"
 
 #include <filesystem>
 #include <memory>
@@ -19,15 +17,15 @@ namespace vglx {
 
 namespace fs = std::filesystem;
 
-class VGLX_EXPORT AssetManager {
+class LoadScheduler {
 public:
-    AssetManager();
+    LoadScheduler();
 
-    AssetManager(const AssetManager&) = delete;
-    auto operator=(const AssetManager&) -> AssetManager& = delete;
+    LoadScheduler(const LoadScheduler&) = delete;
+    auto operator=(const LoadScheduler&) -> LoadScheduler& = delete;
 
-    AssetManager(AssetManager&&) noexcept = delete;
-    auto operator=(AssetManager&&) noexcept -> AssetManager& = delete;
+    LoadScheduler(LoadScheduler&&) noexcept = delete;
+    auto operator=(LoadScheduler&&) noexcept -> LoadScheduler& = delete;
 
     [[nodiscard]] auto LoadTexture(const fs::path& path) -> TextureHandle;
 
@@ -35,7 +33,7 @@ public:
 
     auto Pump() -> void;
 
-    ~AssetManager();
+    ~LoadScheduler();
 
 private:
     /// @cond INTERNAL

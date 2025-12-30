@@ -5,7 +5,7 @@
 ===========================================================================
 */
 
-#include "loaders/texture_loader_xyz.hpp"
+#include "vglx/loaders/texture_loader_xyz.hpp"
 
 #include "vglx/asset_format.hpp"
 #include "vglx/textures/texture_2d.hpp"

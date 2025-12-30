@@ -19,9 +19,9 @@ class Node;
 class Texture2D;
 
 template <typename T>
-class VGLX_EXPORT AssetHandle {
+class VGLX_EXPORT LoadHandle {
 public:
-    AssetHandle() = default;
+    LoadHandle() = default;
 
     [[nodiscard]] auto TryError() -> std::optional<std::string> {
         if (!state_ || !state_->ready || state_->error.empty()) {
@@ -53,13 +53,13 @@ private:
 
     std::shared_ptr<State> state_;
 
-    friend class AssetManager;
-    explicit AssetHandle(std::shared_ptr<State> s) : state_(std::move(s)) {}
+    friend class LoadScheduler;
+    explicit LoadHandle(std::shared_ptr<State> s) : state_(std::move(s)) {}
     /// @endcond
 };
 
-using TextureHandle = AssetHandle<std::shared_ptr<Texture2D>>;
+using TextureHandle = LoadHandle<std::shared_ptr<Texture2D>>;
 
-using MeshHandle = AssetHandle<std::unique_ptr<Node>>;
+using MeshHandle = LoadHandle<std::unique_ptr<Node>>;
 
 }

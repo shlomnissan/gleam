@@ -8,9 +8,9 @@
 #include <gtest/gtest.h>
 #include <print>
 
-#include <vglx/textures/texture_2d.hpp>
+#include <vglx/loaders/texture_loader_xyz.hpp>
 
-#include "loaders/texture_loader_xyz.hpp"
+#include <vglx/textures/texture_2d.hpp>
 
 TEST(TextureLoader, LoadTexture) {
     auto result = vglx::load_texture("assets/texture.tex");

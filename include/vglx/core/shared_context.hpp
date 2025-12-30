@@ -10,7 +10,7 @@
 #include "vglx_export.h"
 
 #include "vglx/loaders.hpp"
-#include "vglx/core/asset_manager.hpp"
+#include "vglx/core/load_scheduler.hpp"
 
 #include <memory>
 
@@ -92,7 +92,7 @@ public:
     int window_height;
 
     /// @cond INTERNAL
-    std::unique_ptr<AssetManager> asset_manager = std::make_unique<AssetManager>();
+    std::unique_ptr<LoadScheduler> asset_manager = std::make_unique<LoadScheduler>();
     /// @endcond
 
     /**

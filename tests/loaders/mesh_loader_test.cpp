@@ -7,10 +7,10 @@
 
 #include <gtest/gtest.h>
 
+#include <vglx/loaders/mesh_loader_xyz.hpp>
+
 #include <vglx/geometries/geometry.hpp>
 #include <vglx/scene/mesh.hpp>
-
-#include "loaders/mesh_loader_xyz.hpp"
 
 TEST(MeshLoader, LoadMesh) {
     auto result = vglx::load_mesh("assets/plane.msh");

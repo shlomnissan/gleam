@@ -5,7 +5,7 @@
 ===========================================================================
 */
 
-#include "vglx/core/asset_manager.hpp"
+#include "vglx/core/load_scheduler.hpp"
 
 #include <functional>
 #include <mutex>
@@ -14,16 +14,14 @@
 #include "utilities/logger.hpp"
 #include "utilities/thread_pool.hpp"
 
-#include "vglx/asset_format.hpp"
+#include "vglx/loaders/mesh_loader_xyz.hpp"
+#include "vglx/loaders/texture_loader_xyz.hpp"
 #include "vglx/scene/node.hpp"
 #include "vglx/textures/texture_2d.hpp"
 
-#include "loaders/mesh_loader_xyz.hpp"
-#include "loaders/texture_loader_xyz.hpp"
-
 namespace vglx {
 
-struct AssetManager::Impl {
+struct LoadScheduler::Impl {
     std::mutex queue_mutex;
     std::queue<std::function<void()>> completions;
     ThreadPool pool;
@@ -47,9 +45,9 @@ struct AssetManager::Impl {
     }
 };
 
-AssetManager::AssetManager() : impl_(std::make_unique<Impl>()) {}
+LoadScheduler::LoadScheduler() : impl_(std::make_unique<Impl>()) {}
 
-auto AssetManager::LoadTexture(const fs::path& path) -> TextureHandle {
+auto LoadScheduler::LoadTexture(const fs::path& path) -> TextureHandle {
     auto state = std::make_shared<TextureHandle::State>();
     auto handle = TextureHandle {state};
 
@@ -74,7 +72,7 @@ auto AssetManager::LoadTexture(const fs::path& path) -> TextureHandle {
     return handle;
 }
 
-auto AssetManager::LoadMesh(const fs::path& path) -> MeshHandle {
+auto LoadScheduler::LoadMesh(const fs::path& path) -> MeshHandle {
     auto state = std::make_shared<MeshHandle::State>();
     auto handle = MeshHandle {state};
 
@@ -99,10 +97,10 @@ auto AssetManager::LoadMesh(const fs::path& path) -> MeshHandle {
     return handle;
 }
 
-auto AssetManager::Pump() -> void {
+auto LoadScheduler::Pump() -> void {
     impl_->Pump();
 }
 
-AssetManager::~AssetManager() = default;
+LoadScheduler::~LoadScheduler() = default;
 
 }

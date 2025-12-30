@@ -5,10 +5,11 @@
 ===========================================================================
 */
 
-#include "loaders/mesh_loader_xyz.hpp"
+#include "vglx/loaders/mesh_loader_xyz.hpp"
 
 #include "vglx/asset_format.hpp"
 #include "vglx/geometries/geometry.hpp"
+#include "vglx/loaders/texture_loader_xyz.hpp"
 #include "vglx/materials/material.hpp"
 #include "vglx/materials/phong_material.hpp"
 #include "vglx/math/color.hpp"
@@ -16,7 +17,6 @@
 #include "vglx/scene/node.hpp"
 #include "vglx/textures/texture_2d.hpp"
 
-#include "loaders/texture_loader_xyz.hpp"
 #include "utilities/file.hpp"
 
 #include <cstdint>
