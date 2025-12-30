@@ -9,7 +9,7 @@
 
 #include "examples.hpp"
 
-#include <iostream>
+#include <print>
 
 using namespace vglx;
 
@@ -24,7 +24,7 @@ auto main() -> int {
 
     auto init_window = window.Initialize();
     if (!init_window.has_value()) {
-        std::cerr << init_window.error() << '\n';
+        std::println(stderr, "{}", init_window.error());
         return 1;
     }
 
@@ -36,7 +36,7 @@ auto main() -> int {
 
     auto init_renderer = renderer.Initialize();
     if (!init_renderer.has_value()) {
-        std::cerr << init_renderer.error() << '\n';
+        std::println(stderr, "{}", init_renderer.error());
         return 1;
     }
 
