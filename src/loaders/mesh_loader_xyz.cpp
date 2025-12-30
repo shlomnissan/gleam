@@ -174,4 +174,13 @@ auto load_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>, std
     return process_mesh(header, path, file);
 }
 
+auto MeshLoaderXYZ::Load(const fs::path& path)
+  -> std::expected<std::shared_ptr<Node>, std::string> {
+    return load_mesh(path);
+}
+
+auto MeshLoaderXYZ::LoadAsync(const fs::path& path) -> MeshLoadHandle {
+    return async_scheduler_->LoadMesh(path);
+}
+
 }

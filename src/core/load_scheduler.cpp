@@ -47,9 +47,9 @@ struct LoadScheduler::Impl {
 
 LoadScheduler::LoadScheduler() : impl_(std::make_unique<Impl>()) {}
 
-auto LoadScheduler::LoadTexture(const fs::path& path) -> TextureHandle {
-    auto state = std::make_shared<TextureHandle::State>();
-    auto handle = TextureHandle {state};
+auto LoadScheduler::LoadTexture(const fs::path& path) -> TextureLoadHandle {
+    auto state = std::make_shared<TextureLoadHandle::State>();
+    auto handle = TextureLoadHandle {state};
 
     impl_->pool.Enqueue([this, state, path] {
         auto result = load_texture(path);
@@ -72,9 +72,9 @@ auto LoadScheduler::LoadTexture(const fs::path& path) -> TextureHandle {
     return handle;
 }
 
-auto LoadScheduler::LoadMesh(const fs::path& path) -> MeshHandle {
-    auto state = std::make_shared<MeshHandle::State>();
-    auto handle = MeshHandle {state};
+auto LoadScheduler::LoadMesh(const fs::path& path) -> MeshLoadHandle {
+    auto state = std::make_shared<MeshLoadHandle::State>();
+    auto handle = MeshLoadHandle {state};
 
     impl_->pool.Enqueue([this, state, path] {
         auto result = load_mesh(path);

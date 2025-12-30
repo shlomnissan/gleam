@@ -20,7 +20,7 @@ using namespace vglx;
 
 namespace {
 
-auto handle = MeshHandle {};
+auto handle = MeshLoadHandle {};
 
 }
 
@@ -56,7 +56,7 @@ auto ExampleModelLoader::OnAttached(SharedContextPointer context) -> void {
         .yaw = math::DegToRad(15.0f)
     }));
 
-    handle = context->asset_manager->LoadMesh(
+    handle = context->load_scheduler->LoadMesh(
         "assets/lps_head/lps_head.msh"
     );
 }

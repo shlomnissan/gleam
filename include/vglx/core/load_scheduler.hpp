@@ -27,9 +27,9 @@ public:
     LoadScheduler(LoadScheduler&&) noexcept = delete;
     auto operator=(LoadScheduler&&) noexcept -> LoadScheduler& = delete;
 
-    [[nodiscard]] auto LoadTexture(const fs::path& path) -> TextureHandle;
+    [[nodiscard]] auto LoadTexture(const fs::path& path) -> TextureLoadHandle;
 
-    [[nodiscard]] auto LoadMesh(const fs::path& path) -> MeshHandle;
+    [[nodiscard]] auto LoadMesh(const fs::path& path) -> MeshLoadHandle;
 
     auto Pump() -> void;
 

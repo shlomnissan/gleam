@@ -16,7 +16,7 @@ using namespace vglx;
 
 namespace {
 
-auto handle = TextureHandle {};
+auto handle = TextureLoadHandle {};
 
 }
 
@@ -36,7 +36,7 @@ auto ExampleSprite::OnAttached(SharedContextPointer context) -> void {
         .pitch = math::pi_over_6
     }));
 
-    handle = context->asset_manager->LoadTexture(
+    handle = context->load_scheduler->LoadTexture(
         "assets/sprite/sprite.tex"
     );
 }

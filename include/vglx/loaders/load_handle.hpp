@@ -58,8 +58,8 @@ private:
     /// @endcond
 };
 
-using TextureHandle = LoadHandle<std::shared_ptr<Texture2D>>;
+using TextureLoadHandle = LoadHandle<std::shared_ptr<Texture2D>>;
 
-using MeshHandle = LoadHandle<std::unique_ptr<Node>>;
+using MeshLoadHandle = LoadHandle<std::unique_ptr<Node>>;
 
 }

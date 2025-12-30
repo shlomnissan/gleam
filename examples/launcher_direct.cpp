@@ -54,7 +54,7 @@ auto main() -> int {
         window.Height()
     );
 
-    auto asset_manager = context->asset_manager.get();
+    auto asset_manager = context->load_scheduler.get();
     auto scene = std::unique_ptr<vglx::Scene> {};
     auto examples = Examples {[&scene, &context](std::unique_ptr<Scene> sc){
         scene = std::move(sc);

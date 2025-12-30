@@ -138,7 +138,7 @@ auto Application::Start() -> void {
 
     while (!impl_->window->ShouldClose()) {
         impl_->window->PollEvents();
-        impl_->context->asset_manager->Pump();
+        impl_->context->load_scheduler->Pump();
 
         const auto dt = frame_timer.Tick();
         impl_->scene->Advance(dt);

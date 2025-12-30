@@ -8,6 +8,7 @@
 #include "vglx/loaders/texture_loader_xyz.hpp"
 
 #include "vglx/asset_format.hpp"
+#include "vglx/core/load_scheduler.hpp"
 #include "vglx/textures/texture_2d.hpp"
 
 #include "utilities/file.hpp"
@@ -53,6 +54,15 @@ auto load_texture(const fs::path& path) -> std::expected<std::shared_ptr<Texture
     out->SetName(path.filename().string());
 
     return out;
+}
+
+auto TextureLoaderXYZ::Load(const fs::path& path)
+  -> std::expected<std::shared_ptr<Texture2D>, std::string> {
+    return load_texture(path);
+}
+
+auto TextureLoaderXYZ::LoadAsync(const fs::path& path) -> TextureLoadHandle {
+    return async_scheduler_->LoadTexture(path);
 }
 
 }

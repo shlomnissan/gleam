@@ -20,7 +20,7 @@ using namespace vglx;
 
 namespace {
 
-auto handle = TextureHandle {};
+auto handle = TextureLoadHandle {};
 
 }
 
@@ -33,7 +33,7 @@ ExampleUnlitMaterial::ExampleUnlitMaterial() {
 auto ExampleUnlitMaterial::OnAttached(SharedContextPointer context) -> void {
     Add(OrbitControls::Create(context->camera, {.radius = 3.0f}));
 
-    handle = context->asset_manager->LoadTexture(
+    handle = context->load_scheduler->LoadTexture(
         "assets/checker/checker.tex"
     );
 }

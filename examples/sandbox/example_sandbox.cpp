@@ -20,7 +20,7 @@ namespace {
 
 auto plane_geometry = PlaneGeometry::Create();
 auto plane_material = PhongMaterial::Create();
-auto handle = TextureHandle {};
+auto handle = TextureLoadHandle {};
 
 }
 
@@ -32,7 +32,7 @@ ExampleSandbox::ExampleSandbox() {
 }
 
 auto ExampleSandbox::OnAttached(SharedContextPointer context) -> void {
-    handle = context->asset_manager->LoadTexture(
+    handle = context->load_scheduler->LoadTexture(
         "assets/checker/checker.tex"
     );
 

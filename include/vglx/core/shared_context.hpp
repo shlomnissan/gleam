@@ -92,7 +92,7 @@ public:
     int window_height;
 
     /// @cond INTERNAL
-    std::unique_ptr<LoadScheduler> asset_manager = std::make_unique<LoadScheduler>();
+    std::unique_ptr<LoadScheduler> load_scheduler = std::make_unique<LoadScheduler>();
     /// @endcond
 
     /**
