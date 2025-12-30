@@ -9,10 +9,9 @@
 
 #include <memory>
 
-#include <vglx/loaders/mesh_loader_xyz.hpp>
-
-#include <vglx/core/load_scheduler.hpp>
 #include <vglx/geometries/geometry.hpp>
+#include <vglx/loaders/load_scheduler.hpp>
+#include <vglx/loaders/mesh_loader_xyz.hpp>
 #include <vglx/scene/mesh.hpp>
 
 class MeshLoaderTest : public ::testing::Test {

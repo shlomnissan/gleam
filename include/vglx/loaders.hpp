@@ -14,5 +14,8 @@
 
 #include "vglx/loaders/texture_loader.hpp"
 #include "vglx/loaders/texture_loader_xyz.hpp"
+
+#include "vglx/loaders/load_handle.hpp"
+#include "vglx/loaders/load_scheduler.hpp"
 #include "vglx/loaders/mesh_loader.hpp"
 #include "vglx/loaders/mesh_loader_xyz.hpp"

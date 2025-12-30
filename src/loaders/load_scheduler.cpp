@@ -5,7 +5,7 @@
 ===========================================================================
 */
 
-#include "vglx/core/load_scheduler.hpp"
+#include "vglx/loaders/load_scheduler.hpp"
 
 #include <mutex>
 #include <queue>

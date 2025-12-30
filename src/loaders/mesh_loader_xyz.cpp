@@ -7,7 +7,7 @@
 
 #include "vglx/loaders/mesh_loader_xyz.hpp"
 
-#include "vglx/core/load_scheduler.hpp"
+#include "vglx/loaders/load_scheduler.hpp"
 #include "vglx/scene/node.hpp"
 
 #include "loaders/detail/mesh_import.hpp"

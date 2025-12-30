@@ -8,10 +8,10 @@
 #include "vglx/core/application.hpp"
 
 #include "vglx/cameras/perspective_camera.hpp"
-#include "vglx/core/load_scheduler.hpp"
 #include "vglx/core/renderer.hpp"
 #include "vglx/core/shared_context.hpp"
 #include "vglx/core/window.hpp"
+#include "vglx/loaders/load_scheduler.hpp"
 #include "vglx/utilities/frame_timer.hpp"
 #include "vglx/utilities/stats.hpp"
 

@@ -6,9 +6,8 @@
 */
 
 #include <gtest/gtest.h>
-#include <print>
 
-#include <vglx/core/load_scheduler.hpp>
+#include <vglx/loaders/load_scheduler.hpp>
 #include <vglx/loaders/texture_loader_xyz.hpp>
 #include <vglx/textures/texture_2d.hpp>
 

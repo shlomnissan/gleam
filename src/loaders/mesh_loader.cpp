@@ -72,9 +72,9 @@ auto load_materials(const fs::path& path, std::ifstream& file, const MeshHeader&
             } else {
                 const auto texture_path = path.parent_path() / filename;
                 const auto result = texture_loader->Load(texture_path.string());
-                if (result) {
+                if (result.has_value()) {
                     texture = result.value();
-                    textures.emplace(filename, texture);
+                    textures.try_emplace(filename, texture);
                 } else {
                     Logger::Log(LogLevel::Error, "{}", result.error());
                 }

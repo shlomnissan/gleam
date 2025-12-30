@@ -7,7 +7,7 @@
 
 #include "vglx/loaders/texture_loader_xyz.hpp"
 
-#include "vglx/core/load_scheduler.hpp"
+#include "vglx/loaders/load_scheduler.hpp"
 #include "vglx/textures/texture_2d.hpp"
 
 #include "loaders/detail/texture_import.hpp"
