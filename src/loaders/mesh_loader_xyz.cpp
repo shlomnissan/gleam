@@ -31,6 +31,8 @@
 
 namespace vglx {
 
+namespace {
+
 auto process_materials(
     const MeshHeader& header,
     const fs::path path,
@@ -155,7 +157,7 @@ auto process_mesh(
     return root;
 }
 
-auto load_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>, std::string> {
+auto import(const fs::path& path) -> std::expected<std::unique_ptr<Node>, std::string> {
     auto file = std::ifstream {path, std::ios::binary};
     if (!file) {
         return std::unexpected(std::format("Unable to open file '{}'", path.string()));
@@ -177,9 +179,13 @@ auto load_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>, std
     return process_mesh(header, path, file);
 }
 
+} // anonymous namespace
+
+MeshLoaderXYZ::MeshLoaderXYZ(LoadScheduler* scheduler) : load_scheduler_(scheduler) {};
+
 auto MeshLoaderXYZ::Load(const fs::path& path)
   -> std::expected<std::shared_ptr<Node>, std::string> {
-    return load_mesh(path);
+    return import(path);
 }
 
 auto MeshLoaderXYZ::LoadAsync(const fs::path& path) -> MeshLoadHandle {
@@ -190,7 +196,7 @@ auto MeshLoaderXYZ::LoadAsync(const fs::path& path) -> MeshLoadHandle {
 
     load_scheduler_->Enqueue(
         [state, path] {
-            auto result = load_mesh(path);
+            auto result = import(path);
             if (result.has_value()) {
                 state->value = std::move(result.value());
             } else {

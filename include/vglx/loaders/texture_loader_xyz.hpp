@@ -27,7 +27,7 @@ auto load_texture(const fs::path& path) -> std::expected<std::shared_ptr<Texture
 
 class VGLX_EXPORT TextureLoaderXYZ {
 public:
-    explicit TextureLoaderXYZ(LoadScheduler* scheduler) : load_scheduler_(scheduler) {};
+    explicit TextureLoaderXYZ(LoadScheduler* scheduler);
 
     auto Load(const fs::path& path) -> std::expected<std::shared_ptr<Texture2D>, std::string>;
 

@@ -7,13 +7,25 @@
 
 #include <gtest/gtest.h>
 
+#include <memory>
+
 #include <vglx/loaders/mesh_loader_xyz.hpp>
 
+#include <vglx/core/load_scheduler.hpp>
 #include <vglx/geometries/geometry.hpp>
 #include <vglx/scene/mesh.hpp>
 
-TEST(MeshLoader, LoadMesh) {
-    auto result = vglx::load_mesh("assets/plane.msh");
+class MeshLoaderTest : public ::testing::Test {
+public:
+    MeshLoaderTest()
+      : loader(std::make_unique<vglx::MeshLoaderXYZ>(scheduler.get())) {}
+
+    std::unique_ptr<vglx::LoadScheduler> scheduler = std::make_unique<vglx::LoadScheduler>();
+    std::unique_ptr<vglx::MeshLoaderXYZ> loader;
+};
+
+TEST_F(MeshLoaderTest, LoadMesh) {
+    auto result = loader->Load("assets/plane.msh");
     EXPECT_TRUE(result.has_value());
 
     auto root = std::move(result.value());
@@ -25,15 +37,15 @@ TEST(MeshLoader, LoadMesh) {
     EXPECT_EQ(geometry->IndexCount(), 6);
 }
 
-TEST(MeshLoader, LoadMeshInvalidFileFormat) {
-    auto result = vglx::load_mesh("assets/plane.obj");
+TEST_F(MeshLoaderTest, LoadMeshInvalidFileFormat) {
+    auto result = loader->Load("assets/plane.obj");
 
     EXPECT_EQ(false, result.has_value());
     EXPECT_EQ(result.error(), "Invalid mesh file 'assets/plane.obj'");
 }
 
-TEST(MeshLoader, LoadMeshInvalidPath) {
-    auto result = vglx::load_mesh("assets/invalid_path.msh");
+TEST_F(MeshLoaderTest, LoadMeshInvalidPath) {
+   auto result = loader->Load("assets/invalid_path.msh");
 
     EXPECT_EQ(false, result.has_value());
     EXPECT_EQ(result.error(), "Unable to open file 'assets/invalid_path.msh'");

@@ -58,6 +58,8 @@ auto load_texture(const fs::path& path) -> std::expected<std::shared_ptr<Texture
     return out;
 }
 
+TextureLoaderXYZ::TextureLoaderXYZ(LoadScheduler* scheduler) : load_scheduler_(scheduler) {};
+
 auto TextureLoaderXYZ::Load(const fs::path& path)
   -> std::expected<std::shared_ptr<Texture2D>, std::string> {
     return load_texture(path);
