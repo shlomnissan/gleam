@@ -10,7 +10,6 @@
 #include "vglx_export.h"
 
 #include "vglx/loaders.hpp"
-#include "vglx/core/load_scheduler.hpp"
 
 #include <memory>
 
@@ -91,9 +90,8 @@ public:
      */
     int window_height;
 
-    /// @cond INTERNAL
-    std::unique_ptr<LoadScheduler> load_scheduler = std::make_unique<LoadScheduler>();
-    /// @endcond
+    std::unique_ptr<TextureLoaderXYZ> texture_loader_xyz;
+    std::unique_ptr<MeshLoaderXYZ> mesh_loader_xyz;
 
     /**
      * @brief Shared texture loader.

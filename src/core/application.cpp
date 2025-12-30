@@ -8,6 +8,7 @@
 #include "vglx/core/application.hpp"
 
 #include "vglx/cameras/perspective_camera.hpp"
+#include "vglx/core/load_scheduler.hpp"
 #include "vglx/core/renderer.hpp"
 #include "vglx/core/shared_context.hpp"
 #include "vglx/core/window.hpp"
@@ -21,14 +22,12 @@
 
 namespace vglx {
 
-constexpr auto kMaxDelta = 0.1; // 100ms
-
 namespace {
 
 auto create_default_camera(int width, int height) {
     return PerspectiveCamera::Create({
         .fov = math::DegToRad(60.0f),
-        .aspect = static_cast<float>(width) / height,
+        .aspect = static_cast<float>(width) / static_cast<float>(height),
         .near = 0.1f,
         .far = 1000.0f
     });
@@ -42,6 +41,7 @@ struct Application::Impl {
     std::unique_ptr<Window> window;
     std::unique_ptr<Renderer> renderer;
     std::unique_ptr<SharedContext> context;
+    std::unique_ptr<LoadScheduler> load_scheduler;
 
     double last_frame_time = 0.0;
 
@@ -72,7 +72,9 @@ struct Application::Impl {
             window->FramebufferWidth(),
             window->FramebufferHeight(),
             window->Width(),
-            window->Height()
+            window->Height(),
+            std::make_unique<TextureLoaderXYZ>(load_scheduler.get()),
+            std::make_unique<MeshLoaderXYZ>(load_scheduler.get())
         );
     }
 
@@ -93,20 +95,22 @@ struct Application::Impl {
     }
 };
 
-Application::Application() : impl_(std::make_unique<Impl>()) {}
+Application::Application() : impl_(std::make_unique<Impl>()) {
+    impl_->load_scheduler = std::make_unique<LoadScheduler>();
+}
 
 auto Application::Setup() -> void {
     const auto params = Configure();
     show_stats_ = params.show_stats;
 
     auto init_window_result = impl_->InitializeWindow(params);
-    if (!init_window_result) {
+    if (!init_window_result.has_value()) {
         Logger::Log(LogLevel::Error, "{}", init_window_result.error());
         return;
     }
 
     auto init_renderer_result = impl_->InitializeRenderer(params);
-    if (!init_renderer_result) {
+    if (!init_renderer_result.has_value()) {
         Logger::Log(LogLevel::Error, "{}", init_renderer_result.error());
         return;
     }
@@ -138,7 +142,7 @@ auto Application::Start() -> void {
 
     while (!impl_->window->ShouldClose()) {
         impl_->window->PollEvents();
-        impl_->context->load_scheduler->Pump();
+        impl_->load_scheduler->Pump();
 
         const auto dt = frame_timer.Tick();
         impl_->scene->Advance(dt);

@@ -17,6 +17,7 @@
 namespace vglx {
 
 class Node;
+class LoadScheduler;
 
 namespace fs = std::filesystem;
 
@@ -24,14 +25,14 @@ auto load_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>, std
 
 class VGLX_EXPORT MeshLoaderXYZ {
 public:
-    explicit MeshLoaderXYZ(LoadScheduler* scheduler) : async_scheduler_(scheduler) {};
+    explicit MeshLoaderXYZ(LoadScheduler* scheduler) : load_scheduler_(scheduler) {};
 
     auto Load(const fs::path& path) -> std::expected<std::shared_ptr<Node>, std::string>;
 
     auto LoadAsync(const fs::path& path) -> MeshLoadHandle;
 
 private:
-    LoadScheduler* async_scheduler_ {nullptr};
+    LoadScheduler* load_scheduler_ {nullptr};
 };
 
 }

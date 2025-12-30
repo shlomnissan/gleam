@@ -11,6 +11,7 @@
 #include "vglx/core/load_scheduler.hpp"
 #include "vglx/textures/texture_2d.hpp"
 
+#include "utilities/assert.hpp"
 #include "utilities/file.hpp"
 
 #include <cstdint>
@@ -62,7 +63,8 @@ auto TextureLoaderXYZ::Load(const fs::path& path)
 }
 
 auto TextureLoaderXYZ::LoadAsync(const fs::path& path) -> TextureLoadHandle {
-    return async_scheduler_->LoadTexture(path);
+    VGLX_ASSERT(load_scheduler_ != nullptr, "Null load scheduler in texture loader");
+    return load_scheduler_->LoadTexture(path);
 }
 
 }

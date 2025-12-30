@@ -21,8 +21,9 @@ auto main() -> int {
         .antialiasing = 4,
         .vsync = false
     }};
+
     auto init_window = window.Initialize();
-    if (!init_window) {
+    if (!init_window.has_value()) {
         std::cerr << init_window.error() << '\n';
         return 1;
     }
@@ -32,8 +33,9 @@ auto main() -> int {
         .framebuffer_height = window.FramebufferHeight(),
         .clear_color = 0x444444
     }};
+
     auto init_renderer = renderer.Initialize();
-    if (!init_renderer) {
+    if (!init_renderer.has_value()) {
         std::cerr << init_renderer.error() << '\n';
         return 1;
     }
@@ -45,16 +47,18 @@ auto main() -> int {
         .far = 1000.0f
     });
 
+    auto load_scheduler = std::make_unique<LoadScheduler>();
     auto context = std::make_unique<SharedContext> (
         camera.get(),
         window.AspectRatio(),
         window.FramebufferWidth(),
         window.FramebufferHeight(),
         window.Width(),
-        window.Height()
+        window.Height(),
+        std::make_unique<TextureLoaderXYZ>(load_scheduler.get()),
+        std::make_unique<MeshLoaderXYZ>(load_scheduler.get())
     );
 
-    auto asset_manager = context->load_scheduler.get();
     auto scene = std::unique_ptr<vglx::Scene> {};
     auto examples = Examples {[&scene, &context](std::unique_ptr<Scene> sc){
         scene = std::move(sc);
@@ -82,7 +86,7 @@ auto main() -> int {
 
     while(!window.ShouldClose()) {
         window.PollEvents();
-        asset_manager->Pump();
+        load_scheduler->Pump();
 
         const auto dt = timer.Tick();
         scene->Advance(dt);

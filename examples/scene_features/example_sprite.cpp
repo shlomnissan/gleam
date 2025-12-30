@@ -36,7 +36,7 @@ auto ExampleSprite::OnAttached(SharedContextPointer context) -> void {
         .pitch = math::pi_over_6
     }));
 
-    handle = context->load_scheduler->LoadTexture(
+    handle = context->texture_loader_xyz->LoadAsync (
         "assets/sprite/sprite.tex"
     );
 }

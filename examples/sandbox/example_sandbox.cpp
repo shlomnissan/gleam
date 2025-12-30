@@ -32,7 +32,7 @@ ExampleSandbox::ExampleSandbox() {
 }
 
 auto ExampleSandbox::OnAttached(SharedContextPointer context) -> void {
-    handle = context->load_scheduler->LoadTexture(
+    handle = context->texture_loader_xyz->LoadAsync(
         "assets/checker/checker.tex"
     );
 

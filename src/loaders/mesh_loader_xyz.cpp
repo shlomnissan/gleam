@@ -8,6 +8,7 @@
 #include "vglx/loaders/mesh_loader_xyz.hpp"
 
 #include "vglx/asset_format.hpp"
+#include "vglx/core/load_scheduler.hpp"
 #include "vglx/geometries/geometry.hpp"
 #include "vglx/loaders/texture_loader_xyz.hpp"
 #include "vglx/materials/material.hpp"
@@ -17,6 +18,7 @@
 #include "vglx/scene/node.hpp"
 #include "vglx/textures/texture_2d.hpp"
 
+#include "utilities/assert.hpp"
 #include "utilities/file.hpp"
 
 #include <cstdint>
@@ -180,7 +182,8 @@ auto MeshLoaderXYZ::Load(const fs::path& path)
 }
 
 auto MeshLoaderXYZ::LoadAsync(const fs::path& path) -> MeshLoadHandle {
-    return async_scheduler_->LoadMesh(path);
+    VGLX_ASSERT(load_scheduler_ != nullptr, "Null load scheduler in mesh loader");
+    return load_scheduler_->LoadMesh(path);
 }
 
 }
