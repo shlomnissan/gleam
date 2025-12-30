@@ -20,6 +20,7 @@
 
 #include "utilities/assert.hpp"
 #include "utilities/file.hpp"
+#include "utilities/logger.hpp"
 
 #include <cstdint>
 #include <cstring>
@@ -183,7 +184,27 @@ auto MeshLoaderXYZ::Load(const fs::path& path)
 
 auto MeshLoaderXYZ::LoadAsync(const fs::path& path) -> MeshLoadHandle {
     VGLX_ASSERT(load_scheduler_ != nullptr, "Null load scheduler in mesh loader");
-    return load_scheduler_->LoadMesh(path);
+
+    auto state = std::make_shared<MeshLoadHandle::State>();
+    auto handle = MeshLoadHandle {state};
+
+    load_scheduler_->Enqueue(
+        [state, path] {
+            auto result = load_mesh(path);
+            if (result.has_value()) {
+                state->value = std::move(result.value());
+            } else {
+                state->error = result.error();
+                Logger::Log(LogLevel::Error, "{}", state->error);
+            }
+        },
+        [state] {
+            VGLX_ASSERT(state != nullptr, "Null in async mesh state");
+            state->ready = true;
+        }
+    );
+
+    return handle;
 }
 
 }

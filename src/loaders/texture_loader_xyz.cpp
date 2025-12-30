@@ -13,6 +13,7 @@
 
 #include "utilities/assert.hpp"
 #include "utilities/file.hpp"
+#include "utilities/logger.hpp"
 
 #include <cstdint>
 #include <cstring>
@@ -64,7 +65,27 @@ auto TextureLoaderXYZ::Load(const fs::path& path)
 
 auto TextureLoaderXYZ::LoadAsync(const fs::path& path) -> TextureLoadHandle {
     VGLX_ASSERT(load_scheduler_ != nullptr, "Null load scheduler in texture loader");
-    return load_scheduler_->LoadTexture(path);
+
+    auto state = std::make_shared<TextureLoadHandle::State>();
+    auto handle = TextureLoadHandle {state};
+
+    load_scheduler_->Enqueue(
+        [state, path] {
+            auto result = load_texture(path);
+            if (result.has_value()) {
+                state->value = std::move(result.value());
+            } else {
+                state->error = result.error();
+                Logger::Log(LogLevel::Error, "{}", state->error);
+            }
+        },
+        [state] {
+            VGLX_ASSERT(state != nullptr, "Null in async texture state");
+            state->ready = true;
+        }
+    );
+
+    return handle;
 }
 
 }

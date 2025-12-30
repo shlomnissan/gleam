@@ -53,7 +53,8 @@ private:
 
     std::shared_ptr<State> state_;
 
-    friend class LoadScheduler;
+    friend class TextureLoaderXYZ;
+    friend class MeshLoaderXYZ;
     explicit LoadHandle(std::shared_ptr<State> s) : state_(std::move(s)) {}
     /// @endcond
 };

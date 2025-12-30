@@ -10,6 +10,7 @@
 #include "vglx/loaders/load_handle.hpp"
 
 #include <filesystem>
+#include <functional>
 #include <memory>
 #include <string>
 
@@ -19,6 +20,9 @@ namespace fs = std::filesystem;
 
 class LoadScheduler {
 public:
+    using WorkFn = std::function<void()>;
+    using CommitFn = std::function<void()>;
+
     LoadScheduler();
 
     LoadScheduler(const LoadScheduler&) = delete;
@@ -27,9 +31,7 @@ public:
     LoadScheduler(LoadScheduler&&) noexcept = delete;
     auto operator=(LoadScheduler&&) noexcept -> LoadScheduler& = delete;
 
-    [[nodiscard]] auto LoadTexture(const fs::path& path) -> TextureLoadHandle;
-
-    [[nodiscard]] auto LoadMesh(const fs::path& path) -> MeshLoadHandle;
+    auto Enqueue(WorkFn work, CommitFn commit) -> void;
 
     auto Pump() -> void;
 

@@ -7,7 +7,6 @@
 
 #include "vglx/core/load_scheduler.hpp"
 
-#include <functional>
 #include <mutex>
 #include <queue>
 
@@ -23,7 +22,7 @@ namespace vglx {
 
 struct LoadScheduler::Impl {
     std::mutex queue_mutex;
-    std::queue<std::function<void()>> completions;
+    std::queue<CommitFn> completions;
     ThreadPool pool;
 
     auto Post(std::function<void()> fn) -> void {
@@ -31,8 +30,17 @@ struct LoadScheduler::Impl {
         completions.push(std::move(fn));
     }
 
+    auto Enqueue(WorkFn work, CommitFn commit) -> void {
+        pool.Enqueue(
+            [this, work = std::move(work), commit = std::move(commit)]() mutable {
+                work();
+                Post(std::move(commit));
+            }
+        );
+    }
+
     auto Pump() -> void {
-        auto local = std::queue<std::function<void()>> {};
+        auto local = std::queue<CommitFn> {};
         {
             auto lock = std::scoped_lock {queue_mutex};
             std::swap(local, completions);
@@ -47,54 +55,8 @@ struct LoadScheduler::Impl {
 
 LoadScheduler::LoadScheduler() : impl_(std::make_unique<Impl>()) {}
 
-auto LoadScheduler::LoadTexture(const fs::path& path) -> TextureLoadHandle {
-    auto state = std::make_shared<TextureLoadHandle::State>();
-    auto handle = TextureLoadHandle {state};
-
-    impl_->pool.Enqueue([this, state, path] {
-        auto result = load_texture(path);
-        auto err = std::string {};
-
-        if (result) {
-            state->value = result.value();
-        } else {
-            err = result.error();
-            Logger::Log(LogLevel::Error, "{}", err);
-        }
-
-        impl_->Post([state = std::move(state), err = std::move(err)]() {
-            if (!state) return;
-            state->error = std::move(err);
-            state->ready = true;
-        });
-    });
-
-    return handle;
-}
-
-auto LoadScheduler::LoadMesh(const fs::path& path) -> MeshLoadHandle {
-    auto state = std::make_shared<MeshLoadHandle::State>();
-    auto handle = MeshLoadHandle {state};
-
-    impl_->pool.Enqueue([this, state, path] {
-        auto result = load_mesh(path);
-        auto err = std::string {};
-
-        if (result) {
-            state->value = std::move(result.value());
-        } else {
-            err = result.error();
-            Logger::Log(LogLevel::Error, "{}", err);
-        }
-
-        impl_->Post([state = std::move(state), err = std::move(err)]() {
-            if (!state) return;
-            state->error = std::move(err);
-            state->ready = true;
-        });
-    });
-
-    return handle;
+auto LoadScheduler::Enqueue(WorkFn work, CommitFn commit) -> void {
+    impl_->Enqueue(std::move(work), std::move(commit));
 }
 
 auto LoadScheduler::Pump() -> void {
