@@ -66,15 +66,10 @@ struct Application::Impl {
     }
 
     auto MakeSharedContext() -> void {
-        context = std::make_unique<SharedContext> (
+        context = SharedContext::Create(
+            window.get(),
             camera.get(),
-            window->AspectRatio(),
-            window->FramebufferWidth(),
-            window->FramebufferHeight(),
-            window->Width(),
-            window->Height(),
-            std::make_unique<TextureLoaderXYZ>(load_scheduler.get()),
-            std::make_unique<MeshLoaderXYZ>(load_scheduler.get())
+            load_scheduler.get()
         );
     }
 

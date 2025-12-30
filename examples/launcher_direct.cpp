@@ -48,15 +48,11 @@ auto main() -> int {
     });
 
     auto load_scheduler = std::make_unique<LoadScheduler>();
-    auto context = std::make_unique<SharedContext> (
+
+    auto context = SharedContext::Create(
+        &window,
         camera.get(),
-        window.AspectRatio(),
-        window.FramebufferWidth(),
-        window.FramebufferHeight(),
-        window.Width(),
-        window.Height(),
-        std::make_unique<TextureLoaderXYZ>(load_scheduler.get()),
-        std::make_unique<MeshLoaderXYZ>(load_scheduler.get())
+        load_scheduler.get()
     );
 
     auto scene = std::unique_ptr<vglx::Scene> {};

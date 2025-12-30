@@ -14,6 +14,7 @@ set(SOURCE_CODE
     "core/renderer.cpp"
     "core/shader_library.cpp"
     "core/shader_library.hpp"
+    "core/shared_context.cpp"
     "core/window.cpp"
     "core/window_impl.cpp"
     "core/window_impl.hpp"

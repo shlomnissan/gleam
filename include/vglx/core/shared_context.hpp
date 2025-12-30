@@ -16,6 +16,8 @@
 namespace vglx {
 
 class Camera;
+class Window;
+class LoadScheduler;
 
 /**
  * @brief Provides access to shared runtime parameters and services.
@@ -42,8 +44,7 @@ class Camera;
  *
  * @ingroup CoreGroup
  */
-class VGLX_EXPORT SharedContext {
-public:
+struct VGLX_EXPORT SharedContext {
     /**
      * @brief Pointer to the active camera.
      *
@@ -108,6 +109,24 @@ public:
      * custom `.msh` format.
      */
     std::shared_ptr<MeshLoader> mesh_loader = MeshLoader::Create();
+
+    /**
+     * @brief Creates and initializes a shared runtime context.
+     *
+     * Creates an instance of @ref SharedContext populated with the current
+     * window and framebuffer dimensions, active camera reference, and
+     * shared loader services. This factory is intended to be called by the
+     * runtime during initialization.
+     *
+     * @param window Pointer to the active window.
+     * @param camera Pointer to the active camera.
+     * @param scheduler Load scheduler used by resource loaders for async loading.
+     */
+    [[nodiscard]] static auto Create(
+        const Window* window,
+        Camera* camera,
+        LoadScheduler* scheduler
+    ) -> std::unique_ptr<SharedContext>;
 };
 
 /**
