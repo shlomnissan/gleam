@@ -23,8 +23,6 @@ class LoadScheduler;
 
 namespace fs = std::filesystem;
 
-auto load_texture(const fs::path& path) -> std::expected<std::shared_ptr<Texture2D>, std::string>;
-
 class VGLX_EXPORT TextureLoaderXYZ {
 public:
     explicit TextureLoaderXYZ(LoadScheduler* scheduler);

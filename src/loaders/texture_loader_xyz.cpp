@@ -7,62 +7,20 @@
 
 #include "vglx/loaders/texture_loader_xyz.hpp"
 
-#include "vglx/asset_format.hpp"
 #include "vglx/core/load_scheduler.hpp"
 #include "vglx/textures/texture_2d.hpp"
 
+#include "loaders/detail/texture_import.hpp"
 #include "utilities/assert.hpp"
-#include "utilities/file.hpp"
 #include "utilities/logger.hpp"
 
-#include <cstdint>
-#include <cstring>
-#include <format>
-#include <fstream>
-#include <vector>
-
 namespace vglx {
-
-auto load_texture(const fs::path& path) -> std::expected<std::shared_ptr<Texture2D>, std::string> {
-    auto file = std::ifstream {path, std::ios::binary};
-    if (!file) {
-        return std::unexpected(std::format("Unable to open texture '{}'", path.string()));
-    }
-
-    auto header = TextureHeader {};
-    if (!read_binary(file, header)) {
-        return std::unexpected(std::format("Failed to read header from '{}'", path.string()));
-    }
-
-    if (std::memcmp(header.magic, "TEX0", 4) != 0) {
-        return std::unexpected(std::format("Invalid texture file '{}'", path.string()));
-    }
-
-    if (header.version != VGLX_TEX_VER) {
-        return std::unexpected(std::format("Unsupported file version '{}'", path.string()));
-    }
-
-    auto data = std::vector<uint8_t>(header.pixel_data_size);
-    if (!read_binary(file, data, header.pixel_data_size)) {
-        return std::unexpected(std::format("Failed to read data from '{}'", path.string()));
-    }
-
-    auto out = std::make_shared<Texture2D>(Texture2D::Parameters {
-        .width = header.width,
-        .height = header.height,
-        .data = std::move(data)
-    });
-
-    out->SetName(path.filename().string());
-
-    return out;
-}
 
 TextureLoaderXYZ::TextureLoaderXYZ(LoadScheduler* scheduler) : load_scheduler_(scheduler) {};
 
 auto TextureLoaderXYZ::Load(const fs::path& path)
   -> std::expected<std::shared_ptr<Texture2D>, std::string> {
-    return load_texture(path);
+    return detail::texture::import(path);
 }
 
 auto TextureLoaderXYZ::LoadAsync(const fs::path& path) -> TextureLoadHandle {
@@ -73,7 +31,7 @@ auto TextureLoaderXYZ::LoadAsync(const fs::path& path) -> TextureLoadHandle {
 
     load_scheduler_->Enqueue(
         [state, path] {
-            auto result = load_texture(path);
+            auto result = detail::texture::import(path);
             if (result.has_value()) {
                 state->value = std::move(result.value());
             } else {
