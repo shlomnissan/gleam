@@ -56,7 +56,7 @@ By default the asset builder writes the resulting `.tex` file next to the source
 
 Textures are loaded at runtime using the [TextureLoader](/reference/loaders/texture_loader). The loader is accessible from any node through the shared context which becomes available when the node is attached to the scene graph via a lifetime hook.
 
-Asset loading is typically performed asynchronously to avoid blocking the main thread. To do this we store a load handle as a member of the scene and poll it during updates until the asset becomes available.
+Asset loading is typically performed asynchronously to avoid blocking the main thread. To do this we store a [LoadHandle](/reference/loaders/load_handle) as a member of the scene and poll it during updates until the asset becomes available.
 
 The following example revisits the rotating cube scene and applies a texture to it:
 
@@ -68,7 +68,7 @@ struct MyScene : public vglx::Scene {
         vglx::UnlitMaterial::Create()
     };
 
-    TextureHandle handle {};
+    TextureLoadHandle handle {};
     vglx::Mesh* mesh {nullptr};
 
     MyScene() {
@@ -86,7 +86,7 @@ struct MyScene : public vglx::Scene {
         context->camera->TranslateZ(2.5f);
     }
 
-    auto OnUpdate(float delta) -> void override {
+    auto OnUpdate([[maybe_unused]] float delta) -> void override {
         if (auto result = handle.TryTake()) {
             material->texture_map = result.value();
         }
@@ -98,7 +98,7 @@ struct MyScene : public vglx::Scene {
 };
 ```
 
-The asynchronous load is initiated in [OnAttached](/reference/scene/node#function-on-attached-369186a1). Once loading completes ownership of the texture is transferred to the application by calling [TryTake](/reference/core/asset_handle#function-try-take-6c1507e8) on the handle in [OnUpdate](/reference/scene/node#function-on-update-5de00e28). If the load fails the handle can be queried for errors. Otherwise failures are reported through the engine logger.
+The asynchronous load is initiated in [OnAttached](/reference/scene/node#function-on-attached-369186a1). Once loading completes ownership of the texture is transferred to the application by calling [TryTake](/reference/loaders/load_handle#function-try-take-8debb008) on the handle in [OnUpdate](/reference/scene/node#function-on-update-5de00e28). If the load fails the handle can be queried for errors. Otherwise failures are reported through the engine logger.
 
 If you used the same source image and followed the steps your application should produce a result similar to the image below:
 
@@ -108,9 +108,9 @@ If your application prints a `file not found` error make sure the texture asset 
 
 ## Importing Meshes
 
-In this section we import a mesh from an OBJ file. Unlike textures, meshes typically reference additional data such as material definitions and multiple textures. In this example the OBJ references an accompanying MTL file, which defines a color map, a normal map, and a specular map.
+In this section we import a mesh from an OBJ file. Unlike textures, meshes typically reference additional data such as material definitions and multiple textures. In this example the OBJ references an accompanying MTL file which includes a color map, a normal map, and a specular map.
 
-When importing a mesh, `asset_builder` treats the OBJ as the root of the asset. Geometry, material definitions, and all referenced textures are processed together. Each referenced image is converted to a `.tex` file, while the mesh geometry, material metadata, and texture paths are stored in a single `.msh` file.
+When importing a mesh the asset builder treats the OBJ as the root of the asset. Geometry, material definitions, and all referenced textures are processed together. Each referenced image is converted to a `.tex` file, while the mesh geometry, material metadata, and texture paths are stored in a single `.msh` file.
 
 The mesh used in this example is a [human head scan](/manual_lps_head.zip) by Lee Perry-Smith. After downloading the archive, unzip it and navigate to the extracted directory. From there, run the asset builder on the OBJ file:
 
@@ -118,14 +118,18 @@ The mesh used in this example is a [human head scan](/manual_lps_head.zip) by Le
 asset_builder -i lps_head.obj -o output
 ```
 
-After the command completes, the output directory will contain one `.msh` file and several `.tex` files corresponding to the referenced textures. When loading the mesh at runtime, these files must remain co-located so the engine can resolve material references correctly.
+After the command completes the output directory will contain one `.msh` file and several `.tex` files corresponding to the referenced textures. When loading the mesh at runtime these files must remain co-located so the engine can resolve material references correctly.
 
-Meshes are loaded at runtime using the [MeshLoader](/reference/loaders/mesh_loader). As with textures, the loader is accessed through the shared context and is only available once a node is attached.
+Meshes are loaded at runtime using the [MeshLoader](/reference/loaders/mesh_loader). As with textures the loader is accessed through the shared context and is only available once a node is attached.
 
 The following snippet defines a custom scene that loads the imported mesh, resolves its materials and textures, and renders it with basic lighting:
 
 ```cpp
+#include <vglx/vglx.h>
+
 struct MyScene : public vglx::Scene {
+    MeshLoadHandle handle {};
+
     MyScene() {
         Add(vglx::AmbientLight::Create({
             .color = 0xFFFFFF,
@@ -139,22 +143,22 @@ struct MyScene : public vglx::Scene {
     }
 
     auto OnAttached(vglx::SharedContextPointer context) -> void override {
-        context->camera->TranslateZ(2.5f);
-
-        context->mesh_loader->LoadAsync(
-            "lps_head.msh", [this](auto result){
-                if (result) {
-                    Add(std::move(result.value()));
-                } else {
-                    std::println(std::cerr, "{}", result.error());
-                }
-            }
+        handle = context->mesh_loader->LoadAsync(
+            "lps_head.msh"
         );
+
+        context->camera->TranslateZ(2.5f);
+    }
+
+    auto OnUpdate([[maybe_unused]] float delta) -> void override {
+        if (auto result = handle.TryTake()) {
+            Add(std::move(result.value()));
+        }
     }
 };
 ```
 
-If you followed the steps above using the same source files, your application should produce a result similar to the image below.
+If you followed the steps above using the same source files your application should produce a result similar to the image below.
 
 ![Human Head Scan](/manual_03.webp)
 
