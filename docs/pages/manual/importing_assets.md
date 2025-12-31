@@ -1,20 +1,18 @@
 # Importing Assets
 
-Asset importing in VGLX is an offline step. Before your application runs, source files are converted into engine-native formats that are ready to upload to the GPU. The runtime never parses image or mesh formats. It only loads data that has already been prepared.
+Asset importing in VGLX is an offline step. Before your application runs source files are converted into engine-native formats that are ready to upload to the GPU. The runtime never parses image or mesh formats. It only loads data that has already been prepared.
 
 This design keeps the engine simple and predictable. Parsing formats like OBJ or PNG at runtime adds cost, complexity, and ambiguity. By moving that work into a build step VGLX can focus on rendering and scene management rather than file decoding.
 
 VGLX uses two custom runtime formats. Textures are stored as `.tex` files and meshes are stored as `.msh` files. These formats are intentionally minimal. They contain exactly the data the renderer needs and nothing more. Vertex layouts are explicit. Texture data is laid out linearly. There is no hidden work when an asset is loaded.
 
+> VGLX never loads OBJ, PNG, or JPG files at runtime. All assets must be converted to runtime formats before running the application.
 
-> VGLX never loads OBJ, PNG, or JPG files at runtime.<br/>
-> All assets must be converted before running the application.
-
-This approach mirrors how integrated engines handle assets. Source files are flexible and convenient for artists. Runtime formats are fast and stable for engines. The asset builder bridges that gap and ensures that every asset your application loads is already in a form the GPU can consume efficiently.
+This approach mirrors how integrated engines handle assets. Source files are flexible and convenient for artists. Runtime formats are fast and stable for engines. The asset builder tool bridges that gap and ensures that every asset your application loads is already in a form the GPU can consume efficiently.
 
 ## Asset Builder
 
-The asset builder CLI converts source assets into VGLX runtime formats that the engine can load directly. The interface is intentionally simple. A single input asset produces one or more runtime files depending on what is being imported.
+The asset builder tool converts source assets into VGLX runtime formats that the engine can load directly. The interface is intentionally simple. A single input asset produces one or more runtime files depending on what is being imported.
 
 The easiest way to get the asset builder is through the VGLX installer. During installation you are prompted to install it alongside the engine. If enabled the installation directory you selected will contain a `bin` folder with the `asset_builder` executable.
 
@@ -37,34 +35,40 @@ As the pipeline evolves additional source formats will be added.
 
 The asset builder exposes a small set of command-line options. Output paths and file names can usually be inferred from the source asset.
 
-| Option           | Description                                       |
-| ---------------- | ------------------------------------------------- |
-| `-i`, `--input`  | Input file to convert (e.g. PNG or OBJ).          |
-| `-o`, `--output` | Output file path. If omitted a default is chosen. |
-| `-h`, `--help`   | Show help and exit.                               |
+| Option           | Description                                                |
+| ---------------- | ---------------------------------------------------------- |
+| `-i`, `--input`  | Input file to convert (e.g. PNG or OBJ).                   |
+| `-o`, `--output` | Output directory. If omitted the source directory is used. |
+| `-h`, `--help`   | Show help and exit.                                        |
 
 ## Importing Textures
 
 In this section we import a texture into VGLX. We start by converting a JPG file into a `.tex` asset, then load it at runtime and apply it to a simple primitive.
 
-The image used in this example is a simple [wooden crate texture](/manual_crate_texture_low.jpg). To convert this image or any other into a `.tex` asset, run the asset builder from the command line and pass the image file using the `-i` flag:
+The image used in this example is a simple [wooden crate texture](/manual_crate_texture_low.jpg). To convert this image or any other into a `.tex` asset run the asset builder from the command line and pass the image file using the `-i` flag:
 
 ```bash
 asset_builder -i manual_crate_texture_low.jpg
 ```
 If the conversion succeeds the asset builder prints the output path.
 
-By default the asset builder writes the resulting `.tex` file next to the source image. You can override the output location using the `-o` option. The generated `.tex` file can be loaded directly by the engine and uploaded to the GPU without further processing.
+By default the asset builder writes the resulting `.tex` file next to the source image. You can override the output location using the `-o` option. The generated `.tex` file can be loaded directly by the engine without further processing.
 
-Textures are imported at runtime using the [TextureLoader](/reference/loaders/texture_loader). The loader is accessible from any node through the shared context which becomes available when the node is attached to the scene graph via the [OnAttached](/reference/scene/node#function-on-attached-ff71adbb) hook.
+Textures are loaded at runtime using the [TextureLoader](/reference/loaders/texture_loader). The loader is accessible from any node through the shared context which becomes available when the node is attached to the scene graph via a lifetime hook.
 
-The following snippet defines a custom scene with a rotating cube.
+Asset loading is typically performed asynchronously to avoid blocking the main thread. To do this we store a load handle as a member of the scene and poll it during updates until the asset becomes available.
+
+The following example revisits the rotating cube scene and applies a texture to it:
 
 ```cpp
-struct MyScene : public vglx::Scene {
-    std::shared_ptr<vglx::UnlitMaterial> material =
-        vglx::UnlitMaterial::Create();
+#include <vglx/vglx.h>
 
+struct MyScene : public vglx::Scene {
+    std::shared_ptr<vglx::UnlitMaterial> material {
+        vglx::UnlitMaterial::Create()
+    };
+
+    TextureHandle handle {};
     vglx::Mesh* mesh {nullptr};
 
     MyScene() {
@@ -75,12 +79,18 @@ struct MyScene : public vglx::Scene {
     }
 
     auto OnAttached(vglx::SharedContextPointer context) -> void override {
-        context->camera->TranslateZ(2.5f);
+        handle = context->texture_loader->LoadAsync(
+            "crate_texture_low.tex"
+        );
 
-        // TODO: import texture...
+        context->camera->TranslateZ(2.5f);
     }
 
     auto OnUpdate(float delta) -> void override {
+        if (auto result = handle.TryTake()) {
+            material->texture_map = result.value();
+        }
+
         const auto rotation_speed = vglx::math::pi_over_2;
         mesh->RotateX(rotation_speed * delta);
         mesh->RotateY(rotation_speed * delta);
@@ -88,32 +98,13 @@ struct MyScene : public vglx::Scene {
 };
 ```
 
-If this setup is unfamiliar refer back to [Creating an Application](/manual/creating_application).
+The asynchronous load is initiated in [OnAttached](/reference/scene/node#function-on-attached-369186a1). Once loading completes ownership of the texture is transferred to the application by calling [TryTake](/reference/core/asset_handle#function-try-take-6c1507e8) on the handle in [OnUpdate](/reference/scene/node#function-on-update-5de00e28). If the load fails the handle can be queried for errors. Otherwise failures are reported through the engine logger.
 
-To apply a texture to the cube, load the `.tex` asset inside the `OnAttached` hook. Once the texture is loaded, assign it to the mesh material:
-
-```cpp
-auto OnAttached(vglx::SharedContextPointer context) -> void override {
-    context->camera->TranslateZ(2.5f);
-
-    context->texture_loader->LoadAsync(
-        "crate_texture_low.tex", [this](auto result) {
-            // Always handle the case where result doesn't contain a value
-            if (result) {
-                material->texture_map = result.value();
-            } else {
-                std::println(std::cerr, "{}", result.error());
-            }
-        }
-    );
-}
-```
-
-If you used the same source image and followed the steps above, your application should produce a result similar to the image below:
+If you used the same source image and followed the steps your application should produce a result similar to the image below:
 
 ![Textured Cube](/manual_02.webp)
 
-If your application prints a `file not found` error, make sure the texture asset is located in a directory that the application can access at runtime. By default assets are loaded using paths relative to the executable. If your assets live elsewhere, provide an explicit relative path when calling the loader.
+If your application prints a `file not found` error make sure the texture asset is located in a directory that the application can access at runtime. By default assets are loaded using paths relative to the executable. If your assets live elsewhere provide an explicit relative path when calling the loader.
 
 ## Importing Meshes
 
