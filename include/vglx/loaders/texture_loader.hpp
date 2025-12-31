@@ -9,83 +9,92 @@
 
 #include "vglx_export.h"
 
-#include "vglx/loaders/loader.hpp"
-#include "vglx/textures/texture_2d.hpp"
-
+#include <expected>
 #include <filesystem>
 #include <memory>
+#include <string>
+
+#include "vglx/loaders/load_handle.hpp"
 
 namespace vglx {
+
+class Texture2D;
+class LoadScheduler;
 
 namespace fs = std::filesystem;
 
 /**
- * @brief Callback type for receiving loaded textures.
+ * @brief Loader for 2D texture assets.
  *
- * @related TextureLoader
- */
-using TextureCallback = std::function<void(std::shared_ptr<Texture2D>)>;
-
-/**
- * @brief Loads 2D textures from engine-optimized files.
+ * Provides both synchronous and asynchronous interfaces for loading `.tex`
+ * texture data from disk. It is intended to be accessed through the shared
+ * runtime context and used directly by application or node code when texture
+ * resources are needed.
  *
- * TextureLoader is a concrete @ref Loader implementation that reads the
- * engine's custom `.tex` format from disk and constructs @ref Texture2D
- * resources. It exposes both synchronous and asynchronous loading through the
- * base class API.
+ * The synchronous @ref Load method performs the entire load on the calling
+ * thread and returns either a fully constructed texture or an error message.
  *
- * You can convert standard image formats (for example PNG or JPG) into `.tex`
- * files using the `asset_builder` CLI located in the engine's `tools`
- * directory. The `.tex` format stores texture data and metadata in a layout
- * optimized for fast loading at runtime.
- * See [Importing Assets Guide](/manual/importing_assets) to learn more.
+ * The asynchronous @ref LoadAsync method schedules file I/O off the main thread
+ * and returns a @ref LoadHandle "TextureLoadHandle" immediately. The handle can
+ * later be queried from the main thread to retrieve the loaded texture once the
+ * operation completes. Ownership of the texture is transferred out of the handle
+ * when it is successfully taken.
  *
- * Explicit instantiation of this class is discouraged due to lifetime concerns
- * in the current architecture, particularly when used with asynchronous
- * loading. Instead, obtain a reference to the loader through
- * @ref Node::OnAttached, which provides access to the owning context and its
- * loader instances.
- *
- * @note Loaders use `std::expected` for error values. Always check the result
- * of loading operations and handle failure cases appropriately.
+ * Internally, asynchronous loading is coordinated through a
+ * @ref LoadScheduler instance, which ensures that background work and main-thread
+ * commits are clearly separated.
  *
  * @code
- * auto MyNode::OnAttached(SharedContextPointer context) -> void override {
- *   context->texture_loader->LoadAsync(
- *     "assets/my_texture.tex",
- *     [this](auto result) {
- *       if (result) {
- *         texture_ = result.value();
- *       } else {
- *         std::println(stderr, "{}", result.error());
- *       }
- *     }
- *   );
+ * auto handle = context->texture_loader->LoadAsync("assets/diffuse.tex");
+ *
+ * auto OnUpdate(float) -> void override {
+ *   if (auto texture = handle.TryTake()) {
+ *     material->texture_map = texture.value();
+ *   }
  * }
  * @endcode
  *
+ * To learn more about how textures are imported and loaded see the
+ * [Importing Assets Guide](/manual/importing_assets).
+ *
  * @ingroup LoadersGroup
  */
-class VGLX_EXPORT TextureLoader : public Loader<std::shared_ptr<Texture2D>> {
+
+class VGLX_EXPORT TextureLoader {
 public:
+    explicit TextureLoader(LoadScheduler* scheduler);
+
     /**
-     * @brief Creates a shared instance of @ref TextureLoader.
+     * @brief Loads a texture synchronously from a `.tex` file.
      *
-     * The constructor is private to ensure the loader is always owned by a
-     * `std\::shared_ptr`. This is required because the base @ref Loader class
-     * inherits from `std\::enable_shared_from_this`, which relies on the loader
-     * being managed by a shared pointer for safe use during asynchronous loading.
+     * Performs file I/O and texture creation on the calling thread. If loading
+     * succeeds a fully constructed @ref Texture2D is returned. On failure
+     * an error message describing the problem is returned instead.
+     *
+     * This method is intended for tooling, offline processing, or scenarios
+     * where blocking behavior is acceptable.
+     *
+     * @param path Filesystem path to the `.tex` asset.
      */
-    [[nodiscard]] static auto Create() -> std::shared_ptr<TextureLoader> {
-        return std::shared_ptr<TextureLoader>(new TextureLoader());
-    }
+    auto Load(const fs::path& path) -> std::expected<std::shared_ptr<Texture2D>, std::string>;
+
+    /**
+     * @brief Loads a texture asynchronously from a `.tex` file.
+     *
+     * Schedules file I/O work to run off the main thread and returns
+     * immediately with a @ref LoadHandle "TextureLoadHandle". The handle can later
+     * be polled to retrieve the loaded texture once the operation completes.
+     *
+     * Ownership of the texture is transferred out of the handle when it is
+     * successfully taken. Errors can be retrieved explicitly from the handle
+     * or will be reported through the logger.
+     *
+     * @param path Filesystem path to the `.tex` asset.
+     */
+    auto LoadAsync(const fs::path& path) -> TextureLoadHandle;
 
 private:
-    /// @cond INTERNAL
-    TextureLoader() = default;
-
-    [[nodiscard]] auto LoadImpl(const fs::path& path) const -> LoaderResult<std::shared_ptr<Texture2D>> override;
-    /// @endcond
+    LoadScheduler* load_scheduler_ {nullptr};
 };
 
 }

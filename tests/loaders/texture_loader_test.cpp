@@ -8,16 +8,16 @@
 #include <gtest/gtest.h>
 
 #include <vglx/loaders/load_scheduler.hpp>
-#include <vglx/loaders/texture_loader_xyz.hpp>
+#include <vglx/loaders/texture_loader.hpp>
 #include <vglx/textures/texture_2d.hpp>
 
 class TextureLoaderTest : public ::testing::Test {
 public:
     TextureLoaderTest()
-      : loader(std::make_unique<vglx::TextureLoaderXYZ>(scheduler.get())) {}
+      : loader(std::make_unique<vglx::TextureLoader>(scheduler.get())) {}
 
     std::unique_ptr<vglx::LoadScheduler> scheduler = std::make_unique<vglx::LoadScheduler>();
-    std::unique_ptr<vglx::TextureLoaderXYZ> loader;
+    std::unique_ptr<vglx::TextureLoader> loader;
 };
 
 TEST_F(TextureLoaderTest, LoadTexture) {

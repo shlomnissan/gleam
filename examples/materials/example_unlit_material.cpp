@@ -33,7 +33,7 @@ ExampleUnlitMaterial::ExampleUnlitMaterial() {
 auto ExampleUnlitMaterial::OnAttached(SharedContextPointer context) -> void {
     Add(OrbitControls::Create(context->camera, {.radius = 3.0f}));
 
-    handle = context->texture_loader_xyz->LoadAsync(
+    handle = context->texture_loader->LoadAsync(
         "assets/checker/checker.tex"
     );
 }

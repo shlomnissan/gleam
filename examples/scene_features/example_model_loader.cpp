@@ -56,7 +56,7 @@ auto ExampleModelLoader::OnAttached(SharedContextPointer context) -> void {
         .yaw = math::DegToRad(15.0f)
     }));
 
-    handle = context->mesh_loader_xyz->LoadAsync(
+    handle = context->mesh_loader->LoadAsync(
         "assets/lps_head/lps_head.msh"
     );
 }

@@ -13,8 +13,8 @@
 #include "utilities/logger.hpp"
 #include "utilities/thread_pool.hpp"
 
-#include "vglx/loaders/mesh_loader_xyz.hpp"
-#include "vglx/loaders/texture_loader_xyz.hpp"
+#include "vglx/loaders/mesh_loader.hpp"
+#include "vglx/loaders/texture_loader.hpp"
 #include "vglx/scene/node.hpp"
 #include "vglx/textures/texture_2d.hpp"
 

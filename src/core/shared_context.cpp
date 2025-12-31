@@ -20,8 +20,8 @@ auto SharedContext::Create(const Window* window, Camera* camera, LoadScheduler* 
         window->FramebufferHeight(),
         window->Width(),
         window->Height(),
-        std::make_unique<TextureLoaderXYZ>(scheduler),
-        std::make_unique<MeshLoaderXYZ>(scheduler)
+        std::make_unique<TextureLoader>(scheduler),
+        std::make_unique<MeshLoader>(scheduler)
     );
 }
 

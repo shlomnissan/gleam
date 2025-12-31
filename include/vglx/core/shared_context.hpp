@@ -91,24 +91,22 @@ struct VGLX_EXPORT SharedContext {
      */
     int window_height;
 
-    std::unique_ptr<TextureLoaderXYZ> texture_loader_xyz;
-    std::unique_ptr<MeshLoaderXYZ> mesh_loader_xyz;
 
     /**
-     * @brief Shared texture loader.
+     * @brief Texture loader.
      *
-     * Handles loading and caching of image assets, targeting the engine's
+     * Handles loading and caching of image assets targeting the engine's
      * custom `.tex` format.
      */
-    std::shared_ptr<TextureLoader> texture_loader = TextureLoader::Create();
+    std::unique_ptr<TextureLoader> texture_loader;
 
     /**
-     * @brief Shared texture loader.
+     * @brief Mesh loader.
      *
-     * Handles loading and caching of mesh assets, targeting the engine's
+     * Handles loading and caching of mesh assets targeting the engine's
      * custom `.msh` format.
      */
-    std::shared_ptr<MeshLoader> mesh_loader = MeshLoader::Create();
+    std::unique_ptr<MeshLoader> mesh_loader;
 
     /**
      * @brief Creates and initializes a shared runtime context.

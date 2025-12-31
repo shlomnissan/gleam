@@ -11,16 +11,16 @@
 
 #include <vglx/geometries/geometry.hpp>
 #include <vglx/loaders/load_scheduler.hpp>
-#include <vglx/loaders/mesh_loader_xyz.hpp>
+#include <vglx/loaders/mesh_loader.hpp>
 #include <vglx/scene/mesh.hpp>
 
 class MeshLoaderTest : public ::testing::Test {
 public:
     MeshLoaderTest()
-      : loader(std::make_unique<vglx::MeshLoaderXYZ>(scheduler.get())) {}
+      : loader(std::make_unique<vglx::MeshLoader>(scheduler.get())) {}
 
     std::unique_ptr<vglx::LoadScheduler> scheduler = std::make_unique<vglx::LoadScheduler>();
-    std::unique_ptr<vglx::MeshLoaderXYZ> loader;
+    std::unique_ptr<vglx::MeshLoader> loader;
 };
 
 TEST_F(MeshLoaderTest, LoadMesh) {

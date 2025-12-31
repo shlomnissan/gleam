@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "vglx_export.h"
+
 #include "vglx/loaders/load_handle.hpp"
 
 #include <filesystem>
@@ -37,7 +39,7 @@ namespace fs = std::filesystem;
  *
  * @ingroup LoadersGroup
  */
-class LoadScheduler {
+class VGLX_EXPORT LoadScheduler {
 public:
     /**
      * @brief Function executed on a worker thread to perform blocking load work.
@@ -67,7 +69,7 @@ public:
      * @brief Enqueues a load job.
      *
      * Schedules `work` to run asynchronously and registers `commit` to be
-     * executed later when @ref Pump is called.
+     * executed later.
      *
      * @param work Worker-thread phase.
      * @param commit Main-thread commit phase.

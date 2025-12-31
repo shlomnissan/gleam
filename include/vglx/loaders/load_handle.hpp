@@ -106,8 +106,8 @@ private:
 
     std::shared_ptr<State> state_;
 
-    friend class TextureLoaderXYZ;
-    friend class MeshLoaderXYZ;
+    friend class TextureLoader;
+    friend class MeshLoader;
     explicit LoadHandle(std::shared_ptr<State> s) : state_(std::move(s)) {}
     /// @endcond
 };

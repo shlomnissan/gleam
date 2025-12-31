@@ -9,90 +9,92 @@
 
 #include "vglx_export.h"
 
-#include "vglx/loaders/loader.hpp"
-
+#include <expected>
 #include <filesystem>
 #include <memory>
+#include <string>
+
+#include "vglx/loaders/load_handle.hpp"
 
 namespace vglx {
 
 class Node;
+class LoadScheduler;
 
 namespace fs = std::filesystem;
 
 /**
- * @brief Callback type for receiving loaded mesh nodes.
+ * @brief Loader for mesh assets.
  *
- * @related MeshLoader
- */
-using MeshCallback = std::function<void(std::unique_ptr<Node>)>;
-
-/**
- * @brief Loads mesh data from engine-optimized files.
+ * Provides both synchronous and asynchronous interfaces for loading `.msh`
+ * data from disk. It is intended to be accessed through the shared runtime
+ * context and used directly by application or node code when mesh resources
+ * are needed.
  *
- * MeshLoader is a concrete @ref Loader implementation that reads the
- * engine's custom `.msh` format from disk and constructs a node hierarchy
- * containing one or more static mesh objects and their associated materials.
- * It exposes both synchronous and asynchronous loading through the base
- * class API. You can learn more about importing meshes
+ * The synchronous @ref Load method performs the entire load on the calling
+ * thread and returns either a fully constructed node hierarchy or an error
+ * message.
  *
- * The returned resource is a @ref Node that acts as a group container for all
- * meshes encoded within the `.msh` file. This node can be attached directly to
- * the scene graph or inserted under an existing node.
+ * The asynchronous @ref LoadAsync method schedules file I/O off the main thread
+ * and returns a @ref LoadHandle "MeshLoadHandle" immediately. The handle can
+ * later be queried from the main thread to retrieve the loaded mesh once the
+ * operation completes. Ownership of the returned node is transferred out of the
+ * handle when it is successfully taken.
  *
- * You can convert common 3D model formats (for example OBJ or glTF) into `.msh`
- * files using the `asset_builder` CLI located in the engine's `tools`
- * directory. The `.msh` format stores geometry, materials, and metadata in a
- * compact layout optimized for fast loading at runtime.
- * See [Importing Assets Guide](/manual/importing_assets) to learn more.
- *
- * Explicit instantiation of this class is discouraged due to lifetime concerns
- * in the current architecture, particularly when used with asynchronous
- * loading. Instead, obtain a reference to the loader through
- * @ref Node::OnAttached, which provides access to the owning context and its
- * loader instances.
- *
- * @note Loaders use `std::expected` for error values. Always check the result
- * of loading operations and handle failure cases appropriately.
+ * Internally, asynchronous loading is coordinated through a
+ * @ref LoadScheduler instance, which ensures that background work and main-thread
+ * commits are clearly separated.
  *
  * @code
- * auto MyNode::OnAttached(SharedContextPointer context) -> void override {
- *   context->mesh_loader->LoadAsync(
- *     "assets/my_model.msh",
- *     [this](auto result) {
- *       if (result) {
- *         // Use std::move to transfer ownership
- *         this->Add(std::move(result.value()));
- *       } else {
- *         std::println(stderr, "{}", result.error());
- *       }
- *     }
- *   );
+ * auto handle = context->mesh_loader->LoadAsync("assets/robot.msh");
+ *
+ * auto OnUpdate(float) -> void override {
+ *   if (auto node = handle.TryTake()) {
+ *     Add(std::move(node.value()));
+ *   }
  * }
  * @endcode
  *
+ * To learn more about how meshes are imported and loaded see the
+ * [Importing Assets Guide](/manual/importing_assets).
+ *
  * @ingroup LoadersGroup
  */
-class VGLX_EXPORT MeshLoader : public Loader<std::unique_ptr<Node>> {
+class VGLX_EXPORT MeshLoader {
 public:
+    explicit MeshLoader(LoadScheduler* scheduler);
+
     /**
-     * @brief Creates a shared instance of @ref MeshLoader.
+     * @brief Loads a mesh synchronously from a `.msh` file.
      *
-     * The constructor is private to ensure the loader is always owned by a
-     * `std\::shared_ptr`. This is required because the base @ref Loader class
-     * inherits from `std\::enable_shared_from_this`, which relies on the loader
-     * being managed by a shared pointer for safe use during asynchronous loading.
+     * Performs file I/O and mesh construction on the calling thread. If loading
+     * succeeds a fully constructed @ref Node is returned. On failure an error
+     * message describing the problem is returned instead.
+     *
+     * This method is intended for tooling, offline processing, or scenarios
+     * where blocking behavior is acceptable.
+     *
+     * @param path Filesystem path to the `.msh` asset.
      */
-    [[nodiscard]] static auto Create() -> std::shared_ptr<MeshLoader> {
-        return std::shared_ptr<MeshLoader>(new MeshLoader());
-    }
+    auto Load(const fs::path& path) -> std::expected<std::shared_ptr<Node>, std::string>;
+
+    /**
+     * @brief Loads a mesh asynchronously from a `.msh` file.
+     *
+     * Schedules file I/O work to run off the main thread and returns
+     * immediately with a @ref LoadHandle "MeshLoadHandle". The handle can later
+     * be polled to retrieve the loaded mesh once the operation completes.
+     *
+     * Ownership of the returned node is transferred out of the handle when it is
+     * successfully taken. Errors can be retrieved explicitly from the handle
+     * or will be reported through the logger.
+     *
+     * @param path Filesystem path to the `.msh` asset.
+     */
+    auto LoadAsync(const fs::path& path) -> MeshLoadHandle;
 
 private:
-    /// @cond INTERNAL
-    MeshLoader() = default;
-
-    [[nodiscard]] auto LoadImpl(const fs::path& path) const -> LoaderResult<std::unique_ptr<Node>> override;
-    /// @endcond
+    LoadScheduler* load_scheduler_ {nullptr};
 };
 
 }
