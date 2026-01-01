@@ -50,7 +50,7 @@ struct Application::Impl {
             .title = params.title,
             .width = params.width,
             .height = params.height,
-            .antialiasing = params.antialiasing,
+            .sample_count = params.sample_count,
             .vsync = params.vsync
         });
         return window->Initialize();
@@ -60,6 +60,7 @@ struct Application::Impl {
         renderer = std::make_unique<Renderer>(Renderer::Parameters {
             .framebuffer_width = window->FramebufferWidth(),
             .framebuffer_height = window->FramebufferHeight(),
+            .sample_count = params.sample_count,
             .clear_color = params.clear_color
         });
         return renderer->Initialize();

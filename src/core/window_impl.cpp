@@ -47,6 +47,10 @@ auto Window::Impl::Initialize() -> std::expected<void, std::string> {
         return std::unexpected("Failed to initialize GLFW " + glfw_get_error());
     }
 
+    if (params_.sample_count == 1) {
+        params_.sample_count = 0;
+    }
+
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
@@ -55,7 +59,7 @@ auto Window::Impl::Initialize() -> std::expected<void, std::string> {
     glfwWindowHint(GLFW_ALPHA_BITS, 8);
     glfwWindowHint(GLFW_DEPTH_BITS, 24);
     glfwWindowHint(GLFW_STENCIL_BITS, 8);
-    glfwWindowHint(GLFW_SAMPLES, params_.antialiasing);
+    glfwWindowHint(GLFW_SAMPLES, params_.sample_count);
 
     #ifdef __APPLE__
         glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_TRUE);
@@ -153,10 +157,17 @@ auto Window::Impl::LogContextInfo() const -> void {
         return reinterpret_cast<const char*>(glGetString(name));
     };
 
+    const auto getInteger = [](GLenum name) {
+        GLint out {0};
+        glGetIntegerv(name, &out);
+        return out;
+    };
+
     Logger::Log(LogLevel::Info, "Vendor: {}", getString(GL_VENDOR));
     Logger::Log(LogLevel::Info, "Renderer: {}", getString(GL_RENDERER));
     Logger::Log(LogLevel::Info, "Version: {}", getString(GL_VERSION));
     Logger::Log(LogLevel::Info, "GLSL Version: {}", getString(GL_SHADING_LANGUAGE_VERSION));
+    Logger::Log(LogLevel::Info, "Sample Count: {}", getInteger(GL_SAMPLES));
     Logger::Log(LogLevel::Info, "Hardware Threads: {}", std::thread::hardware_concurrency());
 }
 

@@ -79,7 +79,7 @@ public:
         std::string title; ///< Window title.
         int width; ///< Client-area width in pixels.
         int height; ///< Client-area height in pixels.
-        int antialiasing; ///< Anti-aliasing sample count.
+        int sample_count; ///< Anti-aliasing sample count.
         bool vsync; ///< Enable or disable vertical sync.
     };
 

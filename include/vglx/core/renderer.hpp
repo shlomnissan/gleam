@@ -55,6 +55,7 @@ public:
     struct Parameters {
         int framebuffer_width; ///< Current framebuffer width in pixels.
         int framebuffer_height; ///< Current framebuffer height in pixels.
+        int sample_count; ///< Antialiasing level (e.g., 4x MSAA).
         Color clear_color; ///< Clear color used at the start of a frame.
     };
 

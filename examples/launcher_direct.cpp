@@ -13,12 +13,21 @@
 
 using namespace vglx;
 
+namespace {
+
+constexpr auto kWindowWidth {1024};
+constexpr auto kWindowHeight {768};
+constexpr auto kSampleCount {1};
+constexpr auto kClearColor {0x444444};
+
+}
+
 auto main() -> int {
     auto window = Window {{
         .title = "Examples (Direct Initialization)",
-        .width = 1024,
-        .height = 768,
-        .antialiasing = 4,
+        .width = kWindowWidth,
+        .height = kWindowHeight,
+        .sample_count = kSampleCount,
         .vsync = false
     }};
 
@@ -31,7 +40,8 @@ auto main() -> int {
     auto renderer = Renderer {{
         .framebuffer_width = window.FramebufferWidth(),
         .framebuffer_height = window.FramebufferHeight(),
-        .clear_color = 0x444444
+        .sample_count = kSampleCount,
+        .clear_color = kClearColor
     }};
 
     auto init_renderer = renderer.Initialize();

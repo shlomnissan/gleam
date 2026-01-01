@@ -14,6 +14,7 @@
 #include "renderer/gl/gl_camera.hpp"
 #include "renderer/gl/gl_lights.hpp"
 #include "renderer/gl/gl_programs.hpp"
+#include "renderer/gl/gl_scene_buffer.hpp"
 #include "renderer/gl/gl_state.hpp"
 #include "renderer/gl/gl_textures.hpp"
 
@@ -51,6 +52,7 @@ private:
     GLCamera camera_ubo_;
     GLLights lights_;
     GLPrograms programs_;
+    GLSceneBuffer scene_buffer_;
     GLState state_;
     GLTextures textures_;
 

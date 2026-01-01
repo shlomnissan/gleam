@@ -25,8 +25,14 @@
 namespace vglx {
 
 Renderer::Impl::Impl(const Renderer::Parameters& params)
-  : params_(params),
-    render_lists_(std::make_unique<RenderLists>()) {
+  : scene_buffer_({
+        params.framebuffer_width,
+        params.framebuffer_height,
+        params.sample_count,
+    }),
+    params_(params),
+    render_lists_(std::make_unique<RenderLists>())
+{
     state_.SetViewport(0, 0, params.framebuffer_width, params.framebuffer_height);
     state_.SetClearColor(params.clear_color);
 }
@@ -230,6 +236,8 @@ auto Renderer::Impl::ProcessLights(Camera* camera) -> void {
 }
 
 auto Renderer::Impl::Render(Scene* scene, Camera* camera) -> void {
+    scene_buffer_.Begin();
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     scene->UpdateTransformHierarchy();
@@ -239,6 +247,8 @@ auto Renderer::Impl::Render(Scene* scene, Camera* camera) -> void {
     ProcessLights(camera);
 
     RenderObjects(scene, camera);
+
+    scene_buffer_.End();
 }
 
 auto Renderer::Impl::SetViewport(int x, int y, int width, int height) -> void {

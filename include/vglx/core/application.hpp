@@ -75,7 +75,7 @@ public:
         Color clear_color {0x000000}; ///< Background clear color.
         int width {1024}; ///< Window width in pixels.
         int height {768}; ///< Window height in pixels.
-        int antialiasing {0}; ///< Antialiasing level (e.g., 4x MSAA).
+        int sample_count {1}; ///< Antialiasing level (e.g., 4x MSAA).
         bool vsync {true}; ///< Enables vertical sync.
         bool show_stats {false}; ///< Show stats UI overlay.
     };
