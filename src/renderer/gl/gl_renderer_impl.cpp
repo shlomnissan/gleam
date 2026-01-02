@@ -33,6 +33,8 @@ Renderer::Impl::Impl(const Renderer::Parameters& params)
     params_(params),
     render_lists_(std::make_unique<RenderLists>())
 {
+    scene_buffer_.Init();
+
     state_.SetViewport(0, 0, params.framebuffer_width, params.framebuffer_height);
     state_.SetClearColor(params.clear_color);
 }
