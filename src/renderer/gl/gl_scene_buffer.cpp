@@ -79,8 +79,8 @@ struct GLSceneBuffer::Impl {
         );
 
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-            DeleteBuffers();
             UnbindBuffers();
+            DeleteBuffers();
             Logger::Log(LogLevel::Error, "Failed to create a scene buffer");
             return std::unexpected("Failed to create a scene buffer");
         }
@@ -108,8 +108,8 @@ struct GLSceneBuffer::Impl {
         );
 
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-            DeleteBuffers();
             UnbindBuffers();
+            DeleteBuffers();
             Logger::Log(LogLevel::Error, "Failed to create a scene buffer");
             return std::unexpected("Failed to create a scene buffer");
         }
@@ -158,8 +158,8 @@ struct GLSceneBuffer::Impl {
         );
 
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-            DeleteBuffers();
             UnbindBuffers();
+            DeleteBuffers();
             Logger::Log(LogLevel::Error, "Failed to create a scene buffer with MSAA");
             return std::unexpected("Failed to create a scene buffer with MSAA");
         }
@@ -167,6 +167,27 @@ struct GLSceneBuffer::Impl {
         UnbindBuffers();
 
         return {};
+    }
+
+    auto Begin() -> void {
+        glBindFramebuffer(GL_FRAMEBUFFER, is_msaa ? msaa_fbo : resolve_fbo);
+        glViewport(0, 0, width, height);
+    }
+
+    auto End() -> void {
+        if (is_msaa) {
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, msaa_fbo);
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, resolve_fbo);
+            glBlitFramebuffer(
+                0, 0, width, height,
+                0, 0, width, height,
+                GL_COLOR_BUFFER_BIT,
+                GL_NEAREST
+            );
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     }
 
     auto UnbindBuffers() -> void {
@@ -199,9 +220,18 @@ auto GLSceneBuffer::Init() -> std::expected<void, std::string> {
     return impl_->Init();
 }
 
-auto GLSceneBuffer::Begin() -> void {}
+auto GLSceneBuffer::Begin() -> void {
+    impl_->Begin();
+}
 
-auto GLSceneBuffer::End() -> void {}
+auto GLSceneBuffer::End() -> void {
+    impl_->End();
+}
+
+auto GLSceneBuffer::GetResolvedColorTexture() const -> unsigned int {
+    return impl_->resolve_color;
+}
+
 
 GLSceneBuffer::~GLSceneBuffer() {
     impl_->DeleteBuffers();

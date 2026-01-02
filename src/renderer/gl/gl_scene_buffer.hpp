@@ -31,7 +31,9 @@ public:
     GLSceneBuffer(GLSceneBuffer&&) = delete;
     auto operator=(GLSceneBuffer&&) -> GLSceneBuffer& = delete;
 
-    auto Init() -> std::expected<void, std::string>;
+    [[nodiscard]] auto Init() -> std::expected<void, std::string>;
+
+    auto GetResolvedColorTexture() const -> unsigned int;
 
     auto Begin() -> void;
 
