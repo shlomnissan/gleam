@@ -7,7 +7,9 @@
 
 #pragma once
 
+#include <expected>
 #include <memory>
+#include <string>
 
 namespace vglx {
 
@@ -29,9 +31,11 @@ public:
     GLSceneBuffer(GLSceneBuffer&&) = delete;
     auto operator=(GLSceneBuffer&&) -> GLSceneBuffer& = delete;
 
-    auto Begin() const -> void;
+    auto Init() -> std::expected<void, std::string>;
 
-    auto End() const -> void;
+    auto Begin() -> void;
+
+    auto End() -> void;
 
     ~GLSceneBuffer();
 
