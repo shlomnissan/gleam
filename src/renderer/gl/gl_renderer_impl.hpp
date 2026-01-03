@@ -13,6 +13,7 @@
 #include "renderer/gl/gl_buffers.hpp"
 #include "renderer/gl/gl_camera.hpp"
 #include "renderer/gl/gl_lights.hpp"
+#include "renderer/gl/gl_present_pass.hpp"
 #include "renderer/gl/gl_programs.hpp"
 #include "renderer/gl/gl_scene_buffer.hpp"
 #include "renderer/gl/gl_state.hpp"
@@ -51,6 +52,7 @@ private:
     GLBuffers buffers_;
     GLCamera camera_ubo_;
     GLLights lights_;
+    GLPresentPass present_pass_;
     GLPrograms programs_;
     GLSceneBuffer scene_buffer_;
     GLState state_;
