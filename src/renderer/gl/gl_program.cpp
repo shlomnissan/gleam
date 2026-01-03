@@ -7,9 +7,11 @@
 
 #include "renderer/gl/gl_program.hpp"
 
-#include "core/shader_library.hpp"
 #include "vglx/geometries/geometry.hpp"
+
+#include "core/shader_library.hpp"
 #include "utilities/logger.hpp"
+#include "utilities/assert.hpp"
 
 #include <utility>
 
@@ -186,7 +188,7 @@ auto GLProgram::GetShaderType(ShaderType type) const -> GLuint {
         case ShaderType::kFragmentShader:
             return GL_FRAGMENT_SHADER;
         default:
-            return -1;
+            VGLX_UNREACHABLE();
     }
 }
 

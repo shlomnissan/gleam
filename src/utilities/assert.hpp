@@ -50,3 +50,23 @@ namespace vglx {
 #else
   #define VGLX_ASSERT(expr, msg) ((void)0)
 #endif
+
+#if defined(__clang__) || defined(__GNUC__)
+    #define VGLX_UNREACHABLE() \
+        do { \
+            VGLX_ASSERT(false, "Unreachable code reached"); \
+            __builtin_unreachable(); \
+        } while (0)
+#elif defined(_MSC_VER)
+    #define VGLX_UNREACHABLE() \
+        do { \
+            VGLX_ASSERT(false, "Unreachable code reached"); \
+            __assume(false); \
+        } while (0)
+#else
+    #define VGLX_UNREACHABLE() \
+        do { \
+            VGLX_ASSERT(false, "Unreachable code reached"); \
+            std::abort(); \
+        } while (0)
+#endif
