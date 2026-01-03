@@ -53,6 +53,8 @@ set(SOURCE_CODE
     "renderer/gl/gl_camera.hpp"
     "renderer/gl/gl_lights.cpp"
     "renderer/gl/gl_lights.hpp"
+    "renderer/gl/gl_present_pass.cpp"
+    "renderer/gl/gl_present_pass.hpp"
     "renderer/gl/gl_program.cpp"
     "renderer/gl/gl_program.hpp"
     "renderer/gl/gl_programs.cpp"

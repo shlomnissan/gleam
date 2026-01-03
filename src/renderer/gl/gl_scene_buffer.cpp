@@ -169,12 +169,12 @@ struct GLSceneBuffer::Impl {
         return {};
     }
 
-    auto Begin() -> void {
+    auto Begin() const -> void {
         glBindFramebuffer(GL_FRAMEBUFFER, is_msaa ? msaa_fbo : resolve_fbo);
         glViewport(0, 0, width, height);
     }
 
-    auto End() -> void {
+    auto End() const -> void {
         if (is_msaa) {
             glBindFramebuffer(GL_READ_FRAMEBUFFER, msaa_fbo);
             glBindFramebuffer(GL_DRAW_FRAMEBUFFER, resolve_fbo);
@@ -190,7 +190,7 @@ struct GLSceneBuffer::Impl {
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
     }
 
-    auto UnbindBuffers() -> void {
+    auto UnbindBuffers() const -> void {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glBindTexture(GL_TEXTURE_2D, 0);
         glBindRenderbuffer(GL_RENDERBUFFER, 0);
@@ -220,11 +220,11 @@ auto GLSceneBuffer::Init() -> std::expected<void, std::string> {
     return impl_->Init();
 }
 
-auto GLSceneBuffer::Begin() -> void {
+auto GLSceneBuffer::Begin() const -> void {
     impl_->Begin();
 }
 
-auto GLSceneBuffer::End() -> void {
+auto GLSceneBuffer::End() const -> void {
     impl_->End();
 }
 

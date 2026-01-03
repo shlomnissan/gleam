@@ -33,17 +33,18 @@ public:
 
     [[nodiscard]] auto Init() -> std::expected<void, std::string>;
 
-    auto GetResolvedColorTexture() const -> unsigned int;
+    auto Begin() const -> void;
 
-    auto Begin() -> void;
-
-    auto End() -> void;
+    auto End() const -> void;
 
     ~GLSceneBuffer();
 
 private:
+    friend class GLPresentPass;
     class Impl;
     std::unique_ptr<Impl> impl_;
+
+    [[nodiscard]] auto GetResolvedColorTexture() const -> unsigned int;
 };
 
 }
