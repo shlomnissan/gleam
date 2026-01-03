@@ -31,7 +31,7 @@ public:
     GLSceneBuffer(GLSceneBuffer&&) = delete;
     auto operator=(GLSceneBuffer&&) -> GLSceneBuffer& = delete;
 
-    [[nodiscard]] auto Init() -> std::expected<void, std::string>;
+    [[nodiscard]] auto Initialize() -> std::expected<void, std::string>;
 
     auto Begin() const -> void;
 

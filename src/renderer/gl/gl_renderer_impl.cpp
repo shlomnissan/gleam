@@ -38,7 +38,15 @@ Renderer::Impl::Impl(const Renderer::Parameters& params)
 }
 
 auto Renderer::Impl::Initialize() -> std::expected<void, std::string> {
-    return scene_buffer_.Init();
+    if (auto result = scene_buffer_.Initialize(); !result.has_value()) {
+        return result;
+    }
+
+    if (auto result = present_pass_.Initialize(); !result.has_value()) {
+        return result;
+    }
+
+    return {};
 }
 
 auto Renderer::Impl::RenderObjects(Scene* scene, Camera* camera) -> void {

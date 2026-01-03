@@ -216,7 +216,7 @@ struct GLSceneBuffer::Impl {
 GLSceneBuffer::GLSceneBuffer(const Parameters& params)
   : impl_(std::make_unique<GLSceneBuffer::Impl>(params)) {}
 
-auto GLSceneBuffer::Init() -> std::expected<void, std::string> {
+auto GLSceneBuffer::Initialize() -> std::expected<void, std::string> {
     return impl_->Init();
 }
 

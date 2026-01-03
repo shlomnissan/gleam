@@ -7,7 +7,9 @@
 
 #pragma once
 
+#include <expected>
 #include <memory>
+#include <string>
 
 namespace vglx {
 
@@ -24,6 +26,8 @@ public:
     // Non-moveable
     GLPresentPass(GLPresentPass&&) = delete;
     auto operator=(GLPresentPass&&) -> GLPresentPass& = delete;
+
+    [[nodiscard]] auto Initialize() -> std::expected<void, std::string>;
 
     auto Present(GLSceneBuffer& scene_buffer) -> void;
 
