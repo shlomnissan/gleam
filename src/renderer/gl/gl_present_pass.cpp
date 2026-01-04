@@ -9,6 +9,7 @@
 
 #include "core/shader_library.hpp"
 #include "renderer/gl/gl_program.hpp"
+#include "renderer/gl/gl_state.hpp"
 #include "renderer/gl/gl_scene_buffer.hpp"
 
 #include "shaders/internal/headers/present_pass_vert.h"
@@ -44,6 +45,18 @@ struct GLPresentPass::Impl {
         return {};
     }
 
+    auto Present(const GLSceneBuffer& scene_buffer) -> void {
+        glUseProgram(program->Id());
+
+        auto tex_unit = 0;
+        glActiveTexture(GL_TEXTURE0 + tex_unit);
+        glBindTexture(GL_TEXTURE_2D, scene_buffer.GetResolvedColorTexture());
+        program->SetUnknownUniform("u_ResolvedTexture", &tex_unit);
+
+        glBindVertexArray(vao);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+    }
+
     ~Impl() {
         if (vao) glDeleteVertexArrays(1, &vao);
     }
@@ -56,7 +69,9 @@ auto GLPresentPass::Initialize() -> std::expected<void, std::string> {
     return impl_->Initialize();
 }
 
-auto GLPresentPass::Present(GLSceneBuffer& scene_buffer) -> void {}
+auto GLPresentPass::Present(const GLSceneBuffer& scene_buffer) -> void {
+    impl_->Present(scene_buffer);
+}
 
 GLPresentPass::~GLPresentPass() = default;
 

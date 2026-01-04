@@ -243,6 +243,8 @@ auto Renderer::Impl::ProcessLights(Camera* camera) -> void {
 }
 
 auto Renderer::Impl::Render(Scene* scene, Camera* camera) -> void {
+    scene_buffer_.Begin();
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     scene->UpdateTransformHierarchy();
@@ -252,6 +254,14 @@ auto Renderer::Impl::Render(Scene* scene, Camera* camera) -> void {
     ProcessLights(camera);
 
     RenderObjects(scene, camera);
+
+    scene_buffer_.End();
+
+    textures_.Reset();
+    buffers_.Reset();
+    state_.Reset();
+
+    present_pass_.Present(scene_buffer_);
 }
 
 auto Renderer::Impl::SetViewport(int x, int y, int width, int height) -> void {

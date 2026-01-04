@@ -11,6 +11,7 @@
 
 #include "utilities/logger.hpp"
 
+#include <algorithm>
 #include <utility>
 
 namespace vglx {
@@ -32,6 +33,10 @@ auto GLTextures::Bind(
 
     glBindTexture(GL_TEXTURE_2D, tex_id);
     current_texture_ids_[tex_unit] = tex_id;
+}
+
+auto GLTextures::Reset() -> void {
+    std::ranges::fill(current_texture_ids_, 0);
 }
 
 auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {

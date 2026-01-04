@@ -29,7 +29,6 @@ public:
 
     auto CreateScene() -> std::unique_ptr<Scene> override {
         if (examples_ == nullptr) {
-            auto context = GetContext();
             examples_ = std::make_unique<Examples>(
                 [this](std::unique_ptr<Scene> scene) { SetScene(std::move(scene)); }
             );

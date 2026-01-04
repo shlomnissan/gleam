@@ -42,6 +42,10 @@ auto GLBuffers::Bind(const std::shared_ptr<Geometry>& geometry) -> void {
     current_vao_ = vao;
 }
 
+auto GLBuffers::Reset() -> void {
+    current_vao_ = 0;
+}
+
 auto GLBuffers::GenerateBuffers(Geometry* geometry) -> void {
     auto& vao = geometry->renderer_id;
     auto buffers = std::array<GLuint, 4> {};

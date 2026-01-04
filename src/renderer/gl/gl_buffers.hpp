@@ -33,6 +33,8 @@ public:
 
     auto BindInstancedMesh(InstancedMesh* mesh) -> void;
 
+    auto Reset() -> void;
+
     ~GLBuffers();
 
 private:

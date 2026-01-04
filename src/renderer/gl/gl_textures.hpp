@@ -41,6 +41,8 @@ public:
         GLTextureMapType map_type
     ) -> void;
 
+    auto Reset() -> void;
+
     ~GLTextures();
 
 private:
