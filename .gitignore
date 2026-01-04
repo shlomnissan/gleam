@@ -13,8 +13,7 @@
 **/out/
 **/debug/
 **/release/
-src/shaders/headers/*.h
-src/shaders/snippets/headers/*.h
+src/shaders/**/*.h
 CMakeUserPresets.json
 
 # imgui
