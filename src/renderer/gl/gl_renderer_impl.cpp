@@ -266,6 +266,7 @@ auto Renderer::Impl::Render(Scene* scene, Camera* camera) -> void {
 
 auto Renderer::Impl::SetViewport(int x, int y, int width, int height) -> void {
     state_.SetViewport(x, y, width, height);
+    scene_buffer_.ResizeViewport(width, height);
 }
 
 auto Renderer::Impl::SetClearColor(const Color& color) -> void {

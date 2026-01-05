@@ -7,6 +7,7 @@
 
 #include "renderer/gl/gl_scene_buffer.hpp"
 
+#include "utilities/assert.hpp"
 #include "utilities/logger.hpp"
 
 #include <glad/glad.h>
@@ -169,6 +170,77 @@ struct GLSceneBuffer::Impl {
         return {};
     }
 
+    auto ResizeViewport(int new_width, int new_height) -> void {
+        if (new_width <= 0 || new_height <= 0) return;
+
+        if (new_width == width && new_height == height) return;
+
+        glBindTexture(GL_TEXTURE_2D, resolve_color);
+        glTexImage2D(
+            GL_TEXTURE_2D,
+            0,
+            kColorFormat,
+            new_width,
+            new_height,
+            0,
+            GL_RGBA,
+            GL_UNSIGNED_BYTE,
+            nullptr
+        );
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        if (!is_msaa) {
+            glBindFramebuffer(GL_FRAMEBUFFER, resolve_fbo);
+
+            glBindRenderbuffer(GL_RENDERBUFFER, resolve_depth_stencil);
+            glRenderbufferStorage(
+                GL_RENDERBUFFER,
+                kDepthStencilFormat,
+                new_width,
+                new_height
+            );
+            glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+            auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            VGLX_ASSERT(
+                status == GL_FRAMEBUFFER_COMPLETE,
+                "Scene buffer incomplete after resize (no MSAA)"
+            );
+        } else {
+            glBindFramebuffer(GL_FRAMEBUFFER, msaa_fbo);
+
+            glBindRenderbuffer(GL_RENDERBUFFER, msaa_color);
+            glRenderbufferStorageMultisample(
+                GL_RENDERBUFFER,
+                samples,
+                kColorFormat,
+                new_width,
+                new_height
+            );
+
+            glBindRenderbuffer(GL_RENDERBUFFER, msaa_depth_stencil);
+            glRenderbufferStorageMultisample(
+                GL_RENDERBUFFER,
+                samples,
+                kDepthStencilFormat,
+                new_width,
+                new_height
+            );
+
+            auto status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            glBindRenderbuffer(GL_RENDERBUFFER, 0);
+            VGLX_ASSERT(
+                status == GL_FRAMEBUFFER_COMPLETE,
+                "Scene buffer incomplete after resize (MSAA)"
+            );
+        }
+
+        width = new_width;
+        height = new_height;
+    }
+
     auto Begin() const -> void {
         glBindFramebuffer(GL_FRAMEBUFFER, is_msaa ? msaa_fbo : resolve_fbo);
         glViewport(0, 0, width, height);
@@ -218,6 +290,10 @@ GLSceneBuffer::GLSceneBuffer(const Parameters& params)
 
 auto GLSceneBuffer::Initialize() -> std::expected<void, std::string> {
     return impl_->Init();
+}
+
+auto GLSceneBuffer::ResizeViewport(int width, int height) -> void {
+    impl_->ResizeViewport(width, height);
 }
 
 auto GLSceneBuffer::Begin() const -> void {

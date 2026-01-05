@@ -33,6 +33,8 @@ public:
 
     [[nodiscard]] auto Initialize() -> std::expected<void, std::string>;
 
+    auto ResizeViewport(int width, int height) -> void;
+
     auto Begin() const -> void;
 
     auto End() const -> void;
