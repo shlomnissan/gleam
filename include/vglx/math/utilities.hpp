@@ -330,6 +330,32 @@ alignas(64) constexpr uint32_t arctan_table[65] {
 }
 
 /**
+ * @brief Converts an sRGB channel value to linear.
+ *
+ * @param c Input and output are in the range [0, 1].
+ */
+[[nodiscard]] constexpr auto SRGBToLinear(float c) -> float {
+    c = Clamp(c, 0.0f, 1.0f);
+    if (c <= 0.04045f) {
+        return c / 12.92f;
+    }
+    return std::pow((c + 0.055f) / 1.055f, 2.4f);
+}
+
+/**
+ * @brief Converts a linear channel value to sRGB.
+ *
+ * @param c Input and output are in the range [0, 1].
+ */
+[[nodiscard]] constexpr auto LinearToSRGB(float c) -> float {
+    c = Clamp(c, 0.0f, 1.0f);
+    if (c <= 0.0031308f) {
+        return c * 12.92f;
+    }
+    return 1.055f * std::pow(c, 1.0f / 2.4f) - 0.055f;
+}
+
+/**
  * @brief Generates a UUID string (version 4-like).
  * @ingroup MathGroup
  *

@@ -428,6 +428,49 @@ TEST(MathUtilities, ClampNanPassThrough) {
 
 #pragma endregion
 
+#pragma region Color Management
+
+TEST(MathUtilities, SRGBToLinear) {
+    // boundaries
+    EXPECT_FLOAT_EQ(math::SRGBToLinear(0.0f), 0.0f);
+    EXPECT_FLOAT_EQ(math::SRGBToLinear(1.0f), 1.0f);
+
+    // known values
+    EXPECT_NEAR(math::SRGBToLinear(0.5f), 0.214041f, 1e-6f);
+    EXPECT_NEAR(math::SRGBToLinear(0.18f), 0.02721f, 1e-5f);
+
+    // clamping
+    EXPECT_FLOAT_EQ(math::SRGBToLinear(-1.0f), 0.0f);
+    EXPECT_FLOAT_EQ(math::SRGBToLinear( 2.0f), 1.0f);
+}
+
+TEST(MathUtilities, LinearToSRGB) {
+    // boundaries
+    EXPECT_FLOAT_EQ(math::LinearToSRGB(0.0f), 0.0f);
+    EXPECT_FLOAT_EQ(math::LinearToSRGB(1.0f), 1.0f);
+
+    // known values
+    EXPECT_NEAR(math::LinearToSRGB(0.214041f), 0.5f, 1e-6f);
+
+    // clamping
+    EXPECT_FLOAT_EQ(math::LinearToSRGB(-1.0f), 0.0f);
+    EXPECT_FLOAT_EQ(math::LinearToSRGB( 2.0f), 1.0f);
+}
+
+TEST(MathUtilities, RoundTripSRGBLinearSRGB) {
+    constexpr float kValues[] = {
+        0.0f, 0.003f, 0.01f, 0.1f, 0.25f, 0.5f, 0.75f, 1.0f
+    };
+
+    for (float c : kValues) {
+        const float linear = math::SRGBToLinear(c);
+        const float srgb = math::LinearToSRGB(linear);
+        EXPECT_NEAR(srgb, c, 1e-5f);
+    }
+}
+
+#pragma endregion
+
 #pragma region UUID
 
 TEST(MathUtilities, UUIDFormat) {
