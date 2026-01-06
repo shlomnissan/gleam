@@ -18,7 +18,7 @@ namespace vglx {
 
 namespace {
 
-constexpr GLenum kColorFormat = GL_RGBA8;
+constexpr GLenum kColorFormat = GL_RGBA16F;
 constexpr GLenum kDepthStencilFormat = GL_DEPTH24_STENCIL8;
 
 }
@@ -184,7 +184,7 @@ struct GLSceneBuffer::Impl {
             new_height,
             0,
             GL_RGBA,
-            GL_UNSIGNED_BYTE,
+            GL_HALF_FLOAT,
             nullptr
         );
         glBindTexture(GL_TEXTURE_2D, 0);
