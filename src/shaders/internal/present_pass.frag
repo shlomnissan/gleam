@@ -7,5 +7,7 @@ in vec2 v_TexCoord;
 uniform sampler2D u_ResolvedTexture;
 
 void main() {
-    v_FragColor = texture(u_ResolvedTexture, v_TexCoord);
+    vec3 color = texture(u_ResolvedTexture, v_TexCoord).rgb;
+    color = pow(color, vec3(1.0 / 2.2));
+    v_FragColor = vec4(color, 1.0);
 }

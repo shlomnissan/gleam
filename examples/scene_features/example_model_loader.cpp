@@ -69,8 +69,12 @@ auto ExampleModelLoader::OnUpdate(float delta) -> void {
         auto ptr = static_cast<Mesh*>(model_->Children().front().get());
         material_ = static_cast<PhongMaterial*>(ptr->GetMaterial().get());
         albedo_map_ = material_->albedo_map;
+
         normal_map_ = material_->normal_map;
+        normal_map_->color_space = Texture::ColorSpace::Linear;
+
         specular_map_ = material_->specular_map;
+        specular_map_->color_space = Texture::ColorSpace::Linear;
     }
 
     if (albedo_map_ != nullptr && !!material_->albedo_map != show_albedo_map_) {

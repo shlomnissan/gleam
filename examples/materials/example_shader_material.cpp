@@ -31,8 +31,6 @@ constexpr auto frag_str = R"(
 #version 410 core
 #pragma inject_attributes
 
-precision mediump float;
-
 #include "snippets/frag_global_params.glsl"
 #include "snippets/frag_global_fog.glsl"
 

@@ -41,6 +41,8 @@ public:
     /**
      * @brief Constructs a color from individual RGB components.
      *
+     * The components are assumed to be in linear color space.
+     *
      * @param r Red component.
      * @param g Green component.
      * @param b Blue component.
@@ -50,14 +52,21 @@ public:
     /**
      * @brief Constructs a color from a hexadecimal value.
      *
-     * The format is `0xRRGGBB`, and all channels are normalized to $[0.0, 1.0]$.
+     * The format is `0xRRGGBB`. The hexadecimal value is interpreted as an sRGB
+     * color (as commonly used in CSS and color pickers) and is converted to linear
+     * RGB for storage in this Color instance.
      *
-     * @param hex Hexadecimal color code.
+     * @param hex Hexadecimal color code in `0xRRGGBB` format (sRGB).
      */
-    constexpr Color(unsigned int hex) :
-        r(static_cast<float>(hex >> 16 & 255) / 255.f),
-        g(static_cast<float>(hex >> 8 & 255) / 255.f),
-        b(static_cast<float>(hex & 255) / 255.f) {}
+    constexpr Color(unsigned int hex) {
+        const float sr = static_cast<float>((hex >> 16) & 255) / 255.f;
+        const float sg = static_cast<float>((hex >> 8)  & 255) / 255.f;
+        const float sb = static_cast<float>((hex) & 255) / 255.f;
+
+        r = math::SRGBToLinear(sr);
+        g = math::SRGBToLinear(sg);
+        b = math::SRGBToLinear(sb);
+    }
 
     /**
      * @brief Constructs a color from a span of three float values.

@@ -33,6 +33,19 @@ public:
     };
 
     /**
+     * @brief Enumerates supported color spaces for texture data.
+     *
+     * Textures containing color data (e.g. albedo or base color maps) are
+     * typically authored in sRGB and should use @ref ColorSpace "ColorSpace::sRGB".
+     * Data textures (e.g. normals, roughness, metallic, masks) must use
+     * @ref ColorSpace "ColorSpace::Linear" to preserve numerical correctness.
+     */
+    enum class ColorSpace {
+        Linear, ///< Linear color space, no gamma correction is applied.
+        sRGB ///< sRGB color space, converted to linear on sampling.
+    };
+
+    /**
      * @brief Specifies the byte alignment of each row in source texture data.
      *
      * Determines how pixel rows are aligned in memory when uploading texture
@@ -57,8 +70,11 @@ public:
      */
     unsigned int renderer_id = 0;
 
-    /// @brief Current row alignment used when uploading texture data.
+    /// @brief Row alignment used when uploading texture data.
     RowAlignment row_alignment = RowAlignment::FourBytes;
+
+    /// @brief Color space of the texture data.
+    ColorSpace color_space = ColorSpace::sRGB;
 
     /**
      * @brief Identifies the concrete @ref Texture::Type "texture type".

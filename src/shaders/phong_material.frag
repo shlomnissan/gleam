@@ -4,8 +4,6 @@
 
 #pragma inject_attributes
 
-precision mediump float;
-
 #include "snippets/frag_global_params.glsl"
 #include "snippets/frag_global_fog.glsl"
 
@@ -62,7 +60,7 @@ float attenuation(in float dist, in Light light) {
     float denominator = light.Base +
                         light.Linear * dist +
                         light.Quadratic * (dist * dist);
-    return clamp(1.0 / max(denominator, 0.01), 0.02, 1.0);
+    return clamp(1.0 / max(denominator, 0.01), 0.0, 1.0);
 }
 
 vec3 processLights(
@@ -150,7 +148,6 @@ void main() {
     vec3 output_color = diffuse_color * u_AmbientLight;
     #if NUM_LIGHTS > 0
         output_color += processLights(normal, diffuse_color, specular_factor);
-        output_color = clamp(output_color, 0.0, 1.0);
     #endif
 
     #ifdef USE_FOG

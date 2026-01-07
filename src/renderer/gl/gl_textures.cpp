@@ -47,6 +47,11 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
     // Currently, the engine only supports 2D textures.
     auto texture_2d = static_cast<Texture2D*>(texture);
 
+    auto internal_format =
+        texture->color_space == Texture::ColorSpace::Linear ?
+            GL_RGBA8 :
+            GL_SRGB8_ALPHA8;
+
     glPixelStorei(
         GL_UNPACK_ALIGNMENT,
         std::to_underlying(texture->row_alignment)
@@ -55,7 +60,7 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
     glTexImage2D(
         GL_TEXTURE_2D,
         0,
-        GL_RGBA8, // Guaranteed by asset builder
+        internal_format,
         texture_2d->width,
         texture_2d->height,
         0,
