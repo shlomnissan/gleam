@@ -27,7 +27,8 @@ ExampleSprite::ExampleSprite() {
         .color = 0x333333,
         .size = 4.0f,
         .divisions = 16
-    }));
+    }))->TranslateY(-1.0f);
+
 }
 
 auto ExampleSprite::OnAttached(SharedContextPointer context) -> void {
@@ -44,8 +45,7 @@ auto ExampleSprite::OnAttached(SharedContextPointer context) -> void {
 auto ExampleSprite::OnUpdate(float delta) -> void {
     if (auto tex = handle.TryTake()) {
         sprite_ = Add(Sprite::Create(SpriteMaterial::Create(tex.value())));
-        sprite_->SetScale(0.15f);
-        sprite_->TranslateY(1.0f);
+        sprite_->SetScale(0.3f);
     }
 
     if (sprite_) {
