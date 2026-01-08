@@ -333,6 +333,7 @@ auto generate_tangents(
 
 auto convert_texture(
     const std::string& tex_name,
+    MaterialTextureMapType tex_type,
     const fs::path& input_path,
     const fs::path& output_path
 ) -> std::expected<std::string, std::string> {
@@ -348,8 +349,12 @@ auto convert_texture(
         }
     }
 
+    auto color_space = tex_type == MaterialTextureMapType_Diffuse ?
+        TextureColorSpace_sRGB :
+        TextureColorSpace_Linear;
+
     tex_output_path.replace_extension(".tex");
-    if (auto result = ::convert_texture(tex_input_path, tex_output_path); !result) {
+    if (auto result = ::convert_texture(tex_input_path, tex_output_path, color_space); !result) {
         return std::unexpected(result.error());
     }
 
@@ -365,7 +370,7 @@ auto parse_texture(
     const fs::path& input_path,
     const fs::path& output_path
 ) -> std::expected<MaterialTextureMapRecord, std::string> {
-    auto tex_converted_path = convert_texture(tex_name, input_path, output_path);
+    auto tex_converted_path = convert_texture(tex_name, tex_type, input_path, output_path);
     if (!tex_converted_path) {
         return std::unexpected(tex_converted_path.error());
     }

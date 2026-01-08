@@ -16,6 +16,11 @@ enum TextureFormat : uint32_t {
     TextureFormat_RGBA8 = 0,
 };
 
+enum TextureColorSpace : uint32_t {
+    TextureColorSpace_Linear = 0,
+    TextureColorSpace_sRGB = 1,
+};
+
 enum VertexAttributeFlags : uint32_t {
     VertexAttr_None         = 0,
     VertexAttr_HasPosition  = 1 << 0,
@@ -40,6 +45,7 @@ struct TextureHeader {
     uint32_t width;
     uint32_t height;
     uint32_t format; // TextureFormat
+    uint32_t color_space; // TextureColorSpace
     uint32_t mip_levels;
     uint64_t pixel_data_size;
 };

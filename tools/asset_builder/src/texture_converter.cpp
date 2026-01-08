@@ -7,8 +7,6 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 
-#include "vglx/asset_format.hpp"
-
 #include "texture_converter.hpp"
 
 #include <cstdint>
@@ -19,7 +17,8 @@
 
 auto convert_texture(
     const fs::path& input_path,
-    const fs::path& output_path
+    const fs::path& output_path,
+    TextureColorSpace color_space
 ) -> std::expected<void, std::string> {
     auto width = 0;
     auto height = 0;
@@ -38,6 +37,7 @@ auto convert_texture(
     header.width = static_cast<uint32_t>(width);
     header.height = static_cast<uint32_t>(height);
     header.format = static_cast<uint32_t>(TextureFormat::TextureFormat_RGBA8);
+    header.color_space = static_cast<uint32_t>(color_space);
     header.mip_levels = 1;
     header.pixel_data_size = static_cast<uint64_t>(width) * height * 4;
 

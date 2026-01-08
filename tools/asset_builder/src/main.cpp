@@ -5,9 +5,13 @@
 ===========================================================================
 */
 
+#include "vglx/asset_format.hpp"
+
 #include "mesh_converter.hpp"
 #include "texture_converter.hpp"
 
+#include <algorithm>
+#include <expected>
 #include <filesystem>
 #include <print>
 #include <string>
@@ -38,6 +42,20 @@ auto get_asset_type(const fs::path& path) -> AssetType {
     return AssetType::Invalid;
 }
 
+auto get_color_space(const cxxopts::ParseResult& options) -> std::expected<TextureColorSpace, std::string> {
+    if (!options.count("color-space")) return TextureColorSpace_sRGB;
+
+    auto color_space = options["color-space"].as<std::string>();
+    std::ranges::transform(color_space, color_space.begin(), [](auto c) {
+        return std::tolower(c);
+    });
+
+    if (color_space == "srgb") return TextureColorSpace_sRGB;
+    if (color_space == "linear") return TextureColorSpace_Linear;
+
+    return std::unexpected("Error: Unsupported color space");
+}
+
 auto asset_type_to_str(AssetType type) {
     return type == AssetType::Texture ? "texture" : "mesh";
 }
@@ -49,8 +67,9 @@ auto main(int argc, char** argv) -> int {
     };
 
     opts.add_options()
-        ("i,input", "Input file (e.g. .png, .obj)", cxxopts::value<std::string>())
+        ("i,input", "Input file (.png, .jpg, .obj)", cxxopts::value<std::string>())
         ("o,output", "Output directory", cxxopts::value<std::string>()->default_value(""))
+        ("c,color-space", "Texture color space (linear, sRGB)", cxxopts::value<std::string>())
         ("h,help", "Show help");
 
     auto options = opts.parse(argc, argv);
@@ -88,9 +107,15 @@ auto main(int argc, char** argv) -> int {
     auto result = std::expected<void, std::string>{};
 
     switch (asset_type) {
-        case AssetType::Texture:
+        case AssetType::Texture: {
+            auto color_space = get_color_space(options);
+            if (!color_space.has_value()) {
+                std::println(stderr, "{}", color_space.error());
+                return 1;
+            }
             output.replace_extension("tex");
-            result = convert_texture(input, output);
+            result = convert_texture(input, output, color_space.value());
+        }
             break;
         case AssetType::Mesh:
             output.replace_extension(".msh");
