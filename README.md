@@ -49,38 +49,33 @@ The installer checks for CMake, detects your compiler, and asks for an installat
 ## Hello VGLX (minimal example)
 
 ```cpp
-struct MyApp : public vglx::Application {
+#include <vglx/vglx.hpp>
+
+using namespace vglx;
+
+struct MyApp : public Application {
     auto Configure() -> Application::Parameters override {
-        return {
-            .title = "Hello VGLX",
-            .clear_color = {0x000000},
-            .width = 1024,
-            .height = 768,
-            .antialiasing = 4,
-            .vsync = true,
-            .show_stats = false,
-        };
+        return { .title = "Hello VGLX" };
     }
 
-    auto CreateScene() -> std::unique_ptr<vglx::Scene> override {
-        auto scene = vglx::Scene::Create();
+    auto CreateScene() -> std::unique_ptr<Scene> override {
+        GetContext()->camera->TranslateZ(3.0f);
 
-        scene->Add(vglx::AmbientLight::Create({
-            .color = 0xFFFFFF,
-            .intensity = 0.5f
-        }));
+        auto scene = Scene::Create();
 
-        scene->Add(vglx::PointLight::Create({
-            .color = 0xFFFFFF,
-            .intensity = 1.0f
-        }))->transform.Translate({2.0f, 2.5f, 4.0f});
+        scene->Add(
+            PointLight::Create({
+                .color = 0xFFFFFF,
+                .intensity = 1.0f
+            })
+        )->transform.Translate({2.0f, 2.5f, 4.0f});
 
-        scene->Add(vglx::Mesh::Create(
-            vglx::BoxGeometry::Create(),
-            vglx::PhongMaterial::Create(0x049EF4)
-        ))->RotateY(vglx::math::DegToRad(45.0f));
-
-        GetContext()->camera->TranslateZ(2.5f);
+        scene->Add(
+            Mesh::Create(
+                BoxGeometry::Create(),
+                PhongMaterial::Create(0x049EF4)
+            )
+        )->RotateY(math::DegToRad(45.0f));
 
         return scene;
     }
