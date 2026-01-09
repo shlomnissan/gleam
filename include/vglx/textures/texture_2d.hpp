@@ -57,6 +57,7 @@ public:
     struct Parameters {
         unsigned width; ///< Width in pixels.
         unsigned height; ///< Height in pixels.
+        ColorSpace color_space {ColorSpace::sRGB}; ///< Color space for texture data.
         std::vector<uint8_t> data; ///< Raw texture pixel data.
     };
 
@@ -69,7 +70,9 @@ public:
     explicit Texture2D(const Parameters& params) :
         width(params.width),
         height(params.height),
-        data(std::move(params.data)) {}
+        data(std::move(params.data)) {
+            color_space = params.color_space;
+        }
 
     /**
      * @brief Creates a shared instance of @ref Texture2D.

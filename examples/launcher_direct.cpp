@@ -18,7 +18,6 @@ namespace {
 constexpr auto kWindowWidth {1024};
 constexpr auto kWindowHeight {768};
 constexpr auto kSampleCount {1};
-constexpr auto kClearColor {0x444444};
 
 }
 
@@ -41,7 +40,7 @@ auto main() -> int {
         .framebuffer_width = window.FramebufferWidth(),
         .framebuffer_height = window.FramebufferHeight(),
         .sample_count = kSampleCount,
-        .clear_color = kClearColor
+        .clear_color = 0x444444
     }};
 
     auto init_renderer = renderer.Initialize();
