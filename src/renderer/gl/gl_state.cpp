@@ -102,17 +102,11 @@ auto GLState::SetClearColor(const Color& color) -> void {
 }
 
 auto GLState::Reset() -> void {
-    glDisable(GL_CULL_FACE);
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_POLYGON_OFFSET_FILL);
-    glFrontFace(GL_CCW);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    SetBackfaceCulling(false);
+    SetDepthTest(false);
+    SetPolygonOffset(0.0f, 0.0f);
+    SetBlending(Material::Blending::None);
 
-    features_.clear();
-
-    curr_blending_ = Material::Blending::None;
-    curr_depth_mask_ = false;
-    curr_wireframe_mode_ = false;
     curr_program_ = 0;
 }
 
