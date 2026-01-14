@@ -47,7 +47,7 @@ namespace vglx {
  * });
  *
  * // Update a uniform each frame
- * material->uniforms["u_Time"] = timer.GetElapsedSeconds();
+ * material->SetUniform("u_Time", timer.GetElapsedSeconds());
  *
  * my_scene->Add(vglx::Mesh::Create(geometry, material));
  * @endcode
@@ -56,8 +56,6 @@ namespace vglx {
  */
 class VGLX_EXPORT ShaderMaterial : public Material {
 public:
-    friend class ProgramAttributes;
-
     /**
      * @brief Represents a supported uniform value type.
      *
@@ -67,21 +65,22 @@ public:
     using UniformValue = std::variant<int, float, Color, Matrix3, Matrix4, Vector2, Vector3, Vector4>;
 
     /**
+     * @brief List of named uniform initializers.
+     *
+     * Defines a collection of uniform name–value pairs used to initialize a
+     * @ref ShaderMaterial at creation time. Each entry maps a GLSL uniform
+     * variable name to its initial value.
+     */
+    using UniformList = std::initializer_list<std::pair<std::string, UniformValue>>;
+
+    /**
      * @brief Parameters for constructing a @ref ShaderMaterial object.
      */
     struct Parameters {
         std::string vertex_shader; ///< Vertex shader code.
         std::string fragment_shader; ///< Fragment shader code.
-        std::unordered_map<std::string, UniformValue> uniforms; ///< Initial uniform values.
+        UniformList uniforms = {}; ///< Initial uniform values.
     };
-
-    /**
-     * @brief Map of uniform names to their current values.
-     *
-     * To update a uniform, modify this map directly using the uniform name.
-     * Updates take effect on the next frame when the material is bound.
-     */
-    std::unordered_map<std::string, UniformValue> uniforms;
 
     /**
      * @brief Constructs a shader material from custom GLSL source strings.
@@ -89,10 +88,7 @@ public:
      * @param params @ref ShaderMaterial::Parameters "Initialization parameters"
      * defining the shader sources and initial uniform values.
      */
-    ShaderMaterial(const Parameters& params) :
-        vertex_shader_(params.vertex_shader),
-        fragment_shader_(params.fragment_shader),
-        uniforms(params.uniforms) {}
+    ShaderMaterial(const Parameters& params);
 
     /**
      * @brief Creates a shared instance of @ref ShaderMaterial.
@@ -105,6 +101,22 @@ public:
     }
 
     /**
+     * @brief Sets or updates a uniform value by name.
+     *
+     * Associates a uniform variable in the shader program with the given value.
+     * If a uniform with the specified name exists its value is updated.
+     * Otherwise, a new uniform entry is created.
+     *
+     * Uniform values are uploaded to the GPU the next time the material is bound
+     * and rendered. The uniform name must exactly match the name declared in the
+     * GLSL shader source.
+     *
+     * @param name Name of the uniform variable as declared in the shader.
+     * @param value Value to assign to the uniform.
+     */
+    auto SetUniform(std::string_view name, UniformValue value) -> void;
+
+    /**
      * @brief Identifies this material as
      * @ref Material::Type "Material::Type::ShaderMaterial".
      */
@@ -114,9 +126,33 @@ public:
 
 private:
     /// @cond INTERNAL
+    struct StringHash {
+        using is_transparent = void;
+        size_t operator()(std::string_view v) const noexcept {
+            return std::hash<std::string_view>{}(v);
+        }
+    };
+
+    struct StringEq {
+        using is_transparent = void;
+        bool operator()(std::string_view a, std::string_view b) const noexcept {
+            return a == b;
+        }
+    };
+    /// @endcond
+
+    friend class Renderer;
+    friend class ProgramAttributes;
+
     std::string vertex_shader_;
     std::string fragment_shader_;
-    /// @endcond
+
+    std::unordered_map<
+        std::string,
+        UniformValue,
+        StringHash,
+        StringEq
+    > uniforms_;
 };
 
 }

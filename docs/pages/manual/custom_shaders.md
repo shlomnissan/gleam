@@ -148,7 +148,7 @@ material = vglx::ShaderMaterial::Create({
 If you plan to update uniforms dynamically it is a good idea to store the shader material instance as a member. Changing the cube’s color after creation can be done by updating the uniform value:
 
 ```cpp
-material->uniforms["color"] = vglx::Color {0xFF0000};
+material->SetUniform("color", vglx::Color {0xFF0000});
 ```
 
 With this minimal example we implemented a complete custom shader program and integrated it into VGLX. While the shader itself is simple the same structure scales to complex techniques. Shaders are the foundation of everything rendered on screen and shader materials provide the entry point for extending VGLX beyond its built-in materials.

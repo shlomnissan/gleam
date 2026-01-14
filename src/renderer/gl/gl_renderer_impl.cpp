@@ -204,7 +204,7 @@ auto Renderer::Impl::SetUniforms(
 
     if (attrs->type == Material::Type::ShaderMaterial) {
         auto m = static_cast<ShaderMaterial*>(material);
-        for (const auto& [name, value] : m->uniforms) {
+        for (const auto& [name, value] : m->uniforms_) {
             program->SetUnknownUniform(name, &value);
         }
     }

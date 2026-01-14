@@ -36,6 +36,7 @@ set(SOURCE_CODE
     "loaders/load_scheduler.cpp"
     "loaders/mesh_loader.cpp"
     "loaders/texture_loader.cpp"
+    "materials/shader_material.cpp"
     "scene/instanced_mesh.cpp"
     "scene/instanced_mesh_impl.hpp"
     "scene/mesh.cpp"
