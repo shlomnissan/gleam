@@ -27,6 +27,9 @@ enum class GLTextureMapType {
     TextureMap = 4,
 };
 
+constexpr auto kReservedTextureUnits = 5; // 0...4
+constexpr auto kMaxTextureUnits = 16;
+
 class GLTextures {
 public:
     GLTextures() = default;
@@ -48,7 +51,7 @@ public:
 private:
     std::vector<std::weak_ptr<Texture>> textures_;
 
-    std::array<GLuint, 16> current_texture_ids_ {};
+    std::array<GLuint, kMaxTextureUnits> current_texture_ids_ {};
 
     auto GenerateTexture(Texture* texture) const -> GLuint;
 };

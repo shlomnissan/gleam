@@ -16,11 +16,13 @@
 #include "vglx/math/vector2.hpp"
 #include "vglx/math/vector3.hpp"
 #include "vglx/math/vector4.hpp"
+#include "vglx/textures/texture.hpp"
 
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <variant>
+#include <vector>
 
 namespace vglx {
 
@@ -73,6 +75,11 @@ public:
      */
     using UniformList = std::initializer_list<std::pair<std::string, UniformValue>>;
 
+    struct TextureBinding {
+        std::string name;
+        std::shared_ptr<Texture> texture;
+    };
+
     /**
      * @brief Parameters for constructing a @ref ShaderMaterial object.
      */
@@ -80,6 +87,7 @@ public:
         std::string vertex_shader; ///< Vertex shader code.
         std::string fragment_shader; ///< Fragment shader code.
         UniformList uniforms = {}; ///< Initial uniform values.
+        std::vector<TextureBinding> textures;
     };
 
     /**
@@ -115,6 +123,8 @@ public:
      * @param value Value to assign to the uniform.
      */
     auto SetUniform(std::string_view name, UniformValue value) -> void;
+
+    auto SetTexture(std::string_view name, std::shared_ptr<Texture> texture) -> void;
 
     /**
      * @brief Identifies this material as
@@ -153,6 +163,8 @@ private:
         StringHash,
         StringEq
     > uniforms_;
+
+    std::vector<TextureBinding> textures_;
 };
 
 }
