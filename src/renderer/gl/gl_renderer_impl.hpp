@@ -65,6 +65,8 @@ private:
     size_t rendered_objects_counter_ {0};
     size_t rendered_objects_per_frame_ {0};
 
+    int next_texture_unit_ {0};
+
     auto ProcessLights(Camera* camera) -> void;
 
     auto RenderObjects(Scene* scene, Camera* camera) -> void;

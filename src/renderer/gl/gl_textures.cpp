@@ -16,11 +16,7 @@
 
 namespace vglx {
 
-auto GLTextures::Bind(
-    const std::shared_ptr<Texture>& texture,
-    GLTextureMapType map_type
-) -> void {
-    auto tex_unit = std::to_underlying(map_type);
+auto GLTextures::Bind(const std::shared_ptr<Texture>& texture, int tex_unit) -> void {
     glActiveTexture(GL_TEXTURE0 + tex_unit);
 
     auto tex_id = texture->renderer_id;

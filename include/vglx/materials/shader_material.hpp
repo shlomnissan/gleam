@@ -86,7 +86,7 @@ public:
     struct Parameters {
         std::string vertex_shader; ///< Vertex shader code.
         std::string fragment_shader; ///< Fragment shader code.
-        UniformList uniforms = {}; ///< Initial uniform values.
+        UniformList uniforms; ///< Initial uniform values.
         std::vector<TextureBinding> textures;
     };
 
@@ -96,7 +96,7 @@ public:
      * @param params @ref ShaderMaterial::Parameters "Initialization parameters"
      * defining the shader sources and initial uniform values.
      */
-    ShaderMaterial(const Parameters& params);
+    explicit ShaderMaterial(Parameters params);
 
     /**
      * @brief Creates a shared instance of @ref ShaderMaterial.

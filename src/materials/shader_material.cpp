@@ -9,20 +9,20 @@
 
 namespace vglx {
 
-ShaderMaterial::ShaderMaterial(const Parameters& params)
+ShaderMaterial::ShaderMaterial(Parameters params)
   : vertex_shader_(std::move(params.vertex_shader)),
     fragment_shader_(std::move(params.fragment_shader)),
     textures_(std::move(params.textures))
 {
     uniforms_.reserve(params.uniforms.size());
-    for (const auto& [k, v] : params.uniforms) uniforms_.emplace(k, v);
+    for (const auto& [k, v] : params.uniforms) uniforms_.try_emplace(k, v);
 }
 
 auto ShaderMaterial::SetUniform(std::string_view name, UniformValue value) -> void {
     if (auto it = uniforms_.find(name); it != uniforms_.end()) {
         it->second = std::move(value);
     } else {
-        uniforms_.emplace(std::string(name), std::move(value));
+        uniforms_.try_emplace(std::string(name), std::move(value));
     }
 }
 

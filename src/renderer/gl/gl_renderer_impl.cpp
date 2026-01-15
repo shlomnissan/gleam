@@ -12,6 +12,7 @@
 #include "vglx/materials/sprite_material.hpp"
 #include "vglx/materials/unlit_material.hpp"
 #include "vglx/math/vector3.hpp"
+#include "vglx/math/matrix3.hpp"
 #include "vglx/scene/fog.hpp"
 #include "vglx/scene/instanced_mesh.hpp"
 #include "vglx/scene/sprite.hpp"
@@ -21,6 +22,8 @@
 #include "utilities/logger.hpp"
 
 #include <glad/glad.h>
+
+#include <utility>
 
 namespace vglx {
 
@@ -65,6 +68,7 @@ auto Renderer::Impl::RenderObjects(Scene* scene, Camera* camera) -> void {
 
     rendered_objects_per_frame_ = rendered_objects_counter_;
     rendered_objects_counter_ = 0;
+    next_texture_unit_ = 0;
 }
 
 auto Renderer::Impl::RenderObject(Renderable* renderable, Scene* scene, Camera* camera) -> void {
@@ -135,16 +139,19 @@ auto Renderer::Impl::SetUniforms(
     auto material = renderable->GetMaterial().get();
     auto model = renderable->GetWorldTransform();
     auto resolution = Vector2(
-        params_.framebuffer_width,
-        params_.framebuffer_height
+        static_cast<float>(params_.framebuffer_width),
+        static_cast<float>(params_.framebuffer_height)
     );
 
     program->SetUniform(Uniform::Model, &model);
     program->SetUniform(Uniform::Opacity, &material->opacity);
     program->SetUniform(Uniform::Resolution, &resolution);
 
+    static const auto kIdentity = Matrix3::Identity();
+    program->SetUniform(Uniform::TextureTransform, &kIdentity);
+
     const auto bind_texture = [&](GLTextureMapType type, std::shared_ptr<Texture2D> tex) {
-        textures_.Bind(tex, type);
+        textures_.Bind(tex, std::to_underlying(type));
         const auto& transform = tex->GetTransform();
         program->SetUniform(Uniform::TextureTransform, &transform);
         switch(type) {
@@ -206,6 +213,11 @@ auto Renderer::Impl::SetUniforms(
         auto m = static_cast<ShaderMaterial*>(material);
         for (const auto& [name, value] : m->uniforms_) {
             program->SetUnknownUniform(name, &value);
+        }
+        for (const auto& [name, value] : m->textures_) {
+            const int tex_unit = kReservedTextureUnits + next_texture_unit_++;
+            textures_.Bind(value, tex_unit);
+            program->SetUnknownUniform(name, &tex_unit);
         }
     }
 

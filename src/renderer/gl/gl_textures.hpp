@@ -13,6 +13,7 @@
 #include <memory>
 #include <string_view>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include <glad/glad.h>
@@ -25,9 +26,10 @@ enum class GLTextureMapType {
     NormalMap = 2,
     SpecularMap = 3,
     TextureMap = 4,
+    Reserved
 };
 
-constexpr auto kReservedTextureUnits = 5; // 0...4
+constexpr auto kReservedTextureUnits = std::to_underlying(GLTextureMapType::Reserved);
 constexpr auto kMaxTextureUnits = 16;
 
 class GLTextures {
@@ -39,10 +41,7 @@ public:
     GLTextures& operator=(const GLTextures&) = delete;
     GLTextures& operator=(GLTextures&&) = delete;
 
-    auto Bind(
-        const std::shared_ptr<Texture>& texture,
-        GLTextureMapType map_type
-    ) -> void;
+    auto Bind(const std::shared_ptr<Texture>& texture, int tex_unit) -> void;
 
     auto Reset() -> void;
 
