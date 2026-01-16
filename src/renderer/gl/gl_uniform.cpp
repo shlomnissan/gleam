@@ -15,6 +15,7 @@ namespace {
 
 UniformType ToUniformType(GLenum type) {
     switch (type) {
+        case GL_BOOL: return UniformType::Bool;
         case GL_FLOAT: return UniformType::Float;
         case GL_FLOAT_MAT3: return UniformType::Matrix3;
         case GL_FLOAT_MAT4: return UniformType::Matrix4;
@@ -35,12 +36,18 @@ GLUniform::GLUniform(std::string_view name, GLint location, GLenum type)
     type_(ToUniformType(type))
 {
     if (type_ == UniformType::Unsupported) {
-        Logger::Log(LogLevel::Error, "Unsupported GL uniform type {}:{}", name, type);
+        Logger::Log(LogLevel::Error, "Unsupported GL uniform type {}:{}", type, name);
     }
 }
 
 auto GLUniform::SetValue(const void* value) -> void {
     switch(type_) {
+        case UniformType::Bool:
+            if (data_.b != *reinterpret_cast<const float*>(value)) {
+                data_.b = *reinterpret_cast<const float*>(value);
+                needs_upload_ = true;
+            }
+            break;
         case UniformType::Float:
             if (data_.f != *reinterpret_cast<const float*>(value)) {
                 data_.f = *reinterpret_cast<const float*>(value);
@@ -96,6 +103,7 @@ auto GLUniform::SetValue(const void* value) -> void {
 auto GLUniform::UploadIfNeeded() -> void {
     if (!needs_upload_) return;
     switch(type_) {
+        case UniformType::Bool: glUniform1i(location_, data_.b ? 1 : 0); break;
         case UniformType::Float: glUniform1f(location_, data_.f); break;
         case UniformType::Int: glUniform1i(location_, data_.i); break;
         case UniformType::Matrix3: glUniformMatrix3fv(location_, 1, GL_FALSE, &data_.m3[0][0]); break;

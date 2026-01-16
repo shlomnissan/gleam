@@ -21,6 +21,7 @@
 namespace vglx {
 
 enum class UniformType {
+    Bool,
     Float,
     Int,
     Matrix3,
@@ -101,6 +102,7 @@ private:
     bool needs_upload_ {false};
 
     union {
+        GLboolean b;
         GLfloat f;
         GLint i;
         Matrix3 m3;

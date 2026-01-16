@@ -61,10 +61,10 @@ public:
     /**
      * @brief Represents a supported uniform value type.
      *
-     * A uniform can be an integer, float, color, or a vector/matrix type.
+     * A uniform can be a boolean, integer, float, color, or a vector/matrix type.
      * Values are matched by name when uploaded to the shader program.
      */
-    using UniformValue = std::variant<int, float, Color, Matrix3, Matrix4, Vector2, Vector3, Vector4>;
+    using UniformValue = std::variant<bool, int, float, Color, Matrix3, Matrix4, Vector2, Vector3, Vector4>;
 
     /**
      * @brief List of named uniform initializers.

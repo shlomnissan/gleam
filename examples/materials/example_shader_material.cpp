@@ -16,6 +16,8 @@ using namespace vglx;
 
 namespace {
 
+auto handle = TextureLoadHandle {};
+
 constexpr auto vert_str = R"(
 #version 410 core
 #pragma inject_attributes
@@ -36,10 +38,16 @@ constexpr auto frag_str = R"(
 
 uniform float u_Time;
 uniform vec2 u_Resolution;
+uniform bool u_EnableTexture;
+uniform sampler2D u_Channel0;
 
 void main() {
     vec2 uv = gl_FragCoord.xy / u_Resolution.xy;
     vec3 output_color = 0.5 + 0.5 * cos(u_Time + uv.xyx + vec3(0,2,4));
+
+    if (u_EnableTexture) {
+        output_color += texture(u_Channel0, v_TexCoord).rgb;
+    }
 
     #ifdef USE_FOG
         applyFog(output_color, v_ViewDepth);
@@ -56,7 +64,7 @@ ExampleShaderMaterial::ExampleShaderMaterial() {
     material_ = ShaderMaterial::Create({
         .vertex_shader = vert_str,
         .fragment_shader = frag_str,
-        .uniforms = {{"u_Time", 0.0f}}
+        .uniforms = {{"u_Time", 0.0f}, {"u_EnableTexture", false}},
     });
 
     fog = Fog::CreateExponential(0x444444, 0.3f);
@@ -67,16 +75,37 @@ ExampleShaderMaterial::ExampleShaderMaterial() {
 
 auto ExampleShaderMaterial::OnAttached(SharedContextPointer context) -> void {
     Add(OrbitControls::Create(context->camera, {.radius = 3.0f}));
+
+    handle = context->texture_loader->LoadAsync(
+        "assets/checker/checker.tex"
+    );
 }
 
 auto ExampleShaderMaterial::OnUpdate(float delta) -> void {
+    if (auto tex = handle.TryTake()) {
+        material_->SetTexture("u_Channel0", tex.value());
+    }
+
     mesh_->transform.Rotate(Vector3::Up(), 1.0f * delta);
     mesh_->transform.Rotate(Vector3::Right(), 1.0f * delta);
     material_->SetUniform("u_Time", static_cast<float>(timer_.GetElapsedSeconds()));
 }
 
 auto ExampleShaderMaterial::ContextMenu() -> void {
-    auto _ = false;
+    static auto _ = false;
+    static auto curr_texture = std::string {"none"};
+    static auto textures = std::array<const char*, 2> {
+        "none", "checkerboard"
+    };
+
+    UIDropDown("texture", textures, curr_texture,
+      [this](std::string_view str) {
+        curr_texture = str;
+        if (str == "none") material_->SetUniform("u_EnableTexture", false);
+        if (str == "checkerboard") material_->SetUniform("u_EnableTexture", true);
+    });
+
+    UISeparator();
 
     UICheckbox("transparent", material_->transparent, _);
     UISliderFloat("opacity", material_->opacity, 0.0f, 1.0f, _, 160.0f);
