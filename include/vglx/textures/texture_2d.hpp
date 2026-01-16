@@ -67,7 +67,7 @@ public:
      * @param params @ref Texture2D::Parameters "Initialization parameters"
      * for constructing the texture.
      */
-    explicit Texture2D(const Parameters& params) :
+    explicit Texture2D(Parameters params) :
         width(params.width),
         height(params.height),
         data(std::move(params.data)) {

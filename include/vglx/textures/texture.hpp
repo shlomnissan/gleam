@@ -84,8 +84,8 @@ public:
     /**
      * @brief Destroys the texture and releases associated resources.
      */
-    virtual ~Texture() {
-        Dispose();
+    ~Texture() override {
+        Disposable::Dispose();
     }
 };
 
