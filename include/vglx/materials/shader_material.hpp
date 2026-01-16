@@ -75,9 +75,15 @@ public:
      */
     using UniformList = std::initializer_list<std::pair<std::string, UniformValue>>;
 
+    /**
+     * @brief Represents a texture bound to a shader sampler.
+     *
+     * Maps a GLSL sampler name to a specific texture instance. Texture bindings
+     * are used to pass image data to the shader for sampling.
+     */
     struct TextureBinding {
-        std::string name;
-        std::shared_ptr<Texture> texture;
+        std::string name; ///< Name of the sampler uniform in the shader.
+        std::shared_ptr<Texture> texture; ///< Shared pointer to the texture resource.
     };
 
     /**
@@ -124,6 +130,20 @@ public:
      */
     auto SetUniform(std::string_view name, UniformValue value) -> void;
 
+    /**
+     * @brief Assigns a texture to a shader sampler by name.
+     *
+     * Binds a texture resource to a specific sampler uniform. If a texture
+     * binding with the specified name already exists, it is replaced.
+     * Otherwise, a new binding is added to the material.
+     *
+     * Textures are bound to the appropriate texture units the next time the
+     * material is used for rendering. The name must match the sampler2D
+     * (or other sampler type) declared in the GLSL shader source.
+     *
+     * @param name Name of the sampler variable as declared in the shader.
+     * @param texture The texture instance to bind.
+     */
     auto SetTexture(std::string_view name, std::shared_ptr<Texture> texture) -> void;
 
     /**
