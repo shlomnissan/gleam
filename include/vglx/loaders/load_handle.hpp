@@ -55,7 +55,7 @@ class Texture2D;
  * @ingroup LoadersGroup
  */
 template <typename T>
-class VGLX_EXPORT LoadHandle {
+class LoadHandle {
 public:
     LoadHandle() = default;
 
