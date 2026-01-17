@@ -30,6 +30,7 @@ public:
      */
     enum class Type {
         Texture2D, ///< Two-dimensional texture.
+        DynamicTexture2D, ///< Two-dimensional dynamic GPU texture.
     };
 
     /**

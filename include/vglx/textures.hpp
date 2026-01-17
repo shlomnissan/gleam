@@ -12,4 +12,5 @@
  * @brief Texture types used in materials and rendering processes.
  */
 
+#include "vglx/textures/dynamic_texture_2d.hpp"
 #include "vglx/textures/texture_2d.hpp"
