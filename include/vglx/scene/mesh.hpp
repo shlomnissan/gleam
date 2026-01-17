@@ -92,7 +92,7 @@ public:
      *
      * @param material New material to assign.
      */
-    auto SetMaterial(std::shared_ptr<Material> material) { material_ = material; }
+    auto SetMaterial(std::shared_ptr<Material> material) -> void { material_ = material; }
 
     /**
      * @brief Returns a wireframe representation of the current geometry.
@@ -102,7 +102,7 @@ public:
      */
     [[nodiscard]] auto GetWireframeGeometry() -> std::shared_ptr<Geometry>;
 
-    virtual ~Mesh() override = default;
+    ~Mesh() override = default;
 
 private:
     /// @cond INTERNAL
