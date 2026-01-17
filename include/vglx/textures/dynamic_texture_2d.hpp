@@ -11,9 +11,10 @@
 
 #include "vglx/textures/texture.hpp"
 
+#include <cstdint>
 #include <memory>
-#include <vector>
 #include <span>
+#include <vector>
 
 namespace vglx {
 
