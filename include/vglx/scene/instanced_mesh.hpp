@@ -150,7 +150,7 @@ private:
 
     std::size_t count_;
 
-    friend class GLBuffers;
+    friend class GLVertexBuffers;
     class Impl;
     std::unique_ptr<Impl> impl_;
     /// @endcond

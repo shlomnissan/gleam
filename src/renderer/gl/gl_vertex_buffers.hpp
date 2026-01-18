@@ -20,14 +20,14 @@
 
 namespace vglx {
 
-class GLBuffers {
+class GLVertexBuffers {
 public:
-    GLBuffers() = default;
+    GLVertexBuffers() = default;
 
-    GLBuffers(const GLBuffers&) = delete;
-    GLBuffers(GLBuffers&&) = delete;
-    GLBuffers& operator=(const GLBuffers&) = delete;
-    GLBuffers& operator=(GLBuffers&&) = delete;
+    GLVertexBuffers(const GLVertexBuffers&) = delete;
+    GLVertexBuffers(GLVertexBuffers&&) = delete;
+    GLVertexBuffers& operator=(const GLVertexBuffers&) = delete;
+    GLVertexBuffers& operator=(GLVertexBuffers&&) = delete;
 
     auto Bind(const std::shared_ptr<Geometry>& geometry) -> void;
 
@@ -35,7 +35,7 @@ public:
 
     auto Reset() -> void;
 
-    ~GLBuffers();
+    ~GLVertexBuffers();
 
 private:
     std::unordered_map<GLuint, std::array<GLuint, 4>> bindings_;

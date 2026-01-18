@@ -5,7 +5,7 @@
 ===========================================================================
 */
 
-#include "renderer/gl/gl_buffers.hpp"
+#include "renderer/gl/gl_vertex_buffers.hpp"
 
 #include "vglx/math/vector4.hpp"
 
@@ -28,7 +28,7 @@ constexpr uint8_t BUFF_IDX_INSTANCE_TRANSFORM = 3;
 
 #define BUFFER_OFFSET(offset) ((void*)(offset * sizeof(GLfloat)))
 
-auto GLBuffers::Bind(const std::shared_ptr<Geometry>& geometry) -> void {
+auto GLVertexBuffers::Bind(const std::shared_ptr<Geometry>& geometry) -> void {
     auto vao = geometry->renderer_id;
     if (vao != 0 && vao == current_vao_) return;
 
@@ -42,11 +42,11 @@ auto GLBuffers::Bind(const std::shared_ptr<Geometry>& geometry) -> void {
     current_vao_ = vao;
 }
 
-auto GLBuffers::Reset() -> void {
+auto GLVertexBuffers::Reset() -> void {
     current_vao_ = 0;
 }
 
-auto GLBuffers::GenerateBuffers(Geometry* geometry) -> void {
+auto GLVertexBuffers::GenerateBuffers(Geometry* geometry) -> void {
     auto& vao = geometry->renderer_id;
     auto buffers = std::array<GLuint, 4> {};
 
@@ -107,7 +107,7 @@ auto GLBuffers::GenerateBuffers(Geometry* geometry) -> void {
     });
 }
 
-auto GLBuffers::BindInstancedMesh(InstancedMesh* mesh) -> void {
+auto GLVertexBuffers::BindInstancedMesh(InstancedMesh* mesh) -> void {
     if (mesh->impl_->transforms_buff_id == 0) {
         auto& buffers = bindings_[mesh->GetGeometry()->renderer_id];
         mesh->impl_->transforms_buff_id = buffers[BUFF_IDX_INSTANCE_TRANSFORM];
@@ -170,7 +170,7 @@ auto GLBuffers::BindInstancedMesh(InstancedMesh* mesh) -> void {
     }
 }
 
-GLBuffers::~GLBuffers() {
+GLVertexBuffers::~GLVertexBuffers() {
     for (const auto& geometry : geometries_) {
         if (auto g = geometry.lock()) g->Dispose();
     }

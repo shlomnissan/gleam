@@ -10,7 +10,7 @@
 #include "vglx/core/renderer.hpp"
 #include "vglx/scene/renderable.hpp"
 
-#include "renderer/gl/gl_buffers.hpp"
+#include "renderer/gl/gl_vertex_buffers.hpp"
 #include "renderer/gl/gl_camera.hpp"
 #include "renderer/gl/gl_lights.hpp"
 #include "renderer/gl/gl_present_pass.hpp"
@@ -49,7 +49,7 @@ public:
     ~Impl();
 
 private:
-    GLBuffers buffers_;
+    GLVertexBuffers buffers_;
     GLCamera camera_ubo_;
     GLLights lights_;
     GLPresentPass present_pass_;
