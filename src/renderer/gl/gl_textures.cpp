@@ -20,13 +20,13 @@ namespace vglx {
 
 namespace {
 
-struct TextureFormat {
+struct DynamicTextureFormat {
     int internal_format;
     int format;
     int type;
 };
 
-auto get_dynamic_texture_format(const DynamicTexture2D* tex) -> TextureFormat;
+auto get_dynamic_texture_format(const DynamicTexture2D* tex) -> DynamicTextureFormat;
 
 }
 
@@ -64,16 +64,6 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
     glGenTextures(1, &tex_id);
     glBindTexture(GL_TEXTURE_2D, tex_id);
 
-    auto f = TextureFormat {
-        .internal_format = GL_RGBA8,
-        .format = GL_RGBA,
-        .type = GL_UNSIGNED_BYTE
-    };
-
-    f.internal_format = texture->color_space == Texture::ColorSpace::Linear
-        ? GL_RGBA8
-        : GL_SRGB8_ALPHA8;
-
     glPixelStorei(
         GL_UNPACK_ALIGNMENT,
         std::to_underlying(texture->row_alignment)
@@ -81,27 +71,33 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
 
     if (texture->GetType() == Texture::Type::Texture2D) {
         auto tex = static_cast<Texture2D*>(texture);
+        auto internal_format = texture->color_space == Texture::ColorSpace::Linear
+            ? GL_RGBA8
+            : GL_SRGB8_ALPHA8;
+
         glTexImage2D(
             GL_TEXTURE_2D,
             0,
-            f.internal_format,
+            internal_format,
             tex->width,
             tex->height,
             0,
-            f.format,
-            f.type,
+            GL_RGBA,
+            GL_UNSIGNED_BYTE,
             tex->data.data()
         );
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+        if (tex->generate_mipamps) {
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     }
 
     if (texture->GetType() == Texture::Type::DynamicTexture2D) {
         auto tex = static_cast<DynamicTexture2D*>(texture);
-        f = get_dynamic_texture_format(tex);
+        auto f = get_dynamic_texture_format(tex);
         for (auto level = 0u; level < tex->mips; ++level) {
             const auto width = std::max(1, tex->width >> level);
             const auto height = std::max(1, tex->height >> level);
@@ -165,34 +161,34 @@ GLTextures::~GLTextures() {
 
 namespace {
 
-auto get_dynamic_texture_format(const DynamicTexture2D* tex) -> TextureFormat {
+auto get_dynamic_texture_format(const DynamicTexture2D* tex) -> DynamicTextureFormat {
     switch (tex->format) {
         case DynamicTexture2D::Format::RGBA8:
-            return TextureFormat {
+            return DynamicTextureFormat {
                 .internal_format = GL_RGBA8,
                 .format = GL_RGBA,
                 .type = GL_UNSIGNED_BYTE
             };
         case DynamicTexture2D::Format::RGBA16F:
-            return TextureFormat {
+            return DynamicTextureFormat {
                 .internal_format = GL_RGBA16F,
                 .format = GL_RGBA,
                 .type = GL_HALF_FLOAT
             };
         case DynamicTexture2D::Format::R16F:
-            return TextureFormat {
+            return DynamicTextureFormat {
                 .internal_format = GL_R16F,
                 .format = GL_RED,
                 .type = GL_HALF_FLOAT
             };
         case DynamicTexture2D::Format::R32F:
-            return TextureFormat {
+            return DynamicTextureFormat {
                 .internal_format = GL_R32F,
                 .format = GL_RED,
                 .type = GL_FLOAT
             };
         case DynamicTexture2D::Format::R32UI:
-            return TextureFormat {
+            return DynamicTextureFormat {
                 .internal_format = GL_R32UI,
                 .format = GL_RED_INTEGER,
                 .type = GL_UNSIGNED_INT

@@ -77,6 +77,9 @@ public:
     /// @brief Color space of the texture data.
     ColorSpace color_space = ColorSpace::sRGB;
 
+    /// @brief Enables automatic mipmap generation for this texture.
+    bool generate_mipamps {false};
+
     /**
      * @brief Identifies the concrete @ref Texture::Type "texture type".
      */

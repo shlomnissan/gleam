@@ -55,6 +55,8 @@ auto import(const fs::path& path) -> std::expected<std::shared_ptr<Texture2D>, s
         .data = std::move(data)
     });
 
+    out->generate_mipamps = true;
+
     out->SetName(path.filename().string());
 
     return out;
