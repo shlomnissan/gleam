@@ -48,6 +48,7 @@ public:
         format(params.format)
     {
         color_space = params.color_space;
+        row_alignment = RowAlignment::OneByte;
     }
 
     [[nodiscard]] static auto Create(const Parameters& params)
@@ -69,7 +70,6 @@ public:
     ) -> void;
 
 private:
-    friend class GLTextures;
 
     struct PendingUpdate {
         unsigned int mip_level;
@@ -80,6 +80,7 @@ private:
         std::vector<std::uint8_t> bytes;
     };
 
+    friend class GLTextures;
     std::vector<PendingUpdate> pending_;
 };
 

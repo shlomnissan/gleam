@@ -32,6 +32,8 @@ enum class GLTextureMapType {
 constexpr auto kReservedTextureUnits = std::to_underlying(GLTextureMapType::Reserved);
 constexpr auto kMaxTextureUnits = 16;
 
+class DynamicTexture2D;
+
 class GLTextures {
 public:
     GLTextures() = default;
@@ -53,6 +55,8 @@ private:
     std::array<GLuint, kMaxTextureUnits> current_texture_ids_ {};
 
     auto GenerateTexture(Texture* texture) const -> GLuint;
+
+    auto FlushDynamicTexture(DynamicTexture2D* texture) const -> void;
 };
 
 }
