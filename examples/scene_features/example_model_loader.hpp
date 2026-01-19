@@ -31,9 +31,9 @@ private:
     vglx::Mesh* sphere_ {nullptr};
     vglx::Node* model_ {nullptr};
 
-    std::shared_ptr<vglx::Texture2D> albedo_map_;
-    std::shared_ptr<vglx::Texture2D> normal_map_;
-    std::shared_ptr<vglx::Texture2D> specular_map_;
+    std::shared_ptr<vglx::Texture> albedo_map_;
+    std::shared_ptr<vglx::Texture> normal_map_;
+    std::shared_ptr<vglx::Texture> specular_map_;
 
     vglx::PhongMaterial* material_ {nullptr};
 

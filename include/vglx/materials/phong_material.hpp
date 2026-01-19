@@ -51,16 +51,16 @@ public:
     float shininess = 32.0f;
 
     /// @brief Albedo (diffuse) map defining base color and optional alpha channel.
-    std::shared_ptr<Texture2D> albedo_map = nullptr;
+    std::shared_ptr<Texture> albedo_map = nullptr;
 
     /// @brief Alpha map defining per-pixel opacity.
-    std::shared_ptr<Texture2D> alpha_map = nullptr;
+    std::shared_ptr<Texture> alpha_map = nullptr;
 
     /// @brief Normal map for per-pixel surface detail and lighting variation.
-    std::shared_ptr<Texture2D> normal_map = nullptr;
+    std::shared_ptr<Texture> normal_map = nullptr;
 
     /// @brief Specular map scaling the intensity of specular highlights.
-    std::shared_ptr<Texture2D> specular_map = nullptr;
+    std::shared_ptr<Texture> specular_map = nullptr;
 
     /**
      * @brief Constructs a Phong material with a given base color.

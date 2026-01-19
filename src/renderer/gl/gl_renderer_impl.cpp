@@ -150,10 +150,13 @@ auto Renderer::Impl::SetUniforms(
     static const auto kIdentity = Matrix3::Identity();
     program->SetUniform(Uniform::TextureTransform, &kIdentity);
 
-    const auto bind_texture = [&](GLTextureMapType type, std::shared_ptr<Texture2D> tex) {
+    const auto bind_texture = [&](GLTextureMapType type, std::shared_ptr<Texture> tex) {
         textures_.Bind(tex, std::to_underlying(type));
-        const auto& transform = tex->GetTransform();
-        program->SetUniform(Uniform::TextureTransform, &transform);
+        if (tex->GetType() == Texture::Type::Texture2D) {
+            const auto& transform = static_cast<Texture2D*>(tex.get())->GetTransform();
+            program->SetUniform(Uniform::TextureTransform, &transform);
+        }
+
         switch(type) {
             case GLTextureMapType::AlbedoMap:
                 program->SetUniform(Uniform::AlbedoMap, &type);

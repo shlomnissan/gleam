@@ -40,10 +40,10 @@ public:
     Color color = 0xFFFFFF;
 
     /// @brief Color texture sampled for rendering; alpha channel controls transparency.
-    std::shared_ptr<Texture2D> texture_map = nullptr;
+    std::shared_ptr<Texture> texture_map = nullptr;
 
     /// @brief Alpha-only texture providing per-pixel opacity.
-    std::shared_ptr<Texture2D> alpha_map = nullptr;
+    std::shared_ptr<Texture> alpha_map = nullptr;
 
     /**
      * @brief Constructs an unlit material.
