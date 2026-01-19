@@ -28,6 +28,10 @@ struct DynamicTextureFormat {
 
 auto get_dynamic_texture_format(const DynamicTexture2D* tex) -> DynamicTextureFormat;
 
+auto to_gl_min_filter(Texture::MinFilter f) -> int;
+
+auto to_gl_mag_filter(Texture::MagFilter f) -> int;
+
 }
 
 auto GLTextures::Bind(const std::shared_ptr<Texture>& texture, int tex_unit) -> void {
@@ -87,12 +91,9 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
             tex->data.data()
         );
 
-        if (tex->generate_mipamps) {
-            glGenerateMipmap(GL_TEXTURE_2D);
-        }
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        if (tex->generate_mipamps) glGenerateMipmap(GL_TEXTURE_2D);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, to_gl_min_filter(tex->min_filter));
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, to_gl_mag_filter(tex->mag_filter));
     }
 
     if (texture->GetType() == Texture::Type::DynamicTexture2D) {
@@ -116,8 +117,8 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
         auto max_mip = static_cast<GLint>(tex->mips - 1);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, max_mip);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, to_gl_min_filter(tex->min_filter));
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, to_gl_mag_filter(tex->mag_filter));
     }
 
     if (glGetError() != GL_NO_ERROR) {
@@ -193,6 +194,28 @@ auto get_dynamic_texture_format(const DynamicTexture2D* tex) -> DynamicTextureFo
                 .format = GL_RED_INTEGER,
                 .type = GL_UNSIGNED_INT
             };
+        default: VGLX_UNREACHABLE();
+    }
+}
+
+auto to_gl_min_filter(Texture::MinFilter f) -> int {
+    using Filter = Texture::MinFilter;
+    switch (f) {
+        case Filter::Nearest: return GL_NEAREST;
+        case Filter::Linear: return GL_LINEAR;
+        case Filter::NearestMipmapNearest: return GL_NEAREST_MIPMAP_NEAREST;
+        case Filter::LinearMipmapNearest: return GL_LINEAR_MIPMAP_NEAREST;
+        case Filter::NearestMipmapLinear: return GL_NEAREST_MIPMAP_LINEAR;
+        case Filter::LinearMipmapLinear: return GL_LINEAR_MIPMAP_LINEAR;
+        default: VGLX_UNREACHABLE();
+    }
+}
+
+auto to_gl_mag_filter(Texture::MagFilter f) -> int {
+    using Filter = Texture::MagFilter;
+    switch (f) {
+        case Filter::Nearest: return GL_NEAREST;
+        case Filter::Linear: return GL_LINEAR;
         default: VGLX_UNREACHABLE();
     }
 }

@@ -64,6 +64,33 @@ public:
     };
 
     /**
+     * @brief Enumerates supported minification filters.
+     *
+     * Minification filters control how a texture is sampled when it is rendered
+     * smaller than its native resolution. Mipmapped filters select and blend
+     * between mip levels when available.
+     */
+    enum class MinFilter {
+        Nearest, ///< Nearest-neighbor sampling.
+        Linear, ///< Linear interpolation.
+        NearestMipmapNearest, ///< Nearest mip, nearest sample.
+        LinearMipmapNearest, ///< Nearest mip, linear sample.
+        NearestMipmapLinear, ///< Linear mip, nearest sample.
+        LinearMipmapLinear ///< Linear mip, linear sample.
+    };
+
+    /**
+     * @brief Enumerates supported magnification filters.
+     *
+     * Magnification filters control how a texture is sampled when it is rendered
+     * larger than its native resolution.
+     */
+    enum class MagFilter {
+        Nearest, ///< Nearest-neighbor sampling.
+        Linear ///< Linear interpolation.
+    };
+
+    /**
      * @brief Renderer-specific texture handle.
      *
      * Typically corresponds to the underlying graphics API object identifier,
@@ -76,6 +103,12 @@ public:
 
     /// @brief Color space of the texture data.
     ColorSpace color_space = ColorSpace::sRGB;
+
+    /// @brief Minification filter used when sampling the texture.
+    MinFilter min_filter = MinFilter::Linear;
+
+    /// @brief Magnification filter used when sampling the texture.
+    MagFilter mag_filter = MagFilter::Linear;
 
     /// @brief Enables automatic mipmap generation for this texture.
     bool generate_mipamps {false};

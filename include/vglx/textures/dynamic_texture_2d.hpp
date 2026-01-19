@@ -41,15 +41,7 @@ public:
     const unsigned int mips;
     const Format format;
 
-    explicit DynamicTexture2D(const Parameters& params) :
-        width(params.width),
-        height(params.height),
-        mips(params.mips),
-        format(params.format)
-    {
-        color_space = params.color_space;
-        row_alignment = RowAlignment::OneByte;
-    }
+    explicit DynamicTexture2D(const Parameters& params);
 
     [[nodiscard]] static auto Create(const Parameters& params)
       -> std::shared_ptr<DynamicTexture2D> {

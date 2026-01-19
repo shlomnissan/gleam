@@ -56,6 +56,8 @@ auto import(const fs::path& path) -> std::expected<std::shared_ptr<Texture2D>, s
     });
 
     out->generate_mipamps = true;
+    out->min_filter = Texture::MinFilter::LinearMipmapLinear;
+    out->mag_filter = Texture::MagFilter::Linear;
 
     out->SetName(path.filename().string());
 
