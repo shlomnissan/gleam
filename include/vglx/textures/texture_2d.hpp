@@ -42,15 +42,6 @@ namespace vglx {
  */
 class VGLX_EXPORT Texture2D : public Texture {
 public:
-    /// @brief Texture width in pixels.
-    unsigned width;
-
-    /// @brief Texture height in pixels.
-    unsigned height;
-
-    /// @brief Raw texture pixel data.
-    std::vector<uint8_t> data;
-
     /**
      * @brief Parameters for constructing a @ref Texture2D object.
      */
@@ -60,6 +51,15 @@ public:
         ColorSpace color_space {ColorSpace::sRGB}; ///< Color space for texture data.
         std::vector<uint8_t> data; ///< Raw texture pixel data.
     };
+
+    /// @brief Texture width in pixels.
+    unsigned width;
+
+    /// @brief Texture height in pixels.
+    unsigned height;
+
+    /// @brief Raw texture pixel data.
+    std::vector<uint8_t> data;
 
     /**
      * @brief Constructs a 2D texture.
