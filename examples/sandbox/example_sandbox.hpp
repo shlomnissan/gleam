@@ -7,9 +7,12 @@
 
 #pragma once
 
-#include <memory>
-
 #include "example_scene.hpp"
+
+#include <vglx/core.hpp>
+#include <vglx/scene.hpp>
+
+#include <memory>
 
 class ExampleSandbox : public ExampleScene {
 public:
@@ -17,7 +20,7 @@ public:
 
     auto OnAttached(vglx::SharedContextPointer context) -> void override;
 
-    auto OnUpdate([[maybe_unused]] float delta) -> void override;
+    auto OnKeyboardEvent(vglx::KeyboardEvent* event) -> void override;
 
 private:
     std::shared_ptr<vglx::Node> model_;

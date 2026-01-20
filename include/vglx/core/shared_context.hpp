@@ -91,7 +91,6 @@ struct VGLX_EXPORT SharedContext {
      */
     int window_height;
 
-
     /**
      * @brief Texture loader.
      *
