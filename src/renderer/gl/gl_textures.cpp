@@ -34,7 +34,7 @@ auto to_gl_mag_filter(Texture::MagFilter f) -> int;
 
 }
 
-auto GLTextures::Bind(const std::shared_ptr<Texture>& texture, int tex_unit) -> void {
+auto GLTextures::Bind(Texture* texture, int tex_unit) -> void {
     VGLX_ASSERT(
         tex_unit >= 0 && tex_unit < kMaxTextureUnits,
         "GLTextures::Bind texture unit out of range"
@@ -42,10 +42,9 @@ auto GLTextures::Bind(const std::shared_ptr<Texture>& texture, int tex_unit) -> 
 
     glActiveTexture(GL_TEXTURE0 + tex_unit);
 
-    auto raw = texture.get();
     auto tex_id = texture->renderer_id;
     if (tex_id == 0) {
-        tex_id = GenerateTexture(raw);
+        tex_id = GenerateTexture(texture);
     }
 
     if (tex_id != current_texture_ids_[tex_unit]) {
@@ -53,8 +52,8 @@ auto GLTextures::Bind(const std::shared_ptr<Texture>& texture, int tex_unit) -> 
         current_texture_ids_[tex_unit] = tex_id;
     }
 
-    if (raw->GetType() == Texture::Type::DynamicTexture2D) {
-        FlushDynamicTexture(static_cast<DynamicTexture2D*>(raw));
+    if (texture->GetType() == Texture::Type::DynamicTexture2D) {
+        FlushDynamicTexture(static_cast<DynamicTexture2D*>(texture));
     }
 }
 

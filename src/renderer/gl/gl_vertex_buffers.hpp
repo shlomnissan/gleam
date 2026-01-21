@@ -11,10 +11,7 @@
 #include "vglx/scene/instanced_mesh.hpp"
 
 #include <array>
-#include <memory>
-#include <string_view>
 #include <unordered_map>
-#include <vector>
 
 #include <glad/glad.h>
 
@@ -32,7 +29,7 @@ public:
     GLVertexBuffers(GLVertexBuffers&&) = delete;
     GLVertexBuffers& operator=(GLVertexBuffers&&) = delete;
 
-    auto Bind(const std::shared_ptr<Geometry>& geometry) -> void;
+    auto Bind(Geometry* geometry) -> void;
 
     auto BindInstancedMesh(InstancedMesh* mesh) -> void;
 

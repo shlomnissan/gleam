@@ -10,7 +10,6 @@
 #include "vglx/textures/texture.hpp"
 
 #include <array>
-#include <memory>
 #include <utility>
 
 #include <glad/glad.h>
@@ -43,7 +42,7 @@ public:
     GLTextures(GLTextures&&) = delete;
     GLTextures& operator=(GLTextures&&) = delete;
 
-    auto Bind(const std::shared_ptr<Texture>& texture, int tex_unit) -> void;
+    auto Bind(Texture* texture, int tex_unit) -> void;
 
     auto Reset() -> void;
 

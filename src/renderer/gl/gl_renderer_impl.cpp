@@ -88,10 +88,10 @@ auto Renderer::Impl::RenderObject(Renderable* renderable, Scene* scene, Camera* 
     state_.ProcessMaterial(material);
     if (material->wireframe && Renderable::IsMeshType(renderable)) {
         const auto mesh = static_cast<Mesh*>(renderable);
-        buffers_.Bind(mesh->GetWireframeGeometry());
         geometry = mesh->GetWireframeGeometry().get();
+        buffers_.Bind(geometry);
     } else {
-        buffers_.Bind(renderable->GetGeometry());
+        buffers_.Bind(geometry);
     }
 
     SetUniforms(program, &attrs, renderable, camera, scene);
@@ -151,7 +151,7 @@ auto Renderer::Impl::SetUniforms(
     program->SetUniform(Uniform::TextureTransform, &kIdentity);
 
     const auto bind_texture = [&](GLTextureMapType type, std::shared_ptr<Texture> tex) {
-        textures_.Bind(tex, std::to_underlying(type));
+        textures_.Bind(tex.get(), std::to_underlying(type));
         if (tex->GetType() == Texture::Type::Texture2D) {
             const auto& transform = static_cast<Texture2D*>(tex.get())->GetTransform();
             program->SetUniform(Uniform::TextureTransform, &transform);
@@ -219,7 +219,7 @@ auto Renderer::Impl::SetUniforms(
         }
         for (const auto& [name, tex] : m->textures_) {
             const int tex_unit = kReservedTextureUnits + next_texture_unit_++;
-            textures_.Bind(tex, tex_unit);
+            textures_.Bind(tex.get(), tex_unit);
             program->SetUnknownUniform(name, &tex_unit);
 
             if (tex->GetType() == Texture::Type::Texture2D) {

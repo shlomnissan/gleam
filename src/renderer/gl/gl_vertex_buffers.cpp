@@ -28,12 +28,12 @@ constexpr uint8_t BUFF_IDX_INSTANCE_TRANSFORM = 3;
 
 #define BUFFER_OFFSET(offset) ((void*)(offset * sizeof(GLfloat)))
 
-auto GLVertexBuffers::Bind(const std::shared_ptr<Geometry>& geometry) -> void {
+auto GLVertexBuffers::Bind(Geometry* geometry) -> void {
     auto vao = geometry->renderer_id;
     if (vao != 0 && vao == current_vao_) return;
 
     if (vao == 0) {
-        GenerateBuffers(geometry.get());
+        GenerateBuffers(geometry);
         vao = geometry->renderer_id;
     }
 
