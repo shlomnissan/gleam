@@ -37,6 +37,8 @@ public:
         return std::make_shared<RenderTarget>(params);
     }
 
+    ~RenderTarget();
+
 private:
     class Impl;
     std::unique_ptr<Impl> impl_;

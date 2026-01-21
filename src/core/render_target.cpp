@@ -22,6 +22,8 @@ RenderTarget::RenderTarget(const Parameters& params)
     height(params.height),
     has_depth(params.has_depth),
     enable_readback(params.enable_readback),
-    impl_(std::make_unique<RenderTarget::Impl>()) {}
+    impl_(std::make_unique<Impl>()) {}
+
+RenderTarget::~RenderTarget() = default;
 
 }

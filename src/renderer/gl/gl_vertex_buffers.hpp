@@ -7,15 +7,15 @@
 
 #pragma once
 
-#include "vglx/geometries/geometry.hpp"
-#include "vglx/scene/instanced_mesh.hpp"
-
 #include <array>
 #include <unordered_map>
 
 #include <glad/glad.h>
 
 namespace vglx {
+
+class Geometry;
+class InstancedMesh;
 
 class GLVertexBuffers {
 public:

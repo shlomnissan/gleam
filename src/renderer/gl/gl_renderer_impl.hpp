@@ -10,14 +10,15 @@
 #include "vglx/core/renderer.hpp"
 #include "vglx/scene/renderable.hpp"
 
-#include "renderer/gl/gl_vertex_buffers.hpp"
 #include "renderer/gl/gl_camera.hpp"
+#include "renderer/gl/gl_framebuffers.hpp"
 #include "renderer/gl/gl_lights.hpp"
 #include "renderer/gl/gl_present_pass.hpp"
 #include "renderer/gl/gl_programs.hpp"
 #include "renderer/gl/gl_scene_buffer.hpp"
 #include "renderer/gl/gl_state.hpp"
 #include "renderer/gl/gl_textures.hpp"
+#include "renderer/gl/gl_vertex_buffers.hpp"
 
 #include <memory>
 
@@ -49,14 +50,15 @@ public:
     ~Impl();
 
 private:
-    GLVertexBuffers buffers_;
     GLCamera camera_ubo_;
+    GLFramebuffers framebuffers_;
     GLLights lights_;
     GLPresentPass present_pass_;
     GLPrograms programs_;
     GLSceneBuffer scene_buffer_;
     GLState state_;
     GLTextures textures_;
+    GLVertexBuffers buffers_;
 
     Renderer::Parameters params_;
 

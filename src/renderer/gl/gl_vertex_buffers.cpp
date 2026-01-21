@@ -7,7 +7,9 @@
 
 #include "renderer/gl/gl_vertex_buffers.hpp"
 
+#include "vglx/geometries/geometry.hpp"
 #include "vglx/math/vector4.hpp"
+#include "vglx/scene/instanced_mesh.hpp"
 
 #include "scene/instanced_mesh_impl.hpp"
 #include "utilities/logger.hpp"

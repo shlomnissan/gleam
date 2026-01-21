@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include "vglx/textures/texture.hpp"
-
 #include <array>
 #include <utility>
 
@@ -28,6 +26,7 @@ enum class GLTextureMapType {
 constexpr auto kReservedTextureUnits = std::to_underlying(GLTextureMapType::Reserved);
 constexpr auto kMaxTextureUnits = 16;
 
+class Texture;
 class DynamicTexture2D;
 
 class GLTextures {
