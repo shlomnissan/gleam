@@ -46,7 +46,6 @@ auto GLTextures::Bind(const std::shared_ptr<Texture>& texture, int tex_unit) -> 
     auto tex_id = texture->renderer_id;
     if (tex_id == 0) {
         tex_id = GenerateTexture(raw);
-        textures_.emplace_back(texture);
     }
 
     if (tex_id != current_texture_ids_[tex_unit]) {
@@ -125,7 +124,7 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
         Logger::Log(LogLevel::Error, "OpenGL error failed to generate texture");
     }
 
-    texture->OnDispose([this](Disposable* target) {
+    texture->OnDispose([](Disposable* target) {
         glDeleteTextures(1, &(static_cast<Texture*>(target)->renderer_id));
         Logger::Log(LogLevel::Debug, "Texture buffer cleared {}", *static_cast<Texture*>(target));
     });
@@ -152,12 +151,6 @@ auto GLTextures::FlushDynamicTexture(DynamicTexture2D* texture) const -> void {
     }
 
     texture->pending_.clear();
-}
-
-GLTextures::~GLTextures() {
-    for (const auto& texture : textures_) {
-        if (auto t = texture.lock()) t->Dispose();
-    }
 }
 
 namespace {

@@ -11,10 +11,7 @@
 
 #include <array>
 #include <memory>
-#include <string_view>
-#include <unordered_map>
 #include <utility>
-#include <vector>
 
 #include <glad/glad.h>
 
@@ -38,20 +35,19 @@ class GLTextures {
 public:
     GLTextures() = default;
 
+    // delete copy constructor and assignment operator
     GLTextures(const GLTextures&) = delete;
-    GLTextures(GLTextures&&) = delete;
     GLTextures& operator=(const GLTextures&) = delete;
+
+    // delete move constructor and assignment operator
+    GLTextures(GLTextures&&) = delete;
     GLTextures& operator=(GLTextures&&) = delete;
 
     auto Bind(const std::shared_ptr<Texture>& texture, int tex_unit) -> void;
 
     auto Reset() -> void;
 
-    ~GLTextures();
-
 private:
-    std::vector<std::weak_ptr<Texture>> textures_;
-
     std::array<GLuint, kMaxTextureUnits> current_texture_ids_ {};
 
     auto GenerateTexture(Texture* texture) const -> GLuint;
