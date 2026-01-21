@@ -11,6 +11,9 @@
 
 namespace vglx {
 
+auto GLFramebuffers::EnsureFramebuffer(RenderTarget* target) -> void {
+}
+
 auto GLFramebuffers::Begin(RenderTarget* target) -> void {
 }
 

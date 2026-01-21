@@ -11,18 +11,11 @@
 
 namespace vglx {
 
-struct RenderTarget::Impl {
-    unsigned int renderer_id;
-
-    std::shared_ptr<Texture> color_attachment;
-};
-
 RenderTarget::RenderTarget(const Parameters& params)
   : width(params.width),
     height(params.height),
     has_depth(params.has_depth),
-    enable_readback(params.enable_readback),
-    impl_(std::make_unique<Impl>()) {}
+    enable_readback(params.enable_readback) {}
 
 RenderTarget::~RenderTarget() = default;
 

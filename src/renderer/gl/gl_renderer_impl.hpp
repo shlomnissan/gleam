@@ -25,6 +25,7 @@
 namespace vglx {
 
 class RenderLists;
+class RenderTarget;
 
 class Renderer::Impl {
 public:
@@ -37,7 +38,7 @@ public:
 
     [[nodiscard]] auto Initialize() -> std::expected<void, std::string>;
 
-    auto Render(Scene* scene, Camera* camera) -> void;
+    auto Render(Scene* scene, Camera* camera, RenderTarget* target = nullptr) -> void;
 
     auto SetViewport(int x, int y, int width, int height) -> void;
 
@@ -58,7 +59,7 @@ private:
     GLSceneBuffer scene_buffer_;
     GLState state_;
     GLTextures textures_;
-    GLVertexBuffers buffers_;
+    GLVertexBuffers vertex_buffers_;
 
     Renderer::Parameters params_;
 

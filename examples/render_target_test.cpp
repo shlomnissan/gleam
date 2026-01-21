@@ -7,8 +7,6 @@
 
 #include <vglx/vglx.hpp>
 
-#include "examples.hpp"
-
 #include <print>
 
 using namespace vglx;
@@ -21,9 +19,29 @@ constexpr auto kSampleCount {1};
 
 }
 
+class Scene0 : public Scene {
+public:
+    Scene0() {
+        Add(Mesh::Create(BoxGeometry::Create(), UnlitMaterial::Create(0xFF0000)));
+    }
+};
+
+class Scene1 : public Scene {
+public:
+    Scene1() {
+        Add(Mesh::Create(BoxGeometry::Create(), UnlitMaterial::Create(0x00FF00)));
+    }
+};
+
+auto make_scene_1(SharedContextPointer context) {
+    auto scene = Scene::Create();
+    scene->SetContext(context);
+    return scene;
+}
+
 auto main() -> int {
     auto window = Window {{
-        .title = "Examples (Direct Initialization)",
+        .title = "Render Target Test",
         .width = kWindowWidth,
         .height = kWindowHeight,
         .sample_count = kSampleCount,
@@ -40,7 +58,7 @@ auto main() -> int {
         .framebuffer_width = window.FramebufferWidth(),
         .framebuffer_height = window.FramebufferHeight(),
         .sample_count = kSampleCount,
-        .clear_color = 0x444444
+        .clear_color = Color {0.4f, 0.4f, 0.4f}
     }};
 
     auto init_renderer = renderer.Initialize();
@@ -50,61 +68,50 @@ auto main() -> int {
     }
 
     auto camera = PerspectiveCamera::Create({
-        .fov = math::DegToRad(60.0f),
+        .fov = vglx::math::DegToRad(60.0f),
         .aspect = window.AspectRatio(),
         .near = 0.1f,
         .far = 1000.0f
     });
 
-    auto load_scheduler = std::make_unique<LoadScheduler>();
+    camera->TranslateZ(3.0f);
 
+    auto load_scheduler = std::make_unique<LoadScheduler>();
     auto context = SharedContext::Create(
         &window,
         camera.get(),
         load_scheduler.get()
     );
 
-    auto scene = std::unique_ptr<Scene> {};
-    auto examples = Examples {[&scene, &context](std::unique_ptr<Scene> sc){
-        scene = std::move(sc);
-        scene->SetContext(context.get());
-    }};
-
-    scene = examples.GetScene();
-    scene->SetContext(context.get());
-
-    window.OnResize([&](const ResizeParameters& params){
-        context->framebuffer_width = params.framebuffer_width;
-        context->framebuffer_height = params.framebuffer_height;
-        context->window_width = params.window_width;
-        context->window_height = params.window_height;
-        renderer.SetViewport(
-            0, 0,
-            params.framebuffer_width,
-            params.framebuffer_height
-        );
-        camera->Resize(params.window_width, params.window_height);
+    auto target = RenderTarget::Create({
+        .width = window.FramebufferWidth(),
+        .height = window.FramebufferHeight(),
+        .has_depth = true,
+        .enable_readback = true
     });
 
-    auto timer = FrameTimer {true}; // auto-start
-    auto stats = Stats {};
+    auto scene_0 = std::make_shared<Scene0>();
+    scene_0->SetContext(context.get());
 
+    auto scene_1 = std::make_shared<Scene1>();
+    scene_1->SetContext(context.get());
+
+    auto timer = FrameTimer {true}; // auto-start
     while(!window.ShouldClose()) {
         window.PollEvents();
-        load_scheduler->Pump();
-
-        const auto dt = timer.Tick();
-        scene->Advance(dt);
-
         window.BeginUIFrame();
-        examples.Draw();
-        stats.Draw();
+        load_scheduler->Pump();
+        const auto dt = timer.Tick();
 
-        stats.BeforeRender();
-        renderer.Render(scene.get(), camera.get());
+        scene_0->Advance(dt);
+        renderer.SetClearColor({0.4f, 0.4f, 0.4f}); // linear
+        renderer.Render(scene_0.get(), camera.get(), target.get());
+
+        scene_1->Advance(dt);
+        renderer.SetClearColor(0x444444); // sRGB
+        renderer.Render(scene_1.get(), camera.get());
+
         window.EndUIFrame();
-
-        stats.AfterRender(renderer.RenderedObjectsPerFrame());
         window.SwapBuffers();
     }
 

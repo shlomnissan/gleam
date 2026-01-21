@@ -30,6 +30,8 @@ public:
 
     const bool enable_readback;
 
+    unsigned int renderer_id;
+
     explicit RenderTarget(const Parameters& params);
 
     [[nodiscard]] static auto Create(const Parameters& params)
@@ -38,10 +40,6 @@ public:
     }
 
     ~RenderTarget();
-
-private:
-    class Impl;
-    std::unique_ptr<Impl> impl_;
 };
 
 }

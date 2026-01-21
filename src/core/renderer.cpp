@@ -7,6 +7,8 @@
 
 #include "vglx/core/renderer.hpp"
 
+#include "vglx/core/render_target.hpp"
+
 #include "renderer/gl/gl_renderer_impl.hpp"
 
 namespace vglx {
@@ -22,8 +24,8 @@ auto Renderer::Initialize() -> std::expected<void, std::string> {
     return impl_->Initialize();
 }
 
-auto Renderer::Render(Scene* scene, Camera* camera) -> void {
-    impl_->Render(scene, camera);
+auto Renderer::Render(Scene* scene, Camera* camera, RenderTarget* target) -> void {
+    impl_->Render(scene, camera, target);
 }
 
 auto Renderer::SetViewport(int x, int y, int width, int height) -> void {

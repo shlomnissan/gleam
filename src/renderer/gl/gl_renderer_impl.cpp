@@ -7,6 +7,7 @@
 
 #include "renderer/gl/gl_renderer_impl.hpp"
 
+#include "vglx/core/render_target.hpp"
 #include "vglx/materials/phong_material.hpp"
 #include "vglx/materials/shader_material.hpp"
 #include "vglx/materials/sprite_material.hpp"
@@ -89,9 +90,9 @@ auto Renderer::Impl::RenderObject(Renderable* renderable, Scene* scene, Camera* 
     if (material->wireframe && Renderable::IsMeshType(renderable)) {
         const auto mesh = static_cast<Mesh*>(renderable);
         geometry = mesh->GetWireframeGeometry().get();
-        buffers_.Bind(geometry);
+        vertex_buffers_.Bind(geometry);
     } else {
-        buffers_.Bind(geometry);
+        vertex_buffers_.Bind(geometry);
     }
 
     SetUniforms(program, &attrs, renderable, camera, scene);
@@ -119,7 +120,7 @@ auto Renderer::Impl::RenderObject(Renderable* renderable, Scene* scene, Camera* 
     if (renderable->GetNodeType() == Node::Type::InstancedMesh) {
         const auto instanced = static_cast<InstancedMesh*>(renderable);
         const auto count = instanced->Count();
-        buffers_.BindInstancedMesh(instanced);
+        vertex_buffers_.BindInstancedMesh(instanced);
 
         index_size
             ? glDrawElementsInstanced(primitive, index_size, GL_UNSIGNED_INT, nullptr, count)
@@ -262,8 +263,14 @@ auto Renderer::Impl::ProcessLights(Camera* camera) -> void {
     if (lights_.HasLights()) lights_.Update();
 }
 
-auto Renderer::Impl::Render(Scene* scene, Camera* camera) -> void {
-    scene_buffer_.Begin();
+auto Renderer::Impl::Render(Scene* scene, Camera* camera, RenderTarget* target) -> void {
+    const auto use_default_target = target == nullptr;
+
+    if (use_default_target) {
+        scene_buffer_.Begin();
+    } else {
+        framebuffers_.Begin(target);
+    }
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -275,13 +282,19 @@ auto Renderer::Impl::Render(Scene* scene, Camera* camera) -> void {
 
     RenderObjects(scene, camera);
 
-    scene_buffer_.End();
+    if (use_default_target) {
+        scene_buffer_.End();
+    } else {
+        framebuffers_.End(target);
+    }
 
     textures_.Reset();
-    buffers_.Reset();
+    vertex_buffers_.Reset();
     state_.Reset();
 
-    present_pass_.Present(scene_buffer_);
+    if (use_default_target) {
+        present_pass_.Present(scene_buffer_);
+    }
 }
 
 auto Renderer::Impl::SetViewport(int x, int y, int width, int height) -> void {

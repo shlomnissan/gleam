@@ -9,9 +9,12 @@
 
 #include <glad/glad.h>
 
+#include "renderer/gl/gl_textures.hpp"
+
 namespace vglx {
 
 class RenderTarget;
+class GLTextures;
 
 class GLFramebuffers {
 public:
@@ -33,6 +36,8 @@ public:
 
 private:
     GLuint current_fbo_ {0};
+
+    auto EnsureFramebuffer(RenderTarget* target) -> void;
 };
 
 }

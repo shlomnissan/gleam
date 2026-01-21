@@ -18,6 +18,8 @@
 
 namespace vglx {
 
+class RenderTarget;
+
 /**
  * @brief Renderer interface for drawing a scene with a given camera.
  *
@@ -93,7 +95,7 @@ public:
      * @param scene Pointer to the scene to render.
      * @param camera Pointer to the active camera.
      */
-    auto Render(Scene* scene, Camera* camera) -> void;
+    auto Render(Scene* scene, Camera* camera, RenderTarget* target = nullptr) -> void;
 
     /**
      * @brief Sets the active viewport rectangle in pixels.
