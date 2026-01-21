@@ -35,7 +35,6 @@ auto GLVertexBuffers::Bind(const std::shared_ptr<Geometry>& geometry) -> void {
     if (vao == 0) {
         GenerateBuffers(geometry.get());
         vao = geometry->renderer_id;
-        geometries_.emplace_back(geometry);
     }
 
     glBindVertexArray(vao);
@@ -96,15 +95,13 @@ auto GLVertexBuffers::GenerateBuffers(Geometry* geometry) -> void {
         );
     }
 
-    bindings_.try_emplace(vao, std::move(buffers));
-
-    geometry->OnDispose([this](Disposable* target){
-        const auto vao = static_cast<Geometry*>(target)->renderer_id;
-        auto& buffers = this->bindings_[vao];
+    geometry->OnDispose([this, &buffers, vao](Disposable* target){
         glDeleteBuffers(buffers.size(), buffers.data());
         Logger::Log(LogLevel::Debug, "Geometry buffer cleared {}", *static_cast<Geometry*>(target));
         this->bindings_.erase(vao);
     });
+
+    bindings_.try_emplace(vao, std::move(buffers));
 }
 
 auto GLVertexBuffers::BindInstancedMesh(InstancedMesh* mesh) -> void {
@@ -167,12 +164,6 @@ auto GLVertexBuffers::BindInstancedMesh(InstancedMesh* mesh) -> void {
             GL_DYNAMIC_DRAW
         );
         mesh->impl_->colors_touched = false;
-    }
-}
-
-GLVertexBuffers::~GLVertexBuffers() {
-    for (const auto& geometry : geometries_) {
-        if (auto g = geometry.lock()) g->Dispose();
     }
 }
 

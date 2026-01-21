@@ -24,9 +24,12 @@ class GLVertexBuffers {
 public:
     GLVertexBuffers() = default;
 
+    // delete copy constructor and assignment operator
     GLVertexBuffers(const GLVertexBuffers&) = delete;
-    GLVertexBuffers(GLVertexBuffers&&) = delete;
     GLVertexBuffers& operator=(const GLVertexBuffers&) = delete;
+
+    // delete move constructor and assignment operator
+    GLVertexBuffers(GLVertexBuffers&&) = delete;
     GLVertexBuffers& operator=(GLVertexBuffers&&) = delete;
 
     auto Bind(const std::shared_ptr<Geometry>& geometry) -> void;
@@ -35,12 +38,8 @@ public:
 
     auto Reset() -> void;
 
-    ~GLVertexBuffers();
-
 private:
     std::unordered_map<GLuint, std::array<GLuint, 4>> bindings_;
-
-    std::vector<std::weak_ptr<Geometry>> geometries_;
 
     GLuint current_vao_ {0};
 
