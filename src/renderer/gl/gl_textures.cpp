@@ -15,6 +15,7 @@
 #include "utilities/assert.hpp"
 
 #include <algorithm>
+#include <memory>
 #include <utility>
 
 namespace vglx {
@@ -35,7 +36,7 @@ auto to_gl_mag_filter(Texture::MagFilter f) -> int;
 
 }
 
-auto GLTextures::Bind(Texture* texture, int tex_unit) -> void {
+auto GLTextures::Bind(const std::shared_ptr<Texture>& texture, int tex_unit) -> void {
     VGLX_ASSERT(
         tex_unit >= 0 && tex_unit < kMaxTextureUnits,
         "GLTextures::Bind texture unit out of range"
@@ -45,7 +46,8 @@ auto GLTextures::Bind(Texture* texture, int tex_unit) -> void {
 
     auto tex_id = texture->renderer_id;
     if (tex_id == 0) {
-        tex_id = GenerateTexture(texture);
+        tex_id = GenerateTexture(texture.get());
+        textures_.emplace_back(texture);
     }
 
     if (tex_id != current_texture_ids_[tex_unit]) {
@@ -54,7 +56,7 @@ auto GLTextures::Bind(Texture* texture, int tex_unit) -> void {
     }
 
     if (texture->GetType() == Texture::Type::DynamicTexture2D) {
-        FlushDynamicTexture(static_cast<DynamicTexture2D*>(texture));
+        FlushDynamicTexture(static_cast<DynamicTexture2D*>(texture.get()));
     }
 }
 
@@ -151,6 +153,19 @@ auto GLTextures::FlushDynamicTexture(DynamicTexture2D* texture) const -> void {
     }
 
     texture->pending_.clear();
+}
+
+GLTextures::~GLTextures() {
+    // Ensure GPU resources owned by texture objects are released
+    // while the OpenGL context is still valid.
+    //
+    // Texture instances may outlive the renderer (e.g. due to static
+    // references in examples). By explicitly disposing them here, we
+    // avoid calling glDelete* from late static destructors after the
+    // OpenGL context has already been destroyed.
+    for (const auto& texture : textures_) {
+        if (auto t = texture.lock()) t->Dispose();
+    }
 }
 
 namespace {

@@ -30,13 +30,14 @@ constexpr uint8_t BUFF_IDX_INSTANCE_TRANSFORM = 3;
 
 #define BUFFER_OFFSET(offset) ((void*)(offset * sizeof(GLfloat)))
 
-auto GLVertexBuffers::Bind(Geometry* geometry) -> void {
+auto GLVertexBuffers::Bind(const std::shared_ptr<Geometry>& geometry) -> void {
     auto vao = geometry->renderer_id;
     if (vao != 0 && vao == current_vao_) return;
 
     if (vao == 0) {
-        GenerateBuffers(geometry);
+        GenerateBuffers(geometry.get());
         vao = geometry->renderer_id;
+        geometries_.emplace_back(geometry);
     }
 
     glBindVertexArray(vao);
@@ -97,7 +98,7 @@ auto GLVertexBuffers::GenerateBuffers(Geometry* geometry) -> void {
         );
     }
 
-    geometry->OnDispose([this, &buffers, vao](Disposable* target){
+    geometry->OnDispose([this, buffers, vao](Disposable* target){
         glDeleteBuffers(buffers.size(), buffers.data());
         Logger::Log(LogLevel::Debug, "Geometry buffer cleared {}", *static_cast<Geometry*>(target));
         this->bindings_.erase(vao);
@@ -166,6 +167,19 @@ auto GLVertexBuffers::BindInstancedMesh(InstancedMesh* mesh) -> void {
             GL_DYNAMIC_DRAW
         );
         mesh->impl_->colors_touched = false;
+    }
+}
+
+GLVertexBuffers::~GLVertexBuffers() {
+    // Ensure GPU resources owned by geometry objects are released
+    // while the OpenGL context is still valid.
+    //
+    // Geometry instances may outlive the renderer (e.g. due to static
+    // references in examples). By explicitly disposing them here, we
+    // avoid calling glDelete* from late static destructors after the
+    // OpenGL context has already been destroyed.
+    for (const auto& geometry : geometries_) {
+        if (auto g = geometry.lock()) g->Dispose();
     }
 }
 
