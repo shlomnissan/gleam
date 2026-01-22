@@ -146,7 +146,7 @@ public:
      *
      * @param target Render target whose color texture should be retrieved.
      */
-    [[nodiscard]] auto GetTextureFromRenderTarget(RenderTarget* target)
+    [[nodiscard]] auto CreateTextureView(RenderTarget* target)
         -> std::shared_ptr<Texture2D>;
 
     virtual ~Renderer();

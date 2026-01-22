@@ -22,7 +22,6 @@ public:
         int width {0};
         int height {0};
         bool has_depth {true};
-        bool enable_readback {false};
     };
 
     const int width;
@@ -30,8 +29,6 @@ public:
     const int height;
 
     const bool has_depth;
-
-    const bool enable_readback;
 
     unsigned int renderer_id;
 

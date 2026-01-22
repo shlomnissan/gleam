@@ -14,8 +14,7 @@ namespace vglx {
 RenderTarget::RenderTarget(const Parameters& params)
   : width(params.width),
     height(params.height),
-    has_depth(params.has_depth),
-    enable_readback(params.enable_readback) {}
+    has_depth(params.has_depth) {}
 
 RenderTarget::~RenderTarget() {
     Disposable::Dispose();

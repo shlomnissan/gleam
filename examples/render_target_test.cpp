@@ -22,15 +22,34 @@ constexpr auto kSampleCount {1};
 class Scene0 : public Scene {
 public:
     Scene0() {
-        Add(Mesh::Create(BoxGeometry::Create(), UnlitMaterial::Create(0xFF0000)));
+        mesh_ = Add(Mesh::Create(BoxGeometry::Create(), UnlitMaterial::Create(0xFF0000)));
     }
+
+    auto OnUpdate(float delta) -> void override {
+        mesh_->RotateX(1.0f * delta);
+        mesh_->RotateY(1.0f * delta);
+    }
+
+private:
+    Mesh* mesh_ {nullptr};
 };
 
 class Scene1 : public Scene {
 public:
-    Scene1() {
-        Add(Mesh::Create(BoxGeometry::Create(), UnlitMaterial::Create(0x00FF00)));
+    Scene1(const std::shared_ptr<Texture2D>& texture) {
+        auto material = UnlitMaterial::Create(0xFFFFFF);
+        material->texture_map = texture;
+
+        mesh_ = Add(Mesh::Create(BoxGeometry::Create(), material));
     }
+
+    auto OnUpdate(float delta) -> void override {
+        mesh_->RotateX(1.0f * delta);
+        mesh_->RotateY(1.0f * delta);
+    }
+
+private:
+    Mesh* mesh_ {nullptr};
 };
 
 auto make_scene_1(SharedContextPointer context) {
@@ -86,14 +105,14 @@ auto main() -> int {
     auto target = RenderTarget::Create({
         .width = window.FramebufferWidth(),
         .height = window.FramebufferHeight(),
-        .has_depth = true,
-        .enable_readback = true
+        .has_depth = true
     });
 
     auto scene_0 = std::make_shared<Scene0>();
     scene_0->SetContext(context.get());
 
-    auto scene_1 = std::make_shared<Scene1>();
+    auto texture = renderer.CreateTextureView(target.get());
+    auto scene_1 = std::make_shared<Scene1>(texture);
     scene_1->SetContext(context.get());
 
     auto timer = FrameTimer {true}; // auto-start
@@ -104,11 +123,11 @@ auto main() -> int {
         const auto dt = timer.Tick();
 
         scene_0->Advance(dt);
-        renderer.SetClearColor({0.4f, 0.4f, 0.4f}); // linear
+        renderer.SetClearColor(0x000080);
         renderer.Render(scene_0.get(), camera.get(), target.get());
 
         scene_1->Advance(dt);
-        renderer.SetClearColor(0x444444); // sRGB
+        renderer.SetClearColor(0x444444);
         renderer.Render(scene_1.get(), camera.get());
 
         window.EndUIFrame();

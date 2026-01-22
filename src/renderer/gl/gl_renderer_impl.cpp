@@ -306,7 +306,7 @@ auto Renderer::Impl::SetClearColor(const Color& color) -> void {
     state_.SetClearColor(color);
 }
 
-auto Renderer::Impl::GetTextureFromRenderTarget(RenderTarget* target) -> std::shared_ptr<Texture2D> {
+auto Renderer::Impl::CreateTextureView(RenderTarget* target) -> std::shared_ptr<Texture2D> {
     const auto tex_id = framebuffers_.GetColorAttachment(target);
     if (tex_id == 0) {
         Logger::Log(LogLevel::Error, "Failed to retrieve color attachment from target");
