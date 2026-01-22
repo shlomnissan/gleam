@@ -11,7 +11,7 @@
 
 namespace vglx {
 
-auto SharedContext::Create(const Window* window, Camera* camera, LoadScheduler* scheduler)
+auto SharedContext::Create(Window* window, Camera* camera)
   -> std::unique_ptr<SharedContext> {
     return std::make_unique<SharedContext> (
         camera,
@@ -19,9 +19,7 @@ auto SharedContext::Create(const Window* window, Camera* camera, LoadScheduler* 
         window->FramebufferWidth(),
         window->FramebufferHeight(),
         window->Width(),
-        window->Height(),
-        std::make_unique<TextureLoader>(scheduler),
-        std::make_unique<MeshLoader>(scheduler)
+        window->Height()
     );
 }
 

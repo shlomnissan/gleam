@@ -95,12 +95,7 @@ auto main() -> int {
 
     camera->TranslateZ(3.0f);
 
-    auto load_scheduler = std::make_unique<LoadScheduler>();
-    auto context = SharedContext::Create(
-        &window,
-        camera.get(),
-        load_scheduler.get()
-    );
+    auto context = SharedContext::Create(&window, camera.get());
 
     auto target = RenderTarget::Create({
         .width = window.FramebufferWidth(),
@@ -119,7 +114,7 @@ auto main() -> int {
     while(!window.ShouldClose()) {
         window.PollEvents();
         window.BeginUIFrame();
-        load_scheduler->Pump();
+        context->load_scheduler->Pump();
         const auto dt = timer.Tick();
 
         scene_0->Advance(dt);

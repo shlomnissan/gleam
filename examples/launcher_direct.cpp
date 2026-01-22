@@ -56,13 +56,7 @@ auto main() -> int {
         .far = 1000.0f
     });
 
-    auto load_scheduler = std::make_unique<LoadScheduler>();
-
-    auto context = SharedContext::Create(
-        &window,
-        camera.get(),
-        load_scheduler.get()
-    );
+    auto context = SharedContext::Create(&window, camera.get());
 
     auto scene = std::unique_ptr<Scene> {};
     auto examples = Examples {[&scene, &context](std::unique_ptr<Scene> sc){
@@ -91,7 +85,7 @@ auto main() -> int {
 
     while(!window.ShouldClose()) {
         window.PollEvents();
-        load_scheduler->Pump();
+        context->load_scheduler->Pump();
 
         const auto dt = timer.Tick();
         scene->Advance(dt);

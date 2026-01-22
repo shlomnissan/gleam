@@ -91,13 +91,15 @@ struct VGLX_EXPORT SharedContext {
      */
     int window_height;
 
+    std::unique_ptr<LoadScheduler> load_scheduler = std::make_unique<LoadScheduler>();
+
     /**
      * @brief Texture loader.
      *
      * Handles loading and caching of image assets targeting the engine's
      * custom `.tex` format.
      */
-    std::unique_ptr<TextureLoader> texture_loader;
+    std::unique_ptr<TextureLoader> texture_loader = std::make_unique<TextureLoader>(load_scheduler.get());
 
     /**
      * @brief Mesh loader.
@@ -105,7 +107,7 @@ struct VGLX_EXPORT SharedContext {
      * Handles loading and caching of mesh assets targeting the engine's
      * custom `.msh` format.
      */
-    std::unique_ptr<MeshLoader> mesh_loader;
+    std::unique_ptr<MeshLoader> mesh_loader = std::make_unique<MeshLoader>(load_scheduler.get());
 
     /**
      * @brief Creates and initializes a shared runtime context.
@@ -120,9 +122,8 @@ struct VGLX_EXPORT SharedContext {
      * @param scheduler Load scheduler used by resource loaders for async loading.
      */
     [[nodiscard]] static auto Create(
-        const Window* window,
-        Camera* camera,
-        LoadScheduler* scheduler
+        Window* window,
+        Camera* camera
     ) -> std::unique_ptr<SharedContext>;
 };
 

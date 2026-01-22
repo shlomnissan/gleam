@@ -41,7 +41,6 @@ struct Application::Impl {
     std::unique_ptr<Window> window;
     std::unique_ptr<Renderer> renderer;
     std::unique_ptr<SharedContext> context;
-    std::unique_ptr<LoadScheduler> load_scheduler;
 
     double last_frame_time = 0.0;
 
@@ -67,11 +66,7 @@ struct Application::Impl {
     }
 
     auto MakeSharedContext() -> void {
-        context = SharedContext::Create(
-            window.get(),
-            camera.get(),
-            load_scheduler.get()
-        );
+        context = SharedContext::Create(window.get(), camera.get());
     }
 
     auto SetCamera(std::unique_ptr<Camera> camera) -> void {
@@ -91,9 +86,7 @@ struct Application::Impl {
     }
 };
 
-Application::Application() : impl_(std::make_unique<Impl>()) {
-    impl_->load_scheduler = std::make_unique<LoadScheduler>();
-}
+Application::Application() : impl_(std::make_unique<Impl>()) {}
 
 auto Application::Setup() -> void {
     const auto params = Configure();
@@ -138,7 +131,7 @@ auto Application::Start() -> void {
 
     while (!impl_->window->ShouldClose()) {
         impl_->window->PollEvents();
-        impl_->load_scheduler->Pump();
+        impl_->context->load_scheduler->Pump();
 
         const auto dt = frame_timer.Tick();
         impl_->scene->Advance(dt);
