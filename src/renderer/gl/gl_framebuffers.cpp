@@ -140,6 +140,11 @@ auto GLFramebuffers::End(RenderTarget* target) -> void {
     current_fbo_ = 0;
 }
 
+auto GLFramebuffers::GetColorAttachment(RenderTarget* target) -> unsigned int {
+    auto framebuffer = GetFramebuffer(target);
+    return framebuffer.color_attachment;
+}
+
 auto GLFramebuffers::Reset() -> void {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     current_fbo_ = 0;

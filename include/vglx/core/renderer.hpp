@@ -133,6 +133,22 @@ public:
      */
     [[nodiscard]] auto RenderedObjectsPerFrame() const -> size_t;
 
+    /**
+     * @brief Returns the color texture associated with an offscreen render target.
+     *
+     * When rendering to a @ref RenderTarget the renderer attaches a 2D texture
+     * that receives the color output of the frame. This method retrieves that
+     * texture so it can be bound in subsequent passes.
+     *
+     * The returned pointer is shared with the render target and remains valid as
+     * long as both the renderer and the render target are alive. If `target` is
+     * null or does not have an associated color texture an empty pointer is returned.
+     *
+     * @param target Render target whose color texture should be retrieved.
+     */
+    [[nodiscard]] auto GetTextureFromRenderTarget(RenderTarget* target)
+        -> std::shared_ptr<Texture2D>;
+
     virtual ~Renderer();
 
 private:

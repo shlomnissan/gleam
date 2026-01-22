@@ -34,6 +34,8 @@ public:
 
     auto End(RenderTarget* target) -> void;
 
+    auto GetColorAttachment(RenderTarget* target) -> unsigned int;
+
     auto Reset() -> void;
 
 private:

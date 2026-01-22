@@ -306,6 +306,28 @@ auto Renderer::Impl::SetClearColor(const Color& color) -> void {
     state_.SetClearColor(color);
 }
 
+auto Renderer::Impl::GetTextureFromRenderTarget(RenderTarget* target) -> std::shared_ptr<Texture2D> {
+    const auto tex_id = framebuffers_.GetColorAttachment(target);
+    if (tex_id == 0) {
+        Logger::Log(LogLevel::Error, "Failed to retrieve color attachment from target");
+        return {};
+    }
+
+    auto texture = Texture2D::Create({
+        .width = static_cast<unsigned int>(target->width),
+        .height = static_cast<unsigned int>(target->height),
+        .color_space = Texture::ColorSpace::Linear,
+    });
+
+    texture->renderer_id = tex_id;
+
+    texture->min_filter = Texture::MinFilter::Linear;
+    texture->mag_filter = Texture::MagFilter::Linear;
+    texture->color_space = Texture::ColorSpace::Linear;
+
+    return texture;
+}
+
 Renderer::Impl::~Impl() = default;
 
 }

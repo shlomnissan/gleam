@@ -44,6 +44,8 @@ public:
 
     auto SetClearColor(const Color& color) -> void;
 
+    auto GetTextureFromRenderTarget(RenderTarget* target) -> std::shared_ptr<Texture2D>;
+
     [[nodiscard]] auto RenderedObjectsPerFrame() const {
         return rendered_objects_per_frame_;
     }
