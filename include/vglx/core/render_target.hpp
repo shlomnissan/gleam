@@ -9,11 +9,14 @@
 
 #include "vglx_export.h"
 
+#include "vglx/core/disposable.hpp"
+#include "vglx/core/identity.hpp"
+
 #include <memory>
 
 namespace vglx {
 
-class VGLX_EXPORT RenderTarget {
+class VGLX_EXPORT RenderTarget : public Disposable, public Identity {
 public:
     struct Parameters {
         int width {0};
@@ -39,7 +42,7 @@ public:
         return std::make_shared<RenderTarget>(params);
     }
 
-    ~RenderTarget();
+    ~RenderTarget() override;
 };
 
 }

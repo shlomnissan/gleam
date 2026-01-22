@@ -17,6 +17,8 @@ RenderTarget::RenderTarget(const Parameters& params)
     has_depth(params.has_depth),
     enable_readback(params.enable_readback) {}
 
-RenderTarget::~RenderTarget() = default;
+RenderTarget::~RenderTarget() {
+    Disposable::Dispose();
+}
 
 }

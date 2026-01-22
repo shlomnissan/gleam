@@ -11,6 +11,8 @@
 
 #include "renderer/gl/gl_textures.hpp"
 
+#include <vector>
+
 namespace vglx {
 
 class RenderTarget;
@@ -37,7 +39,17 @@ public:
 private:
     GLuint current_fbo_ {0};
 
-    auto EnsureFramebuffer(RenderTarget* target) -> void;
+    struct GLFramebuffer {
+        GLuint fbo;
+        GLuint color_attachment;
+        GLuint depth_attachment;
+    };
+
+    std::vector<std::pair<unsigned int, GLFramebuffer>> framebuffers_ {};
+
+    auto GetFramebuffer(RenderTarget* target) -> GLFramebuffer;
+
+    auto CreateFramebuffer(RenderTarget* target) -> GLFramebuffer;
 };
 
 }
