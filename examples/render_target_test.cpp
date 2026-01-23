@@ -106,7 +106,7 @@ auto main() -> int {
     auto scene_0 = std::make_shared<Scene0>();
     scene_0->SetContext(context.get());
 
-    auto texture = renderer.CreateTextureView(target.get());
+    auto texture = renderer.CreateTextureFromRenderTarget(target.get());
     auto scene_1 = std::make_shared<Scene1>(texture);
     scene_1->SetContext(context.get());
 

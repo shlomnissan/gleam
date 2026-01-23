@@ -36,8 +36,8 @@ auto Renderer::SetClearColor(const Color& color) -> void {
     impl_->SetClearColor(color);
 }
 
-auto Renderer:: CreateTextureView(RenderTarget* target) -> std::shared_ptr<Texture2D> {
-    return impl_->CreateTextureView(target);
+auto Renderer:: CreateTextureFromRenderTarget(RenderTarget* target) -> std::shared_ptr<Texture2D> {
+    return impl_->CreateTextureFromRenderTarget(target);
 }
 
 auto Renderer::RenderedObjectsPerFrame() const -> size_t {
