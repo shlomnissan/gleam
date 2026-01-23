@@ -40,6 +40,10 @@ public:
         dispose_callbacks_.emplace_back(callback);
     }
 
+    auto RemoveDisposeHandlers() -> void {
+        dispose_callbacks_.clear();
+    }
+
     virtual ~Disposable() = default;
 
 private:

@@ -91,22 +91,21 @@ auto GLFramebuffers::CreateFramebuffer(RenderTarget* target) -> GLFramebuffer {
     }
 
     target->renderer_id = framebuffer.fbo;
-    framebuffers_.emplace_back(target->renderer_id, framebuffer);
+    framebuffers_.emplace_back(target, framebuffer);
 
-    target->OnDispose([this, framebuffer](Disposable* target) {
-        if (framebuffer.fbo) glDeleteFramebuffers(1, &framebuffer.fbo);
-        if (framebuffer.color_attachment) glDeleteTextures(1, &framebuffer.color_attachment);
-        if (framebuffer.depth_attachment) glDeleteRenderbuffers(1, &framebuffer.depth_attachment);
+    target->OnDispose([this](Disposable* d) {
+        auto* target = static_cast<RenderTarget*>(d);
 
-        std::erase_if(this->framebuffers_, [fbo = framebuffer.fbo](const auto& e){
-            return e.first == fbo;
+        auto it = std::ranges::find_if(framebuffers_, [target](const auto& e) {
+            return e.first == target;
         });
 
-        Logger::Log(
-            LogLevel::Debug,
-            "Framebuffer object cleared {}",
-            *static_cast<RenderTarget*>(target)
-        );
+        if (it != framebuffers_.end()) {
+            target->renderer_id = 0;
+            DisposeFramebuffer(it->second);
+            framebuffers_.erase(it);
+            Logger::Log(LogLevel::Debug, "Framebuffer object cleared", *target);
+        }
     });
 
     unbind_buffers();
@@ -115,12 +114,11 @@ auto GLFramebuffers::CreateFramebuffer(RenderTarget* target) -> GLFramebuffer {
 }
 
 auto GLFramebuffers::GetFramebuffer(RenderTarget* target) -> GLFramebuffer {
-    if (target->renderer_id != 0) {
-        auto it = std::ranges::find_if(framebuffers_, [id = target->renderer_id](const auto& entry) {
-            return entry.first == id;
-        });
-        if (it != framebuffers_.end()) return it->second;
-    }
+    auto it = std::ranges::find_if(framebuffers_, [target](const auto& entry) {
+        return entry.first == target;
+    });
+    if (it != framebuffers_.end()) return it->second;
+
     return CreateFramebuffer(target);
 }
 
@@ -135,7 +133,7 @@ auto GLFramebuffers::Begin(RenderTarget* target) -> void {
     current_fbo_ = framebuffer.fbo;
 }
 
-auto GLFramebuffers::End(RenderTarget* target) -> void {
+auto GLFramebuffers::End() -> void {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     current_fbo_ = 0;
 }
@@ -148,6 +146,22 @@ auto GLFramebuffers::GetColorAttachment(RenderTarget* target) -> unsigned int {
 auto GLFramebuffers::Reset() -> void {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     current_fbo_ = 0;
+}
+
+auto GLFramebuffers::DisposeFramebuffer(const GLFramebuffer& framebuffer) -> void {
+    if (framebuffer.fbo) glDeleteFramebuffers(1, &framebuffer.fbo);
+    if (framebuffer.color_attachment) glDeleteTextures(1, &framebuffer.color_attachment);
+    if (framebuffer.depth_attachment) glDeleteRenderbuffers(1, &framebuffer.depth_attachment);
+}
+
+GLFramebuffers::~GLFramebuffers() {
+    for (auto& [target, framebuffer] : framebuffers_) {
+        target->renderer_id = 0;
+        target->RemoveDisposeHandlers();
+        DisposeFramebuffer(framebuffer);
+        Logger::Log(LogLevel::Debug, "Framebuffer object cleared", *target);
+    }
+    framebuffers_.clear();
 }
 
 }

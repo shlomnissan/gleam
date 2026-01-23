@@ -32,11 +32,13 @@ public:
 
     auto Begin(RenderTarget* target) -> void;
 
-    auto End(RenderTarget* target) -> void;
+    auto End() -> void;
 
     auto GetColorAttachment(RenderTarget* target) -> unsigned int;
 
     auto Reset() -> void;
+
+    ~GLFramebuffers();
 
 private:
     GLuint current_fbo_ {0};
@@ -47,11 +49,13 @@ private:
         GLuint depth_attachment;
     };
 
-    std::vector<std::pair<unsigned int, GLFramebuffer>> framebuffers_ {};
+    std::vector<std::pair<RenderTarget*, GLFramebuffer>> framebuffers_ {};
 
     auto GetFramebuffer(RenderTarget* target) -> GLFramebuffer;
 
     auto CreateFramebuffer(RenderTarget* target) -> GLFramebuffer;
+
+    auto DisposeFramebuffer(const GLFramebuffer& framebuffer) -> void;
 };
 
 }
