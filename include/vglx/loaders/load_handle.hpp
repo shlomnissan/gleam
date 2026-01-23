@@ -96,7 +96,6 @@ public:
         return out;
     }
 
-private:
     /// @cond INTERNAL
     struct State {
         bool ready {false};
@@ -106,8 +105,6 @@ private:
 
     std::shared_ptr<State> state_;
 
-    friend class TextureLoader;
-    friend class MeshLoader;
     explicit LoadHandle(std::shared_ptr<State> s) : state_(std::move(s)) {}
     /// @endcond
 };
