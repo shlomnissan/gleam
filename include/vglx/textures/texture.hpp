@@ -12,6 +12,8 @@
 #include "vglx/core/disposable.hpp"
 #include "vglx/core/identity.hpp"
 
+#include "utilities/assert.hpp"
+
 namespace vglx {
 
 /**
@@ -140,5 +142,18 @@ public:
         Disposable::Dispose();
     }
 };
+
+constexpr auto bytes_per_pixel(Texture::Format format) {
+    using enum Texture::Format;
+    switch (format) {
+        case RGBA8:   return 4;
+        case RGBA16F: return 8;
+        case R16F:    return 2;
+        case R32F:    return 4;
+        case R32UI:   return 4;
+        case SRGBA8:  return 4;
+        default: VGLX_UNREACHABLE();
+    }
+}
 
 }

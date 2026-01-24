@@ -70,7 +70,8 @@ auto main() -> int {
         .width = window.FramebufferWidth() / 4,
         .height = window.FramebufferHeight() / 4,
         .format = Texture::Format::RGBA8,
-        .has_depth = true
+        .has_depth = true,
+        .enable_readback = true
     });
 
     auto scene = std::make_shared<MainScene>();

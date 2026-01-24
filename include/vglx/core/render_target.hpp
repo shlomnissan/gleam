@@ -13,7 +13,10 @@
 #include "vglx/core/identity.hpp"
 #include "vglx/textures/texture.hpp"
 
+#include <cstdint>
 #include <memory>
+#include <span>
+#include <vector>
 
 namespace vglx {
 
@@ -24,7 +27,7 @@ public:
         int height;
         Texture::Format format;
         bool has_depth;
-        bool enable_reads {false};
+        bool enable_readback {false};
     };
 
     const int width;
@@ -35,6 +38,8 @@ public:
 
     const bool has_depth;
 
+    const bool enable_readback;
+
     unsigned int renderer_id;
 
     explicit RenderTarget(const Parameters& params);
@@ -44,7 +49,16 @@ public:
         return std::make_shared<RenderTarget>(params);
     }
 
+    [[nodiscard]] auto ReadbackData() const -> std::span<const std::uint8_t>;
+
     ~RenderTarget() override;
+
+private:
+    friend class GLFramebuffers;
+
+    std::vector<uint8_t> data_;
+
+    bool has_readback_ {false};
 };
 
 }

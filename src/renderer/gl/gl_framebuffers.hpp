@@ -32,7 +32,7 @@ public:
 
     auto Begin(RenderTarget* target) -> void;
 
-    auto End() -> void;
+    auto End(RenderTarget* target) -> void;
 
     auto GetColorAttachment(RenderTarget* target) -> unsigned int;
 

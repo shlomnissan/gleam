@@ -15,7 +15,21 @@ RenderTarget::RenderTarget(const Parameters& params)
   : width(params.width),
     height(params.height),
     format(params.format),
-    has_depth(params.has_depth) {}
+    has_depth(params.has_depth),
+    enable_readback(params.enable_readback)
+{
+    if (enable_readback) {
+        const auto bpp = bytes_per_pixel(format);
+        data_.resize(static_cast<size_t>(width) * height * bpp);
+    }
+}
+
+auto RenderTarget::ReadbackData() const -> std::span<const uint8_t> {
+    if (!enable_readback || !has_readback_) {
+        return {};
+    }
+    return std::span<const std::uint8_t>(data_.data(), data_.size());
+}
 
 RenderTarget::~RenderTarget() {
     Disposable::Dispose();

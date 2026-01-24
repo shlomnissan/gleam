@@ -131,7 +131,17 @@ auto GLFramebuffers::Begin(RenderTarget* target) -> void {
     current_fbo_ = framebuffer.fbo;
 }
 
-auto GLFramebuffers::End() -> void {
+auto GLFramebuffers::End(RenderTarget* target) -> void {
+    if (target->enable_readback) {
+        auto framebuffer = GetFramebuffer(target);
+        auto format = to_gl_tex_format(target->format);
+
+        glBindTexture(GL_TEXTURE_2D, framebuffer.color_attachment);
+        glGetTexImage(GL_TEXTURE_2D, 0, format.source_format, format.type, target->data_.data());
+
+        target->has_readback_ = true;
+    }
+
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     current_fbo_ = 0;
 }

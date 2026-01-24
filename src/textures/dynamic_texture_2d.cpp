@@ -7,24 +7,11 @@
 
 #include "vglx/textures/dynamic_texture_2d.hpp"
 
-#include "utilities/assert.hpp"
 #include "utilities/logger.hpp"
 
 namespace vglx {
 
 namespace {
-
-auto bytes_per_pixel(DynamicTexture2D::Format format) {
-    using enum DynamicTexture2D::Format;
-    switch (format) {
-        case RGBA8: return 4;
-        case RGBA16F: return 8;
-        case R16F: return 2;
-        case R32F: return 4;
-        case R32UI: return 4;
-        default: VGLX_UNREACHABLE();
-    }
-}
 
 auto mip_dimensions(const DynamicTexture2D& tex, unsigned int mip_level) {
     const auto w = std::max(1, tex.width  >> mip_level);

@@ -285,7 +285,7 @@ auto Renderer::Impl::Render(Scene* scene, Camera* camera, RenderTarget* target) 
     if (use_default_target) {
         scene_buffer_.End();
     } else {
-        framebuffers_.End();
+        framebuffers_.End(target);
     }
 
     textures_.Reset();
