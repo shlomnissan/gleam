@@ -8,7 +8,6 @@
 #include "renderer/gl/gl_textures.hpp"
 
 #include "vglx/textures/dynamic_texture_2d.hpp"
-#include "vglx/textures/texture.hpp"
 #include "vglx/textures/texture_2d.hpp"
 
 #include "utilities/logger.hpp"
@@ -19,22 +18,6 @@
 #include <utility>
 
 namespace vglx {
-
-namespace {
-
-struct TextureFormat {
-    int internal_format;
-    int format;
-    int type;
-};
-
-auto get_texture_format(const Texture* tex) -> TextureFormat;
-
-auto to_gl_min_filter(Texture::MinFilter f) -> int;
-
-auto to_gl_mag_filter(Texture::MagFilter f) -> int;
-
-}
 
 auto GLTextures::Bind(const std::shared_ptr<Texture>& texture, int tex_unit) -> void {
     VGLX_ASSERT(
@@ -80,16 +63,16 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
             ? Texture::Format::RGBA8
             : Texture::Format::SRGBA8;
 
-        auto f = get_texture_format(tex);
+        auto format = to_gl_tex_format(tex->format);
         glTexImage2D(
             GL_TEXTURE_2D,
             0,
-            f.internal_format,
+            format.internal_format,
             tex->width,
             tex->height,
             0,
-            f.format,
-            f.type,
+            format.source_format,
+            format.type,
             tex->data.data()
         );
 
@@ -100,19 +83,19 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
 
     if (texture->GetType() == Texture::Type::DynamicTexture2D) {
         auto tex = static_cast<DynamicTexture2D*>(texture);
-        auto f = get_texture_format(tex);
+        auto format = to_gl_tex_format(tex->format);
         for (auto level = 0u; level < tex->mips; ++level) {
             const auto width = std::max(1, tex->width >> level);
             const auto height = std::max(1, tex->height >> level);
             glTexImage2D(
                 GL_TEXTURE_2D,
                 static_cast<GLint>(level),
-                f.internal_format,
+                format.internal_format,
                 width,
                 height,
                 0,
-                f.format,
-                f.type,
+                format.source_format,
+                format.type,
                 nullptr
             );
         }
@@ -138,7 +121,7 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
 auto GLTextures::FlushDynamicTexture(DynamicTexture2D* texture) const -> void {
     if (texture->pending_.empty()) return;
 
-    auto f = get_texture_format(texture);
+    auto format = to_gl_tex_format(texture->format);
     for (auto& u : texture->pending_) {
         glTexSubImage2D(
             GL_TEXTURE_2D,
@@ -147,8 +130,8 @@ auto GLTextures::FlushDynamicTexture(DynamicTexture2D* texture) const -> void {
             u.y,
             u.w,
             u.h,
-            f.format,
-            f.type,
+            format.source_format,
+            format.type,
             u.bytes.data()
         );
     }
@@ -169,44 +152,42 @@ GLTextures::~GLTextures() {
     }
 }
 
-namespace {
-
-auto get_texture_format(const Texture* tex) -> TextureFormat {
-    switch (tex->format) {
+auto to_gl_tex_format(Texture::Format f) -> TextureFormat {
+    switch (f) {
         case Texture::Format::RGBA8:
             return TextureFormat {
                 .internal_format = GL_RGBA8,
-                .format = GL_RGBA,
+                .source_format = GL_RGBA,
                 .type = GL_UNSIGNED_BYTE
             };
         case Texture::Format::RGBA16F:
             return TextureFormat {
                 .internal_format = GL_RGBA16F,
-                .format = GL_RGBA,
+                .source_format = GL_RGBA,
                 .type = GL_HALF_FLOAT
             };
         case Texture::Format::R16F:
             return TextureFormat {
                 .internal_format = GL_R16F,
-                .format = GL_RED,
+                .source_format = GL_RED,
                 .type = GL_HALF_FLOAT
             };
         case Texture::Format::R32F:
             return TextureFormat {
                 .internal_format = GL_R32F,
-                .format = GL_RED,
+                .source_format = GL_RED,
                 .type = GL_FLOAT
             };
         case Texture::Format::R32UI:
             return TextureFormat {
                 .internal_format = GL_R32UI,
-                .format = GL_RED_INTEGER,
+                .source_format = GL_RED_INTEGER,
                 .type = GL_UNSIGNED_INT
             };
         case Texture::Format::SRGBA8:
             return TextureFormat {
                 .internal_format = GL_SRGB8_ALPHA8,
-                .format = GL_RGBA,
+                .source_format = GL_RGBA,
                 .type = GL_UNSIGNED_BYTE
             };
         default: VGLX_UNREACHABLE();
@@ -233,8 +214,6 @@ auto to_gl_mag_filter(Texture::MagFilter f) -> int {
         case Filter::Linear: return GL_LINEAR;
         default: VGLX_UNREACHABLE();
     }
-}
-
 }
 
 }

@@ -9,16 +9,15 @@
 
 #include "vglx/core/render_target.hpp"
 
+#include "renderer/gl/gl_textures.hpp"
 #include "utilities/logger.hpp"
 
 #include <algorithm>
-#include <print>
 
 namespace vglx {
 
 namespace {
 
-constexpr GLenum kColorFormat = GL_RGBA8;
 constexpr GLenum kDepthStencilFormat = GL_DEPTH24_STENCIL8;
 
 auto unbind_buffers() -> void {
@@ -31,6 +30,7 @@ auto unbind_buffers() -> void {
 
 auto GLFramebuffers::CreateFramebuffer(RenderTarget* target) -> GLFramebuffer {
     auto framebuffer = GLFramebuffer { .fbo = 0 };
+    auto format = to_gl_tex_format(target->format);
 
     glGenFramebuffers(1, &framebuffer.fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer.fbo);
@@ -42,12 +42,12 @@ auto GLFramebuffers::CreateFramebuffer(RenderTarget* target) -> GLFramebuffer {
     glTexImage2D(
         GL_TEXTURE_2D,
         0,
-        kColorFormat,
+        format.internal_format,
         target->width,
         target->height,
         0,
-        GL_RGBA,
-        GL_UNSIGNED_BYTE,
+        format.source_format,
+        format.type,
         nullptr
     );
 

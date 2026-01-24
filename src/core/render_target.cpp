@@ -14,6 +14,7 @@ namespace vglx {
 RenderTarget::RenderTarget(const Parameters& params)
   : width(params.width),
     height(params.height),
+    format(params.format),
     has_depth(params.has_depth) {}
 
 RenderTarget::~RenderTarget() {

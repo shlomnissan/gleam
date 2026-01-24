@@ -14,6 +14,8 @@
 
 #include <glad/glad.h>
 
+#include "vglx/textures/texture.hpp"
+
 namespace vglx {
 
 enum class GLTextureMapType {
@@ -28,7 +30,18 @@ enum class GLTextureMapType {
 constexpr auto kReservedTextureUnits = std::to_underlying(GLTextureMapType::Reserved);
 constexpr auto kMaxTextureUnits = 16;
 
-class Texture;
+struct TextureFormat {
+    int internal_format;
+    int source_format;
+    int type;
+};
+
+auto to_gl_tex_format(Texture::Format f) -> TextureFormat;
+
+auto to_gl_min_filter(Texture::MinFilter f) -> int;
+
+auto to_gl_mag_filter(Texture::MagFilter f) -> int;
+
 class DynamicTexture2D;
 
 class GLTextures {

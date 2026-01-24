@@ -11,6 +11,7 @@
 
 #include "vglx/core/disposable.hpp"
 #include "vglx/core/identity.hpp"
+#include "vglx/textures/texture.hpp"
 
 #include <memory>
 
@@ -19,14 +20,17 @@ namespace vglx {
 class VGLX_EXPORT RenderTarget : public Disposable, public Identity {
 public:
     struct Parameters {
-        int width {0};
-        int height {0};
-        bool has_depth {true};
+        int width;
+        int height;
+        Texture::Format format;
+        bool has_depth;
     };
 
     const int width;
 
     const int height;
+
+    const Texture::Format format;
 
     const bool has_depth;
 

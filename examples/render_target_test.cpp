@@ -100,6 +100,7 @@ auto main() -> int {
     auto target = RenderTarget::Create({
         .width = window.FramebufferWidth(),
         .height = window.FramebufferHeight(),
+        .format = Texture::Format::RGBA8,
         .has_depth = true
     });
 
