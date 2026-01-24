@@ -55,25 +55,14 @@ namespace vglx {
 class VGLX_EXPORT DynamicTexture2D : public Texture {
 public:
     /**
-     * @brief Pixel format and storage type for the texture.
-     */
-    enum class Format {
-        RGBA8, ///< 8-bit normalized RGBA.
-        RGBA16F, ///< 16-bit float RGBA.
-        R16F, ///< 16-bit float single channel.
-        R32F, ///< 32-bit float single channel.
-        R32UI ///< 32-bit unsigned integer single channel.
-    };
-
-    /**
      * @brief Parameters for constructing a @ref DynamicTexture2D object.
      */
     struct Parameters {
         int width; ///< Width in pixels.
         int height; ///< Height in pixels.
-        unsigned int mips = 1; ///< Number of mip levels to allocate.
-        Format format = Format::RGBA8; ///< Texture storage format.
-        ColorSpace color_space = ColorSpace::Linear; ///< Color space for sampling.
+        unsigned int mips {1}; ///< Number of mip levels to allocate.
+        Format format {Format::RGBA8}; ///< Texture storage format.
+        ColorSpace color_space {ColorSpace::Linear}; ///< Color space for sampling.
     };
 
     /// @brief Texture width in pixels.
@@ -84,9 +73,6 @@ public:
 
     /// @brief Number of allocated mip levels.
     const unsigned int mips;
-
-    /// @brief Texture storage format.
-    const Format format;
 
     /**
      * @brief Constructs a dynamic 2D texture.

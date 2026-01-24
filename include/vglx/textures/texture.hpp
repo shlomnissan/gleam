@@ -34,6 +34,18 @@ public:
     };
 
     /**
+     * @brief Enumerates pixel format and storage type for the texture.
+     */
+    enum class Format {
+        RGBA8, ///< 8-bit normalized RGBA.
+        RGBA16F, ///< 16-bit float RGBA.
+        R16F, ///< 16-bit float single channel.
+        R32F, ///< 32-bit float single channel.
+        R32UI, ///< 32-bit unsigned integer single channel.
+        SRGBA8 ///< 8-bit sRGB-encoded RGBA.
+    };
+
+    /**
      * @brief Enumerates supported color spaces for texture data.
      *
      * Textures containing color data (e.g. albedo or base color maps) are
@@ -112,6 +124,9 @@ public:
 
     /// @brief Enables automatic mipmap generation for this texture.
     bool generate_mipamps {false};
+
+    /// @brief Texture storage format.
+    Format format {Format::RGBA8};
 
     /**
      * @brief Identifies the concrete @ref Texture::Type "texture type".

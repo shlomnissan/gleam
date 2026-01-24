@@ -37,9 +37,9 @@ auto mip_dimensions(const DynamicTexture2D& tex, unsigned int mip_level) {
 DynamicTexture2D::DynamicTexture2D(const Parameters& params) :
     width(params.width),
     height(params.height),
-    mips(params.mips),
-    format(params.format)
+    mips(params.mips)
 {
+    format = params.format;
     color_space = params.color_space;
     row_alignment = RowAlignment::OneByte;
     generate_mipamps = false;

@@ -22,13 +22,13 @@ namespace vglx {
 
 namespace {
 
-struct DynamicTextureFormat {
+struct TextureFormat {
     int internal_format;
     int format;
     int type;
 };
 
-auto get_dynamic_texture_format(const DynamicTexture2D* tex) -> DynamicTextureFormat;
+auto get_texture_format(const Texture* tex) -> TextureFormat;
 
 auto to_gl_min_filter(Texture::MinFilter f) -> int;
 
@@ -76,19 +76,20 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
 
     if (texture->GetType() == Texture::Type::Texture2D) {
         auto tex = static_cast<Texture2D*>(texture);
-        auto internal_format = texture->color_space == Texture::ColorSpace::Linear
-            ? GL_RGBA8
-            : GL_SRGB8_ALPHA8;
+        tex->format = texture->color_space == Texture::ColorSpace::Linear
+            ? Texture::Format::RGBA8
+            : Texture::Format::SRGBA8;
 
+        auto f = get_texture_format(tex);
         glTexImage2D(
             GL_TEXTURE_2D,
             0,
-            internal_format,
+            f.internal_format,
             tex->width,
             tex->height,
             0,
-            GL_RGBA,
-            GL_UNSIGNED_BYTE,
+            f.format,
+            f.type,
             tex->data.data()
         );
 
@@ -99,7 +100,7 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
 
     if (texture->GetType() == Texture::Type::DynamicTexture2D) {
         auto tex = static_cast<DynamicTexture2D*>(texture);
-        auto f = get_dynamic_texture_format(tex);
+        auto f = get_texture_format(tex);
         for (auto level = 0u; level < tex->mips; ++level) {
             const auto width = std::max(1, tex->width >> level);
             const auto height = std::max(1, tex->height >> level);
@@ -137,7 +138,7 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
 auto GLTextures::FlushDynamicTexture(DynamicTexture2D* texture) const -> void {
     if (texture->pending_.empty()) return;
 
-    auto f = get_dynamic_texture_format(texture);
+    auto f = get_texture_format(texture);
     for (auto& u : texture->pending_) {
         glTexSubImage2D(
             GL_TEXTURE_2D,
@@ -170,37 +171,43 @@ GLTextures::~GLTextures() {
 
 namespace {
 
-auto get_dynamic_texture_format(const DynamicTexture2D* tex) -> DynamicTextureFormat {
+auto get_texture_format(const Texture* tex) -> TextureFormat {
     switch (tex->format) {
-        case DynamicTexture2D::Format::RGBA8:
-            return DynamicTextureFormat {
+        case Texture::Format::RGBA8:
+            return TextureFormat {
                 .internal_format = GL_RGBA8,
                 .format = GL_RGBA,
                 .type = GL_UNSIGNED_BYTE
             };
-        case DynamicTexture2D::Format::RGBA16F:
-            return DynamicTextureFormat {
+        case Texture::Format::RGBA16F:
+            return TextureFormat {
                 .internal_format = GL_RGBA16F,
                 .format = GL_RGBA,
                 .type = GL_HALF_FLOAT
             };
-        case DynamicTexture2D::Format::R16F:
-            return DynamicTextureFormat {
+        case Texture::Format::R16F:
+            return TextureFormat {
                 .internal_format = GL_R16F,
                 .format = GL_RED,
                 .type = GL_HALF_FLOAT
             };
-        case DynamicTexture2D::Format::R32F:
-            return DynamicTextureFormat {
+        case Texture::Format::R32F:
+            return TextureFormat {
                 .internal_format = GL_R32F,
                 .format = GL_RED,
                 .type = GL_FLOAT
             };
-        case DynamicTexture2D::Format::R32UI:
-            return DynamicTextureFormat {
+        case Texture::Format::R32UI:
+            return TextureFormat {
                 .internal_format = GL_R32UI,
                 .format = GL_RED_INTEGER,
                 .type = GL_UNSIGNED_INT
+            };
+        case Texture::Format::SRGBA8:
+            return TextureFormat {
+                .internal_format = GL_SRGB8_ALPHA8,
+                .format = GL_RGBA,
+                .type = GL_UNSIGNED_BYTE
             };
         default: VGLX_UNREACHABLE();
     }
