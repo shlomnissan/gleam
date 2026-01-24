@@ -49,14 +49,14 @@ public:
         return std::make_shared<RenderTarget>(params);
     }
 
-    [[nodiscard]] auto ReadbackData() const -> std::span<const std::uint8_t>;
+    [[nodiscard]] auto ReadColorData() const -> std::span<const std::uint8_t>;
 
     ~RenderTarget() override;
 
 private:
     friend class GLFramebuffers;
 
-    std::vector<uint8_t> data_;
+    std::vector<uint8_t> color_data_;
 
     bool has_readback_ {false};
 };

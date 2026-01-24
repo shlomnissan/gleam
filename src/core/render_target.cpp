@@ -20,15 +20,15 @@ RenderTarget::RenderTarget(const Parameters& params)
 {
     if (enable_readback) {
         const auto bpp = bytes_per_pixel(format);
-        data_.resize(static_cast<size_t>(width) * height * bpp);
+        color_data_.resize(static_cast<size_t>(width) * height * bpp);
     }
 }
 
-auto RenderTarget::ReadbackData() const -> std::span<const uint8_t> {
+auto RenderTarget::ReadColorData() const -> std::span<const uint8_t> {
     if (!enable_readback || !has_readback_) {
         return {};
     }
-    return std::span<const std::uint8_t>(data_.data(), data_.size());
+    return std::span<const std::uint8_t>(color_data_.data(), color_data_.size());
 }
 
 RenderTarget::~RenderTarget() {
