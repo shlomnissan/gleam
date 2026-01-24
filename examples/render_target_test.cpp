@@ -14,49 +14,20 @@ using namespace vglx;
 namespace {
 
 constexpr auto kWindowWidth {1024};
-constexpr auto kWindowHeight {768};
+constexpr auto kWindowHeight {1024};
 constexpr auto kSampleCount {1};
 
 }
 
-class Scene0 : public Scene {
+class MainScene : public Scene {
 public:
-    Scene0() {
-        mesh_ = Add(Mesh::Create(BoxGeometry::Create(), UnlitMaterial::Create(0xFF0000)));
+    MainScene() {
+        Add(Mesh::Create(
+            PlaneGeometry::Create({.width = 5.0f, .height = 5.0f}),
+            UnlitMaterial::Create(0xFFFFFF)
+        ));
     }
-
-    auto OnUpdate(float delta) -> void override {
-        mesh_->RotateX(1.0f * delta);
-        mesh_->RotateY(1.0f * delta);
-    }
-
-private:
-    Mesh* mesh_ {nullptr};
 };
-
-class Scene1 : public Scene {
-public:
-    Scene1(const std::shared_ptr<Texture2D>& texture) {
-        auto material = UnlitMaterial::Create(0xFFFFFF);
-        material->texture_map = texture;
-
-        mesh_ = Add(Mesh::Create(BoxGeometry::Create(), material));
-    }
-
-    auto OnUpdate(float delta) -> void override {
-        mesh_->RotateX(1.0f * delta);
-        mesh_->RotateY(1.0f * delta);
-    }
-
-private:
-    Mesh* mesh_ {nullptr};
-};
-
-auto make_scene_1(SharedContextPointer context) {
-    auto scene = Scene::Create();
-    scene->SetContext(context);
-    return scene;
-}
 
 auto main() -> int {
     auto window = Window {{
@@ -77,7 +48,7 @@ auto main() -> int {
         .framebuffer_width = window.FramebufferWidth(),
         .framebuffer_height = window.FramebufferHeight(),
         .sample_count = kSampleCount,
-        .clear_color = Color {0.4f, 0.4f, 0.4f}
+        .clear_color = {0x000000}
     }};
 
     auto init_renderer = renderer.Initialize();
@@ -93,23 +64,18 @@ auto main() -> int {
         .far = 1000.0f
     });
 
-    camera->TranslateZ(3.0f);
-
     auto context = SharedContext::Create(&window, camera.get());
 
     auto target = RenderTarget::Create({
-        .width = window.FramebufferWidth(),
-        .height = window.FramebufferHeight(),
+        .width = window.FramebufferWidth() / 4,
+        .height = window.FramebufferHeight() / 4,
         .format = Texture::Format::RGBA8,
         .has_depth = true
     });
 
-    auto scene_0 = std::make_shared<Scene0>();
-    scene_0->SetContext(context.get());
-
-    auto texture = renderer.CreateTextureFromRenderTarget(target.get());
-    auto scene_1 = std::make_shared<Scene1>(texture);
-    scene_1->SetContext(context.get());
+    auto scene = std::make_shared<MainScene>();
+    scene->SetContext(context.get());
+    scene->Add(OrbitControls::Create(camera.get(), {.radius = 10.0f}));
 
     auto timer = FrameTimer {true}; // auto-start
     while(!window.ShouldClose()) {
@@ -118,13 +84,11 @@ auto main() -> int {
         context->load_scheduler->Pump();
         const auto dt = timer.Tick();
 
-        scene_0->Advance(dt);
-        renderer.SetClearColor(0x000080);
-        renderer.Render(scene_0.get(), camera.get(), target.get());
+        scene->Advance(dt);
+        renderer.Render(scene.get(), camera.get(), target.get());
 
-        scene_1->Advance(dt);
-        renderer.SetClearColor(0x444444);
-        renderer.Render(scene_1.get(), camera.get());
+        scene->Advance(dt);
+        renderer.Render(scene.get(), camera.get());
 
         window.EndUIFrame();
         window.SwapBuffers();

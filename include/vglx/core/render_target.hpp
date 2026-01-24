@@ -24,6 +24,7 @@ public:
         int height;
         Texture::Format format;
         bool has_depth;
+        bool enable_reads {false};
     };
 
     const int width;
