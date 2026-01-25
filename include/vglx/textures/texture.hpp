@@ -12,8 +12,6 @@
 #include "vglx/core/disposable.hpp"
 #include "vglx/core/identity.hpp"
 
-#include "utilities/assert.hpp"
-
 namespace vglx {
 
 /**
@@ -152,7 +150,7 @@ constexpr auto bytes_per_pixel(Texture::Format format) {
         case R32F:    return 4;
         case R32UI:   return 4;
         case SRGBA8:  return 4;
-        default: VGLX_UNREACHABLE();
+        default:      return 4;
     }
 }
 
