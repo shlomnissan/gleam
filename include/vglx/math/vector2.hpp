@@ -264,6 +264,17 @@ struct VGLX_EXPORT Vector2 {
 }
 
 /**
+ * @brief Divides two vectors component-wise.
+ * @related Vector2
+ *
+ * @param a First vector.
+ * @param b Second vector.
+ */
+[[nodiscard]] constexpr auto operator/(const Vector2& a, const Vector2& b) -> Vector2 {
+    return {a.x / b.x, a.y / b.y};
+}
+
+/**
  * @brief Computes the dot product of two 2D vectors.
  * @related Vector2
  *

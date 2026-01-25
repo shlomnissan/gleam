@@ -271,6 +271,17 @@ struct VGLX_EXPORT Vector4 {
 }
 
 /**
+ * @brief Divides two vectors component-wise.
+ * @related Vector4
+ *
+ * @param a First vector.
+ * @param b Second vector.
+ */
+[[nodiscard]] constexpr auto operator/(const Vector4& a, const Vector4& b) -> Vector4 {
+    return {a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w};
+}
+
+/**
  * @brief Computes the dot product of two 4D vectors.
  * @related Vector4
  *

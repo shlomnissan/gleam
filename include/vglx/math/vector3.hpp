@@ -275,6 +275,17 @@ struct VGLX_EXPORT Vector3 {
 }
 
 /**
+ * @brief Divides two vectors component-wise.
+ * @related Vector3
+ *
+ * @param a First vector.
+ * @param b Second vector.
+ */
+[[nodiscard]] constexpr auto operator/(const Vector3& a, const Vector3& b) -> Vector3 {
+    return {a.x / b.x, a.y / b.y, a.z / b.z};
+}
+
+/**
  * @brief Computes the cross product of two 3D vectors.
  * @related Vector3
  *
