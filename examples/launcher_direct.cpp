@@ -30,9 +30,8 @@ auto main() -> int {
         .vsync = false
     }};
 
-    auto init_window = window.Initialize();
-    if (!init_window.has_value()) {
-        std::println(stderr, "{}", init_window.error());
+    if (auto result = window.Initialize(); !result.has_value()) {
+        std::println(stderr, "{}", result.error());
         return 1;
     }
 
@@ -43,9 +42,8 @@ auto main() -> int {
         .clear_color = 0x444444
     }};
 
-    auto init_renderer = renderer.Initialize();
-    if (!init_renderer.has_value()) {
-        std::println(stderr, "{}", init_renderer.error());
+    if (auto result = renderer.Initialize(); !result.has_value()) {
+        std::println(stderr, "{}", result.error());
         return 1;
     }
 

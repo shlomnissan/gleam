@@ -32,9 +32,7 @@ namespace vglx {
  *   context->texture_loader->LoadAsync("assets/sprite.tex",
  *     [this](auto result) {
  *       if (result) {
- *         auto material = vglx::SpriteMaterial::Create();
- *         material->albedo_map = result.value();
- *
+ *         auto material = vglx::SpriteMaterial::Create(result.value());
  *         Add(Sprite::Create(material))->SetScale(0.5f);
  *       } else {
  *         std::println(stderr, "{}", result.error());

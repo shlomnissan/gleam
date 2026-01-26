@@ -93,7 +93,7 @@ public:
         std::string vertex_shader; ///< Vertex shader code.
         std::string fragment_shader; ///< Fragment shader code.
         UniformList uniforms; ///< Initial uniform values.
-        std::vector<TextureBinding> textures;
+        std::vector<TextureBinding> textures; ///< Initial texture bindings.
     };
 
     /**
