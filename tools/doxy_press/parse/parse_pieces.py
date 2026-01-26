@@ -57,9 +57,11 @@ def _function_param_brief_map(el: ET.Element, resolver: Resolver):
         return output
 
     for param in details.findall(".//parameterlist[@kind='param']/parameteritem"):
-        name = element_text(param.find("./parameternamelist/parametername"))
-        brief = read_pieces(param.find("parameterdescription"), resolver)
-        output[name] = brief
+        name_el = param.find("./parameternamelist/parametername")
+        if name_el is not None:
+            name = "".join(name_el.itertext()).strip()
+            brief = read_pieces(param.find("parameterdescription"), resolver)
+            output[name] = brief
 
     return output
 
