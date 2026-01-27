@@ -10,12 +10,11 @@
 #include "vglx/lights/ambient_light.hpp"
 #include "vglx/lights/directional_light.hpp"
 #include "vglx/lights/point_light.hpp"
-#include "vglx/materials/unlit_material.hpp"
 #include "vglx/materials/phong_material.hpp"
 #include "vglx/materials/shader_material.hpp"
 #include "vglx/materials/sprite_material.hpp"
-
-#include "utilities/logger.hpp"
+#include "vglx/materials/unlit_material.hpp"
+#include "vglx/math/utilities.hpp"
 
 #include <cassert>
 
@@ -40,8 +39,10 @@ ProgramAttributes::ProgramAttributes(
         specular_map = m->specular_map != nullptr;
     }
 
+    auto shader_material_id = 0;
     if (type == Material::Type::ShaderMaterial) {
         auto m = static_cast<const ShaderMaterial*>(material);
+        shader_material_id = m->shader_material_id_;
         vertex_shader = m->vertex_shader_;
         fragment_shader = m->fragment_shader_;
     }
@@ -85,6 +86,10 @@ ProgramAttributes::ProgramAttributes(
     key |= (tangent ? 1 : 0) << 25; // 1 bit
     key |= (specular_map ? 1 : 0) << 26; // 1 bit
     key |= (texture_map ? 1 : 0) << 27; // 1 bit
+
+    if (type == Material::Type::ShaderMaterial) {
+        math::HashCombine(key, shader_material_id);
+    }
 }
 
 }

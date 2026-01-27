@@ -177,6 +177,8 @@ private:
     std::string vertex_shader_;
     std::string fragment_shader_;
 
+    size_t shader_material_id_;
+
     std::unordered_map<
         std::string,
         UniformValue,

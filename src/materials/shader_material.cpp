@@ -6,6 +6,7 @@
 */
 
 #include "vglx/materials/shader_material.hpp"
+#include "vglx/math/utilities.hpp"
 
 namespace vglx {
 
@@ -15,6 +16,10 @@ ShaderMaterial::ShaderMaterial(Parameters params)
     textures_(std::move(params.textures))
 {
     uniforms_.reserve(params.uniforms.size());
+
+    math::HashCombine(shader_material_id_, vertex_shader_);
+    math::HashCombine(shader_material_id_, fragment_shader_);
+
     for (const auto& [k, v] : params.uniforms) uniforms_.try_emplace(k, v);
 }
 
