@@ -198,24 +198,38 @@ target_compile_options(${PROJECT_NAME} PRIVATE
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${VENDOR_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+
+target_include_directories(${PROJECT_NAME} PRIVATE
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/tools/asset_builder/include>
-    $<BUILD_INTERFACE:${VENDOR_DIR}>
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE glad glfw)
 
 if (VGLX_BUILD_IMGUI)
-    target_sources(
-        ${PROJECT_NAME} PRIVATE
-        "${VENDOR_DIR}/imgui/backends/imgui_impl_glfw.cpp"
-        "${VENDOR_DIR}/imgui/backends/imgui_impl_opengl3.cpp"
-        "core/imgui_integration.hpp"
+    target_sources(${PROJECT_NAME} PRIVATE
+        ${VENDOR_DIR}/imgui/backends/imgui_impl_glfw.cpp
+        ${VENDOR_DIR}/imgui/backends/imgui_impl_opengl3.cpp
+        core/imgui_integration.hpp
     )
+
+    set_target_properties(imgui PROPERTIES
+        CXX_VISIBILITY_PRESET default
+        VISIBILITY_INLINES_HIDDEN OFF
+    )
+
+    if(WIN32)
+        target_compile_definitions(${PROJECT_NAME} PRIVATE IMGUI_API=__declspec(dllexport))
+        target_compile_definitions(${PROJECT_NAME} INTERFACE IMGUI_API=__declspec(dllimport))
+    endif()
+
     target_link_libraries(${PROJECT_NAME} PRIVATE imgui)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE VGLX_USE_IMGUI=1)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC VGLX_USE_IMGUI=ON)
 endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
@@ -231,15 +245,15 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
     VERSION ${vglx_VERSION_MAJOR}.${vglx_VERSION_MINOR}.${vglx_VERSION_PATCH}
     COMPATIBILITY SameMajorVersion
 )
 
-set(CONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")
+set(CONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
 configure_package_config_file(
-    "${CMAKE_SOURCE_DIR}/cmake/Config.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+    ${CMAKE_SOURCE_DIR}/cmake/Config.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
     INSTALL_DESTINATION ${CONFIG_INSTALL_DIR}
 )
 
@@ -254,21 +268,31 @@ install(TARGETS ${PROJECT_NAME}
     INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
-install(DIRECTORY "${PUBLIC_HEADERS_DIR}/"
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}"
+install(DIRECTORY ${PUBLIC_HEADERS_DIR}/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
     FILES_MATCHING PATTERN "*.hpp"
 )
 
 install(FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/vglx_export.h"
-    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
+    ${CMAKE_CURRENT_BINARY_DIR}/vglx_export.h
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
 install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
     DESTINATION ${CONFIG_INSTALL_DIR}
+    COMPONENT development
 )
+
+if (VGLX_BUILD_IMGUI)
+    install(DIRECTORY ${VENDOR_DIR}/imgui/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}/imgui
+        FILES_MATCHING
+            PATTERN "*.h"
+            PATTERN "backends" EXCLUDE
+    )
+endif()
 
 install(
     EXPORT ${PROJECT_NAME}
