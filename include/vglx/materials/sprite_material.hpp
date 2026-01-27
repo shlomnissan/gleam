@@ -38,7 +38,7 @@ public:
     Color color;
 
     /// @brief Sprite texture sampled in RGBA; alpha controls transparency.
-    std::shared_ptr<Texture2D> texture_map;
+    std::shared_ptr<Texture> texture_map;
 
     /**
      * @brief Constructs a sprite material.
@@ -50,7 +50,7 @@ public:
      * @param color Base tint color applied to the texture.
      */
     SpriteMaterial(
-        std::shared_ptr<Texture2D> texture_map,
+        std::shared_ptr<Texture> texture_map,
         const Color& color = 0xFFFFFF
     ) : color(color), texture_map(std::move(texture_map)) {
         transparent = true;
@@ -63,7 +63,7 @@ public:
      * @param color Base tint color applied to the texture.
      */
     [[nodiscard]] static auto Create(
-        std::shared_ptr<Texture2D> texture_map,
+        std::shared_ptr<Texture> texture_map,
         const Color& color = 0xFFFFFF
     ) -> std::shared_ptr<SpriteMaterial> {
         return std::make_shared<SpriteMaterial>(std::move(texture_map), color);
