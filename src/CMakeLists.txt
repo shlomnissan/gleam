@@ -212,18 +212,21 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 target_link_libraries(${PROJECT_NAME} PRIVATE glad glfw)
 
 if (VGLX_BUILD_IMGUI)
-    target_sources(${PROJECT_NAME} PRIVATE
+    set(IMGUI_SOURCES
         ${VENDOR_DIR}/imgui/imgui.cpp
         ${VENDOR_DIR}/imgui/imgui_draw.cpp
         ${VENDOR_DIR}/imgui/imgui_tables.cpp
         ${VENDOR_DIR}/imgui/imgui_widgets.cpp
         ${VENDOR_DIR}/imgui/backends/imgui_impl_glfw.cpp
         ${VENDOR_DIR}/imgui/backends/imgui_impl_opengl3.cpp
-        core/imgui_integration.hpp
     )
+
+    target_sources(${PROJECT_NAME} PRIVATE ${IMGUI_SOURCES} core/imgui_integration.hpp)
 
     if(WIN32)
         target_compile_definitions(${PROJECT_NAME} PRIVATE "IMGUI_API=__declspec(dllexport)")
+    else()
+        set_source_files_properties(${IMGUI_SOURCES} PROPERTIES COMPILE_FLAGS "-fvisibility=default")
     endif()
 
     target_include_directories(${PROJECT_NAME} PRIVATE
