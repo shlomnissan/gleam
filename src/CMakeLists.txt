@@ -213,22 +213,23 @@ target_link_libraries(${PROJECT_NAME} PRIVATE glad glfw)
 
 if (VGLX_BUILD_IMGUI)
     target_sources(${PROJECT_NAME} PRIVATE
+        ${VENDOR_DIR}/imgui/imgui.cpp
+        ${VENDOR_DIR}/imgui/imgui_draw.cpp
+        ${VENDOR_DIR}/imgui/imgui_tables.cpp
+        ${VENDOR_DIR}/imgui/imgui_widgets.cpp
         ${VENDOR_DIR}/imgui/backends/imgui_impl_glfw.cpp
         ${VENDOR_DIR}/imgui/backends/imgui_impl_opengl3.cpp
         core/imgui_integration.hpp
     )
 
-    set_target_properties(imgui PROPERTIES
-        CXX_VISIBILITY_PRESET default
-        VISIBILITY_INLINES_HIDDEN OFF
-    )
-
     if(WIN32)
-        target_compile_definitions(${PROJECT_NAME} PRIVATE IMGUI_API=__declspec(dllexport))
-        target_compile_definitions(${PROJECT_NAME} INTERFACE IMGUI_API=__declspec(dllimport))
+        target_compile_definitions(${PROJECT_NAME} PRIVATE "IMGUI_API=__declspec(dllexport)")
     endif()
 
-    target_link_libraries(${PROJECT_NAME} PRIVATE imgui)
+    target_include_directories(${PROJECT_NAME} PRIVATE
+        $<BUILD_INTERFACE:${VENDOR_DIR}/imgui>
+    )
+
     target_compile_definitions(${PROJECT_NAME} PUBLIC VGLX_USE_IMGUI=ON)
 endif()
 
