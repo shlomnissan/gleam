@@ -26,7 +26,7 @@ enum class UniformType {
     Int,
     Matrix3,
     Matrix4,
-    Sampler2D,
+    Sampler,
     Vector2,
     Vector3,
     Vector4,
