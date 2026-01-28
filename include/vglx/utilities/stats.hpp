@@ -36,7 +36,7 @@ namespace vglx {
  *
  * @ingroup UtilitiesGroup
  */
-class Stats {
+class VGLX_EXPORT Stats {
 public:
     /**
      * @brief Constructs a stats object.
