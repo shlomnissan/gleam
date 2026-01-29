@@ -827,7 +827,10 @@ bool    ImGui_ImplOpenGL3_CreateDeviceObjects()
         "varying vec4 Frag_Color;\n"
         "void main()\n"
         "{\n"
-        "    gl_FragColor = Frag_Color * texture2D(Texture, Frag_UV.st);\n"
+        "    vec4 texel = texture(Texture, Frag_UV.st);\n"
+        "    vec3 uiColorLinear = pow(Frag_Color.rgb, vec3(2.2));\n"
+        "    vec3 combinedLinear = uiColorLinear * texel.rgb;\n"
+        "    Out_Color = vec4(pow(combinedLinear, vec3(1.0/2.2)), Frag_Color.a * texel.a);\n"
         "}\n";
 
     const GLchar* fragment_shader_glsl_130 =
@@ -837,7 +840,10 @@ bool    ImGui_ImplOpenGL3_CreateDeviceObjects()
         "out vec4 Out_Color;\n"
         "void main()\n"
         "{\n"
-        "    Out_Color = Frag_Color * texture(Texture, Frag_UV.st);\n"
+        "    vec4 texel = texture(Texture, Frag_UV.st);\n"
+        "    vec3 uiColorLinear = pow(Frag_Color.rgb, vec3(2.2));\n"
+        "    vec3 combinedLinear = uiColorLinear * texel.rgb;\n"
+        "    Out_Color = vec4(pow(combinedLinear, vec3(1.0/2.2)), Frag_Color.a * texel.a);\n"
         "}\n";
 
     const GLchar* fragment_shader_glsl_300_es =
@@ -848,7 +854,10 @@ bool    ImGui_ImplOpenGL3_CreateDeviceObjects()
         "layout (location = 0) out vec4 Out_Color;\n"
         "void main()\n"
         "{\n"
-        "    Out_Color = Frag_Color * texture(Texture, Frag_UV.st);\n"
+        "    vec4 texel = texture(Texture, Frag_UV.st);\n"
+        "    vec3 uiColorLinear = pow(Frag_Color.rgb, vec3(2.2));\n"
+        "    vec3 combinedLinear = uiColorLinear * texel.rgb;\n"
+        "    Out_Color = vec4(pow(combinedLinear, vec3(1.0/2.2)), Frag_Color.a * texel.a);\n"
         "}\n";
 
     const GLchar* fragment_shader_glsl_410_core =
@@ -858,7 +867,10 @@ bool    ImGui_ImplOpenGL3_CreateDeviceObjects()
         "layout (location = 0) out vec4 Out_Color;\n"
         "void main()\n"
         "{\n"
-        "    Out_Color = Frag_Color * texture(Texture, Frag_UV.st);\n"
+        "    vec4 texel = texture(Texture, Frag_UV.st);\n"
+        "    vec3 uiColorLinear = pow(Frag_Color.rgb, vec3(2.2));\n"
+        "    vec3 combinedLinear = uiColorLinear * texel.rgb;\n"
+        "    Out_Color = vec4(pow(combinedLinear, vec3(1.0/2.2)), Frag_Color.a * texel.a);\n"
         "}\n";
 
     // Select shaders matching our GLSL versions
