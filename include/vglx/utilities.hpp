@@ -13,5 +13,6 @@
  */
 
 #include "vglx/utilities/frame_timer.hpp"
+#include "vglx/utilities/logging.hpp"
 #include "vglx/utilities/stats.hpp"
 #include "vglx/utilities/timer.hpp"

@@ -7,20 +7,57 @@
 
 #include "utilities/logger.hpp"
 
+#include "vglx/utilities/logging.hpp"
+
+#ifndef VGLX_LOG_LEVEL
+    #define VGLX_LOG_LEVEL 3
+#endif
+
 namespace vglx {
+
+constexpr LogLevel kDefaultLogLevel =
+#if VGLX_LOG_LEVEL == 0
+    LogLevel::Error;
+#elif VGLX_LOG_LEVEL == 1
+    LogLevel::Warning;
+#elif VGLX_LOG_LEVEL == 2
+    LogLevel::Info;
+#elif VGLX_LOG_LEVEL == 3
+    LogLevel::Debug;
+#else
+    #error "Invalid VGLX_LOG_LEVEL (must be 0..3)"
+#endif
+;
 
 namespace fs = std::filesystem;
 
-std::mutex Logger::mutex_;
+std::atomic<LogLevel> Logger::runtime_level_{kDefaultLogLevel};
+std::mutex Logger::mutex_ {};
 
-auto Logger::ToString(LogLevel level) -> std::string {
+auto Logger::GetLevel() -> LogLevel {
+    return runtime_level_.load(std::memory_order_relaxed);
+}
+
+void Logger::SetLevel(LogLevel level) {
+    runtime_level_.store(level, std::memory_order_relaxed);
+}
+
+void SetLogLevel(LogLevel level) {
+    Logger::SetLevel(level);
+}
+
+auto GetLogLevel() -> LogLevel {
+    return Logger::GetLevel();
+}
+
+VGLX_EXPORT auto GetLogLevelString(LogLevel level) -> std::string {
     using enum LogLevel;
     switch (level) {
-        case Error:    return "\033[1;31m[Error]\033[0m";
-        case Warning:  return "\033[1;33m[Warning]\033[0m";
-        case Info:     return "\033[1;34m[Info]\033[0m";
-        case Debug:    return "\033[1;35m[Debug]\033[0m";
-        default:       return "Unknown";
+        case Error: return "\033[1;31m[Error]\033[0m";
+        case Warning: return "\033[1;33m[Warning]\033[0m";
+        case Info: return "\033[1;34m[Info]\033[0m";
+        case Debug: return "\033[1;35m[Debug]\033[0m";
+        default: return "Unknown";
     }
 }
 

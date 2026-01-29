@@ -154,6 +154,7 @@ set(PUBLIC_HEADERS
     "${PUBLIC_HEADERS_DIR}/textures/texture.hpp"
     "${PUBLIC_HEADERS_DIR}/textures/texture_2d.hpp"
     "${PUBLIC_HEADERS_DIR}/utilities/frame_timer.hpp"
+    "${PUBLIC_HEADERS_DIR}/utilities/logging.hpp"
     "${PUBLIC_HEADERS_DIR}/utilities/stats.hpp"
     "${PUBLIC_HEADERS_DIR}/utilities/timer.hpp"
 )

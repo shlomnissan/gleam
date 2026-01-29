@@ -8,8 +8,10 @@
 #pragma once
 
 #include "vglx/core/identity.hpp"
+#include "vglx/utilities/logging.hpp"
 #include "vglx/utilities/timer.hpp"
 
+#include <atomic>
 #include <filesystem>
 #include <format>
 #include <iostream>
@@ -22,35 +24,6 @@ namespace vglx {
 
 namespace fs = std::filesystem;
 
-enum class LogLevel {
-    Error,
-    Warning,
-    Info,
-    Debug
-};
-
-#ifndef VGLX_LOG_LEVEL
-    #define VGLX_LOG_LEVEL 3
-#endif
-
-namespace {
-
-constexpr LogLevel kDefaultLogLevel =
-#if VGLX_LOG_LEVEL == 0
-    LogLevel::Error;
-#elif VGLX_LOG_LEVEL == 1
-    LogLevel::Warning;
-#elif VGLX_LOG_LEVEL == 2
-    LogLevel::Info;
-#elif VGLX_LOG_LEVEL == 3
-    LogLevel::Debug;
-#else
-    #error "Invalid VGLX_LOG_LEVEL (must be 0..3)"
-#endif
-;
-
-}
-
 class Logger {
 public:
     template <typename... Args>
@@ -61,7 +34,7 @@ public:
             Args&&... args,
             const std::source_location& loc = std::source_location::current()
         ) {
-            if (std::to_underlying(level) > std::to_underlying(kDefaultLogLevel)) return;
+            if (std::to_underlying(level) > std::to_underlying(GetLevel())) return;
 
             const auto lock = std::scoped_lock(mutex_);
 
@@ -77,7 +50,7 @@ public:
             *stream << std::format(
                 "[{}]{}: {} -> {}:{}\n",
                 Timer::GetTimestamp(),
-                Logger::ToString(level),
+                GetLogLevelString(level),
                 message,
                 path.filename().string(),
                 loc.line()
@@ -97,10 +70,13 @@ public:
     template <typename... Args>
     Log(std::string_view message, Args&&...) -> Log<Args...>;
 
+    static auto GetLevel() -> LogLevel;
+
+    static void SetLevel(LogLevel level);
+
 private:
     static std::mutex mutex_;
-
-    [[nodiscard]] static auto ToString(LogLevel level) -> std::string;
+    static std::atomic<LogLevel> runtime_level_;
 };
 
 }
