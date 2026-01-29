@@ -236,6 +236,8 @@ if (VGLX_BUILD_IMGUI)
     target_compile_definitions(${PROJECT_NAME} PUBLIC VGLX_USE_IMGUI=ON)
 endif()
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE VGLX_LOG_LEVEL=${VGLX_LOG_LEVEL})
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
     POSITION_INDEPENDENT_CODE ON
     VERSION ${vglx_VERSION_MAJOR}.${vglx_VERSION_MINOR}.${vglx_VERSION_PATCH}

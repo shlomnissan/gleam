@@ -16,6 +16,7 @@
 #include <mutex>
 #include <source_location>
 #include <string>
+#include <utility>
 
 namespace vglx {
 
@@ -28,6 +29,28 @@ enum class LogLevel {
     Debug
 };
 
+#ifndef VGLX_LOG_LEVEL
+    #define VGLX_LOG_LEVEL 3
+#endif
+
+namespace {
+
+constexpr LogLevel kDefaultLogLevel =
+#if VGLX_LOG_LEVEL == 0
+    LogLevel::Error;
+#elif VGLX_LOG_LEVEL == 1
+    LogLevel::Warning;
+#elif VGLX_LOG_LEVEL == 2
+    LogLevel::Info;
+#elif VGLX_LOG_LEVEL == 3
+    LogLevel::Debug;
+#else
+    #error "Invalid VGLX_LOG_LEVEL (must be 0..3)"
+#endif
+;
+
+}
+
 class Logger {
 public:
     template <typename... Args>
@@ -38,6 +61,8 @@ public:
             Args&&... args,
             const std::source_location& loc = std::source_location::current()
         ) {
+            if (std::to_underlying(level) > std::to_underlying(kDefaultLogLevel)) return;
+
             const auto lock = std::scoped_lock(mutex_);
 
             auto stream = level == LogLevel::Error ? &std::cerr : &std::cout;
