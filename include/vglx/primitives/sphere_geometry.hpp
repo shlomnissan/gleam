@@ -58,7 +58,7 @@ public:
     /**
      * @brief Creates a shared instance of @ref SphereGeometry with default parameters.
      */
-    [[nodiscard]] static auto Create() {
+    [[nodiscard]] static auto Create() -> std::shared_ptr<SphereGeometry>  {
         return std::make_shared<SphereGeometry>(Parameters {});
     }
 
@@ -68,7 +68,7 @@ public:
      * @param params @ref SphereGeometry::Parameters "Initialization parameters"
      * used to generate the sphere.
      */
-    [[nodiscard]] static auto Create(const Parameters& params){
+    [[nodiscard]] static auto Create(const Parameters& params) -> std::shared_ptr<SphereGeometry> {
         return std::make_shared<SphereGeometry>(params);
     }
 };
