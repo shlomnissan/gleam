@@ -32,8 +32,8 @@ namespace vglx {
  *   auto Configure() -> Application::Parameters override {
  *     return {
  *       .title = "My App",
- *       .width = 1024,
- *       .height = 768,
+ *       .width = 1280,
+ *       .height = 720,
  *       .clear_color = 0x444444,
  *       .vsync = true,
  *       .show_stats = true
@@ -73,8 +73,8 @@ public:
     struct Parameters {
         std::string title {"Application"}; ///< Window title.
         Color clear_color {0x000000}; ///< Background clear color.
-        int width {1024}; ///< Window width in pixels.
-        int height {768}; ///< Window height in pixels.
+        int width {1280}; ///< Window width in pixels.
+        int height {720}; ///< Window height in pixels.
         int sample_count {1}; ///< Antialiasing level (e.g., 4x MSAA).
         bool vsync {true}; ///< Enables vertical sync.
         bool show_stats {false}; ///< Show stats UI overlay.

@@ -55,10 +55,11 @@ class VGLX_EXPORT Renderer {
 public:
     /// @brief Parameters for constructing a @ref Renderer object.
     struct Parameters {
-        int framebuffer_width; ///< Current framebuffer width in pixels.
-        int framebuffer_height; ///< Current framebuffer height in pixels.
-        int sample_count; ///< Antialiasing level (e.g., 4x MSAA).
-        Color clear_color; ///< Clear color used at the start of a frame.
+        int framebuffer_width {1280}; ///< Current framebuffer width in pixels.
+        int framebuffer_height {720}; ///< Current framebuffer height in pixels.
+        int sample_count {1}; ///< Antialiasing level (e.g., 4x MSAA).
+        Color clear_color {0x000000}; ///< Clear color used at the start of a frame.
+        bool reverse_z {false}; ///< Enables Reverse-Z depth mapping for improved precision.
     };
 
     /**

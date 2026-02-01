@@ -91,8 +91,8 @@ struct MyApp : public vglx::Application {
         return {
             .title = "Hello VGLX",
             .clear_color = {0x000000},
-            .width = 1024,
-            .height = 768,
+            .width = 1280,
+            .height = 720,
             .antialiasing = 4,
             .vsync = false,
             .show_stats = true,
@@ -298,8 +298,8 @@ struct MyApp : public vglx::Application {
         return {
             .title = "Hello VGLX",
             .clear_color = {0x000000},
-            .width = 1024,
-            .height = 768,
+            .width = 1280,
+            .height = 720,
             .antialiasing = 4,
             .vsync = false,
             .show_stats = true,

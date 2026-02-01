@@ -15,8 +15,8 @@ using namespace vglx;
 
 namespace {
 
-constexpr auto kWindowWidth {1024};
-constexpr auto kWindowHeight {768};
+constexpr auto kWindowWidth {1280};
+constexpr auto kWindowHeight {720};
 constexpr auto kSampleCount {1};
 
 }

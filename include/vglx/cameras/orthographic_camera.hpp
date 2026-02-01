@@ -38,9 +38,9 @@ namespace vglx {
  *   auto CreateCamera() -> std::unique_ptr<vglx::Camera> override {
  *     return vglx::OrthographicCamera::Create({
  *       .left = 0.0f,
- *       .right = 1024.0f,
+ *       .right = 1280.0f,
  *       .top = 0.0f,
- *       .bottom = 768.0f,
+ *       .bottom = 720.0f,
  *       .near = 0.1f,
  *       .far = 100.0f
  *     });
