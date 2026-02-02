@@ -271,6 +271,19 @@ alignas(64) inline constexpr auto exp_val_table = std::array<uint32_t, 180> {
 }
 
 /**
+ * @brief Computes base raised to the power of exponent (base^exponent).
+ *
+ * @param exponent The exponent value.
+ */
+[[nodiscard]] constexpr auto Pow(float base, float exponent) -> float {
+    if (exponent == 0.0f) return 1.0f;
+    if (base == 0.0f) return (exponent > 0.0f) ? 0.0f : std::numeric_limits<float>::infinity();
+    if (base < 0.0f) return std::numeric_limits<float>::quiet_NaN();
+
+    return Exp(Log(base) * exponent);
+}
+
+/**
  * @brief Computes square root using fast inverse sqrt refinement.
  * @ingroup MathGroup
  *

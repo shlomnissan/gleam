@@ -427,6 +427,37 @@ TEST(MathUtilities, LogMonotonicity) {
 
 #pragma endregion
 
+#pragma region Pow
+
+TEST(MathUtilities, PowCommonValues) {
+    EXPECT_NEAR(math::Pow(2.0f, 3.0f), 8.0f, 1e-2f);
+    EXPECT_NEAR(math::Pow(10.0f, 2.0f), 100.0f, 1e-1f);
+    EXPECT_NEAR(math::Pow(9.0f, 0.5f), 3.0f, 1e-3f); // square root
+    EXPECT_NEAR(math::Pow(4.0f, -0.5f), 0.5f, 1e-3f); // inverse square root
+
+    static_assert(math::Pow(5.0f, 0.0f) == 1.0f);
+    static_assert(math::Pow(0.0f, 0.0f) == 1.0f);
+}
+
+TEST(MathUtilities, PowEdgeCases) {
+    EXPECT_FLOAT_EQ(math::Pow(0.0f, 5.0f), 0.0f);
+    EXPECT_TRUE(std::isinf(math::Pow(0.0f, -1.0f)));
+    EXPECT_TRUE(std::isnan(math::Pow(-2.0f, 2.0f)));
+
+    static_assert(math::Pow(0.0f, 2.0f) == 0.0f);
+    static_assert(math::Pow(0.0f, -2.0f) == std::numeric_limits<float>::infinity());
+}
+
+TEST(MathUtilities, PowMonotonicity) {
+    EXPECT_GT(math::Pow(2.0f, 4.0f), math::Pow(2.0f, 3.0f));
+    EXPECT_LT(math::Pow(0.5f, 2.0f), math::Pow(0.5f, 1.0f));
+    EXPECT_NEAR(math::Pow(7.89f, 1.0f), 7.89f, 1e-3f);
+
+    static_assert(math::Pow(2.0f, 2.0f) > math::Pow(2.0f, 1.0f));
+}
+
+#pragma endregion
+
 #pragma region Cantor Pairing
 
 TEST(MathUtilities, CantorPairingZeroPairing) {
