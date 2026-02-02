@@ -355,6 +355,42 @@ TEST(MathUtilities, AsinInverseProperty) {
 
 #pragma endregion
 
+#pragma region Exp
+
+TEST(MathUtilities, ExpCommonValues) {
+    EXPECT_NEAR(math::Exp(0.0f), 1.0f, 1e-4f);
+    EXPECT_NEAR(math::Exp(1.0f), 2.71828f, 1e-3f);
+    EXPECT_NEAR(math::Exp(-1.0f), 0.367879f, 1e-4f);
+    EXPECT_NEAR(math::Exp(2.0f), 7.38905f, 1e-3f);
+    EXPECT_NEAR(math::Exp(-5.0f), 0.006737f, 1e-4f);
+
+    static_assert(ApproxEqual(math::Exp(0.0f), 1.0f));
+    static_assert(math::Exp(1.0f) > 2.71f && math::Exp(1.0f) < 2.72f);
+    static_assert(math::Exp(-1.0f) > 0.36f && math::Exp(-1.0f) < 0.37f);
+}
+
+TEST(MathUtilities, ExpLimits) {
+    EXPECT_EQ(math::Exp(-100.0f), 0.0f);
+    EXPECT_TRUE(std::isinf(math::Exp(100.0f)));
+
+    static_assert(math::Exp(-100.0f) == 0.0f);
+    static_assert(math::Exp(100.0f) == std::numeric_limits<float>::infinity());
+}
+
+TEST(MathUtilities, ExpMonotonicity) {
+    constexpr float a = 0.5f;
+    constexpr float b = 1.0f;
+    constexpr float c = 1.5f;
+
+    EXPECT_GT(math::Exp(b), math::Exp(a));
+    EXPECT_GT(math::Exp(c), math::Exp(b));
+    EXPECT_GT(math::Exp(a), math::Exp(-a));
+
+    static_assert(math::Exp(1.0f) > math::Exp(0.0f));
+}
+
+#pragma endregion
+
 #pragma region Cantor Pairing
 
 TEST(MathUtilities, CantorPairingZeroPairing) {

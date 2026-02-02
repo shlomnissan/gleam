@@ -70,6 +70,10 @@ alignas(64) inline constexpr auto trig_table = std::array<std::array<uint32_t, 2
 	{0x3F7B14BE, 0xBE47C5C2}, {0x3F7C3B28, 0xBE2F10A3}, {0x3F7D3AAC, 0xBE164083}, {0x3F7E1324, 0xBDFAB273}, {0x3F7EC46D, 0xBDC8BD36}, {0x3F7F4E6D, 0xBD96A905}, {0x3F7FB10F, 0xBD48FB30}, {0x3F7FEC43, 0xBCC90AB0}
 }};
 
+[[nodiscard]] constexpr auto GetTrigPair(int32_t index) {
+    return std::bit_cast<Pair>(trig_table[index & 255]);
+}
+
 alignas(64) inline constexpr auto arctan_table = std::array<uint32_t, 65> {
     0x00000000, 0x3C7FFAAB, 0x3CFFEAAE, 0x3D3FDC0C, 0x3D7FAADE, 0x3D9FACF8, 0x3DBF70C1, 0x3DDF1CF6,
     0x3DFEADD5, 0x3E0F0FD8, 0x3E1EB777, 0x3E2E4C09, 0x3E3DCBDA, 0x3E4D3547, 0x3E5C86BB, 0x3E6BBEAF,
@@ -81,7 +85,7 @@ alignas(64) inline constexpr auto arctan_table = std::array<uint32_t, 65> {
     0x3F38053E, 0x3F3A44BC, 0x3F3C7B5E, 0x3F3EA941, 0x3F40CE86, 0x3F42EB4B, 0x3F44FFB0, 0x3F470BD5, 0x3F490FDB
 };
 
-alignas(64) inline constexpr auto exp_integer_table = std::array<uint32_t, 180> {
+alignas(64) inline constexpr auto exp_val_table = std::array<uint32_t, 180> {
     0x00000000, 0x00B33687, 0x01739362, 0x022586E0, 0x02E0F96D, 0x0398E2CB, 0x044FCB22, 0x050D35D7,
     0x05BFECBA, 0x06826D27, 0x07314490, 0x07F0EE94, 0x08A3BAF0, 0x095E884F, 0x0A1739FB, 0x0ACD89C1,
     0x0B8BAD78, 0x0C3DD771, 0x0D0102BF, 0x0DAF5800, 0x0E6E511E, 0x0F21F3FE, 0x0FDC1DF9, 0x109595C7,
@@ -107,8 +111,8 @@ alignas(64) inline constexpr auto exp_integer_table = std::array<uint32_t, 180> 
     0x7EF882B7, 0x7F800000
 };
 
-[[nodiscard]] constexpr Pair GetTrigPair(int32_t index) {
-    return std::bit_cast<Pair>(trig_table[index & 255]);
+[[nodiscard]] constexpr auto GetExpValue(int32_t index) {
+    return std::bit_cast<float>(exp_val_table[index]);
 }
 
 /**
@@ -194,6 +198,37 @@ alignas(64) inline constexpr auto exp_integer_table = std::array<uint32_t, 180> 
  */
 [[nodiscard]] constexpr auto Fabs(float x) {
     return (x < 0.0F) ? -x : x;
+}
+/**
+ * @brief Approximates the exponential function e^x.
+ *
+ * Uses a combination of a precomputed integer-range lookup table
+ * and a Taylor series polynomial correction for the fractional part.
+ *
+ * @param x Input exponent.
+ */
+[[nodiscard]] constexpr auto Exp(float x) -> float {
+    if (x > 91.0f) return std::numeric_limits<float>::infinity();
+    if (x < -88.0f) return 0.0f;
+
+    const auto ix = static_cast<int32_t>(x);
+    const auto f = static_cast<float>(ix - (x < static_cast<float>(ix)));
+    const auto i = static_cast<int32_t>(f) + 88;
+    if (i > 0) {
+        x -= f;
+        float r = 1.0f / 362880.0f;
+        r = r * x + 1.0f / 40320.0f;
+        r = r * x + 1.0f / 5040.0f;
+        r = r * x + 1.0f / 720.0f;
+        r = r * x + 1.0f / 120.0f;
+        r = r * x + 1.0f / 24.0f;
+        r = r * x + 1.0f / 6.0f;
+        r = r * x + 0.5f;
+
+        float poly = (r * (x * x) + (x + 1.0f));
+        return poly * GetExpValue(i < 179 ? i : 179);
+    }
+    return 0.0f;
 }
 
 /**
