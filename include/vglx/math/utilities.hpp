@@ -33,6 +33,7 @@ constexpr float tau_over_4 = 1.5707963267948966192313216916398f;
 constexpr float tau_over_6 = 1.0471975511965977461542144610932f;
 constexpr float tau_over_256 = 0.0245436926f;
 constexpr float inv_tau = 40.74366543f;
+constexpr float ln_2 = 0.69314718055994530941723212145818F;
 constexpr float eps = 1e-6f;
 
 alignas(64) inline constexpr auto trig_table = std::array<std::array<uint32_t, 2>, 256> {{
@@ -229,6 +230,44 @@ alignas(64) inline constexpr auto exp_val_table = std::array<uint32_t, 180> {
         return poly * GetExpValue(i < 179 ? i : 179);
     }
     return 0.0f;
+}
+
+/**
+ * @brief Approximates the natural logarithm ln(x).
+ *
+ * Uses bit-manipulation to decompose the input into mantissa and exponent,
+ * applying the identity ln(m * 2^e) = ln(m) + e * ln(2). The mantissa
+ * is approximated using a Taylor series polynomial.
+ *
+ * @param x Input value (must be greater than 0).
+ */
+[[nodiscard]] constexpr auto Log(float x) -> float {
+    if (x > 0) {
+        auto i = std::bit_cast<int32_t>(x);
+        auto e = (i >> 23) - 127;
+
+        i = (i & 0x007FFFFF) | 0x3F800000;
+        auto f = std::bit_cast<float>(i);
+
+        if (f > 1.41421356f) {
+            f *= 0.5f;
+            e++;
+        }
+
+        auto m = f - 1.0f;
+        auto r = 1.0f / 7.0f;
+        r = r * m - 1.0f / 6.0f;
+        r = r * m + 1.0f / 5.0f;
+        r = r * m - 1.0f / 4.0f;
+        r = r * m + 1.0f / 3.0f;
+        r = r * m - 0.5f;
+
+        return (r * (m * m) + m) + (static_cast<float>(e) * ln_2);
+    }
+
+    if (x == 0.0f) return -std::numeric_limits<float>::infinity();
+
+    return std::numeric_limits<float>::quiet_NaN();
 }
 
 /**

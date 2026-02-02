@@ -391,6 +391,42 @@ TEST(MathUtilities, ExpMonotonicity) {
 
 #pragma endregion
 
+#pragma region Log
+
+TEST(MathUtilities, LogCommonValues) {
+    EXPECT_NEAR(math::Log(1.0f), 0.0f, 1e-4f);
+    EXPECT_NEAR(math::Log(2.7182818f), 1.0f, 1e-4f); // ln(e)
+    EXPECT_NEAR(math::Log(2.0f), 0.693147f, 1e-4f); // ln(2)
+    EXPECT_NEAR(math::Log(10.0f), 2.302585f, 1e-4f); // ln(10)
+
+    static_assert(ApproxEqual(math::Log(1.0f), 0.0f));
+    static_assert(math::Log(2.0f) > 0.69f && math::Log(2.0f) < 0.70f);
+}
+
+TEST(MathUtilities, LogLimits) {
+    EXPECT_TRUE(std::isinf(math::Log(0.0f)));
+    EXPECT_LT(math::Log(0.0f), 0.0f);
+    EXPECT_TRUE(std::isnan(math::Log(-1.0f)));
+
+    static_assert(math::Log(0.0f) == -std::numeric_limits<float>::infinity());
+}
+
+TEST(MathUtilities, LogMonotonicity) {
+    constexpr float a = 0.5f;
+    constexpr float b = 1.0f;
+    constexpr float c = 10.0f;
+
+    EXPECT_GT(math::Log(b), math::Log(a));
+    EXPECT_GT(math::Log(c), math::Log(b));
+
+    constexpr float x = 1.23f;
+    EXPECT_NEAR(math::Log(math::Exp(x)), x, 1e-3f);
+
+    static_assert(math::Log(10.0f) > math::Log(1.0f));
+}
+
+#pragma endregion
+
 #pragma region Cantor Pairing
 
 TEST(MathUtilities, CantorPairingZeroPairing) {
