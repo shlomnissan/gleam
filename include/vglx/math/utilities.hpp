@@ -453,7 +453,7 @@ alignas(64) inline constexpr auto exp_val_table = std::array<uint32_t, 180> {
     if (c <= 0.04045f) {
         return c / 12.92f;
     }
-    return std::pow((c + 0.055f) / 1.055f, 2.4f);
+    return Pow((c + 0.055f) / 1.055f, 2.4f);
 }
 
 /**
@@ -466,7 +466,7 @@ alignas(64) inline constexpr auto exp_val_table = std::array<uint32_t, 180> {
     if (c <= 0.0031308f) {
         return c * 12.92f;
     }
-    return 1.055f * std::pow(c, 1.0f / 2.4f) - 0.055f;
+    return 1.055f * Pow(c, 1.0f / 2.4f) - 0.055f;
 }
 
 /**
