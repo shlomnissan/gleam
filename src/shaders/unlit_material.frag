@@ -7,6 +7,9 @@
 #include "snippets/frag_global_params.glsl"
 #include "snippets/frag_global_fog.glsl"
 
+uniform sampler2D u_AlphaMap;
+uniform sampler2D u_TextureMap;
+
 void main() {
     vec3 output_color = u_Color;
     float opacity = u_Opacity;

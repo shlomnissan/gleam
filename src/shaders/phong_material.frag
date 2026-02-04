@@ -19,6 +19,13 @@ uniform vec3 u_AmbientLight;
 uniform vec3 u_EmissiveColor;
 uniform float u_EmissiveIntensity;
 
+uniform sampler2D u_AlbedoMap;
+uniform sampler2D u_AlphaMap;
+uniform sampler2D u_NormalMap;
+uniform sampler2D u_SpecularMap;
+uniform sampler2D u_TextureMap;
+uniform sampler2D u_EmissiveMap;
+
 vec3 phongShading(
     const in vec3 light_dir,
     const in vec3 light_color,
