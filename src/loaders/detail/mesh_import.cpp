@@ -45,7 +45,7 @@ auto process_materials(
 
         auto material = PhongMaterial::Create();
         material->color = Color { mat_record.diffuse };
-        material->specular = Color { mat_record.specular };
+        material->specular_color = Color { mat_record.specular };
         material->shininess = mat_record.shininess;
 
         for (uint32_t t = 0; t < mat_record.texture_count; ++t) {

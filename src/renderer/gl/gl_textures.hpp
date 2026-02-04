@@ -24,6 +24,7 @@ enum class GLTextureMapType {
     NormalMap = 2,
     SpecularMap = 3,
     TextureMap = 4,
+    EmissiveMap = 5,
     Reserved
 };
 

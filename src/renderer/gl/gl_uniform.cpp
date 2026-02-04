@@ -49,11 +49,12 @@ GLUniform::GLUniform(std::string_view name, GLint location, GLenum type)
 
 auto GLUniform::SetValue(const void* value) -> void {
     switch(type_) {
-        case UniformType::Bool:
-            if (data_.b != *reinterpret_cast<const bool*>(value)) {
-                data_.b = *reinterpret_cast<const bool*>(value);
+        case UniformType::Bool: {
+            const GLboolean v = *reinterpret_cast<const bool*>(value) ? GL_TRUE : GL_FALSE;
+            if (data_.b != v) {
+                data_.b = v;
                 needs_upload_ = true;
-            }
+            }}
             break;
         case UniformType::Float:
             if (data_.f != *reinterpret_cast<const float*>(value)) {

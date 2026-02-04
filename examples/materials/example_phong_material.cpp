@@ -29,7 +29,7 @@ auto handle = TextureLoadHandle {};
 ExamplePhongMaterial::ExamplePhongMaterial() {
     auto geometry = BoxGeometry::Create();
     material_ = PhongMaterial::Create(0x049EF4);
-    material_->specular = {0.3f, 0.3f, 0.3f};
+    material_->specular_color = {0.3f, 0.3f, 0.3f};
     material_->shininess = 32.0f;
     mesh_ = Add(Mesh::Create(geometry, material_));
 
@@ -74,7 +74,7 @@ auto ExamplePhongMaterial::ContextMenu() -> void {
     };
 
     UIColor("color", &material_->color[0], _);
-    UIColor("specular", &material_->specular[0], _);
+    UIColor("specular", &material_->specular_color[0], _);
     UISliderFloat("shininess", material_->shininess, 0.0f, 128.0f, _, 160.0f);
     UIDropDown("texture", textures, curr_texture,
       [this](std::string_view str) {

@@ -45,10 +45,16 @@ public:
     Color color = 0xFFFFFF;
 
     /// @brief Specular color controlling the tint of specular highlights.
-    Color specular = 0x111111;
+    Color specular_color = 0x111111;
+
+    /// @brief Emissive color added to the final shaded result, independent of lighting.
+    Color emissive_color = 0x000000;
 
     /// @brief Controls the glossiness of highlights; higher values yield sharper specular peaks.
     float shininess = 32.0f;
+
+    /// @brief Scalar multiplier for emissive contribution.
+    float emissive_intensity = 1.0f;
 
     /// @brief Albedo (diffuse) map defining base color and optional alpha channel.
     std::shared_ptr<Texture> albedo_map = nullptr;
@@ -61,6 +67,9 @@ public:
 
     /// @brief Specular map scaling the intensity of specular highlights.
     std::shared_ptr<Texture> specular_map = nullptr;
+
+    /// @brief Emissive map modulating the emissive color per texel.
+    std::shared_ptr<Texture> emissive_map = nullptr;
 
     /**
      * @brief Constructs a Phong material with a given base color.

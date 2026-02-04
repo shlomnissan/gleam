@@ -37,6 +37,7 @@ ProgramAttributes::ProgramAttributes(
         alpha_map = m->alpha_map != nullptr;
         normal_map = m->normal_map != nullptr;
         specular_map = m->specular_map != nullptr;
+        emissive_map = m->emissive_map != nullptr;
     }
 
     auto shader_material_id = 0;
@@ -80,12 +81,13 @@ ProgramAttributes::ProgramAttributes(
     key |= (albedo_map ? 1 : 0) << 19; // 1 bit
     key |= (alpha_map ? 1 : 0) << 20; // 1 bit
     key |= (normal_map ? 1 : 0) << 21; // 1 bit
-    key |= (two_sided ? 1 : 0) << 22; // 1 bit
-    key |= (instancing ? 1 : 0) << 23; // 1 bit
-    key |= (vertex_color ? 1 : 0) << 24; // 1 bit
-    key |= (tangent ? 1 : 0) << 25; // 1 bit
-    key |= (specular_map ? 1 : 0) << 26; // 1 bit
-    key |= (texture_map ? 1 : 0) << 27; // 1 bit
+    key |= (emissive_map ? 1 : 0) << 22; // 1 bit
+    key |= (two_sided ? 1 : 0) << 23; // 1 bit
+    key |= (instancing ? 1 : 0) << 24; // 1 bit
+    key |= (vertex_color ? 1 : 0) << 25; // 1 bit
+    key |= (tangent ? 1 : 0) << 26; // 1 bit
+    key |= (specular_map ? 1 : 0) << 27; // 1 bit
+    key |= (texture_map ? 1 : 0) << 28; // 1 bit
 
     if (type == Material::Type::ShaderMaterial) {
         math::HashCombine(key, shader_material_id);

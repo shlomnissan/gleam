@@ -39,6 +39,9 @@ enum class Uniform {
     AmbientLight,
     Anchor,
     Color,
+    EmissiveColor,
+    EmissiveIntensity,
+    EmissiveMap,
     FogColor,
     FogDensity,
     FogFar,
@@ -65,6 +68,9 @@ constexpr auto get_uniform_loc(std::string_view str) {
     if (str == "u_AmbientLight") return static_cast<int>(AmbientLight);
     if (str == "u_Anchor") return static_cast<int>(Anchor);
     if (str == "u_Color") return static_cast<int>(Color);
+    if (str == "u_EmissiveColor") return static_cast<int>(EmissiveColor);
+    if (str == "u_EmissiveIntensity") return static_cast<int>(EmissiveIntensity);
+    if (str == "u_EmissiveMap") return static_cast<int>(EmissiveMap);
     if (str == "u_Fog.Color") return static_cast<int>(FogColor);
     if (str == "u_Fog.Density") return static_cast<int>(FogDensity);
     if (str == "u_Fog.Far") return static_cast<int>(FogFar);
@@ -79,8 +85,8 @@ constexpr auto get_uniform_loc(std::string_view str) {
     if (str == "u_Resolution") return static_cast<int>(Resolution);
     if (str == "u_Rotation") return static_cast<int>(Rotation);
     if (str == "u_SpecularMap") return static_cast<int>(SpecularMap);
-    if (str == "u_TextureTransform") return static_cast<int>(TextureTransform);
     if (str == "u_TextureMap") return static_cast<int>(TextureMap);
+    if (str == "u_TextureTransform") return static_cast<int>(TextureTransform);
     return -1;
 }
 

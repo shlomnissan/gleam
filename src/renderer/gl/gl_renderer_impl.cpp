@@ -174,6 +174,9 @@ auto Renderer::Impl::SetUniforms(
             case GLTextureMapType::TextureMap:
                 program->SetUniform(Uniform::TextureMap, &type);
                 break;
+            case GLTextureMapType::EmissiveMap:
+                program->SetUniform(Uniform::EmissiveMap, &type);
+                break;
             default:
                 Logger::Log(LogLevel::Error, "Unable to bind unknown texture map type");
         }
@@ -199,8 +202,10 @@ auto Renderer::Impl::SetUniforms(
         if (lights_.HasLights()) {
             program->SetUniform(Uniform::AmbientLight, &lights_.ambient_light);
             program->SetUniform(Uniform::MaterialDiffuseColor, &m->color);
-            program->SetUniform(Uniform::MaterialSpecularColor, &m->specular);
+            program->SetUniform(Uniform::MaterialSpecularColor, &m->specular_color);
             program->SetUniform(Uniform::MaterialShininess, &m->shininess);
+            program->SetUniform(Uniform::EmissiveColor, &m->emissive_color);
+            program->SetUniform(Uniform::EmissiveIntensity, &m->emissive_intensity);
         }
 
         if (attrs->albedo_map)

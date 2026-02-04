@@ -45,3 +45,4 @@ uniform sampler2D u_AlphaMap;
 uniform sampler2D u_NormalMap;
 uniform sampler2D u_SpecularMap;
 uniform sampler2D u_TextureMap;
+uniform sampler2D u_EmissiveMap;

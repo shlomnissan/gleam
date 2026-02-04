@@ -14,7 +14,10 @@ struct PhongMaterial {
 };
 
 uniform PhongMaterial u_Material;
+
 uniform vec3 u_AmbientLight;
+uniform vec3 u_EmissiveColor;
+uniform float u_EmissiveIntensity;
 
 vec3 phongShading(
     const in vec3 light_dir,
@@ -149,6 +152,14 @@ void main() {
     #if NUM_LIGHTS > 0
         output_color += processLights(normal, diffuse_color, specular_factor);
     #endif
+
+    vec3 emissive = u_EmissiveColor;
+    #ifdef USE_EMISSIVE_MAP
+        emissive *= texture(u_EmissiveMap, v_TexCoord).rgb;
+    #endif
+
+    emissive *= u_EmissiveIntensity;
+    output_color += emissive;
 
     #ifdef USE_FOG
         applyFog(output_color, v_ViewDepth);
