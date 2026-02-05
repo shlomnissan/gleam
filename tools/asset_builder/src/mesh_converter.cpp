@@ -407,10 +407,15 @@ auto parse_materials(
 
         material_record.texture_count = 0;
         auto texture_records = std::vector<MaterialTextureMapRecord> {};
+
+        auto& material_normal_tex_name = !material.normal_texname.empty()
+            ? material.normal_texname
+            : material.bump_texname;
+
         auto available_textures = std::array<std::pair<std::string, MaterialTextureMapType>, 4> {{
             {material.diffuse_texname, MaterialTextureMapType_Diffuse},
             {material.alpha_texname, MaterialTextureMapType_Alpha},
-            {material.normal_texname, MaterialTextureMapType_Normal},
+            {material_normal_tex_name, MaterialTextureMapType_Normal},
             {material.specular_texname, MaterialTextureMapType_Specular},
         }};
 
