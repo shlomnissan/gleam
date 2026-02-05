@@ -5,10 +5,13 @@
 #pragma inject_attributes
 
 #include "snippets/vert_global_params.glsl"
-#include "snippets/utilities.glsl"
 
 uniform float u_Rotation;
 uniform vec2 u_Anchor;
+
+bool isPerspectiveMatrix(in mat4 m) {
+    return m[2][3] == -1.0;
+}
 
 void main() {
     #include "snippets/vert_main_varyings.glsl"

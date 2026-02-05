@@ -23,10 +23,6 @@ layout (location = 0) out vec4 v_FragColor;
     in vec3 v_Color;
 #endif
 
-#ifdef USE_NORMAL_MAP
-    in mat3 v_TBN;
-#endif
-
 in float v_ViewDepth;
 in vec2 v_TexCoord;
 in vec3 v_Normal;

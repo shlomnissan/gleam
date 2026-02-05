@@ -7,6 +7,10 @@
 #include "snippets/frag_global_params.glsl"
 #include "snippets/frag_global_fog.glsl"
 
+#ifdef USE_NORMAL_MAP
+    in mat3 v_TBN;
+#endif
+
 struct PhongMaterial {
     vec3 DiffuseColor;
     vec3 SpecularColor;
@@ -23,7 +27,6 @@ uniform sampler2D u_AlbedoMap;
 uniform sampler2D u_AlphaMap;
 uniform sampler2D u_NormalMap;
 uniform sampler2D u_SpecularMap;
-uniform sampler2D u_TextureMap;
 uniform sampler2D u_EmissiveMap;
 
 vec3 phongShading(
@@ -126,7 +129,22 @@ vec3 processLights(
 #endif
 
 void main() {
-    #include "snippets/frag_main_normal.glsl"
+    #ifdef USE_FLAT_SHADED
+        vec3 fdx = dFdx(v_Position.xyz);
+        vec3 fdy = dFdy(v_Position.xyz);
+        vec3 normal = normalize(cross(fdx, fdy));
+    #else
+        vec3 normal = normalize(v_Normal);
+
+        #ifdef USE_NORMAL_MAP
+            vec3 normal_tan = texture(u_NormalMap, v_TexCoord).rgb  * 2.0 - 1.0;
+            normal = normalize(v_TBN * normal_tan);
+        #endif
+
+        #ifdef USE_TWO_SIDED
+            normal *= gl_FrontFacing ? 1.0 : -1.0;
+        #endif
+    #endif
 
     vec3 diffuse_color = u_Material.DiffuseColor;
     float opacity = u_Opacity;
