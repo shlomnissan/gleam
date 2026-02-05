@@ -337,21 +337,20 @@ auto convert_texture(
     const fs::path& input_path,
     const fs::path& output_path
 ) -> std::expected<std::string, std::string> {
-    auto tex_init_path = fs::path {tex_name};
-    auto tex_input_path = tex_init_path;
-    auto tex_output_path = tex_init_path;
-
-    if (!fs::exists(tex_init_path)) {
-        tex_input_path = input_path.parent_path() / tex_name;
-        tex_output_path = output_path.parent_path() / tex_name;
-        if (!fs::exists(tex_input_path)) {
-            return std::unexpected("Failed to load texture " + tex_input_path.string());
-        }
+    auto tex_rel_path = fs::path {tex_name};
+    auto tex_input_path = tex_rel_path;
+    if (!tex_input_path.is_absolute()) {
+        tex_input_path = input_path.parent_path() / tex_rel_path;
     }
 
-    auto color_space = tex_type == MaterialTextureMapType_Diffuse ?
-        TextureColorSpace_sRGB :
-        TextureColorSpace_Linear;
+    if (!fs::exists(tex_input_path)) {
+        return std::unexpected("Failed to load texture " + tex_input_path.string());
+    }
+
+    auto tex_output_path = output_path.parent_path() / tex_rel_path;
+    auto color_space = tex_type == MaterialTextureMapType_Diffuse
+        ? TextureColorSpace_sRGB
+        : TextureColorSpace_Linear;
 
     tex_output_path.replace_extension(".tex");
     if (auto result = ::convert_texture(tex_input_path, tex_output_path, color_space); !result) {
@@ -359,9 +358,7 @@ auto convert_texture(
     }
 
     std::println("Generated texture {}", tex_output_path.string());
-
-    // always return filenames relative to the asset
-    return tex_init_path.replace_extension(".tex").string();
+    return tex_rel_path.replace_extension(".tex").string();
 }
 
 auto parse_texture(
