@@ -17,7 +17,7 @@ namespace {
 
 constexpr auto kWindowWidth {1280};
 constexpr auto kWindowHeight {720};
-constexpr auto kSampleCount {1};
+constexpr auto kSampleCount {4};
 
 }
 

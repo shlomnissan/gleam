@@ -20,8 +20,8 @@ public:
 
     auto OnAttached(vglx::SharedContextPointer context) -> void override;
 
-    auto OnKeyboardEvent(vglx::KeyboardEvent* event) -> void override;
+    auto OnUpdate([[maybe_unused]] float dt) -> void override;
 
 private:
-    std::shared_ptr<vglx::Node> model_;
+    vglx::Node* mesh_ {nullptr};
 };

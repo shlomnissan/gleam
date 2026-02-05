@@ -21,7 +21,7 @@ public:
             .clear_color = 0x444444,
             .width = 1280,
             .height = 720,
-            .sample_count = 1,
+            .sample_count = 4,
             .vsync = false,
             .show_stats = true
         };
