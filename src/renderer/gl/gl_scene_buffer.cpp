@@ -48,6 +48,12 @@ struct GLSceneBuffer::Impl {
             return std::unexpected("Scene buffer invalid size");
         }
 
+        if (is_msaa) {
+            auto max_samples = GLint {0};
+            glGetIntegerv(GL_MAX_SAMPLES, &max_samples);
+            samples = std::min(samples, static_cast<int>(max_samples));
+        }
+
         DeleteBuffers();
 
         glGenFramebuffers(1, &resolve_fbo);
