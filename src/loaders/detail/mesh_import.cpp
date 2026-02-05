@@ -44,6 +44,7 @@ auto process_materials(
         }
 
         auto material = PhongMaterial::Create();
+        material->SetName(mat_record.name);
         material->color = Color { mat_record.diffuse };
         material->specular_color = Color { mat_record.specular };
         material->shininess = mat_record.shininess;
@@ -128,7 +129,6 @@ auto process_mesh(
 
         auto geometry = Geometry::Create(vertex_data, index_data);
         geometry->SetName(msh_record.name);
-
         geometry->SetAttribute({.type = Geometry::VertexAttributeType::Position, .item_size = 3});
         geometry->SetAttribute({.type = Geometry::VertexAttributeType::Normal, .item_size = 3});
         if (msh_record.vertex_flags & VertexAttributeFlags::VertexAttr_HasUV) {
@@ -146,7 +146,9 @@ auto process_mesh(
             ? materials[material_idx]
             : PhongMaterial::Create();
 
-        root->Add(Mesh::Create(geometry, material));
+        auto mesh = Mesh::Create(geometry, material);
+        mesh->SetName(msh_record.name);
+        root->Add(std::move(mesh));
     }
 
     return root;

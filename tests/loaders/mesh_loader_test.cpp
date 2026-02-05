@@ -28,9 +28,9 @@ TEST_F(MeshLoaderTest, LoadMesh) {
     EXPECT_TRUE(result.has_value());
 
     auto root = std::move(result.value());
-    EXPECT_EQ(root->Children().size(), 1);
+    EXPECT_EQ(root->GetChildren().size(), 1);
 
-    auto mesh = static_cast<vglx::Mesh*>(root->Children().front().get());
+    auto mesh = static_cast<vglx::Mesh*>(root->GetChildren().front().get());
     auto geometry = mesh->GetGeometry();
     EXPECT_EQ(geometry->VertexCount(), 4);
     EXPECT_EQ(geometry->IndexCount(), 6);

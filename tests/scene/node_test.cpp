@@ -18,8 +18,8 @@ TEST(Node, AddChild) {
     auto parent = vglx::Node::Create();
     auto child = parent->Add(vglx::Node::Create());
 
-    EXPECT_EQ(parent->Children().size(), 1);
-    EXPECT_EQ(parent->Children()[0].get(), child);
+    EXPECT_EQ(parent->GetChildren().size(), 1);
+    EXPECT_EQ(parent->GetChildren()[0].get(), child);
 }
 
 TEST(Node, RemoveChild) {
@@ -28,7 +28,7 @@ TEST(Node, RemoveChild) {
 
     parent->Remove(child);
 
-    EXPECT_TRUE(parent->Children().empty());
+    EXPECT_TRUE(parent->GetChildren().empty());
 }
 
 TEST(Node, RemoveAllChildren) {
@@ -38,7 +38,7 @@ TEST(Node, RemoveAllChildren) {
     parent->Add(vglx::Node::Create());
     parent->RemoveAllChildren();
 
-    EXPECT_TRUE(parent->Children().empty());
+    EXPECT_TRUE(parent->GetChildren().empty());
 }
 
 #pragma endregion
@@ -176,7 +176,7 @@ TEST(Node, RemoveNonexistentChild) {
 
     parent->Remove(child.get());
 
-    EXPECT_TRUE(parent->Children().empty());
+    EXPECT_TRUE(parent->GetChildren().empty());
     EXPECT_EQ(child->GetParent(), nullptr);
 }
 

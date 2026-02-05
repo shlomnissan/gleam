@@ -18,7 +18,7 @@ auto RenderLists::ProcessScene(Scene* scene, Camera* camera) -> void {
     Reset();
 
     const auto frustum = camera->GetFrustum();
-    for (const auto& child : scene->Children()) {
+    for (const auto& child : scene->GetChildren()) {
         ProcessNode(child.get(), frustum);
     }
 
@@ -62,7 +62,7 @@ auto RenderLists::ProcessNode(Node* node, const Frustum& frustum) -> void {
         lights_.emplace_back(static_cast<Light*>(node));
     }
 
-    for (const auto& child : node->Children()) {
+    for (const auto& child : node->GetChildren()) {
         ProcessNode(child.get(), frustum);
     }
 }

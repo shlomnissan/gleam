@@ -118,8 +118,15 @@ auto Node::RemoveAllChildren() -> void {
     impl_->children.clear();
 }
 
-auto Node::Children() const -> std::span<const std::unique_ptr<Node>> {
+auto Node::GetChildren() const -> std::span<const std::unique_ptr<Node>> {
     return impl_->children;
+}
+
+auto Node::GetChild(std::string_view name) const -> Node* {
+    for (const auto& child : impl_->children) {
+        if (child->Name() == name) return child.get();
+    }
+    return nullptr;
 }
 
 auto Node::IsChild(const Node* node) const -> bool {
@@ -128,7 +135,7 @@ auto Node::IsChild(const Node* node) const -> bool {
     }
 
     auto to_process = std::queue<Node*> {};
-    for (const auto& child : Children()) {
+    for (const auto& child : GetChildren()) {
         VGLX_ASSERT(child != nullptr, "Null child in children list");
         to_process.push(child.get());
     }
@@ -139,7 +146,7 @@ auto Node::IsChild(const Node* node) const -> bool {
             const auto current = to_process.front();
             to_process.pop();
             if (current == node) return true;
-            for (const auto& child : current->Children()) {
+            for (const auto& child : current->GetChildren()) {
                 VGLX_ASSERT(child != nullptr, "Null child in children list");
                 to_process.push(child.get());
             }
@@ -162,7 +169,7 @@ auto Node::UpdateTransformHierarchy() -> void {
         impl_->world_transform_touched = true;
     }
 
-    for (const auto& child : Children()) {
+    for (const auto& child : GetChildren()) {
         VGLX_ASSERT(child != nullptr, "Null child in children list");
         child->UpdateTransformHierarchy();
     }

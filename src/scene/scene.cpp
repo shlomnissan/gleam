@@ -16,7 +16,7 @@ namespace {
 
 auto handle_node_updates(Node* node, float delta) -> void {
     node->OnUpdate(delta);
-    for (const auto& child : node->Children()) {
+    for (const auto& child : node->GetChildren()) {
         handle_node_updates(child.get(), delta);
     }
 }
@@ -27,7 +27,7 @@ auto handle_input_event(Node* node, Event* event) -> void {
     // Events are propagated from the bottom of the scene graph to the top.
     // This allows nodes at the bottom of the graph to mark events as handled
     // and prevent them from being processed by parent nodes.
-    for (const auto& child : node->Children()) {
+    for (const auto& child : node->GetChildren()) {
         if (event->handled) return;
         handle_input_event(child.get(), event);
     }
@@ -55,7 +55,7 @@ Scene::Scene() : impl_(std::make_unique<Impl>()) {
         if (type == Keyboard || type == Mouse) {
             if (type == Keyboard) OnKeyboardEvent(static_cast<KeyboardEvent*>(event));
             if (type == Mouse) OnMouseEvent(static_cast<MouseEvent*>(event));
-            for (const auto& child : Children()) {
+            for (const auto& child : GetChildren()) {
                 handle_input_event(child.get(), event);
             }
         }
@@ -67,7 +67,7 @@ Scene::Scene() : impl_(std::make_unique<Impl>()) {
 
 auto Scene::Advance(float delta) -> void {
     OnUpdate(delta);
-     for (const auto& child : Children()) {
+     for (const auto& child : GetChildren()) {
         handle_node_updates(child.get(), delta);
     }
 }

@@ -205,7 +205,21 @@ public:
      * by the scene graph. It is intended for inspection and
      * iteration only.
      */
-    [[nodiscard]] auto Children() const -> std::span<const std::unique_ptr<Node>>;
+    [[nodiscard]] auto GetChildren() const -> std::span<const std::unique_ptr<Node>>;
+
+    /**
+     * @brief Returns a direct child node with the given name.
+     *
+     * Searches only this node's immediate children for a node whose name
+     * matches the specified identifier. If no matching child is found,
+     * returns `nullptr`.
+     *
+     * This function does not search descendants. Use @ref GetChildren
+     * to implement recursive searches when needed.
+     *
+     * @param name Name of the child node to retrieve.
+     */
+    [[nodiscard]] auto GetChild(std::string_view name) const -> Node*;
 
     /**
      * @brief Checks whether the given node exists anywhere in this node’s subtree.

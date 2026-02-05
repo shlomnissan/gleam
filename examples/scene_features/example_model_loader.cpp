@@ -66,7 +66,7 @@ auto ExampleModelLoader::OnUpdate(float delta) -> void {
         model_ = sphere_->Add(std::move(mesh.value()));
         model_->RotateY(math::pi_over_2);
 
-        auto ptr = static_cast<Mesh*>(model_->Children().front().get());
+        auto ptr = static_cast<Mesh*>(model_->GetChildren().front().get());
         material_ = static_cast<PhongMaterial*>(ptr->GetMaterial().get());
         albedo_map_ = material_->albedo_map;
         normal_map_ = material_->normal_map;
