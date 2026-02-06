@@ -204,9 +204,10 @@ auto Renderer::Impl::SetUniforms(
             program->SetUniform(Uniform::MaterialDiffuseColor, &m->color);
             program->SetUniform(Uniform::MaterialSpecularColor, &m->specular_color);
             program->SetUniform(Uniform::MaterialShininess, &m->shininess);
-            program->SetUniform(Uniform::EmissiveColor, &m->emissive_color);
-            program->SetUniform(Uniform::EmissiveIntensity, &m->emissive_intensity);
         }
+
+        program->SetUniform(Uniform::EmissiveColor, &m->emissive_color);
+        program->SetUniform(Uniform::EmissiveIntensity, &m->emissive_intensity);
 
         if (attrs->albedo_map)
             bind_texture(GLTextureMapType::AlbedoMap, m->albedo_map);
@@ -216,6 +217,8 @@ auto Renderer::Impl::SetUniforms(
             bind_texture(GLTextureMapType::NormalMap, m->normal_map);
         if (attrs->specular_map)
             bind_texture(GLTextureMapType::SpecularMap, m->specular_map);
+        if (attrs->emissive_map)
+            bind_texture(GLTextureMapType::EmissiveMap, m->emissive_map);
     }
 
     if (attrs->type == Material::Type::ShaderMaterial) {
