@@ -25,17 +25,12 @@ auto loader_handle = MeshLoadHandle {};
 ExampleSandbox::ExampleSandbox() {
     show_context_menu_ = false;
 
-    Add(AmbientLight::Create({.color = 0xFFFFFF, .intensity = 0.4f}));
+    Add(AmbientLight::Create({.color = 0xFFFFFF, .intensity = 0.2f}));
 
     Add(PointLight::Create({
         .color = 0xFFFFFF,
         .intensity = 0.6f
     }))->transform.Translate({2.0f, 2.5f, 0.0f});
-
-    Add(PointLight::Create({
-        .color = 0xFAA916,
-        .intensity = 1.0f
-    }))->transform.Translate({-2.0f, 2.5f, 0.0f});
 }
 
 auto ExampleSandbox::OnAttached(SharedContextPointer context) -> void {
