@@ -24,6 +24,7 @@ namespace vglx {
 // Forward declarations
 enum class ShaderType;
 struct ShaderInfo;
+class Color;
 
 constexpr auto uniforms_len = static_cast<int>(Uniform::KnownUniformsLength);
 
@@ -45,6 +46,8 @@ public:
     auto SetUnknownUniform(const std::string& name, const void* v) -> void;
 
     auto SetUniform(Uniform uniform, const void* v) -> void;
+
+    auto SetUniform(Uniform uniform, const Color* color) -> void;
 
     ~GLProgram();
 

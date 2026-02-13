@@ -89,6 +89,13 @@ auto GLProgram::SetUniform(Uniform uniform, const void* v) -> void {
     }
 }
 
+auto GLProgram::SetUniform(Uniform uniform, const Color* color) -> void {
+    if (color != nullptr) {
+        const Vector3 c(color->r, color->g, color->b);
+        SetUniform(uniform, &c);
+    }
+}
+
 auto GLProgram::BindVertexAttributeLocations() const -> void {
     for (auto& [attr_name, attr_type] : VertexAttributesMap) {
         glBindAttribLocation(
