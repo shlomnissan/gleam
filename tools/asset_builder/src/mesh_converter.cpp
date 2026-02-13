@@ -403,6 +403,7 @@ auto parse_materials(
             ? std::array {0.1f, 0.1f, 0.1f}
             : std::array {specular[0], specular[1], specular[2]};
         std::memcpy(material_record.specular, src.data(), sizeof(material_record.specular));
+        std::memcpy(material_record.emission, material.emission, sizeof(material_record.emission));
         material_record.shininess = material.shininess;
 
         material_record.texture_count = 0;
@@ -412,11 +413,12 @@ auto parse_materials(
             ? material.normal_texname
             : material.bump_texname;
 
-        auto available_textures = std::array<std::pair<std::string, MaterialTextureMapType>, 4> {{
+        auto available_textures = std::array<std::pair<std::string, MaterialTextureMapType>, 5> {{
             {material.diffuse_texname, MaterialTextureMapType_Diffuse},
             {material.alpha_texname, MaterialTextureMapType_Alpha},
             {material_normal_tex_name, MaterialTextureMapType_Normal},
             {material.specular_texname, MaterialTextureMapType_Specular},
+            {material.emissive_texname, MaterialTextureMapType_Emissive},
         }};
 
         for (const auto& [tex_name, tex_type] : available_textures) {

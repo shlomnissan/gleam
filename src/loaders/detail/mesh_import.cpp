@@ -47,6 +47,7 @@ auto process_materials(
         material->SetName(mat_record.name);
         material->color = Color { mat_record.diffuse };
         material->specular_color = Color { mat_record.specular };
+        material->emissive_color = Color { mat_record.emission };
         material->shininess = mat_record.shininess;
 
         for (uint32_t t = 0; t < mat_record.texture_count; ++t) {
@@ -82,6 +83,17 @@ auto process_materials(
             break;
             case MaterialTextureMapType_Specular:
                 material->specular_map = textures.at(filename);
+            break;
+            case MaterialTextureMapType_Emissive:
+            {
+                // If emissive color from OBJ is black, set to white so the emissive map
+                // is visible. Otherwise, preserve the color to allow tinting.
+                const auto& e = mat_record.emission;
+                if (e[0] == 0.0f && e[1] == 0.0f && e[2] == 0.0f) {
+                    material->emissive_color = Color {0xFFFFFF};
+                }
+                material->emissive_map = textures.at(filename);
+            }
             break;
             default:
                 return std::unexpected(std::format("Unsupported texture type {}", tex_record.type));

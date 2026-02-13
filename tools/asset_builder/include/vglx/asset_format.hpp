@@ -35,6 +35,7 @@ enum MaterialTextureMapType : uint32_t {
     MaterialTextureMapType_Alpha    = 1,
     MaterialTextureMapType_Normal   = 2,
     MaterialTextureMapType_Specular = 3,
+    MaterialTextureMapType_Emissive = 4,
 };
 
 #pragma pack(push, 1)
@@ -75,6 +76,7 @@ struct MaterialRecord {
     float ambient[3];
     float diffuse[3];
     float specular[3];
+    float emission[3];
     float shininess;
 };
 #pragma pack(pop)
