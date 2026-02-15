@@ -39,12 +39,9 @@ set(SOURCE_CODE
 add_executable(examples_launcher_runtime launcher_runtime.cpp ${SOURCE_CODE})
 add_executable(examples_launcher_direct launcher_direct.cpp ${SOURCE_CODE})
 
-add_executable(render_target_test render_target_test.cpp)
-
 set(BINARIES
     examples_launcher_runtime
     examples_launcher_direct
-    render_target_test
 )
 
 foreach(BINARY IN LISTS BINARIES)
