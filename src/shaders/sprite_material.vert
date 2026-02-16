@@ -19,10 +19,10 @@ void main() {
     vec4 position = u_ModelView[3];
     vec2 scale = vec2(length(u_Model[0].xyz), length(u_Model[1].xyz));
 
-    bool is_perspective = isPerspectiveMatrix(u_Projection);
-    if (is_perspective) {
-        scale *= -position.z;
-    }
+    #ifndef USE_SIZE_ATTENUATION
+        bool is_perspective = isPerspectiveMatrix(u_Projection);
+        if (is_perspective) scale *= -position.z;
+    #endif
 
     vec2 offset = (a_Position.xy - (u_Anchor - vec2(0.5))) * scale;
     vec2 offset_with_rotation = vec2(0.0);

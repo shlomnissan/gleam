@@ -47,6 +47,7 @@ struct ProgramAttributes {
     bool specular_map {false};
     bool texture_map {false};
     bool emissive_map {false};
+    bool size_attenuation {false};
 
     ProgramAttributes(
         Renderable* renderable,

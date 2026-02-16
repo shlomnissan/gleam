@@ -40,6 +40,9 @@ public:
     /// @brief Sprite texture sampled in RGBA; alpha controls transparency.
     std::shared_ptr<Texture> texture_map;
 
+    /// @brief Controls whether sprite size is attenuated by distance in perspective.
+    bool size_attenuation {true};
+
     /**
      * @brief Constructs a sprite material.
      *

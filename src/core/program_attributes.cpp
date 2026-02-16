@@ -52,6 +52,7 @@ ProgramAttributes::ProgramAttributes(
         auto m = static_cast<const SpriteMaterial*>(material);
         color = true;
         texture_map = m->texture_map != nullptr;
+        size_attenuation = m->size_attenuation;
     }
 
     if (type == Material::Type::UnlitMaterial) {
@@ -88,6 +89,7 @@ ProgramAttributes::ProgramAttributes(
     key |= (tangent ? 1 : 0) << 26; // 1 bit
     key |= (specular_map ? 1 : 0) << 27; // 1 bit
     key |= (texture_map ? 1 : 0) << 28; // 1 bit
+    key |= (size_attenuation ? 1 : 0) << 29; // 1 bit
 
     if (type == Material::Type::ShaderMaterial) {
         math::HashCombine(key, shader_material_id);
