@@ -132,13 +132,6 @@ public:
      * @brief Identifies the concrete @ref Texture::Type "texture type".
      */
     [[nodiscard]] virtual auto GetType() const -> Type = 0;
-
-    /**
-     * @brief Destroys the texture and releases associated resources.
-     */
-    ~Texture() override {
-        Disposable::Dispose();
-    }
 };
 
 constexpr auto bytes_per_pixel(Texture::Format format) {

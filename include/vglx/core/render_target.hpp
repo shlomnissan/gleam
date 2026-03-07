@@ -51,8 +51,6 @@ public:
 
     [[nodiscard]] auto ReadColorData() const -> std::span<const std::uint8_t>;
 
-    ~RenderTarget() override;
-
 private:
     friend class GLFramebuffers;
 

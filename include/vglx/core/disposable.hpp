@@ -44,7 +44,9 @@ public:
         dispose_callbacks_.clear();
     }
 
-    virtual ~Disposable() = default;
+    virtual ~Disposable() {
+        Dispose();
+    }
 
 private:
     std::vector<OnDisposeCallback> dispose_callbacks_;

@@ -22,7 +22,7 @@ public:
             .width = 1280,
             .height = 720,
             .sample_count = 4,
-            .vsync = false,
+            .vsync = true,
             .show_stats = true
         };
     }

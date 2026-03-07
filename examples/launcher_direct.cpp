@@ -27,7 +27,7 @@ auto main() -> int {
         .width = kWindowWidth,
         .height = kWindowHeight,
         .sample_count = kSampleCount,
-        .vsync = false
+        .vsync = true
     }};
 
     if (auto result = window.Initialize(); !result.has_value()) {

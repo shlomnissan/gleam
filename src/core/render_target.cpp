@@ -31,8 +31,4 @@ auto RenderTarget::ReadColorData() const -> std::span<const uint8_t> {
     return std::span<const std::uint8_t>(color_data_.data(), color_data_.size());
 }
 
-RenderTarget::~RenderTarget() {
-    Disposable::Dispose();
-}
-
 }
