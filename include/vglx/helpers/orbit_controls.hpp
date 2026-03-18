@@ -50,8 +50,8 @@ public:
         float radius {1.0f}; ///< Initial distance of the camera from its target.
         float pitch {0.0f}; ///< Initial pitch angle in radians.
         float yaw {0.0f}; ///< Initial yaw angle in radians.
-        float orbit_speed {0.005f}; ///< Mouse sensitivity when orbiting.
-        float pan_speed {0.002f}; ///< Mouse sensitivity when panning.
+        float orbit_speed {3.0f}; ///< Orbit sensitivity (radians per full-height drag).
+        float pan_speed {0.5f}; ///< Pan sensitivity (relative to distance and viewport).
         float zoom_speed {0.95f}; ///< Scroll wheel zoom factor.
         float damping_factor {0.3f}; ///< Set to 1 for instant response.
     };
@@ -74,6 +74,13 @@ public:
     Create(Camera* camera, const Parameters& params) -> std::unique_ptr<OrbitControls> {
         return std::make_unique<OrbitControls>(camera, params);
     }
+
+    /**
+     * @brief Stores shared context for viewport-relative input handling.
+     *
+     * @param context Shared engine context.
+     */
+    auto OnAttached(SharedContextPointer context) -> void override;
 
     /**
      * @brief Responds to mouse input for orbiting, panning, and zooming.

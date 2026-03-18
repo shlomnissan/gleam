@@ -23,6 +23,7 @@ constexpr float kThetaLimit = vglx::math::pi_over_2 - 0.001f;
 
 struct OrbitControls::Impl {
     Camera* camera;
+    SharedContextPointer context = nullptr;
     OrbitControls::Parameters params;
 
     Spherical spherical;
@@ -37,6 +38,7 @@ struct OrbitControls::Impl {
     MouseButton curr_button = {MouseButton::None};
 
     float damping_factor = 0.0f;
+    float zoom_scale = 1.0f;
 
     Impl(Camera* camera, const Parameters& params) :
       camera(camera),
@@ -65,13 +67,15 @@ struct OrbitControls::Impl {
             curr_pos = event->position;
             auto offset = curr_pos - prev_pos;
 
+            const auto h = context ? static_cast<float>(context->window_height) : 1.0f;
+
             if (curr_button == Left && !shift_mod) {
-                spherical_delta.phi -= offset.x * params.orbit_speed;
-                spherical_delta.theta += offset.y * params.orbit_speed;
+                spherical_delta.phi -= offset.x / h * params.orbit_speed;
+                spherical_delta.theta += offset.y / h * params.orbit_speed;
             }
 
             if (curr_button == Right || (curr_button == Left && shift_mod)) {
-                const auto speed = params.pan_speed * spherical.radius;
+                const auto speed = params.pan_speed * spherical.radius / h;
                 const auto right = camera->Right();
                 const auto up = camera->Up();
                 pan_delta -= (right * offset.x - up * offset.y) * speed;
@@ -81,14 +85,14 @@ struct OrbitControls::Impl {
         }
 
         if (event->type == Scrolled) {
-            spherical_delta.radius += params.zoom_speed * event->scroll.y;
+            zoom_scale *= std::pow(params.zoom_speed, event->scroll.y);
         }
     }
 
-    auto OnUpdate() {
+    auto OnUpdate(float delta) {
         spherical.phi += spherical_delta.phi;
         spherical.theta += spherical_delta.theta;
-        spherical.radius += spherical_delta.radius;
+        spherical.radius *= zoom_scale;
         target += pan_delta;
 
         spherical.theta = math::Clamp(spherical.theta, -kThetaLimit, kThetaLimit);
@@ -98,13 +102,17 @@ struct OrbitControls::Impl {
         camera->LookAt(target);
 
         if (damping_factor > 0.0f) {
-            const auto t = 1.0f - damping_factor;
+            // Framerate-independent damping. The exponent normalizes
+            // to 60 fps so the damping_factor parameter keeps its
+            // original per-frame meaning at that reference rate.
+            const auto t = std::pow(1.0f - damping_factor, delta * 60.0f);
             spherical_delta.phi *= t;
             spherical_delta.theta *= t;
-            spherical_delta.radius *= t;
+            zoom_scale = math::Lerp(1.0f, zoom_scale, t);
             pan_delta *= t;
         } else {
             spherical_delta = Spherical {0.0f, 0.0f, 0.0f};
+            zoom_scale = 1.0f;
             pan_delta = Vector3::Zero();
         }
     }
@@ -113,12 +121,16 @@ struct OrbitControls::Impl {
 OrbitControls::OrbitControls(Camera* camera, const Parameters& params)
     : impl_(std::make_unique<Impl>(camera, params)) {}
 
+auto OrbitControls::OnAttached(SharedContextPointer context) -> void {
+    impl_->context = context;
+}
+
 auto OrbitControls::OnMouseEvent(MouseEvent* event) -> void {
     impl_->OnMouseEvent(event);
 }
 
-auto OrbitControls::OnUpdate(float) -> void {
-    impl_->OnUpdate();
+auto OrbitControls::OnUpdate(float delta) -> void {
+    impl_->OnUpdate(delta);
 }
 
 OrbitControls::~OrbitControls() = default;
