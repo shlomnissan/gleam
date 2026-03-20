@@ -12,11 +12,12 @@
 #include "vglx/materials/shader_material.hpp"
 #include "vglx/materials/sprite_material.hpp"
 #include "vglx/materials/unlit_material.hpp"
-#include "vglx/math/vector3.hpp"
 #include "vglx/math/matrix3.hpp"
+#include "vglx/math/vector3.hpp"
 #include "vglx/scene/fog.hpp"
 #include "vglx/scene/instanced_mesh.hpp"
 #include "vglx/scene/sprite.hpp"
+#include "vglx/textures/image.hpp"
 
 #include "core/program_attributes.hpp"
 #include "core/render_lists.hpp"
@@ -324,14 +325,14 @@ auto Renderer::Impl::CreateTextureFromRenderTarget(RenderTarget* target) -> std:
     auto texture = Texture2D::Create({
         .width = static_cast<unsigned int>(target->width),
         .height = static_cast<unsigned int>(target->height),
-        .color_space = Texture::ColorSpace::Linear,
+        .color_space = Image::ColorSpace::Linear,
     });
 
     texture->renderer_id = tex_id;
 
     texture->min_filter = Texture::MinFilter::Linear;
     texture->mag_filter = Texture::MagFilter::Linear;
-    texture->color_space = Texture::ColorSpace::Linear;
+    texture->color_space = Image::ColorSpace::Linear;
 
     return texture;
 }

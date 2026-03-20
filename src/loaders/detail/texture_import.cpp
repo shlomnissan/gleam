@@ -8,6 +8,7 @@
 #include "loaders/detail/texture_import.hpp"
 
 #include "vglx/asset_format.hpp"
+#include "vglx/textures/image.hpp"
 #include "vglx/textures/texture_2d.hpp"
 
 #include "utilities/file.hpp"
@@ -45,8 +46,8 @@ auto import(const fs::path& path) -> std::expected<std::shared_ptr<Texture2D>, s
     }
 
     auto color_space = header.color_space == TextureColorSpace_Linear ?
-        Texture::ColorSpace::Linear :
-        Texture::ColorSpace::sRGB;
+        Image::ColorSpace::Linear :
+        Image::ColorSpace::sRGB;
 
     auto out = std::make_shared<Texture2D>(Texture2D::Parameters {
         .width = header.width,

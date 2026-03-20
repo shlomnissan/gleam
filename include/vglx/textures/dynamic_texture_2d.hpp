@@ -9,6 +9,7 @@
 
 #include "vglx_export.h"
 
+#include "vglx/textures/image.hpp"
 #include "vglx/textures/texture.hpp"
 
 #include <cstdint>
@@ -62,7 +63,7 @@ public:
         int height; ///< Height in pixels.
         unsigned int mips {1}; ///< Number of mip levels to allocate.
         Format format {Format::RGBA8}; ///< Texture storage format.
-        ColorSpace color_space {ColorSpace::Linear}; ///< Color space for sampling.
+        Image::ColorSpace color_space {Image::ColorSpace::Linear}; ///< Color space for sampling.
     };
 
     /// @brief Texture width in pixels.

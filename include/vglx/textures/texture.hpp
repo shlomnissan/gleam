@@ -11,6 +11,7 @@
 
 #include "vglx/core/disposable.hpp"
 #include "vglx/core/identity.hpp"
+#include "vglx/textures/image.hpp"
 
 namespace vglx {
 
@@ -43,19 +44,6 @@ public:
         R32F, ///< 32-bit float single channel.
         R32UI, ///< 32-bit unsigned integer single channel.
         SRGBA8 ///< 8-bit sRGB-encoded RGBA.
-    };
-
-    /**
-     * @brief Enumerates supported color spaces for texture data.
-     *
-     * Textures containing color data (e.g. albedo or base color maps) are
-     * typically authored in sRGB and should use @ref ColorSpace "ColorSpace::sRGB".
-     * Data textures (e.g. normals, roughness, metallic, masks) must use
-     * @ref ColorSpace "ColorSpace::Linear" to preserve numerical correctness.
-     */
-    enum class ColorSpace {
-        Linear, ///< Linear color space, no gamma correction is applied.
-        sRGB ///< sRGB color space, converted to linear on sampling.
     };
 
     /**
@@ -114,7 +102,7 @@ public:
     RowAlignment row_alignment = RowAlignment::FourBytes;
 
     /// @brief Color space of the texture data.
-    ColorSpace color_space = ColorSpace::sRGB;
+    Image::ColorSpace color_space = Image::ColorSpace::sRGB;
 
     /// @brief Minification filter used when sampling the texture.
     MinFilter min_filter = MinFilter::Linear;

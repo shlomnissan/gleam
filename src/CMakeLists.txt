@@ -151,6 +151,7 @@ set(PUBLIC_HEADERS
     "${PUBLIC_HEADERS_DIR}/scene/scene.hpp"
     "${PUBLIC_HEADERS_DIR}/scene/sprite.hpp"
     "${PUBLIC_HEADERS_DIR}/textures/dynamic_texture_2d.hpp"
+    "${PUBLIC_HEADERS_DIR}/textures/image.hpp"
     "${PUBLIC_HEADERS_DIR}/textures/texture.hpp"
     "${PUBLIC_HEADERS_DIR}/textures/texture_2d.hpp"
     "${PUBLIC_HEADERS_DIR}/utilities/frame_timer.hpp"

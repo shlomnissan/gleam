@@ -10,6 +10,7 @@
 #include "vglx_export.h"
 
 #include "vglx/math/transform2.hpp"
+#include "vglx/textures/image.hpp"
 #include "vglx/textures/texture.hpp"
 
 #include <memory>
@@ -48,7 +49,7 @@ public:
     struct Parameters {
         unsigned width; ///< Width in pixels.
         unsigned height; ///< Height in pixels.
-        ColorSpace color_space {ColorSpace::sRGB}; ///< Color space for texture data.
+        Image::ColorSpace color_space {Image::ColorSpace::sRGB}; ///< Color space for texture data.
         std::vector<uint8_t> data; ///< Raw texture pixel data.
     };
 

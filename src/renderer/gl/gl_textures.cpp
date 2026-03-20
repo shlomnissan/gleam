@@ -59,7 +59,7 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
 
     if (texture->GetType() == Texture::Type::Texture2D) {
         auto tex = static_cast<Texture2D*>(texture);
-        tex->format = texture->color_space == Texture::ColorSpace::Linear
+        tex->format = texture->color_space == Image::ColorSpace::Linear
             ? Texture::Format::RGBA8
             : Texture::Format::SRGBA8;
 
