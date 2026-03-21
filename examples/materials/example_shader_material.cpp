@@ -77,7 +77,7 @@ auto ExampleShaderMaterial::OnAttached(SharedContextPointer context) -> void {
     Add(OrbitControls::Create(context->camera, {.radius = 3.0f}));
 
     handle = context->texture_loader->LoadAsync(
-        ASSETS_DIR "/checker/checker.tex"
+        ASSETS_DIR "/checker/checker.png"
     );
 }
 

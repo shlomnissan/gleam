@@ -11,17 +11,25 @@
 #include "vglx/textures/image.hpp"
 #include "vglx/textures/texture_2d.hpp"
 
+#include "loaders/detail/image_import.hpp"
 #include "utilities/file.hpp"
 
 #include <cstdint>
 #include <cstring>
 #include <format>
 #include <fstream>
+#include <string>
 #include <vector>
 
 namespace vglx::detail::texture {
 
-auto import(const fs::path& path) -> std::expected<std::shared_ptr<Texture2D>, std::string> {
+namespace {
+
+auto image_from_raw_image_source(const fs::path& path) -> std::expected<Image, std::string> {
+    return image::import(path);
+}
+
+auto image_from_engine_image_source(const fs::path& path) -> std::expected<Image, std::string> {
     auto file = std::ifstream {path, std::ios::binary};
     if (!file) {
         return std::unexpected(std::format("Unable to open texture '{}'", path.string()));
@@ -49,17 +57,27 @@ auto import(const fs::path& path) -> std::expected<std::shared_ptr<Texture2D>, s
         Image::ColorSpace::Linear :
         Image::ColorSpace::sRGB;
 
-    auto out = std::make_shared<Texture2D>(Image {
+    return Image {
         std::move(data),
         header.width,
         header.height,
         color_space
-    });
+    };
+}
 
+}
+
+auto import(const fs::path& path) -> std::expected<std::shared_ptr<Texture2D>, std::string> {
+    auto image = path.extension().string() == ".tex"
+        ? image_from_engine_image_source(path)
+        : image_from_raw_image_source(path);
+
+    if (!image.has_value()) return std::unexpected(image.error());
+
+    auto out = Texture2D::Create(std::move(image.value()));
     out->generate_mipamps = true;
     out->min_filter = Texture::MinFilter::LinearMipmapLinear;
     out->mag_filter = Texture::MagFilter::Linear;
-
     out->SetName(path.filename().string());
 
     return out;
