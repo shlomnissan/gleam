@@ -9,6 +9,8 @@
 
 #include "vglx_export.h"
 
+#include "vglx/textures/image.hpp"
+
 #include <memory>
 #include <optional>
 #include <string>
@@ -126,5 +128,14 @@ using TextureLoadHandle = LoadHandle<std::shared_ptr<Texture2D>>;
  * @related LoadHandle
  */
 using MeshLoadHandle = LoadHandle<std::unique_ptr<Node>>;
+
+/**
+ * @brief Handle type returned by asynchronous image load requests.
+ *
+ * Represents the eventual result of @ref ImageLoader::LoadAsync.
+ *
+ * @related LoadHandle
+ */
+using ImageLoadHandle = LoadHandle<Image>;
 
 }

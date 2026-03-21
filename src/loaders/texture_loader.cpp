@@ -18,12 +18,12 @@ namespace vglx {
 
 TextureLoader::TextureLoader(LoadScheduler* scheduler) : load_scheduler_(scheduler) {};
 
-auto TextureLoader::Load(const fs::path& path)
+auto TextureLoader::Load(const fs::path& path) const
   -> std::expected<std::shared_ptr<Texture2D>, std::string> {
     return detail::texture::import(path);
 }
 
-auto TextureLoader::LoadAsync(const fs::path& path) -> TextureLoadHandle {
+auto TextureLoader::LoadAsync(const fs::path& path) const -> TextureLoadHandle {
     VGLX_ASSERT(load_scheduler_ != nullptr, "Null load scheduler in texture loader");
 
     auto state = std::make_shared<TextureLoadHandle::State>();

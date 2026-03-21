@@ -76,7 +76,7 @@ public:
      *
      * @param path Filesystem path to the `.tex` asset.
      */
-    auto Load(const fs::path& path) -> std::expected<std::shared_ptr<Texture2D>, std::string>;
+    auto Load(const fs::path& path) const -> std::expected<std::shared_ptr<Texture2D>, std::string>;
 
     /**
      * @brief Loads a texture asynchronously from a `.tex` file.
@@ -91,7 +91,7 @@ public:
      *
      * @param path Filesystem path to the `.tex` asset.
      */
-    auto LoadAsync(const fs::path& path) -> TextureLoadHandle;
+    auto LoadAsync(const fs::path& path) const -> TextureLoadHandle;
 
 private:
     LoadScheduler* load_scheduler_ {nullptr};

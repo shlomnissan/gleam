@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "vglx_export.h"
+
 #include <cstdint>
 #include <vector>
 
@@ -22,7 +24,7 @@ namespace vglx {
  *
  * @ingroup TexturesGroup
  */
-struct Image {
+struct VGLX_EXPORT Image {
     /**
      * @brief Enumerates supported color spaces for image data.
      *

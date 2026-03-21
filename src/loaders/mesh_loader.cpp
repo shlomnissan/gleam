@@ -18,12 +18,12 @@ namespace vglx {
 
 MeshLoader::MeshLoader(LoadScheduler* scheduler) : load_scheduler_(scheduler) {};
 
-auto MeshLoader::Load(const fs::path& path)
+auto MeshLoader::Load(const fs::path& path) const
   -> std::expected<std::shared_ptr<Node>, std::string> {
     return detail::mesh::import(path);
 }
 
-auto MeshLoader::LoadAsync(const fs::path& path) -> MeshLoadHandle {
+auto MeshLoader::LoadAsync(const fs::path& path) const -> MeshLoadHandle {
     VGLX_ASSERT(load_scheduler_ != nullptr, "Null load scheduler in mesh loader");
 
     auto state = std::make_shared<MeshLoadHandle::State>();

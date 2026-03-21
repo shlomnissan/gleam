@@ -34,8 +34,8 @@ auto import(const fs::path& path) -> std::expected<Image, std::string> {
     auto size = size_t(width) * height * 4;
     auto image = Image(
         std::vector<uint8_t>(data, data + size),
-        width,
-        height
+        static_cast<unsigned>(width),
+        static_cast<unsigned>(height)
     );
 
     stbi_image_free(data);
