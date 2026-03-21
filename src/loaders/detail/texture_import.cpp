@@ -49,11 +49,11 @@ auto import(const fs::path& path) -> std::expected<std::shared_ptr<Texture2D>, s
         Image::ColorSpace::Linear :
         Image::ColorSpace::sRGB;
 
-    auto out = std::make_shared<Texture2D>(Texture2D::Parameters {
-        .width = header.width,
-        .height = header.height,
-        .color_space = color_space,
-        .data = std::move(data)
+    auto out = std::make_shared<Texture2D>(Image {
+        std::move(data),
+        header.width,
+        header.height,
+        color_space
     });
 
     out->generate_mipamps = true;

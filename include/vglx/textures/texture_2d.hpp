@@ -44,45 +44,24 @@ namespace vglx {
 class VGLX_EXPORT Texture2D : public Texture {
 public:
     /**
-     * @brief Parameters for constructing a @ref Texture2D object.
-     */
-    struct Parameters {
-        unsigned width; ///< Width in pixels.
-        unsigned height; ///< Height in pixels.
-        Image::ColorSpace color_space {Image::ColorSpace::sRGB}; ///< Color space for texture data.
-        std::vector<uint8_t> data; ///< Raw texture pixel data.
-    };
-
-    /// @brief Texture width in pixels.
-    unsigned width;
-
-    /// @brief Texture height in pixels.
-    unsigned height;
-
-    /// @brief Raw texture pixel data.
-    std::vector<uint8_t> data;
-
-    /**
-     * @brief Constructs a 2D texture.
+     * @brief Constructs a 2D texture from an @ref Image.
      *
-     * @param params @ref Texture2D::Parameters "Initialization parameters"
-     * for constructing the texture.
+     * Ownership of the image data is transferred into the texture via move.
+     *
+     * @param image Decoded image containing pixel data, dimensions, and color space.
      */
-    explicit Texture2D(Parameters params) :
-        width(params.width),
-        height(params.height),
-        data(std::move(params.data)) {
-            color_space = params.color_space;
-        }
+    explicit Texture2D(Image image) : image(std::move(image)) {}
+
+    /// @brief The source image backing this texture.
+    Image image;
 
     /**
      * @brief Creates a shared instance of @ref Texture2D.
      *
-     * @param params @ref Texture2D::Parameters "Initialization parameters"
-     * for constructing the texture.
+     * @param image Decoded image containing pixel data, dimensions, and color space.
      */
-    [[nodiscard]] static auto Create(const Parameters& params) -> std::shared_ptr<Texture2D> {
-        return std::make_shared<Texture2D>(params);
+    [[nodiscard]] static auto Create(Image image) -> std::shared_ptr<Texture2D> {
+        return std::make_shared<Texture2D>(std::move(image));
     }
 
     /**

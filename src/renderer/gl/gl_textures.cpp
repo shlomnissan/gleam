@@ -59,7 +59,7 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
 
     if (texture->GetType() == Texture::Type::Texture2D) {
         auto tex = static_cast<Texture2D*>(texture);
-        tex->format = texture->color_space == Image::ColorSpace::Linear
+        tex->format = tex->image.color_space == Image::ColorSpace::Linear
             ? Texture::Format::RGBA8
             : Texture::Format::SRGBA8;
 
@@ -68,12 +68,12 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
             GL_TEXTURE_2D,
             0,
             format.internal_format,
-            tex->width,
-            tex->height,
+            tex->image.width,
+            tex->image.height,
             0,
             format.source_format,
             format.type,
-            tex->data.data()
+            tex->image.data.data()
         );
 
         if (tex->generate_mipamps) glGenerateMipmap(GL_TEXTURE_2D);

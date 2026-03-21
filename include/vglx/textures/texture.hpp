@@ -101,9 +101,6 @@ public:
     /// @brief Row alignment used when uploading texture data.
     RowAlignment row_alignment = RowAlignment::FourBytes;
 
-    /// @brief Color space of the texture data.
-    Image::ColorSpace color_space = Image::ColorSpace::sRGB;
-
     /// @brief Minification filter used when sampling the texture.
     MinFilter min_filter = MinFilter::Linear;
 

@@ -75,6 +75,9 @@ public:
     /// @brief Number of allocated mip levels.
     const unsigned int mips;
 
+    /// @brief Color space of the texture data.
+    Image::ColorSpace color_space;
+
     /**
      * @brief Constructs a dynamic 2D texture.
      *
