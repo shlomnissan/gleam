@@ -57,7 +57,7 @@ auto ExampleModelLoader::OnAttached(SharedContextPointer context) -> void {
     }));
 
     handle = context->mesh_loader->LoadAsync(
-        "assets/lps_head/lps_head.msh"
+        ASSETS_DIR "/lps_head/lps_head.msh"
     );
 }
 

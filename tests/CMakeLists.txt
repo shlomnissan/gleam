@@ -13,10 +13,6 @@ if (NOT GTest_FOUND)
     FetchContent_MakeAvailable(googletest)
 endif()
 
-if(NOT MSVC)
-    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/assets DESTINATION ${CMAKE_BINARY_DIR}/tests)
-endif()
-
 file(GLOB TEST_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/**/*.cpp
     ${CMAKE_CURRENT_LIST_DIR}/**/**/*.cpp
@@ -33,15 +29,11 @@ foreach(TEST IN LISTS TEST_SOURCES)
 
     set(TEST_TARGET run_${NAME_NO_EXT})
     add_executable(${TEST_TARGET} test_helpers.hpp ${TEST})
+
+    target_compile_definitions(${TEST_TARGET} PRIVATE
+        ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets"
+    )
+
     target_link_libraries(${TEST_TARGET} PRIVATE GTest::gtest_main GTest::gmock vglx)
     add_test(${NAME_NO_EXT} ${TEST_TARGET})
-
-    if (MSVC)
-        add_custom_command(
-            TARGET ${TEST_TARGET} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_directory
-            ${CMAKE_CURRENT_SOURCE_DIR}/assets
-            $<TARGET_FILE_DIR:${TEST_TARGET}>/assets
-        )
-    endif()
 endforeach()

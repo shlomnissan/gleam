@@ -38,7 +38,7 @@ auto ExampleSprite::OnAttached(SharedContextPointer context) -> void {
     }));
 
     handle = context->texture_loader->LoadAsync (
-        "assets/sprite/sprite.tex"
+        ASSETS_DIR "/sprite/sprite.tex"
     );
 }
 

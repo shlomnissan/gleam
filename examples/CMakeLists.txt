@@ -57,13 +57,10 @@ target_include_directories(${BINARY} PUBLIC
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/examples>
 )
 
-target_link_libraries(${BINARY} PRIVATE vglx)
-
-add_custom_command(
-    TARGET ${BINARY} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-    ${CMAKE_CURRENT_SOURCE_DIR}/assets
-    $<TARGET_FILE_DIR:${BINARY}>/assets
+target_compile_definitions(${BINARY} PRIVATE
+    ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets"
 )
+
+target_link_libraries(${BINARY} PRIVATE vglx)
 
 endforeach()

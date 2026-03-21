@@ -34,7 +34,7 @@ ExampleSandbox::ExampleSandbox() {
 }
 
 auto ExampleSandbox::OnAttached(SharedContextPointer context) -> void {
-    loader_handle = context->mesh_loader->LoadAsync("assets/robot/robot.msh");
+    loader_handle = context->mesh_loader->LoadAsync(ASSETS_DIR "/robot/robot.msh");
 
     Add(OrbitControls::Create(
         context->camera, {
