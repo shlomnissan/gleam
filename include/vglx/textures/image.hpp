@@ -55,6 +55,9 @@ struct Image {
     Image(const Image&) = delete;
     auto operator=(const Image&) -> Image& = delete;
 
+    Image(Image&&) noexcept = default;
+    auto operator=(Image&&) noexcept -> Image&  = default;
+
     /// @brief Raw pixel data.
     std::vector<uint8_t> data;
 

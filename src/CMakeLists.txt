@@ -30,6 +30,8 @@ set(SOURCE_CODE
     "lights/directional_light.cpp"
     "lights/point_light.cpp"
     "lights/spot_light.cpp"
+    "loaders/detail/image_import.cpp"
+    "loaders/detail/image_import.hpp"
     "loaders/detail/mesh_import.cpp"
     "loaders/detail/mesh_import.hpp"
     "loaders/detail/texture_import.cpp"
