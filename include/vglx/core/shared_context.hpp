@@ -110,6 +110,14 @@ struct VGLX_EXPORT SharedContext {
     std::unique_ptr<MeshLoader> mesh_loader = std::make_unique<MeshLoader>(load_scheduler.get());
 
     /**
+     * @brief Image loader.
+     *
+     * Handles loading of raw image data from common formats (PNG, JPEG, TGA,
+     * BMP, HDR).
+     */
+    std::unique_ptr<ImageLoader> image_loader = std::make_unique<ImageLoader>(load_scheduler.get());
+
+    /**
      * @brief Creates and initializes a shared runtime context.
      *
      * Creates an instance of @ref SharedContext populated with the current
