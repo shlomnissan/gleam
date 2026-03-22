@@ -41,3 +41,8 @@ Collection of single-file libraries used in VGLX components.
   * Upstream: https://github.com/nothings/stb
   * Version: 2.30
   * License: Public Domain or MIT
+
+- `tiny_obj_loader.hpp`
+  * Upstream: https://github.com/tinyobjloader/tinyobjloader
+  * Version: 2.0.0
+  * License: MIT
