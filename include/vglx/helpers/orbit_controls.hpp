@@ -52,7 +52,7 @@ public:
         float yaw {0.0f}; ///< Initial yaw angle in radians.
         float orbit_speed {3.0f}; ///< Orbit sensitivity (radians per full-height drag).
         float pan_speed {0.5f}; ///< Pan sensitivity (relative to distance and viewport).
-        float zoom_speed {0.95f}; ///< Scroll wheel zoom factor.
+        float zoom_speed {1.0f}; ///< Scroll wheel zoom sensitivity multiplier.
         float damping_factor {0.3f}; ///< Set to 1 for instant response.
     };
 

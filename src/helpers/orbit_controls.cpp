@@ -85,7 +85,7 @@ struct OrbitControls::Impl {
         }
 
         if (event->type == Scrolled) {
-            zoom_scale *= std::pow(params.zoom_speed, event->scroll.y);
+            zoom_scale *= std::pow(0.95f, event->scroll.y * params.zoom_speed);
         }
     }
 
