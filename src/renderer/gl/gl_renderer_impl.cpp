@@ -55,8 +55,6 @@ auto Renderer::Impl::Initialize() -> std::expected<void, std::string> {
 }
 
 auto Renderer::Impl::RenderObjects(Scene* scene, Camera* camera) -> void {
-    camera_ubo_.Update(camera->projection_matrix, camera->view_matrix);
-
     for (auto renderable : render_lists_->Opaque()) {
         RenderObject(renderable, scene, camera);
     }
@@ -285,6 +283,7 @@ auto Renderer::Impl::Render(Scene* scene, Camera* camera, RenderTarget* target) 
 
     scene->UpdateTransformHierarchy();
     camera->UpdateViewMatrix();
+    camera_ubo_.Update(camera->projection_matrix, camera->view_matrix);
 
     render_lists_->ProcessScene(scene, camera);
     ProcessLights(camera);
