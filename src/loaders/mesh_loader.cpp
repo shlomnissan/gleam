@@ -19,7 +19,7 @@ namespace vglx {
 MeshLoader::MeshLoader(LoadScheduler* scheduler) : load_scheduler_(scheduler) {};
 
 auto MeshLoader::Load(const fs::path& path) const
-  -> std::expected<std::shared_ptr<Node>, std::string> {
+  -> std::expected<std::unique_ptr<Node>, std::string> {
     return detail::mesh::import(path);
 }
 

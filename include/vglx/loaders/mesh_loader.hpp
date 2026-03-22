@@ -76,7 +76,7 @@ public:
      *
      * @param path Filesystem path to the `.msh` asset.
      */
-    auto Load(const fs::path& path) const -> std::expected<std::shared_ptr<Node>, std::string>;
+    auto Load(const fs::path& path) const -> std::expected<std::unique_ptr<Node>, std::string>;
 
     /**
      * @brief Loads a mesh asynchronously from a `.msh` file.
