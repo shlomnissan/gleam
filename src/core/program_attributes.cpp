@@ -7,9 +7,6 @@
 
 #include "core/program_attributes.hpp"
 
-#include "vglx/lights/ambient_light.hpp"
-#include "vglx/lights/directional_light.hpp"
-#include "vglx/lights/point_light.hpp"
 #include "vglx/materials/phong_material.hpp"
 #include "vglx/materials/shader_material.hpp"
 #include "vglx/materials/sprite_material.hpp"

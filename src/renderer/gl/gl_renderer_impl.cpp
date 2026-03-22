@@ -322,11 +322,12 @@ auto Renderer::Impl::CreateTextureFromRenderTarget(RenderTarget* target) -> std:
         return {};
     }
 
-    auto texture = Texture2D::Create(Image {{},
-        static_cast<unsigned int>(target->width),
-        static_cast<unsigned int>(target->height),
-        Image::ColorSpace::Linear,
-    });
+    auto texture = Texture2D::Create(Image::Create({
+        .data = {},
+        .width = static_cast<unsigned int>(target->width),
+        .height = static_cast<unsigned int>(target->height),
+        .color_space = Image::ColorSpace::Linear,
+    }));
 
     texture->renderer_id = tex_id;
 

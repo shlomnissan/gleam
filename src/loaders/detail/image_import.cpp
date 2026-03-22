@@ -15,7 +15,7 @@
 
 namespace vglx::detail::image {
 
-auto import(const fs::path& path) -> std::expected<Image, std::string> {
+auto import(const fs::path& path) -> std::expected<std::shared_ptr<Image>, std::string> {
     if (!fs::exists(path)) {
         return std::unexpected(std::format("Can't find image {}", path.string()));
     }
@@ -32,11 +32,11 @@ auto import(const fs::path& path) -> std::expected<Image, std::string> {
     }
 
     auto size = size_t(width) * height * 4;
-    auto image = Image(
-        std::vector<uint8_t>(data, data + size),
-        static_cast<unsigned>(width),
-        static_cast<unsigned>(height)
-    );
+    auto image = Image::Create({
+        .data = std::vector<uint8_t>(data, data + size),
+        .width = static_cast<unsigned>(width),
+        .height = static_cast<unsigned>(height)
+    });
 
     stbi_image_free(data);
 

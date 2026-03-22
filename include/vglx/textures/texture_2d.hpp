@@ -46,22 +46,23 @@ public:
     /**
      * @brief Constructs a 2D texture from an @ref Image.
      *
-     * Ownership of the image data is transferred into the texture via move.
+     * The texture holds a shared reference to the image, allowing multiple
+     * textures to share the same underlying pixel data.
      *
      * @param image Decoded image containing pixel data, dimensions, and color space.
      */
-    explicit Texture2D(Image image) : image(std::move(image)) {}
+    explicit Texture2D(std::shared_ptr<Image> image) : image(image) {}
 
     /// @brief The source image backing this texture.
-    Image image;
+    std::shared_ptr<Image> image {nullptr};
 
     /**
      * @brief Creates a shared instance of @ref Texture2D.
      *
      * @param image Decoded image containing pixel data, dimensions, and color space.
      */
-    [[nodiscard]] static auto Create(Image image) -> std::shared_ptr<Texture2D> {
-        return std::make_shared<Texture2D>(std::move(image));
+    [[nodiscard]] static auto Create(std::shared_ptr<Image> image) -> std::shared_ptr<Texture2D> {
+        return std::make_shared<Texture2D>(image);
     }
 
     /**

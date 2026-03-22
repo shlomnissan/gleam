@@ -19,7 +19,7 @@ namespace vglx {
 
 namespace {
 
-std::array<std::string, 6> supported_file_ext {
+const std::array<std::string, 6> supported_file_ext {
     ".png", ".jpg", ".jpeg", ".tga", ".bmp", ".hdr"
 };
 
@@ -34,7 +34,7 @@ auto is_supported_file_ext(const fs::path& path) {
 ImageLoader::ImageLoader(LoadScheduler* scheduler) : load_scheduler_(scheduler) {}
 
 
-auto ImageLoader::Load(const fs::path& path) const -> std::expected<Image, std::string> {
+auto ImageLoader::Load(const fs::path& path) const -> std::expected<std::shared_ptr<Image>, std::string> {
     if (!is_supported_file_ext(path)) {
         return std::unexpected("Unsupported file extension");
     }
@@ -57,7 +57,7 @@ auto ImageLoader::LoadAsync(const fs::path& path) const -> ImageLoadHandle {
         [state, path] {
             auto result = detail::image::import(path);
             if (result.has_value()) {
-                state->value = std::move(result.value());
+                state->value = result.value();
             } else {
                 state->error = result.error();
                 Logger::Log(LogLevel::Error, "{}", state->error);

@@ -9,6 +9,7 @@
 
 #include <expected>
 #include <filesystem>
+#include <memory>
 #include <string>
 
 #include "vglx/textures/image.hpp"
@@ -17,6 +18,6 @@ namespace vglx::detail::image {
 
 namespace fs = std::filesystem;
 
-[[nodiscard]] auto import(const fs::path& path) -> std::expected<Image, std::string>;
+[[nodiscard]] auto import(const fs::path& path) -> std::expected<std::shared_ptr<Image>, std::string>;
 
 }

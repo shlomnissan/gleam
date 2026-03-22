@@ -25,13 +25,13 @@ TEST_F(TextureLoaderTest, LoadTexture) {
     EXPECT_TRUE(result.has_value());
 
     auto texture = result.value();
-    EXPECT_EQ(texture->image.data.size(), 5 * 5 * 4);
-    EXPECT_EQ(texture->image.width, 5);
-    EXPECT_EQ(texture->image.height, 5);
+    EXPECT_EQ(texture->image->data.size(), 5 * 5 * 4);
+    EXPECT_EQ(texture->image->width, 5);
+    EXPECT_EQ(texture->image->height, 5);
 }
 
 TEST_F(TextureLoaderTest, LoadTextureInvalidFileFormat) {
-    auto result =loader->Load(ASSETS_DIR "/texture.png");
+    auto result =loader->Load(ASSETS_DIR "/texture.invalid");
 
     EXPECT_FALSE(result.has_value());
 }

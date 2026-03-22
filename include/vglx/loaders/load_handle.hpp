@@ -136,6 +136,6 @@ using MeshLoadHandle = LoadHandle<std::unique_ptr<Node>>;
  *
  * @related LoadHandle
  */
-using ImageLoadHandle = LoadHandle<Image>;
+using ImageLoadHandle = LoadHandle<std::shared_ptr<Image>>;
 
 }
