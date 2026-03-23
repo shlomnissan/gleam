@@ -9,7 +9,6 @@
 
 #include "vglx_export.h"
 
-#include "vglx/textures/image.hpp"
 #include "vglx/textures/texture.hpp"
 
 #include <cstdint>
@@ -35,7 +34,7 @@ namespace vglx {
  *     .height = 1024,
  *     .mips = 1,
  *     .format = vglx::DynamicTexture2D::Format::RGBA8,
- *     .color_space = vglx::ColorSpace::Linear
+ *     .color_space = vglx::Texture::ColorSpace::Linear
  *   });
  *
  *   auto patch_bytes = get_image_subregion();
@@ -63,7 +62,7 @@ public:
         int height; ///< Height in pixels.
         unsigned int mips {1}; ///< Number of mip levels to allocate.
         Format format {Format::RGBA8}; ///< Texture storage format.
-        Image::ColorSpace color_space {Image::ColorSpace::Linear}; ///< Color space for sampling.
+        ColorSpace color_space {ColorSpace::Linear}; ///< Color space for sampling.
     };
 
     /// @brief Texture width in pixels.
@@ -74,9 +73,6 @@ public:
 
     /// @brief Number of allocated mip levels.
     const unsigned int mips;
-
-    /// @brief Color space of the texture data.
-    Image::ColorSpace color_space;
 
     /**
      * @brief Constructs a dynamic 2D texture.

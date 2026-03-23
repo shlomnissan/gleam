@@ -18,27 +18,13 @@ namespace vglx {
 /**
  * @brief Represents decoded image data loaded from an asset.
  *
- * An image holds raw pixel data along with the metadata needed to
- * interpret it: dimensions and color space. Images are typically created
- * through @ref Image::Create and shared between one or more
- * @ref Texture2D instances via `std::shared_ptr`.
+ * An image holds raw pixel data along with its dimensions. Images are
+ * typically created through @ref Image::Create and shared between one
+ * or more @ref Texture2D instances via `std::shared_ptr`.
  *
  * @ingroup TexturesGroup
  */
 struct VGLX_EXPORT Image {
-    /**
-     * @brief Enumerates supported color spaces for image data.
-     *
-     * Textures containing color data (e.g. albedo or base color maps) are
-     * typically authored in sRGB and should use @ref ColorSpace "ColorSpace::sRGB".
-     * Data textures (e.g. normals, roughness, metallic, masks) must use
-     * @ref ColorSpace "ColorSpace::Linear" to preserve numerical correctness.
-     */
-    enum class ColorSpace {
-        Linear, ///< Linear color space, no gamma correction is applied.
-        sRGB ///< sRGB color space, converted to linear on sampling.
-    };
-
     /**
      * @brief Parameters for constructing an @ref Image object.
      */
@@ -46,7 +32,6 @@ struct VGLX_EXPORT Image {
         std::vector<uint8_t> data {}; ///< Raw pixel bytes.
         unsigned width {0}; ///< Image width in pixels.
         unsigned height {0}; ///< Image height in pixels.
-        ColorSpace color_space {ColorSpace::sRGB}; ///< Color space of the pixel data.
     };
 
     /**
@@ -61,8 +46,7 @@ struct VGLX_EXPORT Image {
     Image(Parameters params)
         : data(std::move(params.data)),
           width(params.width),
-          height(params.height),
-          color_space(params.color_space) {}
+          height(params.height) {}
 
     // Non-copyable
     Image(const Image&) = delete;
@@ -90,9 +74,6 @@ struct VGLX_EXPORT Image {
 
     /// @brief Image height in pixels.
     unsigned height;
-
-    /// @brief Color space of the pixel data.
-    ColorSpace color_space {ColorSpace::sRGB};
 };
 
 };

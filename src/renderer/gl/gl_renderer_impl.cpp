@@ -325,11 +325,10 @@ auto Renderer::Impl::CreateTextureFromRenderTarget(RenderTarget* target) -> std:
         .data = {},
         .width = static_cast<unsigned int>(target->width),
         .height = static_cast<unsigned int>(target->height),
-        .color_space = Image::ColorSpace::Linear,
     }));
 
+    texture->color_space = Texture::ColorSpace::Linear;
     texture->renderer_id = tex_id;
-
     texture->min_filter = Texture::MinFilter::Linear;
     texture->mag_filter = Texture::MagFilter::Linear;
 

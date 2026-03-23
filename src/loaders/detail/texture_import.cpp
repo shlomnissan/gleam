@@ -24,13 +24,20 @@
 
 namespace vglx::detail::texture {
 
+struct ImageResult {
+    std::shared_ptr<Image> image;
+    Texture::ColorSpace color_space {Texture::ColorSpace::sRGB};
+};
+
 namespace {
 
-auto image_from_raw_image_source(const fs::path& path) -> std::expected<std::shared_ptr<Image>, std::string> {
-    return image::import(path);
+auto image_from_raw_image_source(const fs::path& path) -> std::expected<ImageResult, std::string> {
+    auto image = image::import(path);
+    if (!image) return std::unexpected(image.error());
+    return ImageResult {.image = std::move(image.value())};
 }
 
-auto image_from_engine_image_source(const fs::path& path) -> std::expected<std::shared_ptr<Image>, std::string> {
+auto image_from_engine_image_source(const fs::path& path) -> std::expected<ImageResult, std::string> {
     auto file = std::ifstream {path, std::ios::binary};
     if (!file) {
         return std::unexpected(std::format("Unable to open texture '{}'", path.string()));
@@ -54,28 +61,31 @@ auto image_from_engine_image_source(const fs::path& path) -> std::expected<std::
         return std::unexpected(std::format("Failed to read data from '{}'", path.string()));
     }
 
-    auto color_space = header.color_space == TextureColorSpace_Linear ?
-        Image::ColorSpace::Linear :
-        Image::ColorSpace::sRGB;
+    auto color_space = header.color_space == TextureColorSpace_Linear
+        ? Texture::ColorSpace::Linear
+        : Texture::ColorSpace::sRGB;
 
-    return Image::Create({
-        .data = std::move(data),
-        .width = header.width,
-        .height = header.height,
+    return ImageResult {
+        .image = Image::Create({
+            .data = std::move(data),
+            .width = header.width,
+            .height = header.height,
+        }),
         .color_space = color_space
-    });
+    };
 }
 
 }
 
 auto import(const fs::path& path) -> std::expected<std::shared_ptr<Texture2D>, std::string> {
-    auto image = path.extension().string() == ".tex"
+    auto result = path.extension().string() == ".tex"
         ? image_from_engine_image_source(path)
         : image_from_raw_image_source(path);
 
-    if (!image.has_value()) return std::unexpected(image.error());
+    if (!result.has_value()) return std::unexpected(result.error());
 
-    auto out = Texture2D::Create(image.value());
+    auto out = Texture2D::Create(result->image);
+    out->color_space = result->color_space;
     out->generate_mipamps = true;
     out->min_filter = Texture::MinFilter::LinearMipmapLinear;
     out->mag_filter = Texture::MagFilter::Linear;

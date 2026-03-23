@@ -49,7 +49,7 @@ public:
      * The texture holds a shared reference to the image, allowing multiple
      * textures to share the same underlying pixel data.
      *
-     * @param image Decoded image containing pixel data, dimensions, and color space.
+     * @param image Decoded image containing pixel data and dimensions.
      */
     explicit Texture2D(std::shared_ptr<Image> image) : image(image) {}
 
@@ -59,7 +59,7 @@ public:
     /**
      * @brief Creates a shared instance of @ref Texture2D.
      *
-     * @param image Decoded image containing pixel data, dimensions, and color space.
+     * @param image Decoded image containing pixel data and dimensions.
      */
     [[nodiscard]] static auto Create(std::shared_ptr<Image> image) -> std::shared_ptr<Texture2D> {
         return std::make_shared<Texture2D>(image);

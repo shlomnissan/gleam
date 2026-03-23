@@ -11,7 +11,6 @@
 
 #include "vglx/core/disposable.hpp"
 #include "vglx/core/identity.hpp"
-#include "vglx/textures/image.hpp"
 
 namespace vglx {
 
@@ -32,6 +31,19 @@ public:
     enum class Type {
         Texture2D, ///< Two-dimensional texture.
         DynamicTexture2D, ///< Two-dimensional dynamic GPU texture.
+    };
+
+    /**
+     * @brief Enumerates supported color spaces for texture sampling.
+     *
+     * Textures containing color data (e.g. albedo or base color maps) are
+     * typically authored in sRGB and should use @ref ColorSpace "ColorSpace::sRGB".
+     * Data textures (e.g. normals, roughness, metallic, masks) must use
+     * @ref ColorSpace "ColorSpace::Linear" to preserve numerical correctness.
+     */
+    enum class ColorSpace {
+        Linear, ///< Linear color space, no gamma correction is applied.
+        sRGB ///< sRGB color space, converted to linear on sampling.
     };
 
     /**
@@ -112,6 +124,9 @@ public:
 
     /// @brief Texture storage format.
     Format format {Format::RGBA8};
+
+    /// @brief Color space used when sampling this texture.
+    ColorSpace color_space {ColorSpace::sRGB};
 
     /**
      * @brief Identifies the concrete @ref Texture::Type "texture type".
