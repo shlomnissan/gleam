@@ -26,7 +26,7 @@ VGLX vendors all of its dependencies directly inside the repository. Nothing is 
 Each dependency includes its license inside the `vendor/` directory.
 ## VGLX Installer
 
-The easiest way to install VGLX is using the Python installer included in the repository. It guides you through the process, builds the engine using the right presets for your system and can optionally install the asset builder CLI.
+The easiest way to install VGLX is using the Python installer included in the repository. It guides you through the process and builds the engine using the right presets for your system.
 
 ```bash
 # clone the repository
@@ -37,7 +37,7 @@ cd vglx
 python3 -m tools.installer.main
 ```
 
-The installer checks for a working version of CMake, detects your compiler and asks for an installation prefix. If you plan to import optimized textures or models, enable the asset builder installation when prompted. The asset builder converts textures and meshes into GPU-friendly formats used by the engine. See [Importing Assets](/manual/importing_assets) to learn more.
+The installer checks for a working version of CMake, detects your compiler and asks for an installation prefix.
 
 If you encounter issues, see the [Getting Help](#getting-help) section below.
 ## Creating a New Project
@@ -115,7 +115,6 @@ VGLX includes optional build components. You can enable or disable them using st
 | `VGLX_BUILD_EXAMPLES`      | Build example applications.              |
 | `VGLX_BUILD_IMGUI`         | Enable ImGui support for debug UI/tools. |
 | `VGLX_BUILD_TESTS`         | Build unit tests.                        |
-| `VGLX_BUILD_ASSET_BUILDER` | Build asset builder CLI tool             |
 
 Release presets build a shared library by default. If you prefer a static build, use:
 

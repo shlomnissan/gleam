@@ -26,10 +26,10 @@ namespace fs = std::filesystem;
 /**
  * @brief Loader for mesh assets.
  *
- * Provides both synchronous and asynchronous interfaces for loading `.msh`
- * data from disk. It is intended to be accessed through the shared runtime
- * context and used directly by application or node code when mesh resources
- * are needed.
+ * Provides both synchronous and asynchronous interfaces for loading mesh
+ * data from disk. Supported formats include OBJ. It is intended to be
+ * accessed through the shared runtime context and used directly by
+ * application or node code when mesh resources are needed.
  *
  * The synchronous @ref Load method performs the entire load on the calling
  * thread and returns either a fully constructed node hierarchy or an error
@@ -46,7 +46,7 @@ namespace fs = std::filesystem;
  * commits are clearly separated.
  *
  * @code
- * auto handle = context->mesh_loader->LoadAsync("assets/robot.msh");
+ * auto handle = context->mesh_loader->LoadAsync("assets/robot.obj");
  *
  * auto OnUpdate(float) -> void override {
  *   if (auto node = handle.TryTake()) {
@@ -65,7 +65,7 @@ public:
     explicit MeshLoader(LoadScheduler* scheduler);
 
     /**
-     * @brief Loads a mesh synchronously from a `.msh` file.
+     * @brief Loads a mesh synchronously from a mesh file.
      *
      * Performs file I/O and mesh construction on the calling thread. If loading
      * succeeds a fully constructed @ref Node is returned. On failure an error
@@ -74,12 +74,12 @@ public:
      * This method is intended for tooling, offline processing, or scenarios
      * where blocking behavior is acceptable.
      *
-     * @param path Filesystem path to the `.msh` asset.
+     * @param path Filesystem path to the mesh asset.
      */
     auto Load(const fs::path& path) const -> std::expected<std::unique_ptr<Node>, std::string>;
 
     /**
-     * @brief Loads a mesh asynchronously from a `.msh` file.
+     * @brief Loads a mesh asynchronously from a mesh file.
      *
      * Schedules file I/O work to run off the main thread and returns
      * immediately with a @ref LoadHandle "MeshLoadHandle". The handle can later
@@ -89,7 +89,7 @@ public:
      * successfully taken. Errors can be retrieved explicitly from the handle
      * or will be reported through the logger.
      *
-     * @param path Filesystem path to the `.msh` asset.
+     * @param path Filesystem path to the mesh asset.
      */
     auto LoadAsync(const fs::path& path) const -> MeshLoadHandle;
 

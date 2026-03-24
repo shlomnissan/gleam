@@ -33,7 +33,7 @@ Community feedback shapes the engine. Questions, critiques, and experiments ofte
 
 ## Installation
 
-The easiest way to install VGLX is with the Python installer included in the repository. It guides the process, builds the engine using the correct presets for your system, and can optionally install the asset builder CLI.
+The easiest way to install VGLX is with the Python installer included in the repository. It guides the process and builds the engine using the correct presets for your system.
 
 ```bash
 # clone the repository
@@ -44,7 +44,7 @@ cd vglx
 python3 -m tools.installer.main
 ```
 
-The installer checks for CMake, detects your compiler, and asks for an installation prefix. If you plan to import textures or models, enable the asset builder when prompted. It converts source assets into GPU-ready formats.
+The installer checks for CMake, detects your compiler, and asks for an installation prefix.
 
 ## Hello VGLX (minimal example)
 

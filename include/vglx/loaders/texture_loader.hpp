@@ -26,10 +26,10 @@ namespace fs = std::filesystem;
 /**
  * @brief Loader for 2D texture assets.
  *
- * Provides both synchronous and asynchronous interfaces for loading `.tex`
- * texture data from disk. It is intended to be accessed through the shared
- * runtime context and used directly by application or node code when texture
- * resources are needed.
+ * Provides both synchronous and asynchronous interfaces for loading texture
+ * data from disk. Supported formats include PNG, JPEG, TGA, BMP, and HDR. It is
+ * intended to be accessed through the shared runtime context and used
+ * directly by application or node code when texture resources are needed.
  *
  * The synchronous @ref Load method performs the entire load on the calling
  * thread and returns either a fully constructed texture or an error message.
@@ -45,7 +45,7 @@ namespace fs = std::filesystem;
  * commits are clearly separated.
  *
  * @code
- * auto handle = context->texture_loader->LoadAsync("assets/diffuse.tex");
+ * auto handle = context->texture_loader->LoadAsync("assets/diffuse.png");
  *
  * auto OnUpdate(float) -> void override {
  *   if (auto texture = handle.TryTake()) {
@@ -65,7 +65,7 @@ public:
     explicit TextureLoader(LoadScheduler* scheduler);
 
     /**
-     * @brief Loads a texture synchronously from a `.tex` file.
+     * @brief Loads a texture synchronously from an image file.
      *
      * Performs file I/O and texture creation on the calling thread. If loading
      * succeeds a fully constructed @ref Texture2D is returned. On failure
@@ -74,12 +74,12 @@ public:
      * This method is intended for tooling, offline processing, or scenarios
      * where blocking behavior is acceptable.
      *
-     * @param path Filesystem path to the `.tex` asset.
+     * @param path Filesystem path to the texture asset.
      */
     auto Load(const fs::path& path) const -> std::expected<std::shared_ptr<Texture2D>, std::string>;
 
     /**
-     * @brief Loads a texture asynchronously from a `.tex` file.
+     * @brief Loads a texture asynchronously from an image file.
      *
      * Schedules file I/O work to run off the main thread and returns
      * immediately with a @ref LoadHandle "TextureLoadHandle". The handle can later
@@ -89,7 +89,7 @@ public:
      * successfully taken. Errors can be retrieved explicitly from the handle
      * or will be reported through the logger.
      *
-     * @param path Filesystem path to the `.tex` asset.
+     * @param path Filesystem path to the texture asset.
      */
     auto LoadAsync(const fs::path& path) const -> TextureLoadHandle;
 

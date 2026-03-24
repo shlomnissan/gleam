@@ -65,8 +65,7 @@ public:
      * data to the GPU. The alignment value must match the source image’s
      * row stride to ensure correct decoding and avoid visual artifacts.
      *
-     * Textures generated through the asset builder pipeline are encoded as
-     * RGBA8 with 4-byte row alignment by default.
+     * RGBA8 textures typically use 4-byte row alignment.
      */
     enum class RowAlignment : std::uint8_t {
         OneByte = 1, ///< 1-byte alignment (tightly packed).
