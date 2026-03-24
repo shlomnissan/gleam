@@ -267,6 +267,12 @@ auto parse_material(const tinyobj::material_t& material) -> MaterialDescriptor {
         desc.specular = {0.1f, 0.1f, 0.1f};
     }
 
+    // If an emissive map exists but Ke is black, default to white
+    // so the map isn't multiplied to zero.
+    if (!material.emissive_texname.empty() && material.emission[0] == 0.0f) {
+        desc.emission = {1.0f, 1.0f, 1.0f};
+    }
+
     desc.tex_diffuse = material.diffuse_texname;
     desc.tex_alpha = material.alpha_texname;
     desc.tex_specular = material.specular_texname;

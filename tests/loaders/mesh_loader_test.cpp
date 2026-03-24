@@ -37,7 +37,7 @@ TEST_F(MeshLoaderTest, LoadMesh) {
 }
 
 TEST_F(MeshLoaderTest, LoadMeshInvalidFileFormat) {
-    auto result = loader->Load(ASSETS_DIR "/plane.obj");
+    auto result = loader->Load(ASSETS_DIR "/plane.invalid");
 
     EXPECT_FALSE(result.has_value());
 }

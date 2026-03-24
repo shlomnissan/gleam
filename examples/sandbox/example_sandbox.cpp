@@ -34,14 +34,12 @@ ExampleSandbox::ExampleSandbox() {
 }
 
 auto ExampleSandbox::OnAttached(SharedContextPointer context) -> void {
-    loader_handle = context->mesh_loader->LoadAsync(ASSETS_DIR "/robot/robot.msh");
+    loader_handle = context->mesh_loader->LoadAsync(ASSETS_DIR "/robot/robot.obj");
 
-    Add(OrbitControls::Create(
-        context->camera, {
-            .radius = 4.5f,
-            .yaw = 0.5f
-        })
-    );
+    Add(OrbitControls::Create(context->camera, {
+        .radius = 4.5f,
+        .yaw = 0.5f
+    }));
 }
 
 auto ExampleSandbox::OnUpdate(float dt) -> void {
