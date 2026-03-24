@@ -24,7 +24,7 @@ public:
 };
 
 TEST_F(MeshLoaderTest, LoadMesh) {
-    auto result = loader->Load(ASSETS_DIR "/plane.msh");
+    auto result = loader->Load(ASSETS_DIR "/plane.obj");
     EXPECT_TRUE(result.has_value());
 
     auto root = std::move(result.value());
@@ -43,7 +43,7 @@ TEST_F(MeshLoaderTest, LoadMeshInvalidFileFormat) {
 }
 
 TEST_F(MeshLoaderTest, LoadMeshInvalidPath) {
-   auto result = loader->Load(ASSETS_DIR "/invalid_path.msh");
+   auto result = loader->Load(ASSETS_DIR "/invalid_path.obj");
 
     EXPECT_FALSE(result.has_value());
 }

@@ -21,7 +21,7 @@ public:
 };
 
 TEST_F(TextureLoaderTest, LoadTexture) {
-    auto result = loader->Load(ASSETS_DIR "/texture.tex");
+    auto result = loader->Load(ASSETS_DIR "/texture.png");
     EXPECT_TRUE(result.has_value());
 
     auto texture = result.value();
@@ -37,7 +37,7 @@ TEST_F(TextureLoaderTest, LoadTextureInvalidFileFormat) {
 }
 
 TEST_F(TextureLoaderTest, LoadTextureInvalidPath) {
-    auto result = loader->Load(ASSETS_DIR "/invalid_path.tex");
+    auto result = loader->Load(ASSETS_DIR "/invalid_path.png");
 
     EXPECT_FALSE(result.has_value());
 }
