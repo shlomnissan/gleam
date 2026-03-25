@@ -27,7 +27,7 @@ namespace vglx {
  * @code
  * auto MyNode::OnAttached(SharedContextPointer context) -> void {
  *   context->texture_loader->LoadAsync(
- *     "assets/my_texture.tex",
+ *     "assets/my_texture.png",
  *     [this](auto result) {
  *       if (result) {
  *         texture_ = result.value();

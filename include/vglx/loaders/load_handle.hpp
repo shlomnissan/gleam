@@ -41,7 +41,7 @@ class Texture2D;
  *   vglx::TextureLoadHandle handle_;
  *
  *   auto OnAttached(SharedContextPointer context) -> void override {
- *     handle_ = context->texture_loader->LoadAsync("assets/albedo.tex");
+ *     handle_ = context->texture_loader->LoadAsync("assets/albedo.png");
  *   }
  *
  *   auto OnUpdate([[maybe_unused]] float delta) -> void override {

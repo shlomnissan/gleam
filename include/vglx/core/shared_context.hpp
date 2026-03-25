@@ -96,24 +96,21 @@ struct VGLX_EXPORT SharedContext {
     /**
      * @brief Texture loader.
      *
-     * Handles loading and caching of image assets targeting the engine's
-     * custom `.tex` format.
+     * Handles loading image assets.
      */
     std::unique_ptr<TextureLoader> texture_loader = std::make_unique<TextureLoader>(load_scheduler.get());
 
     /**
      * @brief Mesh loader.
      *
-     * Handles loading and caching of mesh assets targeting the engine's
-     * custom `.msh` format.
+     * Handles loading mesh assets.
      */
     std::unique_ptr<MeshLoader> mesh_loader = std::make_unique<MeshLoader>(load_scheduler.get());
 
     /**
      * @brief Image loader.
      *
-     * Handles loading of raw image data from common formats (PNG, JPEG, TGA,
-     * BMP, HDR).
+     * Handles loading of raw image data.
      */
     std::unique_ptr<ImageLoader> image_loader = std::make_unique<ImageLoader>(load_scheduler.get());
 

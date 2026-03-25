@@ -1,99 +1,53 @@
 # Importing Assets
 
-Asset importing in VGLX is an offline step. Before your application runs source files are converted into engine-native formats that are ready to upload to the GPU. The runtime never parses image or mesh formats. It only loads data that has already been prepared.
+VGLX loads standard asset formats directly at runtime. There is no offline conversion step and no intermediate file formats. You point a loader at a PNG or an OBJ and the engine handles the rest.
 
-This design keeps the engine simple and predictable. Parsing formats like OBJ or PNG at runtime adds cost, complexity, and ambiguity. By moving that work into a build step VGLX can focus on rendering and scene management rather than file decoding.
+This keeps the workflow simple. Assets go straight from your content tools into the engine without an extra build step in between. The loaders decode source files, construct GPU-ready resources, and hand them back to your application.
 
-VGLX uses two custom runtime formats. Textures are stored as `.tex` files and meshes are stored as `.msh` files. These formats are intentionally minimal. They contain exactly the data the renderer needs and nothing more. Vertex layouts are explicit. Texture data is laid out linearly. There is no hidden work when an asset is loaded.
+#### Supported Formats
 
-> VGLX never loads OBJ, PNG, or JPG files at runtime. All assets must be converted to runtime formats before running the application.
+| Asset Type | Supported Formats       |
+| ---------- | ----------------------- |
+| Textures   | PNG, JPEG, TGA, BMP, HDR |
+| Meshes     | OBJ (glTF support coming soon)                    |
 
-This approach mirrors how integrated engines handle assets. Source files are flexible and convenient for artists. Runtime formats are fast and stable for engines. The asset builder tool bridges that gap and ensures that every asset your application loads is already in a form the GPU can consume efficiently.
+## Loading Textures
 
-## Asset Builder
-
-The asset builder tool converts source assets into VGLX runtime formats that the engine can load directly. The interface is intentionally simple. A single input asset produces one or more runtime files depending on what is being imported.
-
-The easiest way to get the asset builder is through the VGLX installer. During installation you are prompted to install it alongside the engine. If enabled the installation directory you selected will contain a `bin` folder with the `asset_builder` executable.
-
-It is recommended to add this directory to your system’s `PATH` so the tool can be invoked from anywhere. On Linux and macOS this usually means updating your shell configuration. On Windows the directory can be added through the system environment variables.
-
-The asset builder is included in the VGLX repository. When building the project from source you must enable the `VGLX_BUILD_ASSET_BUILDER` option to include it. This option is disabled by default in project presets. Once built the executable can be run from the build output directory or copied into your project’s toolchain.
-
-#### Supported File Formats
-
-The asset builder currently supports a small set of source formats. These files are treated as input only and are never loaded by the engine at runtime:
-
-| Asset Type | Supported Formats |
-| ---------- | ----------------- |
-| Meshes     | OBJ               |
-| Textures   | JPG, JPEG, PNG    |
-
-As the pipeline evolves additional source formats will be added.
-
-#### CLI Options
-
-The asset builder exposes a small set of command-line options. Output paths and file names can usually be inferred from the source asset.
-
-| Option           | Description                                                |
-| ---------------- | ---------------------------------------------------------- |
-| `-i`, `--input`  | Input file to convert (e.g. PNG or OBJ).                   |
-| `-o`, `--output` | Output directory. If omitted the source directory is used. |
-| `-h`, `--help`   | Show help and exit.                                        |
-
-## Importing Textures
-
-In this section we import a texture into VGLX. We start by converting a JPG file into a `.tex` asset, then load it at runtime and apply it to a simple primitive.
-
-The image used in this example is a simple [wooden crate texture](/manual_crate_texture_low.jpg). To convert this image or any other into a `.tex` asset run the asset builder from the command line and pass the image file using the `-i` flag:
-
-```bash
-asset_builder -i manual_crate_texture_low.jpg
-```
-If the conversion succeeds the asset builder prints the output path.
-
-By default the asset builder writes the resulting `.tex` file next to the source image. You can override the output location using the `-o` option. The generated `.tex` file can be loaded directly by the engine without further processing.
+In this section we load a texture and apply it to a simple primitive. The image used in this example is a [wooden crate texture](/crate_texture_low.jpg). Any supported image format will work.
 
 Textures are loaded at runtime using the [TextureLoader](/reference/loaders/texture_loader). The loader is accessible from any node through the shared context which becomes available when the node is attached to the scene graph via a lifetime hook.
 
 Asset loading is typically performed asynchronously to avoid blocking the main thread. To do this we store a [LoadHandle](/reference/loaders/load_handle) as a member of the scene and poll it during updates until the asset becomes available.
 
-The following example revisits the rotating cube scene and applies a texture to it:
-
+The following example revisits the rotating cube scene from the [previous guide](/manual/creating_application):
 ```cpp
 #include <vglx/vglx.h>
 
 struct MyScene : public vglx::Scene {
-    std::shared_ptr<vglx::UnlitMaterial> material {
-        vglx::UnlitMaterial::Create()
-    };
-
-    TextureLoadHandle handle {};
+    vglx::TextureLoadHandle handle {};
     vglx::Mesh* mesh {nullptr};
-
-    MyScene() {
-        mesh = Add(vglx::Mesh::Create(
-            vglx::BoxGeometry::Create(),
-            material
-        ));
-    }
 
     auto OnAttached(vglx::SharedContextPointer context) -> void override {
         handle = context->texture_loader->LoadAsync(
-            "crate_texture_low.tex"
+            "crate_texture_low.jpg"
         );
-
         context->camera->TranslateZ(2.5f);
     }
 
     auto OnUpdate([[maybe_unused]] float delta) -> void override {
         if (auto result = handle.TryTake()) {
+            auto geometry = vglx::BoxGeometry::Create();
+            auto material = vglx::UnlitMaterial::Create(0xFFFFFF);
+
             material->texture_map = result.value();
+            mesh = Add(vglx::Mesh::Create(geometry, material));
         }
 
-        const auto rotation_speed = vglx::math::pi_over_2;
-        mesh->RotateX(rotation_speed * delta);
-        mesh->RotateY(rotation_speed * delta);
+        if (mesh != nullptr) {
+            const auto rotation_speed = vglx::math::pi_over_2;
+            mesh->RotateX(rotation_speed * delta);
+            mesh->RotateY(rotation_speed * delta);
+        }
     }
 };
 ```
@@ -104,31 +58,25 @@ If you used the same source image and followed the steps your application should
 
 ![Textured Cube](/manual_02.webp)
 
-If your application prints a `file not found` error make sure the texture asset is located in a directory that the application can access at runtime. By default assets are loaded using paths relative to the executable. If your assets live elsewhere provide an explicit relative path when calling the loader.
+If your application prints a `file not found` error make sure the image is located in a directory that the application can access at runtime. By default assets are loaded using paths relative to the executable. If your assets live elsewhere provide an explicit relative path when calling the loader.
 
-## Importing Meshes
+## Loading Meshes
 
-In this section we import a mesh from an OBJ file. Unlike textures, meshes typically reference additional data such as material definitions and multiple textures. In this example the OBJ references an accompanying MTL file which includes a color map, a normal map, and a specular map.
+In this section we load a mesh from an OBJ file. Unlike textures, meshes typically reference additional data such as materials and textures. In this example the OBJ references an accompanying MTL file which includes a color map, a normal map, and a specular map.
 
-When importing a mesh the asset builder treats the OBJ as the root of the asset. Geometry, material definitions, and all referenced textures are processed together. Each referenced image is converted to a `.tex` file, while the mesh geometry, material metadata, and texture paths are stored in a single `.msh` file.
+When loading a mesh the engine treats the OBJ as the root of the asset. Geometry, materials, and textures are resolved together. Referenced images are loaded from the same directory as the OBJ file and bound to the appropriate material slots automatically.
 
-The mesh used in this example is a [human head scan](/manual_lps_head.zip) by Lee Perry-Smith. After downloading the archive, unzip it and navigate to the extracted directory. From there, run the asset builder on the OBJ file:
-
-```bash
-asset_builder -i lps_head.obj -o output
-```
-
-After the command completes the output directory will contain one `.msh` file and several `.tex` files corresponding to the referenced textures. When loading the mesh at runtime these files must remain co-located so the engine can resolve material references correctly.
+The mesh used in this example is a [human head scan](/lps_head.zip) by Lee Perry-Smith. Unzip the archive and place the contents alongside the executable to follow along.
 
 Meshes are loaded at runtime using the [MeshLoader](/reference/loaders/mesh_loader). As with textures the loader is accessed through the shared context and is only available once a node is attached.
 
-The following snippet defines a custom scene that loads the imported mesh, resolves its materials and textures, and renders it with basic lighting:
+The following example loads the mesh and renders it with basic lighting:
 
 ```cpp
 #include <vglx/vglx.h>
 
 struct MyScene : public vglx::Scene {
-    MeshLoadHandle handle {};
+    vglx::MeshLoadHandle handle {};
 
     MyScene() {
         Add(vglx::AmbientLight::Create({
@@ -144,30 +92,32 @@ struct MyScene : public vglx::Scene {
 
     auto OnAttached(vglx::SharedContextPointer context) -> void override {
         handle = context->mesh_loader->LoadAsync(
-            "lps_head.msh"
+            "lps_head.obj"
         );
 
-        context->camera->TranslateZ(2.5f);
+        context->camera->TranslateZ(3.5f);
     }
 
     auto OnUpdate([[maybe_unused]] float delta) -> void override {
-        if (auto result = handle.TryTake()) {
-            Add(std::move(result.value()));
-        }
+        // Note that we use std::move(result.value())
+        // to transfer ownership to the scene graph
+        Add(std::move(result.value()))->RotateY(
+            vglx::math::DegToRad(90.0f)
+        );
     }
 };
 ```
 
-If you followed the steps above using the same source files your application should produce a result similar to the image below.
+If you followed the steps above using the same source files your application should produce a result similar to the image below:
 
 ![Human Head Scan](/manual_03.webp)
 
-Loading a `.msh` file at runtime produces a fully constructed renderable node. The mesh geometry is uploaded to the GPU lazily, material parameters are initialized from the imported metadata, and any referenced .tex files are loaded and bound to the appropriate material slots. No additional setup is required by the application.
+Loading an OBJ file at runtime produces a fully constructed renderable node. The mesh geometry is uploaded to the GPU lazily, material parameters are initialized from the MTL data, and any referenced textures are loaded and bound to the appropriate material slots. No additional setup is required by the application.
 
-## Pipeline Overview
-
-VGLX focuses on the graphics layer. The asset builder and runtime formats exist to provide a clear and predictable path from source data to GPU-ready resources. They are designed to remove format parsing and asset ambiguity from the runtime without imposing a heavy asset management system.
+## Overview
 
 Asset loading in VGLX is explicit and ownership is clear. Loaders construct GPU-backed resources and return them to the call-site where they are owned and managed by the application. VGLX does not introduce global caches, registries, or lifetime management beyond this handoff. You load an asset, attach it, and use it.
+
+The loader infrastructure is built around a simple class that can be extended to support custom file formats. See the [LoadHandle](/reference/loaders/load_handle) reference for details on implementing your own.
 
 This model keeps the engine small and composable. Applications that require caching, streaming, or higher-level asset systems are free to build those layers on top, while applications that do not need them are not forced to pay for their complexity.

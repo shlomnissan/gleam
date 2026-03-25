@@ -29,7 +29,7 @@ namespace vglx {
  *
  * @code
  * auto MyNode::OnAttached(SharedContextPointer context) -> void override {
- *   context->texture_loader->LoadAsync("assets/sprite.tex",
+ *   context->texture_loader->LoadAsync("assets/sprite.png",
  *     [this](auto result) {
  *       if (result) {
  *         auto material = vglx::SpriteMaterial::Create(result.value());
