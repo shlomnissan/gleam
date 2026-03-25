@@ -7,7 +7,8 @@
 
 #include "loaders/detail/mesh_import.hpp"
 
-#include "vglx/asset_format.hpp"
+#include "asset_format.hpp"
+
 #include "vglx/geometries/geometry.hpp"
 #include "vglx/materials/material.hpp"
 #include "vglx/materials/phong_material.hpp"

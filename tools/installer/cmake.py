@@ -44,7 +44,6 @@ def cmake_configure(
         f"-DCMAKE_BUILD_TYPE={build_type}",
         f"-DCMAKE_INSTALL_PREFIX={config.install_prefix}",
         f"-DBUILD_SHARED_LIBS={'ON' if config.build_shared else 'OFF'}",
-        f"-DVGLX_BUILD_ASSET_BUILDER={'ON' if config.build_asset_builder else 'OFF'}",
         f"-DVGLX_BUILD_IMGUI={'ON' if config.build_imgui else 'OFF'}",
         f"-DVGLX_LOG_LEVEL={1 if build_type == "Release" else 3}",
         "-DVGLX_BUILD_EXAMPLES=OFF",

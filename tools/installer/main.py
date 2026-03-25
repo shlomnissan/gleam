@@ -39,12 +39,9 @@ def configuration_options(os_name: str):
     ).startswith("Shared")
 
     print("\nAdditional components to install with VGLX:")
-    build_asset_builder = ask_yes_no("  *) Asset Builder CLI: generates engine-optimized assets (recommended)")
     build_imgui = ask_yes_no("  *) ImGui: minimal UI library for tools and examples")
 
     components = []
-    if build_asset_builder:
-        components.append("asset builder")
     if build_imgui:
         components.append("imgui")
     if not components:
@@ -68,7 +65,6 @@ def configuration_options(os_name: str):
         os_name = os_name,
         install_prefix = install_prefix,
         build_shared = build_shared,
-        build_asset_builder = build_asset_builder,
         build_imgui = build_imgui,
     )
 

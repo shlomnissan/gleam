@@ -6,7 +6,6 @@
       "binaryDir": "${sourceDir}/build/debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "VGLX_BUILD_ASSET_BUILDER": "OFF",
         "VGLX_BUILD_DOCS": "OFF",
         "VGLX_BUILD_EXAMPLES": "ON",
         "VGLX_BUILD_IMGUI": "ON",
@@ -20,7 +19,6 @@
       "binaryDir": "${sourceDir}/build/release",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "VGLX_BUILD_ASSET_BUILDER": "OFF",
         "VGLX_BUILD_DOCS": "OFF",
         "VGLX_BUILD_EXAMPLES": "ON",
         "VGLX_BUILD_IMGUI": "ON",
@@ -34,7 +32,6 @@
       "binaryDir": "${sourceDir}/out/install-debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "VGLX_BUILD_ASSET_BUILDER": "OFF",
         "VGLX_BUILD_DOCS": "OFF",
         "VGLX_BUILD_EXAMPLES": "OFF",
         "VGLX_BUILD_IMGUI": "ON",
@@ -48,7 +45,6 @@
       "binaryDir": "${sourceDir}/out/install-release",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "VGLX_BUILD_ASSET_BUILDER": "OFF",
         "VGLX_BUILD_DOCS": "OFF",
         "VGLX_BUILD_EXAMPLES": "OFF",
         "VGLX_BUILD_IMGUI": "ON",

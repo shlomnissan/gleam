@@ -214,7 +214,6 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
-    $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/tools/asset_builder/include>
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE glad glfw)

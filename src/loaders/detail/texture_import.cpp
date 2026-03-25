@@ -7,7 +7,8 @@
 
 #include "loaders/detail/texture_import.hpp"
 
-#include "vglx/asset_format.hpp"
+#include "asset_format.hpp"
+
 #include "vglx/textures/image.hpp"
 #include "vglx/textures/texture_2d.hpp"
 

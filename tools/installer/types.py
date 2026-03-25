@@ -8,5 +8,4 @@ class ConfigurationOptions:
     os_name: str
     install_prefix: Path
     build_shared: bool
-    build_asset_builder: bool
     build_imgui: bool

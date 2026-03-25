@@ -12,7 +12,6 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
 set(VGLX_LOG_LEVEL "3" CACHE STRING "Default VGLX log level (0=Error, 1=Warning, 2=Info, 3=Debug)")
 
-option(VGLX_BUILD_ASSET_BUILDER "Build asset builder CLI tools for asset importing" OFF)
 option(VGLX_BUILD_DOCS "Build API documentation using Doxygen" OFF)
 option(VGLX_BUILD_EXAMPLES "Build example application" ON)
 option(VGLX_BUILD_IMGUI "Build and integrate ImGui from the vendored source" ON)
@@ -28,10 +27,6 @@ endif()
 
 if (VGLX_BUILD_EXAMPLES)
     add_subdirectory("examples")
-endif()
-
-if (VGLX_BUILD_ASSET_BUILDER)
-    add_subdirectory("tools/asset_builder")
 endif()
 
 if (VGLX_BUILD_DOCS)
