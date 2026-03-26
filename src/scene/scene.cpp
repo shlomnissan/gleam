@@ -8,7 +8,6 @@
 #include "vglx/scene/scene.hpp"
 
 #include "events/event_dispatcher.hpp"
-#include "utilities/logger.hpp"
 
 namespace vglx {
 

@@ -13,7 +13,6 @@
 #include "vglx/materials/sprite_material.hpp"
 #include "vglx/materials/unlit_material.hpp"
 #include "vglx/math/matrix3.hpp"
-#include "vglx/math/vector3.hpp"
 #include "vglx/scene/fog.hpp"
 #include "vglx/scene/instanced_mesh.hpp"
 #include "vglx/scene/sprite.hpp"
@@ -181,18 +180,18 @@ auto Renderer::Impl::SetUniforms(
         }
     };
 
-    if (auto fog = scene->fog.get()) {
-        auto type = fog->GetType();
-        program->SetUniform(Uniform::FogType, &type);
-        if (type == Fog::Type::Linear) {
-            program->SetUniform(Uniform::FogColor, &fog->color);
-            program->SetUniform(Uniform::FogNear, &fog->near);
-            program->SetUniform(Uniform::FogFar, &fog->far);
+    if (scene->fog) {
+        const auto& fog = scene->fog.value();
+        program->SetUniform(Uniform::FogType, &fog.type);
+        if (fog.type == Fog::Type::Linear) {
+            program->SetUniform(Uniform::FogColor, &fog.color);
+            program->SetUniform(Uniform::FogNear, &fog.near);
+            program->SetUniform(Uniform::FogFar, &fog.far);
         }
 
-        if (type == Fog::Type::Exponential) {
-            program->SetUniform(Uniform::FogColor, &fog->color);
-            program->SetUniform(Uniform::FogDensity, &fog->density);
+        if (fog.type == Fog::Type::Exponential) {
+            program->SetUniform(Uniform::FogColor, &fog.color);
+            program->SetUniform(Uniform::FogDensity, &fog.density);
         }
     }
 

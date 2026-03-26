@@ -60,7 +60,7 @@ ProgramAttributes::ProgramAttributes(
     }
 
     flat_shaded = material->flat_shaded;
-    fog = material->fog && scene->fog != nullptr;
+    fog = material->fog && scene->fog.has_value();
     instancing = renderable->GetNodeType() == Node::Type::InstancedMesh;
     num_lights = lights.directional + lights.point + lights.spot;
     two_sided = material->two_sided;

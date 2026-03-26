@@ -71,10 +71,10 @@ struct Fog {
      * @param near Distance at which fog begins to appear.
      * @param far Distance at which fog reaches full intensity.
      */
-    [[nodiscard]] static auto CreateLinear(const Color& color, float near, float far) -> std::unique_ptr<Fog> {
-        auto out = std::make_unique<Fog>(Type::Linear, color);
-        out->near = near;
-        out->far = far;
+    [[nodiscard]] static auto CreateLinear(const Color& color, float near, float far) -> Fog {
+        auto out = Fog {Type::Linear, color};
+        out.near = near;
+        out.far = far;
         return out;
     }
 
@@ -88,9 +88,9 @@ struct Fog {
      * @param color Fog color.
      * @param density Exponential density factor (higher values produce thicker fog).
      */
-    [[nodiscard]] static auto CreateExponential(const Color& color, float density) -> std::unique_ptr<Fog> {
-        auto out = std::make_unique<Fog>(Type::Exponential, color);
-        out->density = density;
+    [[nodiscard]] static auto CreateExponential(const Color& color, float density) -> Fog {
+        auto out = Fog {Type::Exponential, color};
+        out.density = density;
         return out;
     }
 

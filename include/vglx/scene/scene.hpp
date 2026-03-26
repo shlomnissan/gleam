@@ -13,6 +13,7 @@
 #include "vglx/scene/node.hpp"
 
 #include <memory>
+#include <optional>
 
 namespace vglx {
 
@@ -58,7 +59,7 @@ namespace vglx {
 class VGLX_EXPORT Scene : public Node {
 public:
     /// @brief Optional global fog settings applied during rendering.
-    std::unique_ptr<Fog> fog;
+    std::optional<Fog> fog;
 
     /**
      * @brief Constructs a scene object.
