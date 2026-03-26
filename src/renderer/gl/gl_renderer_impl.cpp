@@ -44,11 +44,11 @@ Renderer::Impl::Impl(const Renderer::Parameters& params)
 
 auto Renderer::Impl::Initialize() -> std::expected<void, std::string> {
     if (auto result = scene_buffer_.Initialize(); !result.has_value()) {
-        return result;
+        return std::unexpected(result.error());
     }
 
     if (auto result = present_pass_.Initialize(); !result.has_value()) {
-        return result;
+        return std::unexpected(result.error());
     }
 
     return {};
@@ -273,11 +273,9 @@ auto Renderer::Impl::ProcessLights(Camera* camera) -> void {
 auto Renderer::Impl::Render(Scene* scene, Camera* camera, RenderTarget* target) -> void {
     const auto use_default_target = target == nullptr;
 
-    if (use_default_target) {
-        scene_buffer_.Begin();
-    } else {
-        framebuffers_.Begin(target);
-    }
+    use_default_target
+        ? scene_buffer_.Begin()
+        : framebuffers_.Begin(target);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -290,11 +288,9 @@ auto Renderer::Impl::Render(Scene* scene, Camera* camera, RenderTarget* target) 
 
     RenderObjects(scene, camera);
 
-    if (use_default_target) {
-        scene_buffer_.End();
-    } else {
-        framebuffers_.End(target);
-    }
+    use_default_target
+        ? scene_buffer_.End()
+        : framebuffers_.End(target);
 
     textures_.Reset();
     vertex_buffers_.Reset();

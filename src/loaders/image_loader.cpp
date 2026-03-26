@@ -19,26 +19,29 @@ namespace vglx {
 
 namespace {
 
-const std::array<std::string, 6> supported_file_ext {
+const std::array<std::string, 6> exts {
     ".png", ".jpg", ".jpeg", ".tga", ".bmp", ".hdr"
 };
 
-auto is_supported_file_ext(const fs::path& path) {
-    return std::ranges::find(
-        supported_file_ext, path.extension().string()
-    ) != supported_file_ext.end();
+auto load_image(const fs::path& path) -> std::expected<std::shared_ptr<Image>, std::string> {
+    if (!fs::exists(path)) {
+        return std::unexpected(std::format("Can't find image {}", path.string()));
+    }
+
+    auto ext = path.extension().string();
+    if (std::ranges::find(exts, ext) == exts.end()) {
+        return std::unexpected(std::format("Unsupported file extension {}", ext));
+    }
+
+    return detail::image::import(path);
 }
 
 }
 
 ImageLoader::ImageLoader(LoadScheduler* scheduler) : load_scheduler_(scheduler) {}
 
-
 auto ImageLoader::Load(const fs::path& path) const -> std::expected<std::shared_ptr<Image>, std::string> {
-    if (!is_supported_file_ext(path)) {
-        return std::unexpected("Unsupported file extension");
-    }
-    return detail::image::import(path);
+    return load_image(path);
 }
 
 auto ImageLoader::LoadAsync(const fs::path& path) const -> ImageLoadHandle {
@@ -47,17 +50,11 @@ auto ImageLoader::LoadAsync(const fs::path& path) const -> ImageLoadHandle {
     auto state = std::make_shared<ImageLoadHandle::State>();
     auto handle = ImageLoadHandle {state};
 
-    if (!is_supported_file_ext(path)) {
-        state->error = "Unsupported file extension";
-        state->ready = true;
-        return handle;
-    }
-
     load_scheduler_->Enqueue(
         [state, path] {
-            auto result = detail::image::import(path);
+            auto result = load_image(path);
             if (result.has_value()) {
-                state->value = result.value();
+                state->value = std::move(result.value());
             } else {
                 state->error = result.error();
                 Logger::Log(LogLevel::Error, "{}", state->error);

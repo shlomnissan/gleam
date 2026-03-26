@@ -16,6 +16,7 @@
 #include <array>
 #include <cassert>
 #include <cmath>
+#include <format>
 #include <optional>
 #include <unordered_map>
 
@@ -387,8 +388,8 @@ auto import(const fs::path& path) -> std::expected<ObjResult, std::string> {
 
     if (!reader.ParseFromFile(path.string(), reader_config)) {
         return reader.Error().empty()
-            ? std::unexpected("Failed to load OBJ file: " + path.string())
-            : std::unexpected("OBJ parse error: " + reader.Error());
+            ? std::unexpected(std::format("Failed to load OBJ file {}", path.string()))
+            : std::unexpected(std::format("OBJ parse error {}", reader.Error()));
     }
 
     auto& attrib = reader.GetAttrib();

@@ -16,10 +16,6 @@
 namespace vglx::detail::image {
 
 auto import(const fs::path& path) -> std::expected<std::shared_ptr<Image>, std::string> {
-    if (!fs::exists(path)) {
-        return std::unexpected(std::format("Can't find image {}", path.string()));
-    }
-
     stbi_set_flip_vertically_on_load(true);
 
     auto width = 0;

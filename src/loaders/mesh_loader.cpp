@@ -14,8 +14,8 @@
 #include "vglx/textures/texture_2d.hpp"
 
 #include "loaders/detail/image_import.hpp"
-#include "loaders/detail/mesh_import.hpp"
 #include "loaders/detail/obj_import.hpp"
+
 #include "utilities/assert.hpp"
 #include "utilities/logger.hpp"
 
@@ -61,8 +61,23 @@ auto build_material(const detail::obj::MaterialDescriptor& desc, const fs::path&
     return material;
 }
 
-auto build_node_from_obj(const detail::obj::ObjResult& obj, const fs::path& path) {
+auto load_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>, std::string> {
+    if (!fs::exists(path)) {
+        return std::unexpected(std::format("Can't find mesh {}", path.string()));
+    }
+
+    auto ext = path.extension().string();
+    if (ext != ".obj") {
+        return std::unexpected(std::format("Unsupported file extension {}", ext));
+    }
+
+    auto result = detail::obj::import(path);
+    if (!result) {
+        return std::unexpected(result.error());
+    }
+
     auto base_dir = path.parent_path();
+    auto obj = result.value();
 
     auto materials = std::vector<std::shared_ptr<PhongMaterial>> {};
     materials.reserve(obj.materials.size());
@@ -76,8 +91,8 @@ auto build_node_from_obj(const detail::obj::ObjResult& obj, const fs::path& path
           && entry.material_index < static_cast<int>(materials.size());
 
         auto material = has_material
-                ? materials[entry.material_index]
-                : PhongMaterial::Create(0xFFFFFF);
+            ? materials[entry.material_index]
+            : PhongMaterial::Create(0xFFFFFF);
 
         auto mesh = Mesh::Create(entry.geometry, material);
         mesh->SetName(entry.name);
@@ -88,25 +103,13 @@ auto build_node_from_obj(const detail::obj::ObjResult& obj, const fs::path& path
     return root;
 }
 
-auto import_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>, std::string> {
-    if (path.extension() == ".obj") {
-        if (auto res = detail::obj::import(path)) {
-            return build_node_from_obj(res.value(), path);
-        } else {
-            return std::unexpected(res.error());
-        }
-    }
-
-    return detail::mesh::import(path);
 }
-
-} // unnamed namespace
 
 MeshLoader::MeshLoader(LoadScheduler* scheduler) : load_scheduler_(scheduler) {};
 
 auto MeshLoader::Load(const fs::path& path) const
   -> std::expected<std::unique_ptr<Node>, std::string> {
-    return import_mesh(path);
+    return load_mesh(path);
 }
 
 auto MeshLoader::LoadAsync(const fs::path& path) const -> MeshLoadHandle {
@@ -117,7 +120,7 @@ auto MeshLoader::LoadAsync(const fs::path& path) const -> MeshLoadHandle {
 
     load_scheduler_->Enqueue(
         [state, path] {
-            auto result = import_mesh(path);
+            auto result = load_mesh(path);
             if (result.has_value()) {
                 state->value = std::move(result.value());
             } else {
