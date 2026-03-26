@@ -7,18 +7,21 @@
 
 #pragma once
 
+#include "renderer/gl/gl_program.hpp"
+
 #include <expected>
 #include <memory>
 #include <string>
 
+#include <glad/glad.h>
+
 namespace vglx {
 
 class GLSceneBuffer;
-class GLState;
 
 class GLPresentPass {
 public:
-    GLPresentPass();
+    GLPresentPass() = default;
 
     // Non-copyable
     GLPresentPass(const GLPresentPass&) = delete;
@@ -35,8 +38,9 @@ public:
     ~GLPresentPass();
 
 private:
-    class Impl;
-    std::unique_ptr<Impl> impl_;
+    GLuint vao_ {0};
+
+    std::unique_ptr<GLProgram> program_ {nullptr};
 };
 
 }
