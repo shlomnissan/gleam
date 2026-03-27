@@ -7,6 +7,7 @@
 
 #include "renderer/gl/gl_renderer_impl.hpp"
 
+#include "renderer/gl/gl_textures.hpp"
 #include "vglx/core/render_target.hpp"
 #include "vglx/materials/phong_material.hpp"
 #include "vglx/materials/shader_material.hpp"
@@ -47,6 +48,10 @@ auto Renderer::Impl::Initialize() -> std::expected<void, std::string> {
     }
 
     if (auto result = present_pass_.Initialize(); !result.has_value()) {
+        return std::unexpected(result.error());
+    }
+
+    if (auto result = background_pass_.Initialize(); !result.has_value()) {
         return std::unexpected(result.error());
     }
 
@@ -277,6 +282,13 @@ auto Renderer::Impl::Render(Scene* scene, Camera* camera, RenderTarget* target) 
         : framebuffers_.Begin(target);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    if (scene->background != nullptr) {
+        state_.SetDepthWrites(false);
+        textures_.Bind(scene->background, 0);
+        background_pass_.Render(scene->background);
+        state_.SetDepthWrites(true);
+    }
 
     scene->UpdateTransformHierarchy();
     camera->UpdateViewMatrix();

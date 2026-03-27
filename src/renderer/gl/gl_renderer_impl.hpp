@@ -10,6 +10,7 @@
 #include "vglx/core/renderer.hpp"
 #include "vglx/scene/renderable.hpp"
 
+#include "renderer/gl/gl_background_pass.hpp"
 #include "renderer/gl/gl_camera.hpp"
 #include "renderer/gl/gl_framebuffers.hpp"
 #include "renderer/gl/gl_lights.hpp"
@@ -53,6 +54,7 @@ public:
     ~Impl();
 
 private:
+    GLBackgroundPass background_pass_;
     GLCamera camera_ubo_;
     GLFramebuffers framebuffers_;
     GLLights lights_;

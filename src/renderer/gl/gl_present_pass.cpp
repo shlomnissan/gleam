@@ -36,13 +36,11 @@ auto GLPresentPass::Initialize() -> std::expected<void, std::string> {
     return {};
 }
 
-auto GLPresentPass::Present(const GLSceneBuffer& scene_buffer) -> void {
+auto GLPresentPass::Present(const GLSceneBuffer& scene_buffer) const -> void {
     glUseProgram(program_->Id());
 
-    auto tex_unit = 0;
-    glActiveTexture(GL_TEXTURE0 + tex_unit);
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, scene_buffer.GetResolvedColorTexture());
-    program_->SetUnknownUniform("u_ResolvedTexture", &tex_unit);
 
     glBindVertexArray(vao_);
     glDrawArrays(GL_TRIANGLES, 0, 3);

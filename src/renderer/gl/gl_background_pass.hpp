@@ -33,7 +33,7 @@ public:
 
     [[nodiscard]] auto Initialize() -> std::expected<void, std::string>;
 
-    auto Render(const std::shared_ptr<Texture>& background) -> void;
+    auto Render(const std::shared_ptr<Texture>& background) const -> void;
 
     ~GLBackgroundPass();
 

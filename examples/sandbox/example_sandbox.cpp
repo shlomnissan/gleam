@@ -18,7 +18,8 @@ using namespace vglx;
 
 namespace {
 
-auto loader_handle = MeshLoadHandle {};
+auto loader_mesh = MeshLoadHandle {};
+auto loader_background = TextureLoadHandle {};
 
 }
 
@@ -34,7 +35,8 @@ ExampleSandbox::ExampleSandbox() {
 }
 
 auto ExampleSandbox::OnAttached(SharedContextPointer context) -> void {
-    loader_handle = context->mesh_loader->LoadAsync(ASSETS_DIR "/robot/robot.obj");
+    loader_mesh = context->mesh_loader->LoadAsync(ASSETS_DIR "/robot/robot.obj");
+    loader_background = context->texture_loader->LoadAsync(ASSETS_DIR "/background/sky.png");
 
     Add(OrbitControls::Create(context->camera, {
         .radius = 4.5f,
@@ -43,10 +45,14 @@ auto ExampleSandbox::OnAttached(SharedContextPointer context) -> void {
 }
 
 auto ExampleSandbox::OnUpdate(float dt) -> void {
-    if (auto result = loader_handle.TryTake()) {
+    if (auto result = loader_mesh.TryTake()) {
         mesh_ = Add(std::move(result.value()));
         mesh_->SetScale(0.03f);
         mesh_->RotateY(math::DegToRad(180.0f));
         mesh_->TranslateY(-1.0f);
+    }
+
+    if (auto result = loader_background.TryTake()) {
+        background = result.value();
     }
 }

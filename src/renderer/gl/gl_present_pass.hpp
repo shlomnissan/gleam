@@ -33,7 +33,7 @@ public:
 
     [[nodiscard]] auto Initialize() -> std::expected<void, std::string>;
 
-    auto Present(const GLSceneBuffer& scene_buffer) -> void;
+    auto Present(const GLSceneBuffer& scene_buffer) const -> void;
 
     ~GLPresentPass();
 

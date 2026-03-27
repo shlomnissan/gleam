@@ -38,7 +38,7 @@ auto GLBackgroundPass::Initialize() -> std::expected<void, std::string> {
     return {};
 }
 
-auto GLBackgroundPass::Render(const std::shared_ptr<Texture>& background) -> void {
+auto GLBackgroundPass::Render(const std::shared_ptr<Texture>& background) const -> void {
     if (background == nullptr) {
         Logger::Log(LogLevel::Warning,
             "Attempting to present background using a null texture"
@@ -53,10 +53,7 @@ auto GLBackgroundPass::Render(const std::shared_ptr<Texture>& background) -> voi
 
     glUseProgram(program_->Id());
 
-    auto tex_unit = 0;
-    glActiveTexture(GL_TEXTURE0 + tex_unit);
-    glBindTexture(GL_TEXTURE_2D, background->renderer_id);
-    program_->SetUnknownUniform("u_BackgroundTexture", &tex_unit);
+    glActiveTexture(GL_TEXTURE0);
 
     glBindVertexArray(vao_);
     glDrawArrays(GL_TRIANGLES, 0, 3);
