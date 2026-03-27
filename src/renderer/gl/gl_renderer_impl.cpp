@@ -58,12 +58,12 @@ auto Renderer::Impl::RenderObjects(Scene* scene, Camera* camera) -> void {
         RenderObject(renderable, scene, camera);
     }
 
-    if (!render_lists_->Transparent().empty()) state_.SetDepthMask(false);
+    if (!render_lists_->Transparent().empty()) state_.SetDepthWrites(false);
     for (auto renderable : render_lists_->Transparent()) {
         RenderObject(renderable, scene, camera);
     }
 
-    state_.SetDepthMask(true);
+    state_.SetDepthWrites(true);
 
     rendered_objects_per_frame_ = rendered_objects_counter_;
     rendered_objects_counter_ = 0;

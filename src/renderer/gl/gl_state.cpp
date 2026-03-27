@@ -44,7 +44,7 @@ auto GLState::SetDepthTest(bool enabled) -> void {
     enabled ? Enable(GL_DEPTH_TEST) : Disable(GL_DEPTH_TEST);
 }
 
-auto GLState::SetDepthMask(bool enabled) -> void {
+auto GLState::SetDepthWrites(bool enabled) -> void {
     if (curr_depth_mask_ != enabled) {
         glDepthMask(enabled ? GL_TRUE : GL_FALSE);
         curr_depth_mask_ = enabled;

@@ -10,20 +10,27 @@
 #include <vglx/materials/material.hpp>
 #include <vglx/math/color.hpp>
 
-#include <memory>
 #include <unordered_map>
 
 namespace vglx {
 
 class GLState {
 public:
-    auto ProcessMaterial(const Material* material) -> void;
+    auto SetBackfaceCulling(bool enabled) -> void;
+
+    auto SetBlending(Material::Blending blending) -> void;
 
     auto SetClearColor(const Color& color) -> void;
 
-    auto SetDepthMask(bool enabled) -> void;
+    auto SetDepthTest(bool enabled) -> void;
+
+    auto SetDepthWrites(bool enabled) -> void;
+
+    auto SetPolygonOffset(float factor, float units) -> void;
 
     auto SetViewport(int x, int y, int width, int height) const -> void;
+
+    auto ProcessMaterial(const Material* material) -> void;
 
     auto UseProgram(unsigned int program_id) -> void;
 
@@ -45,14 +52,6 @@ private:
     auto Enable(int token) -> void;
 
     auto Disable(int token) -> void;
-
-    auto SetBackfaceCulling(bool enabled) -> void;
-
-    auto SetDepthTest(bool enabled) -> void;
-
-    auto SetPolygonOffset(float factor, float units) -> void;
-
-    auto SetBlending(Material::Blending blending) -> void;
 };
 
 }
