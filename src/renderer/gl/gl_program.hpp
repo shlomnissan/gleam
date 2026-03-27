@@ -8,7 +8,6 @@
 #pragma once
 
 #include "renderer/gl/gl_uniform.hpp"
-#include "renderer/gl/gl_uniform_buffer.hpp"
 
 #include <array>
 #include <string>

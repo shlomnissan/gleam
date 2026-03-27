@@ -10,8 +10,9 @@
 #include "vglx/geometries/geometry.hpp"
 
 #include "core/shader_library.hpp"
-#include "utilities/logger.hpp"
+#include "renderer/gl/gl_uniform_buffer.hpp"
 #include "utilities/assert.hpp"
+#include "utilities/logger.hpp"
 
 #include <utility>
 

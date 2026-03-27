@@ -51,6 +51,8 @@ set(SOURCE_CODE
     "primitives/cylinder_geometry.cpp"
     "primitives/plane_geometry.cpp"
     "primitives/sphere_geometry.cpp"
+    "renderer/gl/gl_background_pass.cpp"
+    "renderer/gl/gl_background_pass.hpp"
     "renderer/gl/gl_camera.hpp"
     "renderer/gl/gl_framebuffers.cpp"
     "renderer/gl/gl_framebuffers.hpp"

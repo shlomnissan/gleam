@@ -11,6 +11,7 @@
 
 #include "vglx/scene/fog.hpp"
 #include "vglx/scene/node.hpp"
+#include "vglx/textures/texture.hpp"
 
 #include <memory>
 #include <optional>
@@ -60,6 +61,9 @@ class VGLX_EXPORT Scene : public Node {
 public:
     /// @brief Optional global fog settings applied during rendering.
     std::optional<Fog> fog;
+
+    /// @brief Optional for defining a flat texture background.
+    std::shared_ptr<Texture> background {nullptr};
 
     /**
      * @brief Constructs a scene object.

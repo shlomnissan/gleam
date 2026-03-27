@@ -30,7 +30,7 @@ auto GLPresentPass::Initialize() -> std::expected<void, std::string> {
 
     glGenVertexArrays(1, &vao_);
     if (vao_ == 0) {
-        return std::unexpected("Failed to generate present pass array buffer");
+        return std::unexpected("Failed to generate present pass vertex array object");
     }
 
     return {};
