@@ -51,7 +51,7 @@ public:
      *
      * @param image Decoded image containing pixel data and dimensions.
      */
-    explicit Texture2D(std::shared_ptr<Image> image) : image(image) {}
+    explicit Texture2D(std::shared_ptr<Image> image) : image(std::move(image)) {}
 
     /// @brief The source image backing this texture.
     std::shared_ptr<Image> image {nullptr};
@@ -62,7 +62,7 @@ public:
      * @param image Decoded image containing pixel data and dimensions.
      */
     [[nodiscard]] static auto Create(std::shared_ptr<Image> image) -> std::shared_ptr<Texture2D> {
-        return std::make_shared<Texture2D>(image);
+        return std::make_shared<Texture2D>(std::move(image));
     }
 
     /**
