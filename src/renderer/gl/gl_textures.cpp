@@ -7,7 +7,10 @@
 
 #include "renderer/gl/gl_textures.hpp"
 
+#include "renderer/gl/gl_uniform.hpp"
+#include "vglx/textures/cube_texture.hpp"
 #include "vglx/textures/dynamic_texture_2d.hpp"
+#include "vglx/textures/texture.hpp"
 #include "vglx/textures/texture_2d.hpp"
 
 #include "utilities/logger.hpp"
@@ -34,7 +37,7 @@ auto GLTextures::Bind(const std::shared_ptr<Texture>& texture, int tex_unit) -> 
     }
 
     if (tex_id != current_texture_ids_[tex_unit]) {
-        glBindTexture(GL_TEXTURE_2D, tex_id);
+        glBindTexture(to_gl_tex_type(texture.get()), tex_id);
         current_texture_ids_[tex_unit] = tex_id;
     }
 
@@ -50,7 +53,7 @@ auto GLTextures::Reset() -> void {
 auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
     auto& tex_id = texture->renderer_id;
     glGenTextures(1, &tex_id);
-    glBindTexture(GL_TEXTURE_2D, tex_id);
+    glBindTexture(to_gl_tex_type(texture), tex_id);
 
     glPixelStorei(
         GL_UNPACK_ALIGNMENT,
@@ -99,11 +102,100 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
                 nullptr
             );
         }
+
         auto max_mip = static_cast<GLint>(tex->mips - 1);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, max_mip);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, to_gl_min_filter(tex->min_filter));
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, to_gl_mag_filter(tex->mag_filter));
+    }
+
+    if (texture->GetType() == Texture::Type::CubeTexture) {
+        auto tex = static_cast<CubeTexture*>(texture);
+        tex->format = tex->color_space == Texture::ColorSpace::Linear
+            ? Texture::Format::RGBA8
+            : Texture::Format::SRGBA8;
+
+        auto format = to_gl_tex_format(tex->format);
+
+        glTexImage2D(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+            0,
+            format.internal_format,
+            tex->images.positive_x->width,
+            tex->images.positive_x->height,
+            0,
+            format.source_format,
+            format.type,
+            tex->images.positive_x->data.data()
+        );
+
+        glTexImage2D(
+            GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+            0,
+            format.internal_format,
+            tex->images.negative_x->width,
+            tex->images.negative_x->height,
+            0,
+            format.source_format,
+            format.type,
+            tex->images.negative_x->data.data()
+        );
+
+        glTexImage2D(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+            0,
+            format.internal_format,
+            tex->images.positive_y->width,
+            tex->images.positive_y->height,
+            0,
+            format.source_format,
+            format.type,
+            tex->images.positive_y->data.data()
+        );
+
+        glTexImage2D(
+            GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+            0,
+            format.internal_format,
+            tex->images.negative_y->width,
+            tex->images.negative_y->height,
+            0,
+            format.source_format,
+            format.type,
+            tex->images.negative_y->data.data()
+        );
+
+        glTexImage2D(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+            0,
+            format.internal_format,
+            tex->images.positive_z->width,
+            tex->images.positive_z->height,
+            0,
+            format.source_format,
+            format.type,
+            tex->images.positive_z->data.data()
+        );
+
+        glTexImage2D(
+            GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
+            0,
+            format.internal_format,
+            tex->images.negative_z->width,
+            tex->images.negative_z->height,
+            0,
+            format.source_format,
+            format.type,
+            tex->images.negative_z->data.data()
+        );
+
+        if (tex->generate_mipamps) glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, to_gl_min_filter(tex->min_filter));
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, to_gl_mag_filter(tex->mag_filter));
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     }
 
     if (glGetError() != GL_NO_ERROR) {
@@ -191,6 +283,19 @@ auto to_gl_tex_format(Texture::Format f) -> TextureFormat {
                 .type = GL_UNSIGNED_BYTE
             };
         default: VGLX_UNREACHABLE();
+    }
+}
+
+auto to_gl_tex_type(const Texture* tex) -> int {
+    using enum Texture::Type;
+    switch(tex->GetType()) {
+        case DynamicTexture2D:
+        case Texture2D:
+            return GL_TEXTURE_2D;
+        case CubeTexture:
+            return GL_TEXTURE_CUBE_MAP;
+        default:
+            VGLX_UNREACHABLE();
     }
 }
 

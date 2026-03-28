@@ -37,6 +37,9 @@ struct TextureFormat {
     int type;
 };
 
+
+auto to_gl_tex_type(const Texture* t) -> int;
+
 auto to_gl_tex_format(Texture::Format f) -> TextureFormat;
 
 auto to_gl_min_filter(Texture::MinFilter f) -> int;
