@@ -31,7 +31,7 @@ public:
     GLPresentPass(GLPresentPass&&) = delete;
     auto operator=(GLPresentPass&&) -> GLPresentPass& = delete;
 
-    [[nodiscard]] auto Initialize() -> std::expected<void, std::string>;
+    auto Initialize() -> std::expected<void, std::string>;
 
     auto Present(const GLSceneBuffer& scene_buffer) const -> void;
 

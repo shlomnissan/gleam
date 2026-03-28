@@ -277,11 +277,14 @@ auto Renderer::Impl::ProcessLights(Camera* camera) -> void {
 auto Renderer::Impl::Render(Scene* scene, Camera* camera, RenderTarget* target) -> void {
     const auto use_default_target = target == nullptr;
 
-    use_default_target
-        ? scene_buffer_.Begin()
-        : framebuffers_.Begin(target);
+    use_default_target ? scene_buffer_.Begin() : framebuffers_.Begin(target);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    scene->UpdateTransformHierarchy();
+    camera->UpdateViewMatrix();
+
+    camera_ubo_.Update(camera->projection_matrix, camera->view_matrix);
 
     if (scene->background != nullptr) {
         state_.SetDepthWrites(false);
@@ -290,18 +293,12 @@ auto Renderer::Impl::Render(Scene* scene, Camera* camera, RenderTarget* target) 
         state_.SetDepthWrites(true);
     }
 
-    scene->UpdateTransformHierarchy();
-    camera->UpdateViewMatrix();
-    camera_ubo_.Update(camera->projection_matrix, camera->view_matrix);
-
     render_lists_->ProcessScene(scene, camera);
     ProcessLights(camera);
 
     RenderObjects(scene, camera);
 
-    use_default_target
-        ? scene_buffer_.End()
-        : framebuffers_.End(target);
+    use_default_target ? scene_buffer_.End() : framebuffers_.End(target);
 
     textures_.Reset();
     vertex_buffers_.Reset();

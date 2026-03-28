@@ -11,6 +11,7 @@
 
 #include "renderer/gl/gl_program.hpp"
 
+#include <array>
 #include <expected>
 #include <memory>
 #include <string>
@@ -31,16 +32,21 @@ public:
     GLBackgroundPass(GLBackgroundPass&&) = delete;
     auto operator=(const GLBackgroundPass&&) -> GLBackgroundPass& = delete;
 
-    [[nodiscard]] auto Initialize() -> std::expected<void, std::string>;
+    auto Initialize() -> std::expected<void, std::string>;
 
     auto Render(const std::shared_ptr<Texture>& background) const -> void;
 
     ~GLBackgroundPass();
 
 private:
-    GLuint vao_ {0};
+    std::array<GLuint, 2> vao_ {};
 
-    std::unique_ptr<GLProgram> program_ {nullptr};
+    std::unique_ptr<GLProgram> background_2d_ {nullptr};
+    std::unique_ptr<GLProgram> background_cube_ {nullptr};
+
+    auto InitializeBackground2D() -> std::expected<void, std::string>;
+
+    auto InitializeBackgroundCube() -> std::expected<void, std::string>;
 };
 
 }

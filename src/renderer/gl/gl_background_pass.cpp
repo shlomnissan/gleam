@@ -9,9 +9,10 @@
 
 #include "core/shader_library.hpp"
 
-#include "renderer/gl/gl_uniform.hpp"
-#include "shaders/internal/headers/background_pass_frag.h"
-#include "shaders/internal/headers/background_pass_vert.h"
+#include "shaders/internal/headers/background_cube_frag.h"
+#include "shaders/internal/headers/background_cube_vert.h"
+#include "shaders/internal/headers/background_frag.h"
+#include "shaders/internal/headers/background_vert.h"
 #include "utilities/assert.hpp"
 #include "utilities/logger.hpp"
 
@@ -19,19 +20,40 @@
 
 namespace vglx {
 
-auto GLBackgroundPass::Initialize() -> std::expected<void, std::string> {
+auto GLBackgroundPass::InitializeBackground2D() -> std::expected<void, std::string> {
     auto sources = std::vector<ShaderInfo> {
-        {.type = ShaderType::kVertexShader, .source = _SHADER_background_pass_vert},
-        {.type = ShaderType::kFragmentShader, .source = _SHADER_background_pass_frag}
+        {.type = ShaderType::kVertexShader, .source = _SHADER_background_vert},
+        {.type = ShaderType::kFragmentShader, .source = _SHADER_background_frag}
     };
 
-    program_ = std::make_unique<GLProgram>(sources);
-    if (!program_->IsValid()) {
+    background_2d_ = std::make_unique<GLProgram>(sources);
+    if (!background_2d_->IsValid()) {
         return std::unexpected("Unable to create background pass program");
     }
 
-    glGenVertexArrays(1, &vao_);
-    if (vao_ == 0) {
+    return {};
+}
+
+auto GLBackgroundPass::InitializeBackgroundCube() -> std::expected<void, std::string> {
+    auto sources = std::vector<ShaderInfo> {
+        {.type = ShaderType::kVertexShader, .source = _SHADER_background_cube_vert},
+        {.type = ShaderType::kFragmentShader, .source = _SHADER_background_cube_frag}
+    };
+
+    background_cube_ = std::make_unique<GLProgram>(sources);
+    if (!background_cube_->IsValid()) {
+        return std::unexpected("Unable to create background cube pass program");
+    }
+
+    return {};
+}
+
+auto GLBackgroundPass::Initialize() -> std::expected<void, std::string> {
+    if (auto res = InitializeBackground2D(); !res.has_value()) return res;
+    if (auto res = InitializeBackgroundCube(); !res.has_value()) return res;
+
+    glGenVertexArrays(2, vao_.data());
+    if (vao_[0] == 0 || vao_[1] == 0) {
         return std::unexpected("Failed to generate background pass vertex array object");
     }
 
@@ -47,20 +69,28 @@ auto GLBackgroundPass::Render(const std::shared_ptr<Texture>& background) const 
     }
 
     VGLX_ASSERT(
-        background->GetType() == Texture::Type::Texture2D,
-        "Background texture must be of type Texture2D"
+        background->GetType() == Texture::Type::Texture2D ||
+        background->GetType() == Texture::Type::CubeTexture,
+        "Background texture must be of type Texture2D or CubeTexture"
     );
 
-    glUseProgram(program_->Id());
+    if (background->GetType() == Texture::Type::Texture2D) {
+        glUseProgram(background_2d_->Id());
+        glActiveTexture(GL_TEXTURE0);
+        glBindVertexArray(vao_[0]);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+    }
 
-    glActiveTexture(GL_TEXTURE0);
-
-    glBindVertexArray(vao_);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    if (background->GetType() == Texture::Type::CubeTexture) {
+        glUseProgram(background_cube_->Id());
+        glActiveTexture(GL_TEXTURE0);
+        glBindVertexArray(vao_[1]);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+    }
 }
 
 GLBackgroundPass::~GLBackgroundPass() {
-    if (vao_) glDeleteVertexArrays(1, &vao_);
+    if (vao_[0]) glDeleteVertexArrays(2, vao_.data());
 }
 
 }
