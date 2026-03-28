@@ -9,14 +9,14 @@
 
 #include "vglx_export.h"
 
-#include "vglx/textures/image.hpp"
-
 #include <memory>
 #include <optional>
 #include <string>
 
 namespace vglx {
 
+class CubeTexture;
+class Image;
 class Node;
 class Texture2D;
 
@@ -57,7 +57,7 @@ class Texture2D;
  * @ingroup LoadersGroup
  */
 template <typename T>
-class LoadHandle {
+class VGLX_EXPORT LoadHandle {
 public:
     LoadHandle() = default;
 
@@ -119,6 +119,15 @@ public:
  * @related LoadHandle
  */
 using TextureLoadHandle = LoadHandle<std::shared_ptr<Texture2D>>;
+
+/**
+ * @brief Handle type returned by asynchronous cube texture load requests.
+ *
+ * Represents the eventual result of @ref CubeTextureLoader::LoadAsync.
+ *
+ * @related LoadHandle
+ */
+using CubeTextureLoadHandle = LoadHandle<std::shared_ptr<CubeTexture>>;
 
 /**
  * @brief Handle type returned by asynchronous mesh load requests.

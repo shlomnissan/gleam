@@ -12,6 +12,7 @@
  * @brief Classes for loading and importing external resources.
  */
 
+#include "vglx/loaders/cube_texture_loader.hpp"
 #include "vglx/loaders/image_loader.hpp"
 #include "vglx/loaders/load_handle.hpp"
 #include "vglx/loaders/load_scheduler.hpp"

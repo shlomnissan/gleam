@@ -24,21 +24,6 @@ namespace vglx {
  * rendering. Textures are typically created through the engine’s
  * @ref TextureLoader "texture loader" rather than instantiated directly.
  *
- * @code
- * auto MyNode::OnAttached(SharedContextPointer context) -> void {
- *   context->texture_loader->LoadAsync(
- *     "assets/my_texture.png",
- *     [this](auto result) {
- *       if (result) {
- *         texture_ = result.value();
- *       } else {
- *         std::println(stderr, "{}", result.error());
- *       }
- *     }
- *   );
- * }
- * @endcode
- *
  * @ingroup TexturesGroup
  */
 class VGLX_EXPORT Texture2D : public Texture {

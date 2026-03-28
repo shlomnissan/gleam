@@ -27,29 +27,6 @@ namespace vglx {
  * persistent CPU-side image data. Instead, it exposes methods to update regions
  * of the texture after creation.
  *
- * @code
- * auto MyNode::OnAttached(SharedContextPointer context) -> void {
- *   dynamic_texture_ = vglx::DynamicTexture2D::Create({
- *     .width = 1024,
- *     .height = 1024,
- *     .mips = 1,
- *     .format = vglx::DynamicTexture2D::Format::RGBA8,
- *     .color_space = vglx::Texture::ColorSpace::Linear
- *   });
- *
- *   auto patch_bytes = get_image_subregion();
- *
- *   dynamic_texture_->UpdateSubregion(
- *     0,  // mip-level
- *     0,  // x
- *     0,  // y
- *     64, // w
- *     64, // h
- *     patch_byes
- *   );
- * }
- * @endcode
- *
  * @ingroup TexturesGroup
  */
 class VGLX_EXPORT DynamicTexture2D : public Texture {

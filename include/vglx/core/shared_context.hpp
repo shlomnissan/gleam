@@ -96,9 +96,16 @@ struct VGLX_EXPORT SharedContext {
     /**
      * @brief Texture loader.
      *
-     * Handles loading image assets.
+     * Handles loading texture assets.
      */
     std::unique_ptr<TextureLoader> texture_loader = std::make_unique<TextureLoader>(load_scheduler.get());
+
+    /**
+     * @brief Cube texture loader.
+     *
+     * Handles loading cube texture assets.
+     */
+    std::unique_ptr<CubeTextureLoader> cube_texture_loader = std::make_unique<CubeTextureLoader>(load_scheduler.get());
 
     /**
      * @brief Mesh loader.

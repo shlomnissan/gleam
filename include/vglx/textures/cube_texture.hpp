@@ -21,7 +21,10 @@ namespace vglx {
  *
  * A cube texture stores six face images that form a cube map, commonly used
  * for skyboxes and environment mapping. Each face corresponds to a direction
- * along the positive or negative X, Y, or Z axis.
+ * along the positive or negative X, Y, or Z axis. Cube textures are
+ * typically created through the engine's
+ * @ref CubeTextureLoader "cube texture loader" rather than instantiated
+ * directly.
  *
  * @ingroup TexturesGroup
  */
@@ -31,12 +34,12 @@ public:
      * @brief The six face images that make up the cube map.
      */
     struct Images {
-        std::shared_ptr<Image> positiveX; ///< Right face (+X).
-        std::shared_ptr<Image> negativeX; ///< Left face (-X).
-        std::shared_ptr<Image> positiveY; ///< Top face (+Y).
-        std::shared_ptr<Image> negativeY; ///< Bottom face (-Y).
-        std::shared_ptr<Image> positiveZ; ///< Front face (+Z).
-        std::shared_ptr<Image> negativeZ; ///< Back face (-Z).
+        std::shared_ptr<Image> positive_x; ///< Right face (+X).
+        std::shared_ptr<Image> negative_x; ///< Left face (-X).
+        std::shared_ptr<Image> positive_y; ///< Top face (+Y).
+        std::shared_ptr<Image> negative_y; ///< Bottom face (-Y).
+        std::shared_ptr<Image> positive_z; ///< Front face (+Z).
+        std::shared_ptr<Image> negative_z; ///< Back face (-Z).
     };
 
     /// @brief The source images backing this cube map.
