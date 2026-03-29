@@ -7,16 +7,13 @@
 
 #include "vglx/scene/node.hpp"
 
-#include "vglx/cameras/camera.hpp"
 #include "vglx/scene/scene.hpp"
 
-#include "events/event_dispatcher.hpp"
 #include "utilities/assert.hpp"
 #include "utilities/logger.hpp"
 
 #include <algorithm>
 #include <queue>
-#include <ranges>
 
 namespace vglx {
 

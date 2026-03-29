@@ -9,6 +9,8 @@
 
 #include "vglx_export.h"
 
+#include "vglx/textures/image.hpp"
+
 #include <memory>
 #include <optional>
 #include <string>
@@ -16,7 +18,6 @@
 namespace vglx {
 
 class CubeTexture;
-class Image;
 class Node;
 class Texture2D;
 
