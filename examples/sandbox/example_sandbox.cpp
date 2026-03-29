@@ -6,6 +6,7 @@
 */
 
 #include "example_sandbox.hpp"
+#include "vglx/loaders/load_handle.hpp"
 
 #include <vglx/helpers.hpp>
 #include <vglx/lights.hpp>
@@ -18,8 +19,8 @@ using namespace vglx;
 
 namespace {
 
-auto loader_mesh = MeshLoadHandle {};
-auto loader_background = TextureLoadHandle {};
+auto mesh_handle = MeshLoadHandle {};
+auto skybox_handle = CubeTextureLoadHandle {};
 
 }
 
@@ -35,8 +36,15 @@ ExampleSandbox::ExampleSandbox() {
 }
 
 auto ExampleSandbox::OnAttached(SharedContextPointer context) -> void {
-    loader_mesh = context->mesh_loader->LoadAsync(ASSETS_DIR "/robot/robot.obj");
-    loader_background = context->texture_loader->LoadAsync(ASSETS_DIR "/background/sky.png");
+    mesh_handle = context->mesh_loader->LoadAsync(ASSETS_DIR "/robot/robot.obj");
+    skybox_handle = context->cube_texture_loader->LoadAsync({
+        .positive_x = ASSETS_DIR "/skybox/positive_x.jpg",
+        .negative_x = ASSETS_DIR "/skybox/negative_x.jpg",
+        .positive_y = ASSETS_DIR "/skybox/positive_y.jpg",
+        .negative_y = ASSETS_DIR "/skybox/negative_y.jpg",
+        .positive_z = ASSETS_DIR "/skybox/positive_z.jpg",
+        .negative_z = ASSETS_DIR "/skybox/negative_z.jpg",
+    });
 
     Add(OrbitControls::Create(context->camera, {
         .radius = 4.5f,
@@ -45,14 +53,14 @@ auto ExampleSandbox::OnAttached(SharedContextPointer context) -> void {
 }
 
 auto ExampleSandbox::OnUpdate(float dt) -> void {
-    if (auto result = loader_mesh.TryTake()) {
+    if (auto result = mesh_handle.TryTake()) {
         mesh_ = Add(std::move(result.value()));
         mesh_->SetScale(0.03f);
         mesh_->RotateY(math::DegToRad(180.0f));
         mesh_->TranslateY(-1.0f);
     }
 
-    if (auto result = loader_background.TryTake()) {
+    if (auto result = skybox_handle.TryTake()) {
         background = result.value();
     }
 }

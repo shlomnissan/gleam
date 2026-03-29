@@ -53,7 +53,7 @@ auto GLVertexBuffers::GenerateBuffers(Geometry* geometry) -> void {
     auto buffers = std::array<GLuint, 4> {};
 
     glGenVertexArrays(1, &vao);
-    glBindVertexArray(geometry->renderer_id);
+    glBindVertexArray(vao);
     glGenBuffers(buffers.size(), buffers.data());
 
     const auto& vertex = geometry->VertexData();

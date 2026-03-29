@@ -7,7 +7,6 @@
 
 #include "renderer/gl/gl_textures.hpp"
 
-#include "renderer/gl/gl_uniform.hpp"
 #include "vglx/textures/cube_texture.hpp"
 #include "vglx/textures/dynamic_texture_2d.hpp"
 #include "vglx/textures/texture.hpp"
