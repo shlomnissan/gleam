@@ -55,6 +55,8 @@ auto Renderer::Impl::Initialize() -> std::expected<void, std::string> {
         return std::unexpected(result.error());
     }
 
+    state_.SetDepthFunction(Material::Depth::LessEqual);
+
     return {};
 }
 

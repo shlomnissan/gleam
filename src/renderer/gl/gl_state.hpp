@@ -20,6 +20,8 @@ public:
 
     auto SetBlending(Material::Blending blending) -> void;
 
+    auto SetDepthFunction(Material::Depth depth) -> void;
+
     auto SetClearColor(const Color& color) -> void;
 
     auto SetDepthTest(bool enabled) -> void;
@@ -40,6 +42,8 @@ private:
     std::unordered_map<int, bool> features_;
 
     Material::Blending curr_blending_ {Material::Blending::None};
+
+    Material::Depth curr_depth_ {Material::Depth::Less};
 
     Color curr_clear_color_ {0.0f, 0.0f, 0.0f};
 

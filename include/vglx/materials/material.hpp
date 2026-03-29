@@ -50,6 +50,19 @@ public:
     };
 
     /**
+     * @brief Enumerates depth comparison functions used for depth testing.
+     */
+    enum class Depth {
+        Less, ///< Passes if the fragment depth is less than the stored depth.
+        Equal, ///< Passes if the fragment depth is equal to the stored depth.
+        LessEqual, ///< Passes if the fragment depth is less than or equal to the stored depth.
+        Greater, ///< Passes if the fragment depth is greater than the stored depth.
+        GreaterEqual, ///< Passes if the fragment depth is greater than or equal to the stored depth.
+        Always, ///< Always passes regardless of depth value.
+        Never ///< Never passes regardless of depth value.
+    };
+
+    /**
      * @brief Value in the range $[0.0, 1.0]$ indicating how transparent the material is.
      *
      * For opacity to have an effect, @ref Material::transparent "transparency"
@@ -86,6 +99,9 @@ public:
 
     /// @brief @ref Blending mode used when rendering this material.
     Blending blending {Blending::Normal};
+
+    /// @brief @ref Depth function used for depth testing.
+    Depth depth {Depth::LessEqual};
 
     /**
      * @brief Identifies the concrete @ref Material::Type "Material::Type" of this material.

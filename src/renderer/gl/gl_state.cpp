@@ -7,6 +7,10 @@
 
 #include "renderer/gl/gl_state.hpp"
 
+#include "vglx/materials/material.hpp"
+
+#include "utilities/assert.hpp"
+
 #include <glad/glad.h>
 
 namespace vglx {
@@ -14,6 +18,7 @@ namespace vglx {
 auto GLState::ProcessMaterial(const Material* material) -> void {
     SetBackfaceCulling(!material->two_sided);
     SetDepthTest(material->depth_test);
+    SetDepthFunction(material->depth);
     SetPolygonOffset(material->polygon_offset_factor, material->polygon_offset_units);
     SetBlending(!material->transparent ? Material::Blending::None : material->blending);
 }
@@ -68,29 +73,39 @@ auto GLState::SetPolygonOffset(float factor, float units) -> void {
 }
 
 auto GLState::SetBlending(Material::Blending blending) -> void {
+    using enum Material::Blending;
     if (curr_blending_ != blending) {
-        if (blending == Material::Blending::None) {
+        if (blending == None) {
             Disable(GL_BLEND);
         } else {
             Enable(GL_BLEND);
             switch (blending) {
-            case Material::Blending::Normal:
-                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                break;
-            case Material::Blending::Additive:
-                glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-                break;
-            case Material::Blending::Subtractive:
-                glBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC_COLOR);
-                break;
-            case Material::Blending::Multiply:
-                glBlendFunc(GL_ZERO, GL_SRC_COLOR);
-                break;
-            case Material::Blending::None:
-                break;
+                case Normal: glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); break;
+                case Additive: glBlendFunc(GL_SRC_ALPHA, GL_ONE); break;
+                case Subtractive: glBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC_COLOR); break;
+                case Multiply: glBlendFunc(GL_ZERO, GL_SRC_COLOR); break;
+                case None: break;
+                default: VGLX_UNREACHABLE();
             }
         }
         curr_blending_ = blending;
+    }
+}
+
+auto GLState::SetDepthFunction(Material::Depth depth) -> void {
+    using enum Material::Depth;
+    if (curr_depth_ != depth) {
+        switch(depth) {
+            case Less: glDepthFunc(GL_LESS); break;
+            case Equal: glDepthFunc(GL_EQUAL); break;
+            case LessEqual: glDepthFunc(GL_LEQUAL); break;
+            case Greater: glDepthFunc(GL_GREATER); break;
+            case GreaterEqual: glDepthFunc(GL_GEQUAL); break;
+            case Always: glDepthFunc(GL_ALWAYS); break;
+            case Never: glDepthFunc(GL_NEVER); break;
+            default: VGLX_UNREACHABLE();
+        }
+        curr_depth_ = depth;
     }
 }
 
@@ -106,6 +121,7 @@ auto GLState::Reset() -> void {
     SetDepthTest(false);
     SetPolygonOffset(0.0f, 0.0f);
     SetBlending(Material::Blending::None);
+    SetDepthFunction(Material::Depth::LessEqual);
 
     curr_program_ = 0;
 }
