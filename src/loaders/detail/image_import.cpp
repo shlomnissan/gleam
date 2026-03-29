@@ -15,8 +15,8 @@
 
 namespace vglx::detail::image {
 
-auto import(const fs::path& path) -> std::expected<std::shared_ptr<Image>, std::string> {
-    stbi_set_flip_vertically_on_load(true);
+auto import(const fs::path& path, bool flip_vertically) -> std::expected<std::shared_ptr<Image>, std::string> {
+    stbi_set_flip_vertically_on_load_thread(flip_vertically);
 
     auto width = 0;
     auto height = 0;

@@ -20,22 +20,22 @@ namespace {
 
 auto load_cube_texture(const CubeTextureLoader::Parameters& params)
   -> std::expected<std::shared_ptr<CubeTexture>, std::string> {
-    auto px = detail::image::import(params.positive_x);
+    auto px = detail::image::import(params.positive_x, false);
     if (!px.has_value()) return std::unexpected(px.error());
 
-    auto nx = detail::image::import(params.negative_x);
+    auto nx = detail::image::import(params.negative_x, false);
     if (!nx.has_value()) return std::unexpected(nx.error());
 
-    auto py = detail::image::import(params.positive_y);
+    auto py = detail::image::import(params.positive_y, false);
     if (!py.has_value()) return std::unexpected(py.error());
 
-    auto ny = detail::image::import(params.negative_y);
+    auto ny = detail::image::import(params.negative_y, false);
     if (!ny.has_value()) return std::unexpected(ny.error());
 
-    auto pz = detail::image::import(params.positive_z);
+    auto pz = detail::image::import(params.positive_z, false);
     if (!pz.has_value()) return std::unexpected(pz.error());
 
-    auto nz = detail::image::import(params.negative_z);
+    auto nz = detail::image::import(params.negative_z, false);
     if (!nz.has_value()) return std::unexpected(nz.error());
 
     auto out = CubeTexture::Create({

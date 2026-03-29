@@ -18,6 +18,6 @@ namespace vglx::detail::image {
 
 namespace fs = std::filesystem;
 
-[[nodiscard]] auto import(const fs::path& path) -> std::expected<std::shared_ptr<Image>, std::string>;
+[[nodiscard]] auto import(const fs::path& path, bool flip_vertically = true) -> std::expected<std::shared_ptr<Image>, std::string>;
 
 }
