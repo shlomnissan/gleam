@@ -44,6 +44,8 @@ private:
     std::unique_ptr<GLProgram> background_2d_ {nullptr};
     std::unique_ptr<GLProgram> background_cube_ {nullptr};
 
+    GLuint vbo_ {0};
+
     auto InitializeBackground2D() -> std::expected<void, std::string>;
 
     auto InitializeBackgroundCube() -> std::expected<void, std::string>;

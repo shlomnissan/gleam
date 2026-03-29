@@ -94,15 +94,14 @@ auto GLBackgroundPass::InitializeBackgroundCube() -> std::expected<void, std::st
         return std::unexpected("Unable to create background cube pass program");
     }
 
-    GLuint vbo {0};
-    glGenBuffers(1, &vbo);
+    glGenBuffers(1, &vbo_);
 
-    if (vbo == 0) {
+    if (vbo_ == 0) {
         return std::unexpected("Failed to generate vertex buffer for background cube");
     }
 
     glBindVertexArray(vao_[1]);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_);
     glBufferData(
         GL_ARRAY_BUFFER,
         unit_cube.size() * sizeof(GLfloat),
@@ -159,6 +158,7 @@ auto GLBackgroundPass::Render(const std::shared_ptr<Texture>& background) const 
 
 GLBackgroundPass::~GLBackgroundPass() {
     if (vao_[0]) glDeleteVertexArrays(2, vao_.data());
+    if (vbo_) glDeleteBuffers(1, &vbo_);
 }
 
 }

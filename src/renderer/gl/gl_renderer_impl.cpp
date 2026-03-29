@@ -65,7 +65,14 @@ auto Renderer::Impl::RenderObjects(Scene* scene, Camera* camera) -> void {
         RenderObject(renderable, scene, camera);
     }
 
-    if (!render_lists_->Transparent().empty()) state_.SetDepthWrites(false);
+    state_.SetDepthWrites(false);
+
+    if (scene->background) {
+        textures_.Bind(scene->background, 0);
+        background_pass_.Render(scene->background);
+    }
+
+    if (!render_lists_->Transparent().empty())
     for (auto renderable : render_lists_->Transparent()) {
         RenderObject(renderable, scene, camera);
     }
@@ -287,14 +294,6 @@ auto Renderer::Impl::Render(Scene* scene, Camera* camera, RenderTarget* target) 
     camera->UpdateViewMatrix();
 
     camera_ubo_.Update(camera->projection_matrix, camera->view_matrix);
-
-    if (scene->background != nullptr) {
-        state_.SetDepthWrites(false);
-        textures_.Bind(scene->background, 0);
-        background_pass_.Render(scene->background);
-        state_.SetDepthWrites(true);
-    }
-
     render_lists_->ProcessScene(scene, camera);
     ProcessLights(camera);
 
