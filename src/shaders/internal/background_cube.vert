@@ -11,6 +11,7 @@ out vec3 v_TexDir;
 
 void main() {
     v_TexDir = a_Position;
-    // set z = w so depth is always 1.0 (far plane) after perspective divide
-    gl_Position = (u_Projection * mat4(mat3(u_View)) * vec4(a_Position, 1.0)).xyww;
+    // Reverse-z: set z = -w so depth is always 0.0 (far plane) after perspective divide
+    vec4 pos = u_Projection * mat4(mat3(u_View)) * vec4(a_Position, 1.0);
+    gl_Position = vec4(pos.xy, -pos.w, pos.w);
 }

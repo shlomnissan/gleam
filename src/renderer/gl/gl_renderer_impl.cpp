@@ -55,7 +55,9 @@ auto Renderer::Impl::Initialize() -> std::expected<void, std::string> {
         return std::unexpected(result.error());
     }
 
-    state_.SetDepthFunction(Material::Depth::LessEqual);
+    // Reverse-z: clear depth to 0.0 (far plane) and test with GEQUAL
+    glClearDepthf(0.0f);
+    state_.SetDepthFunction(Material::Depth::GreaterEqual);
 
     return {};
 }

@@ -19,8 +19,9 @@ auto make_perspective_proj(const PerspectiveCamera::Parameters& params) {
     auto mat = Matrix4 {0.0f};
     mat[0] = {1.0f / (params.aspect * tan_half_fov), 0.0f, 0.0f, 0.0f};
     mat[1] = {0.0f, 1.0f / tan_half_fov, 0.0f, 0.0f};
-    mat[2] = {0.0f, 0.0f, -(params.far + params.near) / (params.far - params.near), -1.0f};
-    mat[3] = {0.0f, 0.0f, -(2 * params.far * params.near) / (params.far - params.near), 0.0f};
+    // Reverse-z: maps near -> z_ndc=1, far -> z_ndc=-1 (depth 1.0 near, 0.0 far)
+    mat[2] = {0.0f, 0.0f, (params.far + params.near) / (params.far - params.near), -1.0f};
+    mat[3] = {0.0f, 0.0f, (2.0f * params.far * params.near) / (params.far - params.near), 0.0f};
     return mat;
 }
 

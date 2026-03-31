@@ -19,7 +19,7 @@ namespace vglx {
 namespace {
 
 constexpr GLenum kColorFormat = GL_RGBA16F;
-constexpr GLenum kDepthStencilFormat = GL_DEPTH24_STENCIL8;
+constexpr GLenum kDepthStencilFormat = GL_DEPTH32F_STENCIL8;
 
 }
 

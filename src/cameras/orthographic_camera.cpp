@@ -15,11 +15,12 @@ auto make_orthographic_proj(const OrthographicCamera::Parameters& params) {
     auto mat = Matrix4 {0.0f};
     mat[0] = {2.0f / (params.right - params.left), 0.0f, 0.0f, 0.0f};
     mat[1] = {0.0f, 2.0f / (params.top - params.bottom), 0.0f, 0.0f};
-    mat[2] = {0.0f, 0.0f, -2.0f / (params.far - params.near), 0.0f};
+    // Reverse-z: maps near -> z_ndc=1, far -> z_ndc=-1 (depth 1.0 near, 0.0 far)
+    mat[2] = {0.0f, 0.0f, 2.0f / (params.far - params.near), 0.0f};
     mat[3] = {
         -(params.right + params.left) / (params.right - params.left),
         -(params.top + params.bottom) / (params.top - params.bottom),
-        -(params.far + params.near) / (params.far - params.near),
+        (params.far + params.near) / (params.far - params.near),
         1.0f
     };
     return mat;

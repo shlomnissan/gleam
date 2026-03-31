@@ -121,7 +121,7 @@ auto GLState::Reset() -> void {
     SetDepthTest(false);
     SetPolygonOffset(0.0f, 0.0f);
     SetBlending(Material::Blending::None);
-    SetDepthFunction(Material::Depth::LessEqual);
+    SetDepthFunction(Material::Depth::GreaterEqual);
 
     curr_program_ = 0;
 }

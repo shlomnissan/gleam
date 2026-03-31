@@ -101,7 +101,7 @@ public:
     Blending blending {Blending::Normal};
 
     /// @brief @ref Depth function used for depth testing.
-    Depth depth {Depth::LessEqual};
+    Depth depth {Depth::GreaterEqual};
 
     /**
      * @brief Identifies the concrete @ref Material::Type "Material::Type" of this material.
