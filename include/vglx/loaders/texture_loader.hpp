@@ -45,11 +45,13 @@ namespace fs = std::filesystem;
  * commits are clearly separated.
  *
  * @code
- * auto handle = context->texture_loader->LoadAsync("assets/diffuse.png");
+ * auto MyScene::OnAttached(SharedContextPointer context) -> void {
+ *   texture_handle_ = context->texture_loader->LoadAsync("assets/diffuse.png");
+ * }
  *
- * auto OnUpdate(float) -> void override {
- *   if (auto texture = handle.TryTake()) {
- *     material->texture_map = texture.value();
+ * auto MyScene::OnUpdate(float _) -> void {
+ *   if (auto texture = texture_handle_.TryTake()) {
+ *     material_->texture_map = texture.value();
  *   }
  * }
  * @endcode

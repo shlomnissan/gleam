@@ -46,10 +46,13 @@ namespace fs = std::filesystem;
  * commits are clearly separated.
  *
  * @code
- * auto handle = context->mesh_loader->LoadAsync("assets/robot.obj");
+ * auto MyScene::OnAttached(SharedContextPointer context) -> void {
+ *   mesh_handle_ = context->mesh_loader->LoadAsync("assets/robot.obj");
+ * }
  *
- * auto OnUpdate(float) -> void override {
- *   if (auto node = handle.TryTake()) {
+ * auto MyScene::OnUpdate(float _) -> void {
+ *   if (auto node = mesh_handle_.TryTake()) {
+ *     // nodes are uniquely owned by the scene so we move
  *     Add(std::move(node.value()));
  *   }
  * }

@@ -46,14 +46,22 @@ namespace fs = std::filesystem;
  * main-thread commits are clearly separated.
  *
  * @code
- * auto cube_texture = context->cube_texture_loader->Load({
+ * auto MyScene::OnAttached(SharedContextPointer context) -> void {
+ *   skybox_handle_ = context->cube_texture_loader->LoadAsync({
  *     .positive_x = "assets/skybox/px.png",
  *     .negative_x = "assets/skybox/nx.png",
  *     .positive_y = "assets/skybox/py.png",
  *     .negative_y = "assets/skybox/ny.png",
  *     .positive_z = "assets/skybox/pz.png",
  *     .negative_z = "assets/skybox/nz.png",
- * });
+ *   });
+ * }
+ *
+ * auto MyScene::OnUpdate(float _) -> void {
+ *   if (auto skybox = skybox_handle_.TryTake()) {
+ *     this->background = skybox.value();
+ *   }
+ * }
  * @endcode
  *
  * @ingroup LoadersGroup

@@ -6,7 +6,6 @@
 */
 
 #include "vglx/cameras/perspective_camera.hpp"
-#include "vglx/math/utilities.hpp"
 
 #include <cmath>
 

@@ -44,10 +44,12 @@ namespace fs = std::filesystem;
  * commits are clearly separated.
  *
  * @code
- * auto handle = context->image_loader->LoadAsync("assets/texture.png");
+ * auto MyScene::OnAttached(SharedContextPointer context) -> void {
+ *   image_handle_ = context->image_loader->LoadAsync("assets/texture.png");
+ * }
  *
- * auto OnUpdate(float) -> void override {
- *   if (auto image = handle.TryTake()) {
+ * auto MyScene::OnUpdate(float _) -> void {
+ *   if (auto image = image_handle_.TryTake()) {
  *     // use image.value()
  *   }
  * }
