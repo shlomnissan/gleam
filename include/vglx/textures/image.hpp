@@ -19,8 +19,25 @@ namespace vglx {
  * @brief Represents decoded image data loaded from an asset.
  *
  * An image holds raw pixel data along with its dimensions. Images are
- * typically created through @ref Image::Create and shared between one
- * or more @ref Texture2D instances via `std::shared_ptr`.
+ * typically created using @ref ImageLoader and shared between
+ * texture instances.
+ *
+ * @code
+ * auto MyScene::OnAttached(SharedContextPointer context) -> void {
+ *   image_handle_ = context->image_loader->LoadAsync("assets/texture.png");
+ * }
+ *
+ * auto MyScene::OnUpdate(float _) -> void {
+ *   if (auto image = image_handle_.TryTake()) {
+ *     // use image.value()
+ *   }
+ * }
+ * @endcode
+ *
+ * Loading images directly is useful when you need to share the same
+ * pixel data across textures or update texture contents at runtime
+ * (see @ref DynamicTexture2D). For one-off texture creation, prefer
+ * @ref TextureLoader, which decodes and uploads in a single step.
  *
  * @ingroup TexturesGroup
  */
