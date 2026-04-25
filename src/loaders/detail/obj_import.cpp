@@ -20,7 +20,7 @@
 #include <optional>
 #include <unordered_map>
 
-#include "misc/tiny_obj_loader.hpp"
+#include "tiny_obj_loader.hpp"
 
 namespace vglx::detail::obj {
 

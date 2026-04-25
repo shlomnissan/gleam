@@ -9,7 +9,7 @@
 
 #include "image_import.hpp"
 
-#include "misc/stb_image.hpp"
+#include "stb_image.hpp"
 
 #include <format>
 
