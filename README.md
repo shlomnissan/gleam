@@ -33,18 +33,25 @@ Community feedback shapes the engine. Questions, critiques, and experiments ofte
 
 ## Installation
 
-The easiest way to install VGLX is with the Python installer included in the repository. It guides the process and builds the engine using the correct presets for your system.
+VGLX uses [vcpkg](https://vcpkg.io) to manage its third-party dependencies (`glad`, `glfw3`, and optionally `imgui`). Install vcpkg and export `VCPKG_ROOT` pointing to its location before running the installer:
 
 ```bash
-# clone the repository
+git clone https://github.com/microsoft/vcpkg.git ~/vcpkg
+~/vcpkg/bootstrap-vcpkg.sh   # use bootstrap-vcpkg.bat on Windows
+export VCPKG_ROOT=$HOME/vcpkg
+```
+
+Then clone VGLX and run the Python installer. It checks for CMake and vcpkg, asks for an installation prefix, and builds the engine using the correct presets for your system.
+
+```bash
 git clone https://github.com/shlomnissan/vglx.git
 cd vglx
-
-# run the installer
 python3 -m tools.installer.main
 ```
 
-The installer checks for CMake, detects your compiler, and asks for an installation prefix.
+The first run will compile the vcpkg dependencies from source (one time, ~1–2 minutes); subsequent runs reuse vcpkg's binary cache.
+
+> **Consuming VGLX in your project:** because VGLX no longer bundles ImGui, your project's CMake must also be able to resolve `imgui` (with the `glfw-binding` and `opengl3-binding` features) when VGLX was built with ImGui support. The simplest path is to use vcpkg in your project as well — see the starter template linked above for a working example.
 
 ## Hello VGLX (minimal example)
 

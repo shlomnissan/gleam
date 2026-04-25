@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
 
@@ -35,12 +36,21 @@ def cmake_configure(
     build_dir = root_dir / build_type.lower()
     build_dir.mkdir(parents=True, exist_ok=True)
 
+    vcpkg_root = os.environ.get("VCPKG_ROOT")
+    if not vcpkg_root:
+        make_error(
+            "VCPKG_ROOT is not set.",
+            "Install vcpkg and set VCPKG_ROOT to its location."
+        )
+    toolchain_file = Path(vcpkg_root) / "scripts" / "buildsystems" / "vcpkg.cmake"
+
     args = [
         "cmake",
         "-S",
         str(root_dir),
         "-B",
         str(build_dir),
+        f"-DCMAKE_TOOLCHAIN_FILE={toolchain_file}",
         f"-DCMAKE_BUILD_TYPE={build_type}",
         f"-DCMAKE_INSTALL_PREFIX={config.install_prefix}",
         f"-DBUILD_SHARED_LIBS={'ON' if config.build_shared else 'OFF'}",
@@ -50,6 +60,8 @@ def cmake_configure(
         "-DVGLX_BUILD_DOCS=OFF",
         "-DVGLX_BUILD_TESTS=OFF"
     ]
+    if config.build_imgui:
+        args.append("-DVCPKG_MANIFEST_FEATURES=imgui")
 
     print()
     if run_command(args, cwd = root_dir) != 0:
