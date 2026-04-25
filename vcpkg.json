@@ -1,0 +1,22 @@
+{
+  "name": "vglx",
+  "version": "0.0.1",
+  "dependencies": [
+    {
+      "name": "glad",
+      "features": ["gl-api-41"]
+    },
+    "glfw3"
+  ],
+  "features": {
+    "imgui": {
+      "description": "Build with ImGui integration",
+      "dependencies": [
+        {
+          "name": "imgui",
+          "features": ["glfw-binding", "opengl3-binding"]
+        }
+      ]
+    }
+  }
+}

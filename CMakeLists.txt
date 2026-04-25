@@ -17,7 +17,6 @@ option(VGLX_BUILD_EXAMPLES "Build example application" ON)
 option(VGLX_BUILD_IMGUI "Build and integrate ImGui from the vendored source" ON)
 option(VGLX_BUILD_TESTS "Build unit tests and test infrastructure using GTest" ON)
 
-add_subdirectory("vendor")
 add_subdirectory("src")
 
 if (VGLX_BUILD_TESTS)

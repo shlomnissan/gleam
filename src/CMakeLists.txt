@@ -1,6 +1,9 @@
 set(PUBLIC_HEADERS_DIR ${CMAKE_SOURCE_DIR}/include/vglx)
 set(VENDOR_DIR ${CMAKE_SOURCE_DIR}/vendor)
 
+find_package(glad CONFIG REQUIRED)
+find_package(glfw3 CONFIG REQUIRED)
+
 set(SOURCE_CODE
     "cameras/camera.cpp"
     "cameras/orthographic_camera.cpp"
@@ -217,30 +220,12 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/src>
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE glad glfw)
+target_link_libraries(${PROJECT_NAME} PRIVATE glad::glad glfw)
 
 if (VGLX_BUILD_IMGUI)
-    set(IMGUI_SOURCES
-        ${VENDOR_DIR}/imgui/imgui.cpp
-        ${VENDOR_DIR}/imgui/imgui_draw.cpp
-        ${VENDOR_DIR}/imgui/imgui_tables.cpp
-        ${VENDOR_DIR}/imgui/imgui_widgets.cpp
-        ${VENDOR_DIR}/imgui/backends/imgui_impl_glfw.cpp
-        ${VENDOR_DIR}/imgui/backends/imgui_impl_opengl3.cpp
-    )
-
-    target_sources(${PROJECT_NAME} PRIVATE ${IMGUI_SOURCES} core/imgui_integration.hpp)
-
-    if(WIN32)
-        target_compile_definitions(${PROJECT_NAME} PRIVATE "IMGUI_API=__declspec(dllexport)")
-    else()
-        set_source_files_properties(${IMGUI_SOURCES} PROPERTIES COMPILE_FLAGS "-fvisibility=default")
-    endif()
-
-    target_include_directories(${PROJECT_NAME} PRIVATE
-        $<BUILD_INTERFACE:${VENDOR_DIR}/imgui>
-    )
-
+    find_package(imgui CONFIG REQUIRED)
+    target_sources(${PROJECT_NAME} PRIVATE core/imgui_integration.hpp)
+    target_link_libraries(${PROJECT_NAME} PUBLIC imgui::imgui)
     target_compile_definitions(${PROJECT_NAME} PUBLIC VGLX_USE_IMGUI=ON)
 endif()
 
@@ -298,15 +283,6 @@ install(FILES
     DESTINATION ${CONFIG_INSTALL_DIR}
     COMPONENT development
 )
-
-if (VGLX_BUILD_IMGUI)
-    install(DIRECTORY ${VENDOR_DIR}/imgui/
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}/imgui
-        FILES_MATCHING
-            PATTERN "*.h"
-            PATTERN "backends" EXCLUDE
-    )
-endif()
 
 install(
     EXPORT ${PROJECT_NAME}

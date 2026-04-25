@@ -10,7 +10,7 @@
 #include <vector>
 
 #include <vglx/vglx.hpp>
-#include <imgui/imgui.h>
+#include <imgui.h>
 
 #include "ui_helpers.hpp"
 #include "example_scene.hpp"

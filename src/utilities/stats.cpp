@@ -12,7 +12,7 @@
 #include "utilities/data_series.hpp"
 
 #ifdef VGLX_USE_IMGUI
-#include <imgui/imgui.h>
+#include <imgui.h>
 #endif
 
 namespace vglx {

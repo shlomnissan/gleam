@@ -7,7 +7,7 @@
 
 #include "ui_helpers.hpp"
 
-#include <imgui/imgui.h>
+#include <imgui.h>
 
 auto UICheckbox(Label label, bool& value, bool& dirty) -> void {
     if (ImGui::Checkbox(label.c_str(), &value)) {

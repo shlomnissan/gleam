@@ -4,8 +4,10 @@
     {
       "name": "dev-debug",
       "binaryDir": "${sourceDir}/build/debug",
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
+        "VCPKG_MANIFEST_FEATURES": "imgui",
         "VGLX_BUILD_DOCS": "OFF",
         "VGLX_BUILD_EXAMPLES": "ON",
         "VGLX_BUILD_IMGUI": "ON",
@@ -17,8 +19,10 @@
     {
       "name": "dev-release",
       "binaryDir": "${sourceDir}/build/release",
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
+        "VCPKG_MANIFEST_FEATURES": "imgui",
         "VGLX_BUILD_DOCS": "OFF",
         "VGLX_BUILD_EXAMPLES": "ON",
         "VGLX_BUILD_IMGUI": "ON",
@@ -30,8 +34,10 @@
     {
       "name": "install-debug",
       "binaryDir": "${sourceDir}/out/install-debug",
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
+        "VCPKG_MANIFEST_FEATURES": "imgui",
         "VGLX_BUILD_DOCS": "OFF",
         "VGLX_BUILD_EXAMPLES": "OFF",
         "VGLX_BUILD_IMGUI": "ON",
@@ -43,8 +49,10 @@
     {
       "name": "install-release",
       "binaryDir": "${sourceDir}/out/install-release",
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
+        "VCPKG_MANIFEST_FEATURES": "imgui",
         "VGLX_BUILD_DOCS": "OFF",
         "VGLX_BUILD_EXAMPLES": "OFF",
         "VGLX_BUILD_IMGUI": "ON",
