@@ -43,6 +43,8 @@ The file starts by declaring the minimum CMake version, the project name and the
 
 If you followed the installation guide you can import VGLX with two commands. `find_package(vglx REQUIRED)` asks CMake to locate the library. If it is missing or incorrectly installed, configuration fails. `target_link_libraries` links our application to the VGLX binaries.
 
+Because VGLX's `find_package` config also locates its third-party dependencies (`glad`, `glfw3`, and optionally `imgui`), your project must be able to resolve them too. The simplest way is to add a `vcpkg.json` next to your `CMakeLists.txt` declaring those dependencies — see the [installation guide](./installation.md#creating-a-new-project) for an example, or use the [starter template](https://github.com/shlomnissan/vglx-starter).
+
 The Windows-only section copies the VGLX DLL next to the executable after the build step. CMake selects the correct binary automatically based on your build type. Without this the application
 may fail to compile on Window unless you add the binaries to your system path.
 
