@@ -34,6 +34,8 @@ def cmake_configure(
     build_type: str
 ):
     build_dir = root_dir / build_type.lower()
+    if build_dir.exists():
+        shutil.rmtree(build_dir)
     build_dir.mkdir(parents=True, exist_ok=True)
 
     vcpkg_root = os.environ.get("VCPKG_ROOT")

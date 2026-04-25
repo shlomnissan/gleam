@@ -39,7 +39,7 @@ def configuration_options(os_name: str):
     ).startswith("Shared")
 
     print("\nAdditional components to install with VGLX:")
-    build_imgui = ask_yes_no("  *) ImGui: minimal UI library for tools and examples")
+    build_imgui = ask_yes_no("  *) ImGui integration (your project must also resolve imgui via vcpkg)")
 
     components = []
     if build_imgui:
