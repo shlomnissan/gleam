@@ -1,6 +1,6 @@
 # Installation
 
-This page covers how to build VGLX, install it, and use it in your own project. VGLX uses [vcpkg](https://vcpkg.io) to manage its third-party dependencies, so beyond a C++ compiler, CMake, and an OpenGL driver, you only need a working vcpkg installation.
+This page covers how to build VGLX, install it, and use it in your own project. VGLX uses vcpkg to manage its third-party dependencies, so beyond a C++ compiler, CMake, and an OpenGL driver, you only need a working vcpkg installation.
 ## Requirements
 
 VGLX builds with a C++23-capable toolchain, [CMake](https://cmake.org/) 3.20 or newer, [vcpkg](https://vcpkg.io), and an OpenGL 4.1+ context. It is regularly tested on the major platforms:
@@ -27,15 +27,12 @@ VGLX's [`vcpkg.json`](https://github.com/shlomnissan/vglx/blob/main/vcpkg.json) 
 
 #### Dependencies
 
-| Dependency | Source | Description |
-|------------|--------|-------------|
-| [Glad](https://github.com/Dav1dde/glad)   | vcpkg (`glad[gl-api-41]`) | OpenGL function loader for the 4.1 core profile. |
-| [GLFW](https://glfw.org/)   | vcpkg (`glfw3`)    | Cross-platform window/input/context management. |
-| [ImGui](https://github.com/ocornut/imgui)  | vcpkg (`imgui[glfw-binding,opengl3-binding]`)   | **Optional** immediate-mode UI library. Enabled by `VGLX_BUILD_IMGUI`. |
-| [stb_image](https://github.com/nothings/stb)   | bundled (`vendor/`)  | Image loader for the texture pipeline. |
-| [tinyobjloader](https://github.com/tinyobjloader/tinyobjloader)   | bundled (`vendor/`)  | OBJ mesh loader. |
+| Dependency | Version  |Description |
+|------------|----------|-------------|
+| [Glad](https://glad.dav1d.de/)   | 0.1.36   | OpenGL function loader generated from [glad.dav1d.de](https://glad.dav1d.de/). |
+| [GLFW](https://glfw.org/)   | 3.4.1    |  Cross-platform window/input/context management (with minor internal modifications). |
+| [ImGui](https://github.com/ocornut/imgui)  | 1.92.7   |  **Optional** UI library for in-engine tools and examples. |
 
-The two `stb`-style headers are kept in `vendor/` because they are header-only and used purely as implementation details of the loader code.
 ## VGLX Installer
 
 The easiest way to install VGLX is using the Python installer included in the repository. It guides you through the process and builds the engine using the right presets for your system.
@@ -50,16 +47,6 @@ python3 -m tools.installer.main
 ```
 
 The installer checks for working versions of CMake and vcpkg, detects your compiler, and asks for an installation prefix.
-
-::: tip
-If you choose the default install prefix on Linux or macOS (`/usr/local`), you will need elevated privileges. Use `sudo -E` so that `VCPKG_ROOT` is preserved across the privilege boundary:
-
-```bash
-sudo -E python3 -m tools.installer.main
-```
-
-Or pick a user-writable custom prefix (e.g. `~/local/vglx`) when prompted, and skip `sudo` entirely.
-:::
 
 If you encounter issues, see the [Getting Help](#getting-help) section below.
 ## Creating a New Project
@@ -82,25 +69,6 @@ target_link_libraries(MyApp PRIVATE vglx::vglx)
 ```
 
 CMake automatically picks the correct build configuration (Debug or Release) based on your project settings.
-
-::: warning Consuming VGLX requires vcpkg
-Because VGLX no longer bundles its third-party dependencies, your project must also be able to resolve `glad`, `glfw3`, and (if VGLX was built with ImGui support) `imgui[glfw-binding,opengl3-binding]` at configure time. The simplest path is to use vcpkg in your own project too:
-
-```json
-// vcpkg.json
-{
-  "name": "my-app",
-  "version": "0.0.1",
-  "dependencies": [
-    "glad",
-    "glfw3",
-    { "name": "imgui", "features": ["glfw-binding", "opengl3-binding"] }
-  ]
-}
-```
-
-The starter template above ships with this configuration ready to go.
-:::
 
 On Windows you may need to copy the VGLX DLL next to your application. You can automate this with:
 

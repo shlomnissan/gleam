@@ -4,7 +4,9 @@
   "dependencies": [
     {
       "name": "glad",
-      "features": ["gl-api-41"]
+      "features": [
+        "gl-api-41"
+      ]
     },
     "glfw3"
   ],
@@ -14,9 +16,13 @@
       "dependencies": [
         {
           "name": "imgui",
-          "features": ["glfw-binding", "opengl3-binding"]
+          "features": [
+            "glfw-binding",
+            "opengl3-binding"
+          ]
         }
       ]
     }
-  }
+  },
+  "builtin-baseline": "d46283cf33cf5de7bd88e12156ce03882be1f179"
 }
