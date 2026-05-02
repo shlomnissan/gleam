@@ -9,8 +9,6 @@
 
 #include "utilities/logger.hpp"
 
-#include <vector>
-
 namespace vglx {
 
 auto GLPrograms::GetProgram(const ProgramAttributes& attrs) -> GLProgram* {

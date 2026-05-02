@@ -21,7 +21,7 @@ public:
     auto GetProgram(const ProgramAttributes& attrs) -> GLProgram*;
 
 private:
-    ShaderLibrary shader_lib_;
+    ShaderLibrary shader_lib_ {};
 
     std::unordered_map<std::size_t, std::unique_ptr<GLProgram>> programs_ {};
 };

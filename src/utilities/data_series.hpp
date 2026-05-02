@@ -9,8 +9,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cassert>
-#include <concepts>
 
 template <typename T, size_t N>
 requires std::is_arithmetic_v<T>
