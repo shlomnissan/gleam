@@ -30,23 +30,16 @@ set(SOURCE_CODE
     "lights/directional_light.cpp"
     "lights/point_light.cpp"
     "lights/spot_light.cpp"
+    "loaders/cube_texture_loader.cpp"
     "loaders/detail/image_import.cpp"
     "loaders/detail/image_import.hpp"
     "loaders/detail/obj_import.cpp"
     "loaders/detail/obj_import.hpp"
-    "loaders/cube_texture_loader.cpp"
     "loaders/image_loader.cpp"
     "loaders/load_scheduler.cpp"
     "loaders/mesh_loader.cpp"
     "loaders/texture_loader.cpp"
     "materials/shader_material.cpp"
-    "scene/instanced_mesh.cpp"
-    "scene/instanced_mesh_impl.hpp"
-    "scene/mesh.cpp"
-    "scene/node.cpp"
-    "scene/renderable.cpp"
-    "scene/scene.cpp"
-    "scene/sprite.cpp"
     "primitives/box_geometry.cpp"
     "primitives/cone_geometry.cpp"
     "primitives/cylinder_geometry.cpp"
@@ -79,6 +72,13 @@ set(SOURCE_CODE
     "renderer/gl/gl_uniform_buffer.hpp"
     "renderer/gl/gl_vertex_buffers.cpp"
     "renderer/gl/gl_vertex_buffers.hpp"
+    "scene/instanced_mesh.cpp"
+    "scene/instanced_mesh_impl.hpp"
+    "scene/mesh.cpp"
+    "scene/node.cpp"
+    "scene/renderable.cpp"
+    "scene/scene.cpp"
+    "scene/sprite.cpp"
     "textures/dynamic_texture_2d.cpp"
     "utilities/assert.hpp"
     "utilities/data_series.hpp"
@@ -185,10 +185,6 @@ set(HEADER_BUNDLES
 )
 
 include(ShaderProcessor)
-
-if(NOT_APPLE)
-    set(CMAKE_INSTALL_RPATH "$ORIGIN")
-endif()
 
 add_library(
     ${PROJECT_NAME}
