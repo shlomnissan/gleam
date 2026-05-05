@@ -52,7 +52,7 @@ auto build_material(const detail::obj::MaterialDescriptor& desc, const fs::path&
     material->alpha_map = load_texture(desc.tex_alpha, base_dir, Texture::ColorSpace::Linear);
     material->normal_map = load_texture(desc.tex_normal, base_dir, Texture::ColorSpace::Linear);
     material->specular_map = load_texture(desc.tex_specular, base_dir, Texture::ColorSpace::Linear);
-    material->emissive_map = load_texture(desc.tex_emissive, base_dir, Texture::ColorSpace::Linear);
+    material->emissive_map = load_texture(desc.tex_emissive, base_dir, Texture::ColorSpace::sRGB);
 
     if (material->albedo_map) {
         material->color = 0xFFFFFF;
