@@ -20,8 +20,6 @@ public:
 
     auto OnAttached(vglx::SharedContextPointer context) -> void override;
 
-    auto OnUpdate([[maybe_unused]] float dt) -> void override;
-
 private:
     vglx::Node* mesh_ {nullptr};
 };

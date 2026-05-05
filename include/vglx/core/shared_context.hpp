@@ -9,15 +9,12 @@
 
 #include "vglx_export.h"
 
-#include "vglx/loaders.hpp"
-
 #include <memory>
 
 namespace vglx {
 
 class Camera;
 class Window;
-class LoadScheduler;
 
 /**
  * @brief Provides access to shared runtime parameters and services.
@@ -91,36 +88,6 @@ struct VGLX_EXPORT SharedContext {
      */
     int window_height;
 
-    std::unique_ptr<LoadScheduler> load_scheduler = std::make_unique<LoadScheduler>();
-
-    /**
-     * @brief Texture loader.
-     *
-     * Handles loading texture assets.
-     */
-    std::unique_ptr<TextureLoader> texture_loader = std::make_unique<TextureLoader>(load_scheduler.get());
-
-    /**
-     * @brief Cube texture loader.
-     *
-     * Handles loading cube texture assets.
-     */
-    std::unique_ptr<CubeTextureLoader> cube_texture_loader = std::make_unique<CubeTextureLoader>(load_scheduler.get());
-
-    /**
-     * @brief Mesh loader.
-     *
-     * Handles loading mesh assets.
-     */
-    std::unique_ptr<MeshLoader> mesh_loader = std::make_unique<MeshLoader>(load_scheduler.get());
-
-    /**
-     * @brief Image loader.
-     *
-     * Handles loading of raw image data.
-     */
-    std::unique_ptr<ImageLoader> image_loader = std::make_unique<ImageLoader>(load_scheduler.get());
-
     /**
      * @brief Creates and initializes a shared runtime context.
      *
@@ -131,7 +98,6 @@ struct VGLX_EXPORT SharedContext {
      *
      * @param window Pointer to the active window.
      * @param camera Pointer to the active camera.
-     * @param scheduler Load scheduler used by resource loaders for async loading.
      */
     [[nodiscard]] static auto Create(
         Window* window,

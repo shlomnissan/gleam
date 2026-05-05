@@ -83,7 +83,6 @@ auto main() -> int {
 
     while(!window.ShouldClose()) {
         window.PollEvents();
-        context->load_scheduler->Pump();
 
         const auto dt = timer.Tick();
         scene->Advance(dt);

@@ -7,20 +7,6 @@
 
 #pragma once
 
-/**
- * @defgroup LoadersGroup Loaders
- * @brief Classes for loading and importing external resources.
- */
-
-#include "vglx/loaders/cube_texture_loader.hpp"
-#include "vglx/loaders/image_loader.hpp"
-#include "vglx/loaders/load_handle.hpp"
-#include "vglx/loaders/load_scheduler.hpp"
-#include "vglx/loaders/mesh_loader.hpp"
-#include "vglx/loaders/texture_loader.hpp"
-
-//
-
 #include "vglx_export.h"
 
 #include <expected>
@@ -31,6 +17,8 @@
 #include "vglx/textures/texture.hpp"
 
 namespace vglx {
+
+namespace fs = std::filesystem;
 
 class Image;
 class Texture2D;

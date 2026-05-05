@@ -50,7 +50,7 @@ namespace vglx {
  * }
  * @endcode
  *
- * See @ref ImageLoader for loading raw pixel data.
+ * See @ref LoadImage for loading raw pixel data.
  *
  * @ingroup TexturesGroup
  */

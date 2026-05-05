@@ -9,14 +9,15 @@
 
 #include "ui_helpers.hpp"
 
+#include <print>
+
 #include <vglx/helpers.hpp>
+#include <vglx/loaders.hpp>
 #include <vglx/primitives.hpp>
 
 using namespace vglx;
 
 namespace {
-
-auto handle = TextureLoadHandle {};
 
 constexpr auto vert_str = R"(
 #version 410 core
@@ -71,21 +72,19 @@ ExampleShaderMaterial::ExampleShaderMaterial() {
     material_->fog = false;
 
     mesh_ = Add(Mesh::Create(geometry, material_));
+    auto texture = LoadTexture(ASSETS_DIR "/checker/checker.png");
+    if (texture.has_value()) {
+        material_->SetTexture("u_Channel0", texture.value());
+    } else {
+        std::println(stderr, "{}", texture.error());
+    }
 }
 
 auto ExampleShaderMaterial::OnAttached(SharedContextPointer context) -> void {
     Add(OrbitControls::Create(context->camera, {.radius = 3.0f}));
-
-    handle = context->texture_loader->LoadAsync(
-        ASSETS_DIR "/checker/checker.png"
-    );
 }
 
 auto ExampleShaderMaterial::OnUpdate(float delta) -> void {
-    if (auto tex = handle.TryTake()) {
-        material_->SetTexture("u_Channel0", tex.value());
-    }
-
     mesh_->transform.Rotate(Vector3::Up(), 1.0f * delta);
     mesh_->transform.Rotate(Vector3::Right(), 1.0f * delta);
     material_->SetUniform("u_Time", static_cast<float>(timer_.GetElapsedSeconds()));

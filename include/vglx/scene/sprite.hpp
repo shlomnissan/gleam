@@ -28,17 +28,14 @@ namespace vglx {
  * labels, icons, and world-space markers.
  *
  * @code
- * auto MyNode::OnAttached(SharedContextPointer context) -> void override {
- *   context->texture_loader->LoadAsync("assets/sprite.png",
- *     [this](auto result) {
- *       if (result) {
- *         auto material = vglx::SpriteMaterial::Create(result.value());
- *         Add(Sprite::Create(material))->SetScale(0.5f);
- *       } else {
- *         std::println(stderr, "{}", result.error());
- *       }
- *     }
- *   );
+ * MyNode::MyNode() {
+ *   auto texture = LoadTexture("assets/sprite.png");
+ *   if (texture.has_value()) {
+ *     auto material = vglx::SpriteMaterial::Create(texture.value());
+ *     Add(vglx::Sprite::Create(material))->SetScale(0.5f);
+ *   } else {
+ *     std::println(stderr, "{}", texture.error());
+ *   }
  * }
  * @endcode
  *

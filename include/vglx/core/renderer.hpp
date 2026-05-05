@@ -12,7 +12,9 @@
 #include "vglx/cameras/camera.hpp"
 #include "vglx/math/color.hpp"
 #include "vglx/scene/scene.hpp"
+#include "vglx/textures/texture_2d.hpp"
 
+#include <expected>
 #include <memory>
 #include <string>
 

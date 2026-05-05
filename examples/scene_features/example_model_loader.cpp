@@ -12,17 +12,12 @@
 #include <vglx/core.hpp>
 #include <vglx/helpers.hpp>
 #include <vglx/lights.hpp>
+#include <vglx/loaders.hpp>
 #include <vglx/primitives.hpp>
 
 #include <print>
 
 using namespace vglx;
-
-namespace {
-
-auto handle = MeshLoadHandle {};
-
-}
 
 ExampleModelLoader::ExampleModelLoader() {
     show_context_menu_ = true;
@@ -47,22 +42,9 @@ ExampleModelLoader::ExampleModelLoader() {
         .color = 0xFAA916,
         .intensity = 1.0f
     }))->transform.Translate({-2.0f, 2.5f, -3.0f});
-}
 
-auto ExampleModelLoader::OnAttached(SharedContextPointer context) -> void {
-    Add(OrbitControls::Create(context->camera, {
-        .radius = 4.0f,
-        .pitch = math::DegToRad(20.0f),
-        .yaw = math::DegToRad(15.0f)
-    }));
-
-    handle = context->mesh_loader->LoadAsync(
-        ASSETS_DIR "/lps_head/lps_head.obj"
-    );
-}
-
-auto ExampleModelLoader::OnUpdate(float delta) -> void {
-    if (auto mesh = handle.TryTake()) {
+    auto mesh = LoadMesh(ASSETS_DIR "/lps_head/lps_head.obj");
+    if (mesh.has_value()) {
         model_ = sphere_->Add(std::move(mesh.value()));
         model_->RotateY(math::pi_over_2);
 
@@ -71,8 +53,20 @@ auto ExampleModelLoader::OnUpdate(float delta) -> void {
         albedo_map_ = material_->albedo_map;
         normal_map_ = material_->normal_map;
         specular_map_ = material_->specular_map;
+    } else {
+        std::println(stderr, "{}", mesh.error());
     }
+}
 
+auto ExampleModelLoader::OnAttached(SharedContextPointer context) -> void {
+    Add(OrbitControls::Create(context->camera, {
+        .radius = 4.0f,
+        .pitch = math::DegToRad(20.0f),
+        .yaw = math::DegToRad(15.0f)
+    }));
+}
+
+auto ExampleModelLoader::OnUpdate(float delta) -> void {
     if (albedo_map_ != nullptr && !!material_->albedo_map != show_albedo_map_) {
         material_->albedo_map = show_albedo_map_ ? albedo_map_ : nullptr;
     }

@@ -9,20 +9,17 @@
 
 #include "ui_helpers.hpp"
 
+#include <print>
+
 #include <vglx/core.hpp>
 #include <vglx/helpers.hpp>
+#include <vglx/loaders.hpp>
 #include <vglx/primitives.hpp>
 #include <vglx/textures.hpp>
 
 #include <print>
 
 using namespace vglx;
-
-namespace {
-
-auto handle = TextureLoadHandle {};
-
-}
 
 ExampleUnlitMaterial::ExampleUnlitMaterial() {
     auto geometry = BoxGeometry::Create();
@@ -33,16 +30,15 @@ ExampleUnlitMaterial::ExampleUnlitMaterial() {
 auto ExampleUnlitMaterial::OnAttached(SharedContextPointer context) -> void {
     Add(OrbitControls::Create(context->camera, {.radius = 3.0f}));
 
-    handle = context->texture_loader->LoadAsync(
-        ASSETS_DIR "/checker/checker.png"
-    );
+    auto texture = LoadTexture(ASSETS_DIR "/checker/checker.png");
+    if (texture.has_value()) {
+        texture_ = texture.value();
+    } else {
+        std::println(stderr, "{}", texture.error());
+    }
 }
 
 auto ExampleUnlitMaterial::OnUpdate(float delta) -> void {
-    if (auto tex = handle.TryTake()) {
-        texture_ = tex.value();
-    }
-
     mesh_->transform.Rotate(Vector3::Up(), 1.0f * delta);
     mesh_->transform.Rotate(Vector3::Right(), 1.0f * delta);
 }

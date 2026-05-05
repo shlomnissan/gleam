@@ -11,7 +11,6 @@
 #include "vglx/core/renderer.hpp"
 #include "vglx/core/shared_context.hpp"
 #include "vglx/core/window.hpp"
-#include "vglx/loaders/load_scheduler.hpp"
 #include "vglx/utilities/frame_timer.hpp"
 #include "vglx/utilities/stats.hpp"
 
@@ -131,7 +130,6 @@ auto Application::Start() -> void {
 
     while (!impl_->window->ShouldClose()) {
         impl_->window->PollEvents();
-        impl_->context->load_scheduler->Pump();
 
         const auto dt = frame_timer.Tick();
         impl_->scene->Advance(dt);
