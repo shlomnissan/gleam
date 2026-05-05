@@ -61,7 +61,6 @@ namespace fs = std::filesystem;
  *
  * @ingroup LoadersGroup
  */
-
 class VGLX_EXPORT TextureLoader {
 public:
     explicit TextureLoader(LoadScheduler* scheduler);
