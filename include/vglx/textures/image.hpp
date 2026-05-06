@@ -19,18 +19,16 @@ namespace vglx {
  * @brief Represents decoded image data loaded from an asset.
  *
  * An image holds raw pixel data along with its dimensions. Images are
- * typically loaded using @ref LoadImage and shared between
- * texture instances.
+ * typically loaded using an image loader and shared between
+ * texture instances. To learn more see the
+ * [Importing Assets Guide](/manual/importing_assets).
  *
  * @code
- * MyScene::MyScene() {
- *   auto image = vglx::LoadImage("assets/texture.png");
- *
- *   if (image.has_value()) {
- *     texture_->image = image.value();
- *   } else {
+ * auto image = vglx::LoadImage("assets/heightmap.png");
+ * if (image.has_value()) {
+ *     // use image.value()
+ * } else {
  *     std::println(stderr, "{}", image.error());
- *   }
  * }
  * @endcode
  *

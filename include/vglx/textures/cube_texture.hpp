@@ -22,29 +22,25 @@ namespace vglx {
  * A cube texture stores six face images that form a cube map, commonly used
  * for skyboxes and environment mapping. Each face corresponds to a direction
  * along the positive or negative X, Y, or Z axis. Cube textures are typically
- * loaded using @ref LoadCubeTexture rather than instantiated directly.
+ * loaded using a cube texture loader rather than instantiated directly.
+ * To learn more see the [Importing Assets Guide](/manual/importing_assets).
  *
  * @code
- * MyScene::MyScene() {
- *   auto texture = vglx::LoadCubeTexture({
- *     .positive_x = "assets/skybox/px.png",
- *     .negative_x = "assets/skybox/nx.png",
- *     .positive_y = "assets/skybox/py.png",
- *     .negative_y = "assets/skybox/ny.png",
- *     .positive_z = "assets/skybox/pz.png",
- *     .negative_z = "assets/skybox/nz.png",
- *   });
+ * auto skybox = vglx::LoadCubeTexture({
+ *     .positive_x = "assets/skybox/px.jpg",
+ *     .negative_x = "assets/skybox/nx.jpg",
+ *     .positive_y = "assets/skybox/py.jpg",
+ *     .negative_y = "assets/skybox/ny.jpg",
+ *     .positive_z = "assets/skybox/pz.jpg",
+ *     .negative_z = "assets/skybox/nz.jpg",
+ * });
  *
- *   if (texture.has_value()) {
- *     this->background = texture.value();
- *   } else {
- *     std::println(stderr, "{}", texture.error());
- *   }
+ * if (skybox.has_value()) {
+ *     // use skybox.value()
+ * } else {
+ *     std::println(stderr, "{}", skybox.error());
  * }
  * @endcode
- *
- * To learn more about how textures are imported and loaded see the
- * [Importing Assets Guide](/manual/importing_assets).
  *
  * @ingroup TexturesGroup
  */

@@ -21,23 +21,18 @@ namespace vglx {
  * @brief Represents a two-dimensional texture.
  *
  * A 2D texture stores image data that can be sampled by materials during
- * rendering. Textures are typically loaded using @ref LoadTexture rather
- * than instantiated directly.
+ * rendering. Textures are typically loaded using a texture loader rather
+ * than instantiated directly. To learn more see the
+ * [Importing Assets Guide](/manual/importing_assets).
  *
  * @code
- * MyScene::MyScene() {
- *   auto texture = vglx::LoadTexture("assets/diffuse.png");
- *
- *   if (texture.has_value()) {
- *     material_->texture_map = texture.value();
- *   } else {
+ * auto texture = vglx::LoadTexture("assets/crate.png");
+ * if (texture.has_value()) {
+ *     // use texture.value()
+ * } else {
  *     std::println(stderr, "{}", texture.error());
- *   }
  * }
  * @endcode
- *
- * To learn more about how textures are imported and loaded see the
- * [Importing Assets Guide](/manual/importing_assets).
  *
  * @ingroup TexturesGroup
  */
