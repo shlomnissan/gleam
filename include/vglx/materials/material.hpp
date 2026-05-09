@@ -31,6 +31,7 @@ public:
      * @brief Enumerates all supported material types.
      */
     enum class Type {
+        PBRMaterial, ///< Implements physically-based rendering with the metallic-roughness workflow.
         PhongMaterial, ///< Implements the Blinn–Phong lighting model.
         ShaderMaterial, ///< Uses a custom shader program for rendering.
         SpriteMaterial, ///< Specialized material for 2D sprites and billboards.

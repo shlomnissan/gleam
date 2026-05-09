@@ -25,9 +25,6 @@ namespace vglx {
  * lit geometry that requires view-dependent highlights, such as polished
  * surfaces or simple metals.
  *
- * It supports a base color, specular color, shininess exponent, and optional
- * texture maps for albedo, alpha, normals, and specular intensity.
- *
  * @code
  * auto material = vglx::PhongMaterial::Create(0x049EF4);
  * material->specular = 0x333333;
@@ -62,14 +59,14 @@ public:
     /// @brief Alpha map defining per-pixel opacity.
     std::shared_ptr<Texture> alpha_map = nullptr;
 
+    /// @brief Emissive map modulating the emissive color per texel.
+    std::shared_ptr<Texture> emissive_map = nullptr;
+
     /// @brief Normal map for per-pixel surface detail and lighting variation.
     std::shared_ptr<Texture> normal_map = nullptr;
 
     /// @brief Specular map scaling the intensity of specular highlights.
     std::shared_ptr<Texture> specular_map = nullptr;
-
-    /// @brief Emissive map modulating the emissive color per texel.
-    std::shared_ptr<Texture> emissive_map = nullptr;
 
     /**
      * @brief Constructs a Phong material with a given base color.
