@@ -53,6 +53,9 @@ public:
     /// @brief Scalar multiplier for emissive contribution.
     float emissive_intensity = 1.0f;
 
+    /// @brief Scalar multiplier for normal map perturbation; 0 disables, 1 applies fully.
+    float normal_intensity = 1.0f;
+
     /// @brief Albedo (diffuse) map defining base color and optional alpha channel.
     std::shared_ptr<Texture> albedo_map = nullptr;
 

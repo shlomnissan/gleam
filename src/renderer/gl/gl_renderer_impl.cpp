@@ -225,8 +225,10 @@ auto Renderer::Impl::SetUniforms(
             bind_texture(GLTextureMapType::AlbedoMap, m->albedo_map);
         if (attrs->alpha_map)
             bind_texture(GLTextureMapType::AlphaMap, m->alpha_map);
-        if (attrs->normal_map)
+        if (attrs->normal_map) {
             bind_texture(GLTextureMapType::NormalMap, m->normal_map);
+            program->SetUniform(Uniform::NormalIntensity, &m->normal_intensity);
+        }
         if (attrs->specular_map)
             bind_texture(GLTextureMapType::SpecularMap, m->specular_map);
         if (attrs->emissive_map)

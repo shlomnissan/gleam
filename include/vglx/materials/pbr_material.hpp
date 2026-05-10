@@ -54,6 +54,9 @@ public:
     /// @brief Metallic factor; 0 for dielectrics, 1 for metals.
     float metallic = 0.0f;
 
+    /// @brief Scalar multiplier for normal map perturbation; 0 disables, 1 applies fully.
+    float normal_intensity = 1.0f;
+
     /// @brief Roughness factor; 0 produces sharp mirror reflections, 1 yields a fully rough surface.
     float roughness = 1.0f;
 

@@ -22,6 +22,7 @@ uniform PhongMaterial u_Material;
 uniform vec3 u_AmbientLight;
 uniform vec3 u_EmissiveColor;
 uniform float u_EmissiveIntensity;
+uniform float u_NormalIntensity;
 
 uniform sampler2D u_AlbedoMap;
 uniform sampler2D u_AlphaMap;
@@ -137,7 +138,8 @@ void main() {
         vec3 normal = normalize(v_Normal);
 
         #ifdef USE_NORMAL_MAP
-            vec3 normal_tan = texture(u_NormalMap, v_TexCoord).rgb  * 2.0 - 1.0;
+            vec3 normal_tan = (texture(u_NormalMap, v_TexCoord).rgb * 2.0 - 1.0);
+            normal_tan.xy *= u_NormalIntensity;
             normal = normalize(v_TBN * normal_tan);
         #endif
 

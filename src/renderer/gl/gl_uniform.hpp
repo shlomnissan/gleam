@@ -51,6 +51,7 @@ enum class Uniform {
     MaterialShininess,
     MaterialSpecularColor,
     Model,
+    NormalIntensity,
     NormalMap,
     Opacity,
     Resolution,
@@ -80,6 +81,7 @@ constexpr auto get_uniform_loc(std::string_view str) {
     if (str == "u_Material.Shininess") return static_cast<int>(MaterialShininess);
     if (str == "u_Material.SpecularColor") return static_cast<int>(MaterialSpecularColor);
     if (str == "u_Model") return static_cast<int>(Model);
+    if (str == "u_NormalIntensity") return static_cast<int>(NormalIntensity);
     if (str == "u_NormalMap") return static_cast<int>(NormalMap);
     if (str == "u_Opacity") return static_cast<int>(Opacity);
     if (str == "u_Resolution") return static_cast<int>(Resolution);
