@@ -13,7 +13,13 @@
 
 using namespace vglx;
 
-ExampleDebugVisuals::ExampleDebugVisuals() {
+ExampleDebugVisuals::ExampleDebugVisuals(Camera* camera) {
+    Add(OrbitControls::Create(camera, {
+        .radius = 5.0f,
+        .pitch = math::DegToRad(25.0f),
+        .yaw = math::DegToRad(45.0f)
+    }));
+
     arrows_ = Add(Node::Create());
     arrows_->Add(Arrow::Create({
         .direction = {0.5f, 0.0f, 0.0f},
@@ -38,14 +44,6 @@ ExampleDebugVisuals::ExampleDebugVisuals() {
     arrows_->TranslateY(0.1f);
 
     grid_ptr_ = Grid::Create(grid_params_);
-}
-
-auto ExampleDebugVisuals::OnAttached(SharedContextPointer context) -> void {
-    Add(OrbitControls::Create(context->camera, {
-        .radius = 5.0f,
-        .pitch = math::DegToRad(25.0f),
-        .yaw = math::DegToRad(45.0f)
-    }));
 }
 
 auto ExampleDebugVisuals::OnUpdate(float _) -> void {

@@ -15,9 +15,7 @@
 
 class ExampleSprite : public ExampleScene {
 public:
-    ExampleSprite();
-
-    auto OnAttached(vglx::SharedContextPointer context) -> void override;
+    ExampleSprite(vglx::Camera* camera);
 
     auto OnUpdate(float delta) -> void override;
 

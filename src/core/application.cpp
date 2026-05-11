@@ -9,7 +9,6 @@
 
 #include "vglx/cameras/perspective_camera.hpp"
 #include "vglx/core/renderer.hpp"
-#include "vglx/core/shared_context.hpp"
 #include "vglx/core/window.hpp"
 #include "vglx/utilities/frame_timer.hpp"
 #include "vglx/utilities/stats.hpp"
@@ -39,7 +38,6 @@ struct Application::Impl {
     std::unique_ptr<Camera> camera;
     std::unique_ptr<Window> window;
     std::unique_ptr<Renderer> renderer;
-    std::unique_ptr<SharedContext> context;
 
     double last_frame_time = 0.0;
 
@@ -64,24 +62,18 @@ struct Application::Impl {
         return renderer->Initialize();
     }
 
-    auto MakeSharedContext() -> void {
-        context = SharedContext::Create(window.get(), camera.get());
-    }
-
     auto SetCamera(std::unique_ptr<Camera> camera) -> void {
         this->camera = std::move(camera);
         if (!this->camera) {
             this->camera = create_default_camera(
-                context->window_width,
-                context->window_height
+                window->Width(),
+                window->Height()
             );
         }
-        context->camera = this->camera.get();
     }
 
     auto SetScene(std::unique_ptr<Scene> scene) -> void {
         this->scene = std::move(scene);
-        this->scene->SetContext(context.get());
     }
 };
 
@@ -103,16 +95,10 @@ auto Application::Setup() -> void {
         return;
     }
 
-    impl_->MakeSharedContext();
-    impl_->SetCamera(CreateCamera());
-    impl_->SetScene(CreateScene());
+    impl_->SetCamera(CreateCamera(*impl_->window));
+    impl_->SetScene(CreateScene(impl_->camera.get()));
 
     impl_->window->OnResize([this](const ResizeParameters& params){
-        auto context = impl_->context.get();
-        context->framebuffer_width = params.framebuffer_width;
-        context->framebuffer_height = params.framebuffer_height;
-        context->window_width = params.window_width;
-        context->window_height = params.window_height;
         impl_->renderer->SetViewport(
             0, 0,
             params.framebuffer_width,
@@ -149,10 +135,6 @@ auto Application::Start() -> void {
         stats.AfterRender(impl_->renderer->RenderedObjectsPerFrame());
         impl_->window->SwapBuffers();
     }
-}
-
-auto Application::GetContext() const -> SharedContextPointer {
-    return impl_->context.get();
 }
 
 auto Application::SetScene(std::unique_ptr<Scene> scene) -> void {

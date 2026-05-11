@@ -24,15 +24,13 @@ To demonstrate how shader materials work we will start from the rotating cube sc
 struct MyScene : public vglx::Scene {
     vglx::Mesh* mesh {nullptr};
 
-    MyScene() {
+    MyScene(vglx::Camera* camera) {
+        camera->TranslateZ(2.5f);
+
         mesh = Add(vglx::Mesh::Create(
             vglx::BoxGeometry::Create(),
             vglx::UnlitMaterial::Create(0xFF00FF)
         ));
-    }
-
-    auto OnAttached(vglx::SharedContextPointer context) -> void override {
-        context->camera->TranslateZ(2.5f);
     }
 
     auto OnUpdate(float delta) -> void override {

@@ -54,22 +54,14 @@ auto main() -> int {
         .far = 1000.0f
     });
 
-    auto context = SharedContext::Create(&window, camera.get());
-
     auto scene = std::unique_ptr<Scene> {};
-    auto examples = Examples {[&scene, &context](std::unique_ptr<Scene> sc){
+    auto examples = Examples {camera.get(), [&scene](std::unique_ptr<Scene> sc){
         scene = std::move(sc);
-        scene->SetContext(context.get());
     }};
 
     scene = examples.GetScene();
-    scene->SetContext(context.get());
 
     window.OnResize([&](const ResizeParameters& params){
-        context->framebuffer_width = params.framebuffer_width;
-        context->framebuffer_height = params.framebuffer_height;
-        context->window_width = params.window_width;
-        context->window_height = params.window_height;
         renderer.SetViewport(
             0, 0,
             params.framebuffer_width,

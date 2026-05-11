@@ -17,9 +17,7 @@
 
 class ExampleDebugVisuals : public ExampleScene {
 public:
-    ExampleDebugVisuals();
-
-    auto OnAttached(vglx::SharedContextPointer context) -> void override;
+    ExampleDebugVisuals(vglx::Camera* camera);
 
     auto OnUpdate(float delta) -> void override;
 

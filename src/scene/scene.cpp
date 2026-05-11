@@ -42,7 +42,6 @@ auto handle_input_event(Node* node, Event* event) -> void {
 
 struct Scene::Impl {
     std::shared_ptr<EventListener> event_listener;
-    SharedContextPointer context {nullptr};
 };
 
 Scene::Scene() : impl_(std::make_unique<Impl>()) {
@@ -62,6 +61,8 @@ Scene::Scene() : impl_(std::make_unique<Impl>()) {
 
     EventDispatcher::Get().AddEventListener("keyboard_event", impl_->event_listener);
     EventDispatcher::Get().AddEventListener("mouse_event", impl_->event_listener);
+
+    AttachSubtree(this);
 }
 
 auto Scene::Advance(float delta) -> void {
@@ -69,15 +70,6 @@ auto Scene::Advance(float delta) -> void {
      for (const auto& child : GetChildren()) {
         handle_node_updates(child.get(), delta);
     }
-}
-
-auto Scene::SetContext(SharedContextPointer context) -> void {
-    impl_->context = context;
-    this->AttachSubtree(this, impl_->context);
-}
-
-auto Scene::GetContext() const -> SharedContextPointer {
-    return impl_->context;
 }
 
 Scene::~Scene() {

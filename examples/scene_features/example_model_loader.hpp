@@ -19,9 +19,7 @@
 
 class ExampleModelLoader : public ExampleScene {
 public:
-    ExampleModelLoader();
-
-    auto OnAttached(vglx::SharedContextPointer context) -> void override;
+    ExampleModelLoader(vglx::Camera* camera);
 
     auto OnUpdate(float delta) -> void override;
 

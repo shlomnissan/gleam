@@ -19,8 +19,13 @@
 
 using namespace vglx;
 
-ExampleSandbox::ExampleSandbox() {
+ExampleSandbox::ExampleSandbox(Camera* camera) {
     show_context_menu_ = false;
+
+    Add(OrbitControls::Create(camera, {
+        .radius = 4.5f,
+        .yaw = 0.5f
+    }));
 
     Add(AmbientLight::Create({.color = 0xFFFFFF, .intensity = 0.2f}));
 
@@ -54,9 +59,3 @@ ExampleSandbox::ExampleSandbox() {
     }
 }
 
-auto ExampleSandbox::OnAttached(SharedContextPointer context) -> void {
-    Add(OrbitControls::Create(context->camera, {
-        .radius = 4.5f,
-        .yaw = 0.5f
-    }));
-}

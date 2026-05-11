@@ -19,8 +19,14 @@
 
 using namespace vglx;
 
-ExampleModelLoader::ExampleModelLoader() {
+ExampleModelLoader::ExampleModelLoader(Camera* camera) {
     show_context_menu_ = true;
+
+    Add(OrbitControls::Create(camera, {
+        .radius = 4.0f,
+        .pitch = math::DegToRad(20.0f),
+        .yaw = math::DegToRad(15.0f)
+    }));
 
     sphere_ = Add(Mesh::Create(
         SphereGeometry::Create({.radius = 5.0f}),
@@ -56,14 +62,6 @@ ExampleModelLoader::ExampleModelLoader() {
     } else {
         std::println(stderr, "{}", mesh.error());
     }
-}
-
-auto ExampleModelLoader::OnAttached(SharedContextPointer context) -> void {
-    Add(OrbitControls::Create(context->camera, {
-        .radius = 4.0f,
-        .pitch = math::DegToRad(20.0f),
-        .yaw = math::DegToRad(15.0f)
-    }));
 }
 
 auto ExampleModelLoader::OnUpdate(float delta) -> void {

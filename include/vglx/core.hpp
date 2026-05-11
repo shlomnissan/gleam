@@ -15,5 +15,4 @@
 #include "vglx/core/application.hpp"
 #include "vglx/core/render_target.hpp"
 #include "vglx/core/renderer.hpp"
-#include "vglx/core/shared_context.hpp"
 #include "vglx/core/window.hpp"

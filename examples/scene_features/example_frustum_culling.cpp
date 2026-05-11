@@ -14,8 +14,10 @@
 
 using namespace vglx;
 
-ExampleFrustumCulling::ExampleFrustumCulling() {
+ExampleFrustumCulling::ExampleFrustumCulling(Camera* camera) {
     show_context_menu_ = false;
+
+    Add(OrbitControls::Create(camera, {.radius = 5.0f}));
 
     Add(AmbientLight::Create({.color = 0xFFFFFF, .intensity = .3f}));
 
@@ -32,10 +34,6 @@ ExampleFrustumCulling::ExampleFrustumCulling() {
             boxes_[i * 50 + j] = box;
         }
     }
-}
-
-auto ExampleFrustumCulling::OnAttached(SharedContextPointer context) -> void {
-    Add(OrbitControls::Create(context->camera, {.radius = 5.0f}));
 }
 
 auto ExampleFrustumCulling::OnUpdate(float delta) -> void {

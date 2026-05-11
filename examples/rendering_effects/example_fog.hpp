@@ -13,9 +13,7 @@
 
 class ExampleFog : public ExampleScene {
 public:
-    ExampleFog();
-
-    auto OnAttached(vglx::SharedContextPointer context) -> void override;
+    ExampleFog(vglx::Camera* camera);
 
     auto ContextMenu() -> void override;
 };

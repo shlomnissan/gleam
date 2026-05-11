@@ -17,9 +17,7 @@
 
 class ExamplePrimitives : public ExampleScene {
 public:
-    ExamplePrimitives();
-
-    auto OnAttached(vglx::SharedContextPointer context) -> void override;
+    ExamplePrimitives(vglx::Camera* camera);
 
     auto ContextMenu() -> void override;
 

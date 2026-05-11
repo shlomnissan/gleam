@@ -28,7 +28,7 @@ namespace vglx {
  * of the texture after creation.
  *
  * @code
- * auto MyScene::OnAttached(SharedContextPointer context) -> void {
+ * MyScene::MyScene() {
  *   dynamic_texture_ = vglx::DynamicTexture2D::Create({
  *     .width = 1024,
  *     .height = 1024,

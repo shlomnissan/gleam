@@ -18,7 +18,13 @@
 
 using namespace vglx;
 
-ExampleFog::ExampleFog() {
+ExampleFog::ExampleFog(Camera* camera) {
+    Add(OrbitControls::Create(camera, {
+        .radius = 3.0f,
+        .pitch = math::DegToRad(25.0f),
+        .yaw = math::DegToRad(-25.0f)
+    }));
+
     auto geometry = BoxGeometry::Create();
     auto material = PhongMaterial::Create(0x049EF4);
 
@@ -39,14 +45,6 @@ ExampleFog::ExampleFog() {
     }))->transform.Translate({2.0f, 2.0f, 2.0f});
 
     fog = Fog::CreateLinear(0x444444, 2.0f, 6.0f);
-}
-
-auto ExampleFog::OnAttached(SharedContextPointer context) -> void {
-    Add(OrbitControls::Create(context->camera, {
-        .radius = 3.0f,
-        .pitch = math::DegToRad(25.0f),
-        .yaw = math::DegToRad(-25.0f)
-    }));
 }
 
 auto ExampleFog::ContextMenu() -> void {

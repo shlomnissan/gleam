@@ -22,10 +22,10 @@ namespace vglx {
  * @brief Root node of a renderable scene graph.
  *
  * Scene is the top-level container for all nodes that participate in
- * rendering and updates. It owns the scene graph hierarchy, optional global
- * fog settings, and a shared runtime context. Create a scene by overriding
- * the application runtime @ref Application::CreateScene. The runtime will
- * attach it to the active context and advance it once per frame.
+ * rendering and updates. It owns the scene graph hierarchy and optional
+ * global fog settings. Create a scene by overriding the application
+ * runtime @ref Application::CreateScene. The runtime will advance it
+ * once per frame.
  *
  * @code
  * class MyApp : public vglx::Application {
@@ -88,27 +88,6 @@ public:
      * @param delta Elapsed time in seconds since the last frame.
      */
     auto Advance(float delta) -> void;
-
-    /**
-     * @brief Attaches a shared context to the scene.
-     *
-     * Stores the active shared context and propagates it to all nodes in the
-     * scene graph via @ref Node::OnAttached. The context provides access to
-     * runtime state such as the active camera, window parameters, and renderer
-     * resources. This is normally called by the application runtime during
-     * initialization.
-     *
-     * @param context Pointer to the active SharedContext instance.
-     */
-    auto SetContext(SharedContextPointer context) -> void;
-
-    /**
-     * @brief Returns the active shared context.
-     *
-     * Returns the context previously set via @ref SetContext, or `nullptr`
-     * if the scene has not been attached to a context yet.
-     */
-    auto GetContext() const -> SharedContextPointer;
 
     /**
      * @brief Identifies this node as @ref Node::Type "Node::Type::Scene".

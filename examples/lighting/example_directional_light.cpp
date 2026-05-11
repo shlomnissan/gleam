@@ -15,7 +15,13 @@
 
 using namespace vglx;
 
-ExampleDirectionalLight::ExampleDirectionalLight() {
+ExampleDirectionalLight::ExampleDirectionalLight(Camera* camera) {
+    Add(OrbitControls::Create(camera, {
+        .radius = 5.0f,
+        .pitch = math::DegToRad(25.0f),
+        .yaw = math::DegToRad(45.0f)
+    }));
+
     Add(Grid::Create({
         .color = 0x333333,
         .size = 4,
@@ -48,14 +54,6 @@ ExampleDirectionalLight::ExampleDirectionalLight() {
 
     directional_light_->transform.Translate({2.0f, 2.0f, -2.0f});
     directional_light_->SetDebugMode(true);
-}
-
-auto ExampleDirectionalLight::OnAttached(SharedContextPointer context) -> void {
-    Add(OrbitControls::Create(context->camera, {
-        .radius = 5.0f,
-        .pitch = math::DegToRad(25.0f),
-        .yaw = math::DegToRad(45.0f)
-    }));
 }
 
 auto ExampleDirectionalLight::ContextMenu() -> void {

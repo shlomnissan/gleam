@@ -16,9 +16,7 @@
 
 class ExampleDirectionalLight : public ExampleScene {
 public:
-    ExampleDirectionalLight();
-
-    auto OnAttached(vglx::SharedContextPointer context) -> void override;
+    ExampleDirectionalLight(vglx::Camera* camera);
 
     auto ContextMenu() -> void override;
 

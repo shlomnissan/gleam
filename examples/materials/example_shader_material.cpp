@@ -59,7 +59,9 @@ void main() {
 
 }
 
-ExampleShaderMaterial::ExampleShaderMaterial() {
+ExampleShaderMaterial::ExampleShaderMaterial(Camera* camera) {
+    Add(OrbitControls::Create(camera, {.radius = 3.0f}));
+
     auto geometry = BoxGeometry::Create();
 
     material_ = ShaderMaterial::Create({
@@ -78,10 +80,6 @@ ExampleShaderMaterial::ExampleShaderMaterial() {
     } else {
         std::println(stderr, "{}", texture.error());
     }
-}
-
-auto ExampleShaderMaterial::OnAttached(SharedContextPointer context) -> void {
-    Add(OrbitControls::Create(context->camera, {.radius = 3.0f}));
 }
 
 auto ExampleShaderMaterial::OnUpdate(float delta) -> void {

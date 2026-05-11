@@ -17,9 +17,7 @@
 
 class ExamplePhongMaterial : public ExampleScene {
 public:
-    ExamplePhongMaterial();
-
-    auto OnAttached(vglx::SharedContextPointer context) -> void override;
+    ExamplePhongMaterial(vglx::Camera* camera);
 
     auto OnUpdate(float delta) -> void override;
 

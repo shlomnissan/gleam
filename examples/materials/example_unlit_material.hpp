@@ -17,9 +17,7 @@
 
 class ExampleUnlitMaterial : public ExampleScene {
 public:
-    ExampleUnlitMaterial();
-
-    auto OnAttached(vglx::SharedContextPointer context) -> void override;
+    ExampleUnlitMaterial(vglx::Camera* camera);
 
     auto OnUpdate(float delta) -> void override;
 

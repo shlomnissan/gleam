@@ -58,8 +58,8 @@ struct MyApp : public Application {
         return { .title = "Hello VGLX" };
     }
 
-    auto CreateScene() -> std::unique_ptr<Scene> override {
-        GetContext()->camera->TranslateZ(3.0f);
+    auto CreateScene(Camera* camera) -> std::unique_ptr<Scene> override {
+        camera->TranslateZ(3.0f);
 
         auto scene = Scene::Create();
 

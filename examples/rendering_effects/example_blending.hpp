@@ -16,9 +16,7 @@
 
 class ExampleBlending : public ExampleScene {
 public:
-    ExampleBlending();
-
-    auto OnAttached(vglx::SharedContextPointer context) -> void override;
+    ExampleBlending(vglx::Camera* camera);
 
     auto ContextMenu() -> void override;
 

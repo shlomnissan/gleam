@@ -10,7 +10,6 @@
 #include "vglx_export.h"
 
 #include "vglx/core/identity.hpp"
-#include "vglx/core/shared_context.hpp"
 #include "vglx/events/keyboard_event.hpp"
 #include "vglx/events/mouse_event.hpp"
 #include "vglx/math/matrix4.hpp"
@@ -350,16 +349,6 @@ public:
     virtual auto OnUpdate(float delta) -> void {}
 
     /**
-     * @brief Called when the node is attached to a scene context.
-     *
-     * Override this to perform initialization that depends on the
-     * application's @ref SharedContext "shared context".
-     *
-     * @param context Shared engine context.
-     */
-    virtual auto OnAttached(SharedContextPointer context) -> void {}
-
-    /**
      * @brief Keyboard event handler.
      *
      * Override this to react to keyboard events. Events can be marked as
@@ -392,7 +381,7 @@ private:
     [[nodiscard]] auto DetachImpl(Node* node) -> std::unique_ptr<Node>;
 
     friend class Scene;
-    auto AttachSubtree(Scene* scene, SharedContextPointer context) -> void;
+    auto AttachSubtree(Scene* scene) -> void;
     auto DetachSubtree() -> void;
     /// @endcond
 };

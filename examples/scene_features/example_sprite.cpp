@@ -15,8 +15,13 @@
 
 using namespace vglx;
 
-ExampleSprite::ExampleSprite() {
+ExampleSprite::ExampleSprite(Camera* camera) {
     show_context_menu_ = false;
+
+    Add(OrbitControls::Create(camera, {
+        .radius = 1.0f,
+        .pitch = math::pi_over_6
+    }));
 
     Add(Grid::Create({
         .color = 0x333333,
@@ -31,13 +36,6 @@ ExampleSprite::ExampleSprite() {
     } else {
         std::println(stderr, "{}", texture.error());
     }
-}
-
-auto ExampleSprite::OnAttached(SharedContextPointer context) -> void {
-    Add(OrbitControls::Create(context->camera, {
-        .radius = 1.0f,
-        .pitch = math::pi_over_6
-    }));
 }
 
 auto ExampleSprite::OnUpdate(float delta) -> void {

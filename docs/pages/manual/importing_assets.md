@@ -26,7 +26,9 @@ The following example revisits the rotating cube scene from the [previous guide]
 struct MyScene : public vglx::Scene {
     vglx::Mesh* mesh {nullptr};
 
-    MyScene() {
+    MyScene(vglx::Camera* camera) {
+        camera->TranslateZ(2.5f);
+
         auto texture = vglx::LoadTexture("crate_texture_low.jpg");
         if (!texture.has_value()) {
             std::println(stderr, "{}", texture.error());
@@ -38,10 +40,6 @@ struct MyScene : public vglx::Scene {
         material->texture_map = texture.value();
 
         mesh = Add(vglx::Mesh::Create(geometry, material));
-    }
-
-    auto OnAttached(vglx::SharedContextPointer context) -> void override {
-        context->camera->TranslateZ(2.5f);
     }
 
     auto OnUpdate(float delta) -> void override {
@@ -80,7 +78,9 @@ The following example loads the mesh and renders it with basic lighting:
 #include <print>
 
 struct MyScene : public vglx::Scene {
-    MyScene() {
+    MyScene(vglx::Camera* camera) {
+        camera->TranslateZ(3.5f);
+
         Add(vglx::AmbientLight::Create({
             .color = 0xFFFFFF,
             .intensity = 0.5f
@@ -99,10 +99,6 @@ struct MyScene : public vglx::Scene {
 
         // Transfer ownership of the loaded node to the scene graph.
         Add(std::move(root.value()))->RotateY(vglx::math::DegToRad(90.0f));
-    }
-
-    auto OnAttached(vglx::SharedContextPointer context) -> void override {
-        context->camera->TranslateZ(3.5f);
     }
 };
 ```

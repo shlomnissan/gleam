@@ -17,7 +17,13 @@
 using namespace vglx;
 using namespace vglx::math;
 
-ExamplePrimitives::ExamplePrimitives() {
+ExamplePrimitives::ExamplePrimitives(Camera* camera) {
+    Add(OrbitControls::Create(camera, {
+        .radius = 5.0f,
+        .pitch = math::DegToRad(25.0f),
+        .yaw = math::DegToRad(45.0f)
+    }));
+
     InitializeParams();
 
     Add(AmbientLight::Create({
@@ -46,14 +52,6 @@ ExamplePrimitives::ExamplePrimitives() {
     auto wireframe_material = UnlitMaterial::Create();
     wireframe_material->fog = false;
     wireframes_ = Add(Mesh::Create(wireframe_geometry, wireframe_material));
-}
-
-auto ExamplePrimitives::OnAttached(SharedContextPointer context) -> void {
-    Add(OrbitControls::Create(context->camera, {
-        .radius = 5.0f,
-        .pitch = math::DegToRad(25.0f),
-        .yaw = math::DegToRad(45.0f)
-    }));
 }
 
 auto ExamplePrimitives::ContextMenu() -> void {

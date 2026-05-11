@@ -22,7 +22,9 @@
 
 using namespace vglx;
 
-ExamplePhongMaterial::ExamplePhongMaterial() {
+ExamplePhongMaterial::ExamplePhongMaterial(Camera* camera) {
+    Add(OrbitControls::Create(camera, {.radius = 3.0f}));
+
     auto geometry = BoxGeometry::Create();
     material_ = PhongMaterial::Create(0x049EF4);
     material_->specular_color = {0.3f, 0.3f, 0.3f};
@@ -50,10 +52,6 @@ ExamplePhongMaterial::ExamplePhongMaterial() {
     } else {
         std::println(stderr, "{}", texture.error());
     }
-}
-
-auto ExamplePhongMaterial::OnAttached(SharedContextPointer context) -> void {
-    Add(OrbitControls::Create(context->camera, {.radius = 3.0f}));
 }
 
 auto ExamplePhongMaterial::OnUpdate(float delta) -> void {

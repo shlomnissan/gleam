@@ -60,7 +60,7 @@ auto Node::AddImpl(std::unique_ptr<Node> node) -> Node* {
     impl_->children.emplace_back(std::move(node));
 
     if (impl_->attached && impl_->scene) {
-        raw->AttachSubtree(impl_->scene, impl_->scene->GetContext());
+        raw->AttachSubtree(impl_->scene);
     }
 
     return raw;
@@ -212,14 +212,13 @@ auto Node::LookAt(const Vector3& target) -> void {
     transform.LookAt(GetWorldPosition(), target, up);
 }
 
-auto Node::AttachSubtree(Scene* scene, SharedContextPointer context) -> void {
+auto Node::AttachSubtree(Scene* scene) -> void {
     if (impl_->attached) return;
     impl_->attached = true;
     impl_->scene = scene;
-    OnAttached(context);
     for (const auto& child : impl_->children) {
         VGLX_ASSERT(child != nullptr, "Null child in children list");
-        child->AttachSubtree(scene, context);
+        child->AttachSubtree(scene);
     }
 }
 

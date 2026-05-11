@@ -16,9 +16,7 @@
 
 class ExamplePointLight : public ExampleScene {
 public:
-    ExamplePointLight();
-
-    auto OnAttached(vglx::SharedContextPointer context) -> void override;
+    ExamplePointLight(vglx::Camera* camera);
 
     auto ContextMenu() -> void override;
 

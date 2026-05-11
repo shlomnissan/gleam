@@ -34,8 +34,10 @@ auto colors = std::array<Color, 10> {
 
 }
 
-ExampleMeshInstancing::ExampleMeshInstancing() {
+ExampleMeshInstancing::ExampleMeshInstancing(Camera* camera) {
     show_context_menu_ = false;
+
+    Add(OrbitControls::Create(camera, {.radius = 5.0f}));
 
     Add(AmbientLight::Create({.color = 0xFFFFFF, .intensity = .3f}));
     Add(PointLight::Create({.color = 0xFFFFFF, .intensity = 1.0f}))->TranslateZ(30.0f);
@@ -55,10 +57,6 @@ ExampleMeshInstancing::ExampleMeshInstancing() {
     for (auto i = 0; i < 2500; ++i) {
         boxes_->SetColorAt(i, colors[i % 10]);
     }
-}
-
-auto ExampleMeshInstancing::OnAttached(SharedContextPointer context) -> void {
-    Add(OrbitControls::Create(context->camera, {.radius = 5.0f}));
 }
 
 auto ExampleMeshInstancing::OnUpdate(float delta) -> void {

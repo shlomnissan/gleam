@@ -21,14 +21,12 @@
 
 using namespace vglx;
 
-ExampleUnlitMaterial::ExampleUnlitMaterial() {
+ExampleUnlitMaterial::ExampleUnlitMaterial(Camera* camera) {
+    Add(OrbitControls::Create(camera, {.radius = 3.0f}));
+
     auto geometry = BoxGeometry::Create();
     material_ = UnlitMaterial::Create(0x049EF4);
     mesh_ = Add(Mesh::Create(geometry, material_));
-}
-
-auto ExampleUnlitMaterial::OnAttached(SharedContextPointer context) -> void {
-    Add(OrbitControls::Create(context->camera, {.radius = 3.0f}));
 
     auto texture = LoadTexture(ASSETS_DIR "/checker/checker.png");
     if (texture.has_value()) {

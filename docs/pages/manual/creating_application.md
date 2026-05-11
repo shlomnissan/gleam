@@ -99,7 +99,8 @@ struct MyApp : public vglx::Application {
         };
     }
 
-    auto CreateScene() -> std::unique_ptr<vglx::Scene> override {
+    auto CreateScene([[maybe_unused]] vglx::Camera* camera)
+      -> std::unique_ptr<vglx::Scene> override {
         return vglx::Scene::Create();
     }
 
@@ -134,19 +135,17 @@ Add the following class definition above `MyApp`:
 
 ```cpp
 struct MyScene : public vglx::Scene {
-    MyScene() {}
-
-    auto OnAttached(vglx::SharedContextPointer context) -> void override {}
+    MyScene(vglx::Camera* camera) {}
 
     auto OnUpdate(float delta) -> void override {}
 };
 ```
 
-This defines a `MyScene` type with an empty constructor and two hooks: [OnAttached](/reference/scene/node#function-on-attached-ff71adbb), called when the scene enters the runtime, and [OnUpdate](/reference/scene/node#function-on-update-86a04f9c), called once per frame. We’ll fill these in shortly. First, tell the runtime to use `MyScene`:
+This defines a `MyScene` type that takes the active camera in its constructor and overrides one hook: [OnUpdate](/reference/scene/node#function-on-update-86a04f9c), called once per frame. The constructor receives the camera so we can position it or hand it to camera-aware nodes during setup. We’ll fill these in shortly. First, tell the runtime to use `MyScene`:
 
 ```cpp
-auto CreateScene() -> std::unique_ptr<vglx::Scene> override {
-    return std::make_unique<MyScene>();
+auto CreateScene(vglx::Camera* camera) -> std::unique_ptr<vglx::Scene> override {
+    return std::make_unique<MyScene>(camera);
 }
 ```
 
@@ -160,14 +159,12 @@ A scene is built from nodes: cameras, meshes, lights, and anything else you plac
 
 The runtime gives you a default 3D camera unless you override [CreateCamera](/reference/core/application#function-get-camera-5f2d1639) so we’ll use that for now. By default the camera starts at the world origin $(0, 0, 0)$. We want our cube to sit at the origin, not the camera, so we need to push the camera back and have it look toward the center of the scene.
 
-Once a node is attached to the graph it can access the active camera through the shared context passed to [OnAttached](/reference/scene/node#function-on-attached-ff71adbb):
+The runtime hands the active camera to your scene through the constructor, so we can position it directly during setup:
 
 ```cpp
 struct MyScene : public vglx::Scene {
-    MyScene() {}
-
-    auto OnAttached(vglx::SharedContextPointer context) -> void override {
-        context->camera->TranslateZ(2.5f); // push the camera back
+    MyScene(vglx::Camera* camera) {
+        camera->TranslateZ(2.5f); // push the camera back
     }
 
     auto OnUpdate(float delta) -> void override {}
@@ -183,15 +180,13 @@ For a simple cube we can use the built-in [BoxGeometry](/reference/primitives/bo
 struct MyScene : public vglx::Scene {
     vglx::Mesh* mesh {nullptr};
 
-    MyScene() {
+    MyScene(vglx::Camera* camera) {
+        camera->TranslateZ(2.5f);
+
         mesh = Add(vglx::Mesh::Create(
             vglx::BoxGeometry::Create(),
             vglx::PhongMaterial::Create(0x049EF4)
         ));
-    }
-
-    auto OnAttached(vglx::SharedContextPointer context) -> void override {
-        context->camera->TranslateZ(2.5f);
     }
 
     auto OnUpdate(float delta) -> void override {}
@@ -205,7 +200,9 @@ If we ran the application now we still wouldn’t see anything because the scene
 We can add and configure both lights in our scene’s constructor:
 
 ```cpp
-MyScene() {
+MyScene(vglx::Camera* camera) {
+    camera->TranslateZ(2.5f);
+
     Add(vglx::AmbientLight::Create({
         .color = 0xFFFFFF,
         .intensity = 0.5f
@@ -265,7 +262,9 @@ The complete source code for this example is shown below for reference:
 struct MyScene : public vglx::Scene {
     vglx::Mesh* mesh {nullptr};
 
-    MyScene() {
+    MyScene(vglx::Camera* camera) {
+        camera->TranslateZ(2.5f);
+
         Add(vglx::AmbientLight::Create({
             .color = 0xFFFFFF,
             .intensity = 0.5f
@@ -280,10 +279,6 @@ struct MyScene : public vglx::Scene {
             vglx::BoxGeometry::Create(),
             vglx::PhongMaterial::Create(0x049EF4)
         ));
-    }
-
-    auto OnAttached(vglx::SharedContextPointer context) -> void override {
-        context->camera->TranslateZ(2.5f);
     }
 
     auto OnUpdate(float delta) -> void override {
@@ -306,8 +301,8 @@ struct MyApp : public vglx::Application {
         };
     }
 
-    auto CreateScene() -> std::unique_ptr<vglx::Scene> override {
-        return std::make_unique<MyScene>();
+    auto CreateScene(vglx::Camera* camera) -> std::unique_ptr<vglx::Scene> override {
+        return std::make_unique<MyScene>(camera);
     }
 
     auto Update([[maybe_unused]] float dt) -> bool override {

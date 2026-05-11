@@ -23,7 +23,6 @@ constexpr float kThetaLimit = vglx::math::pi_over_2 - 0.001f;
 
 struct OrbitControls::Impl {
     Camera* camera;
-    SharedContextPointer context = nullptr;
     OrbitControls::Parameters params;
 
     Spherical spherical;
@@ -67,15 +66,13 @@ struct OrbitControls::Impl {
             curr_pos = event->position;
             auto offset = curr_pos - prev_pos;
 
-            const auto h = context ? static_cast<float>(context->window_height) : 1.0f;
-
             if (curr_button == Left && !shift_mod) {
-                spherical_delta.phi -= offset.x / h * params.orbit_speed;
-                spherical_delta.theta += offset.y / h * params.orbit_speed;
+                spherical_delta.phi -= offset.x * params.sensitivity * params.orbit_speed;
+                spherical_delta.theta += offset.y * params.sensitivity * params.orbit_speed;
             }
 
             if (curr_button == Right || (curr_button == Left && shift_mod)) {
-                const auto speed = params.pan_speed * spherical.radius / h;
+                const auto speed = params.pan_speed * spherical.radius * params.sensitivity;
                 const auto right = camera->Right();
                 const auto up = camera->Up();
                 pan_delta -= (right * offset.x - up * offset.y) * speed;
@@ -120,10 +117,6 @@ struct OrbitControls::Impl {
 
 OrbitControls::OrbitControls(Camera* camera, const Parameters& params)
     : impl_(std::make_unique<Impl>(camera, params)) {}
-
-auto OrbitControls::OnAttached(SharedContextPointer context) -> void {
-    impl_->context = context;
-}
 
 auto OrbitControls::OnMouseEvent(MouseEvent* event) -> void {
     impl_->OnMouseEvent(event);

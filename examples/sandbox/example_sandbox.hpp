@@ -16,9 +16,7 @@
 
 class ExampleSandbox : public ExampleScene {
 public:
-    ExampleSandbox();
-
-    auto OnAttached(vglx::SharedContextPointer context) -> void override;
+    ExampleSandbox(vglx::Camera* camera);
 
 private:
     vglx::Node* mesh_ {nullptr};

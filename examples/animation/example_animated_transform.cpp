@@ -15,8 +15,10 @@
 
 using namespace vglx;
 
-ExampleAnimatedTransform::ExampleAnimatedTransform() {
+ExampleAnimatedTransform::ExampleAnimatedTransform(Camera* camera) {
     show_context_menu_ = false;
+
+    Add(OrbitControls::Create(camera, {.radius = 3.0f}));
 
     Add(AmbientLight::Create({
         .color = 0xFFFFFF,
@@ -52,10 +54,6 @@ ExampleAnimatedTransform::ExampleAnimatedTransform() {
     active_material_ = PhongMaterial::Create(start_color_);
     active_point_ = Add(Mesh::Create(sphere, active_material_));
     active_point_->transform.Translate(end_pos_);
-}
-
-auto ExampleAnimatedTransform::OnAttached(SharedContextPointer context) -> void {
-    Add(OrbitControls::Create(context->camera, {.radius = 3.0f}));
 }
 
 auto ExampleAnimatedTransform::OnUpdate(float delta) -> void {

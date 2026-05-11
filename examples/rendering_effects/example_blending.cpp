@@ -16,7 +16,9 @@
 
 using namespace vglx;
 
-ExampleBlending::ExampleBlending() {
+ExampleBlending::ExampleBlending(Camera* camera) {
+    Add(OrbitControls::Create(camera, {.radius = 3.0f}));
+
     auto opaque_material = PhongMaterial::Create();
     opaque_material->color = 0xE5BEED;
     opaque_material->two_sided = true;
@@ -41,10 +43,6 @@ ExampleBlending::ExampleBlending() {
         .color = 0xFFFFFF,
         .intensity = 1.0f
     }))->transform.Translate({2.0f, 2.0f, 2.0f});
-}
-
-auto ExampleBlending::OnAttached(SharedContextPointer context) -> void {
-    Add(OrbitControls::Create(context->camera, {.radius = 3.0f}));
 }
 
 auto ExampleBlending::ContextMenu() -> void {

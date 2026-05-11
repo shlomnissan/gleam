@@ -65,7 +65,8 @@ class Examples {
 public:
     ExampleScene* scene_ptr {nullptr};
 
-    Examples(SceneChangeCallback cb) : scene_change_cb_ {std::move(cb)} {
+    Examples(vglx::Camera* camera, SceneChangeCallback cb)
+      : camera_ {camera}, scene_change_cb_ {std::move(cb)} {
         Theme();
     }
 
@@ -114,22 +115,22 @@ public:
         auto scene = std::unique_ptr<ExampleScene> {nullptr};
         auto name = std::string_view {examples[current_scene_]};
 
-        if (name == "Unlit Material") scene = std::make_unique<ExampleUnlitMaterial>();
-        if (name == "Phong Material") scene = std::make_unique<ExamplePhongMaterial>();
-        if (name == "Shader Material") scene = std::make_unique<ExampleShaderMaterial>();
-        if (name == "Directional Light") scene = std::make_unique<ExampleDirectionalLight>();
-        if (name == "Point Light") scene = std::make_unique<ExamplePointLight>();
-        if (name == "Spot Light") scene = std::make_unique<ExampleSpotLight>();
-        if (name == "Transparency & Blending") scene = std::make_unique<ExampleBlending>();
-        if (name == "Fog Effect") scene = std::make_unique<ExampleFog>();
-        if (name == "Frustum Culling") scene = std::make_unique<ExampleFrustumCulling>();
-        if (name == "Mesh Instancing") scene = std::make_unique<ExampleMeshInstancing>();
-        if (name == "Model Loader") scene = std::make_unique<ExampleModelLoader>();
-        if (name == "Primitives") scene = std::make_unique<ExamplePrimitives>();
-        if (name == "Sprite") scene = std::make_unique<ExampleSprite>();
-        if (name == "Debug Visuals") scene = std::make_unique<ExampleDebugVisuals>();
-        if (name == "Animated Transform") scene = std::make_unique<ExampleAnimatedTransform>();;
-        if (scene == nullptr) scene = std::make_unique<ExampleSandbox>();
+        if (name == "Unlit Material") scene = std::make_unique<ExampleUnlitMaterial>(camera_);
+        if (name == "Phong Material") scene = std::make_unique<ExamplePhongMaterial>(camera_);
+        if (name == "Shader Material") scene = std::make_unique<ExampleShaderMaterial>(camera_);
+        if (name == "Directional Light") scene = std::make_unique<ExampleDirectionalLight>(camera_);
+        if (name == "Point Light") scene = std::make_unique<ExamplePointLight>(camera_);
+        if (name == "Spot Light") scene = std::make_unique<ExampleSpotLight>(camera_);
+        if (name == "Transparency & Blending") scene = std::make_unique<ExampleBlending>(camera_);
+        if (name == "Fog Effect") scene = std::make_unique<ExampleFog>(camera_);
+        if (name == "Frustum Culling") scene = std::make_unique<ExampleFrustumCulling>(camera_);
+        if (name == "Mesh Instancing") scene = std::make_unique<ExampleMeshInstancing>(camera_);
+        if (name == "Model Loader") scene = std::make_unique<ExampleModelLoader>(camera_);
+        if (name == "Primitives") scene = std::make_unique<ExamplePrimitives>(camera_);
+        if (name == "Sprite") scene = std::make_unique<ExampleSprite>(camera_);
+        if (name == "Debug Visuals") scene = std::make_unique<ExampleDebugVisuals>(camera_);
+        if (name == "Animated Transform") scene = std::make_unique<ExampleAnimatedTransform>(camera_);
+        if (scene == nullptr) scene = std::make_unique<ExampleSandbox>(camera_);
 
         scene_ptr = scene.get();
 
@@ -137,7 +138,7 @@ public:
     }
 
 private:
-    vglx::SharedContextPointer context_ {nullptr};
+    vglx::Camera* camera_ {nullptr};
 
     SceneChangeCallback scene_change_cb_;
 

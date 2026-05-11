@@ -10,6 +10,7 @@
 #include "vglx_export.h"
 
 #include "vglx/cameras/camera.hpp"
+#include "vglx/core/window.hpp"
 #include "vglx/math/color.hpp"
 #include "vglx/scene/scene.hpp"
 
@@ -40,7 +41,7 @@ namespace vglx {
  *     };
  *   }
  *
- *   auto CreateScene() -> std::unique_ptr<vglx::Scene> override {
+ *   auto CreateScene(vglx::Camera* camera) -> std::unique_ptr<vglx::Scene> override {
  *     auto scene = vglx::Scene::Create();
  *     // Add nodes to the scene...
  *     return scene;
@@ -113,17 +114,28 @@ public:
      * @brief Creates the root scene graph.
      *
      * This method **must be implemented** by the user and returns the primary
-     * scene used for rendering and updates.
+     * scene used for rendering and updates. The active camera is provided so
+     * the scene constructor can pass it to nodes that need a camera reference
+     * (e.g. @ref OrbitControls).
+     *
+     * @param camera Pointer to the active camera. Remains valid for the
+     *               lifetime of the application.
      */
-    virtual auto CreateScene() -> std::unique_ptr<Scene> = 0;
+    virtual auto CreateScene(Camera* camera) -> std::unique_ptr<Scene> = 0;
 
     /**
      * @brief Creates the main camera.
      *
      * This method can be optionally overridden. If null is returned, a default
      * @ref PerspectiveCamera "perspective camera" will be created automatically.
+     * The active window is provided so the camera can be configured with the
+     * correct aspect ratio.
+     *
+     * @param window Reference to the active window.
      */
-    virtual auto CreateCamera() -> std::unique_ptr<Camera> { return nullptr; }
+    virtual auto CreateCamera(const Window& window) -> std::unique_ptr<Camera> {
+        return nullptr;
+    }
 
     /**
      * @brief Per-frame update callback.
@@ -135,19 +147,6 @@ public:
      * @param delta Time in seconds since the last frame.
      */
     virtual auto Update(float delta) -> bool = 0;
-
-    /**
-     * @brief Returns a pointer to current active @ref SharedContext "shared context".
-     *
-     * The shared context holds runtime properties (e.g., window size,
-     * framebuffer size, aspect ratio, active camera) and provides access to
-     * built-in resource loaders. It is created internally during application
-     * startup and is guaranteed to remain valid for the lifetime of the
-     * application.
-     *
-     * @return SharedContext::SharedContextPointer
-     */
-    [[nodiscard]] auto GetContext() const -> SharedContextPointer;
 
     /**
      * @brief Sets the active scene.

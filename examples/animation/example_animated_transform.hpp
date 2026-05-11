@@ -18,9 +18,7 @@
 
 class ExampleAnimatedTransform : public ExampleScene {
 public:
-    ExampleAnimatedTransform();
-
-    auto OnAttached(vglx::SharedContextPointer context) -> void override;
+    ExampleAnimatedTransform(vglx::Camera* camera);
 
     auto OnUpdate(float delta) -> void override;
 

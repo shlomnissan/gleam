@@ -32,13 +32,13 @@ namespace vglx {
  * - Scroll wheel: zoom in and out
  *
  * @code
- * auto MyScene::OnAttached(SharedContextPointer context) -> void override {
- *   Add(vglx::OrbitControls::Create(
- *     context->camera, {
+ * struct MyScene : public vglx::Scene {
+ *   MyScene(vglx::Camera* camera) {
+ *     Add(vglx::OrbitControls::Create(camera, {
  *       .radius = 5.0f
- *     }
- *   ));
- * }
+ *     }));
+ *   }
+ * };
  * @endcode
  *
  * @ingroup HelpersGroup
@@ -54,6 +54,7 @@ public:
         float pan_speed {0.5f}; ///< Pan sensitivity (relative to distance and viewport).
         float zoom_speed {1.0f}; ///< Scroll wheel zoom sensitivity multiplier.
         float damping_factor {0.3f}; ///< Set to 1 for instant response.
+        float sensitivity {1.0f / 720.0f}; ///< Pixel-to-motion scale (1 / reference window height).
     };
 
     /**
@@ -74,13 +75,6 @@ public:
     Create(Camera* camera, const Parameters& params) -> std::unique_ptr<OrbitControls> {
         return std::make_unique<OrbitControls>(camera, params);
     }
-
-    /**
-     * @brief Stores shared context for viewport-relative input handling.
-     *
-     * @param context Shared engine context.
-     */
-    auto OnAttached(SharedContextPointer context) -> void override;
 
     /**
      * @brief Responds to mouse input for orbiting, panning, and zooming.
