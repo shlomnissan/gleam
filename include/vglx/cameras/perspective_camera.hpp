@@ -22,31 +22,20 @@ namespace vglx {
  * the most common projection mode used for rendering a 3D scene.
  *
  * Although multiple cameras can be added to the scene graph and inherit
- * transformations from their parent objects, only one camera can be active at
- * a time. The active camera is managed by the application’s runtime object:
+ * transformations from their parent objects, only one camera is rendered at
+ * a time, the one passed to @ref Renderer::Render. Construct the camera
+ * directly with the window's aspect ratio and pass it into the render call
+ * each frame.
  *
  * @code
- * class MyApp : public vglx::Application {
- * public:
- *   auto Configure() -> void override {}
+ * auto camera = vglx::PerspectiveCamera::Create({
+ *   .fov = vglx::math::DegToRad(60.0f),
+ *   .aspect = window.AspectRatio(),
+ *   .near = 0.1f,
+ *   .far = 1000.0f
+ * });
  *
- *   auto CreateScene() -> std::unique_ptr<vglx::Scene> override {
- *     return vglx::Scene::Create();
- *   }
- *
- *   auto CreateCamera() -> std::unique_ptr<vglx::Camera> override {
- *     return vglx::PerspectiveCamera::Create({
- *       .fov = vglx::math::DegToRad(60.0f),
- *       .aspect = Context()->Parameters().ratio,
- *       .near = 0.1f,
- *       .far = 1000.0f
- *     });
- *   }
- *
- *   auto Update(float delta) -> bool override {
- *     return true;
- *   }
- * }
+ * renderer.Render(scene.get(), camera.get());
  * @endcode
  *
  * @ingroup CamerasGroup

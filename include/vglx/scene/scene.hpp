@@ -23,36 +23,22 @@ namespace vglx {
  *
  * Scene is the top-level container for all nodes that participate in
  * rendering and updates. It owns the scene graph hierarchy and optional
- * global fog settings. Create a scene by overriding the application
- * runtime @ref Application::CreateScene. The runtime will advance it
- * once per frame.
+ * global fog settings. Construct a scene directly with @ref Scene::Create
+ * or by subclassing, attach nodes to it, and call @ref Advance once per
+ * frame to drive its updates.
  *
  * @code
- * class MyApp : public vglx::Application {
- * public:
- *   auto Configure() -> Application::Parameters override {
- *     return {
- *       .title = "Hello VGLX",
- *       .clear_color = {0x000000},
- *       .width = 1280,
- *       .height = 720,
- *       .antialiasing = 4,
- *     };
- *   }
+ * auto scene = vglx::Scene::Create();
+ * scene->fog = vglx::Fog::CreateExponential(0x444444, 0.3f);
  *
- *   auto CreateScene() -> std::unique_ptr<vglx::Scene> override {
- *     auto scene = vglx::Scene::Create();
- *     scene->fog = vglx::Fog::CreateExponential(0x444444, 0.3f);
+ * scene->Add(vglx::Mesh::Create(
+ *   vglx::BoxGeometry::Create(),
+ *   vglx::PhongMaterial::Create(0x049EF4)
+ * ));
  *
- *     // Add nodes to the scene...
- *
- *     return scene;
- *   }
- *
- *   auto Update(float delta) -> bool override {
- *     return true;
- *   }
- * };
+ * // Inside the main loop:
+ * scene->Advance(delta);
+ * renderer.Render(scene.get(), camera.get());
  * @endcode
  *
  * @ingroup SceneGroup
@@ -82,8 +68,7 @@ public:
      *
      * Propagates per-frame updates through the scene graph, calling
      * @ref Node::OnUpdate "OnUpdate" on the scene and all attached nodes in
-     * depth-first order. This is invoked automatically by the runtime once
-     * per frame.
+     * depth-first order. Call this once per frame from your main loop.
      *
      * @param delta Elapsed time in seconds since the last frame.
      */

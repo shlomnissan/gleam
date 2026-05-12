@@ -26,8 +26,8 @@ class RenderTarget;
  * @brief Renderer interface for drawing a scene with a given camera.
  *
  * The renderer owns GPU state and draw logic for rendering a @ref Scene with a
- * specified @ref Camera. It is typically constructed and driven by the
- * @ref Application runtime but can also be used directly in manual setups.
+ * specified @ref Camera. Construct one alongside your @ref Window and call
+ * @ref Render once per frame from your main loop.
  *
  * This class defines the rendering interface only. The actual rendering
  * implementation is provided by a backend, and multiple backends (for example,

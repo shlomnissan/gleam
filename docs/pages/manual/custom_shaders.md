@@ -79,7 +79,7 @@ Before examining the shader code in detail let’s connect these shaders to a sh
 vglx::Mesh* mesh {nullptr};
 std::shared_ptr<vglx::ShaderMaterial> material;
 
-MyScene() {
+MyScene(vglx::Camera* camera) {
     material = vglx::ShaderMaterial::Create({
         .vertex_shader = vertex_shader,
         .fragment_shader = fragment_shader,

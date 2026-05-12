@@ -44,7 +44,7 @@ The file starts by declaring the minimum CMake version, the project name and the
 If you followed the installation guide you can import VGLX with two commands. `find_package(vglx REQUIRED)` asks CMake to locate the library. If it is missing or incorrectly installed, configuration fails. `target_link_libraries` links our application to the VGLX binaries.
 
 The Windows-only section copies the VGLX DLL next to the executable after the build step. CMake selects the correct binary automatically based on your build type. Without this the application
-may fail to compile on Window unless you add the binaries to your system path.
+may fail to launch on Windows unless you add the binaries to your system path.
 
 This setup looks simple but CMake is doing a lot behind the scenes. It verifies the installation, loads the correct configuration and handles platform-specific details for us.
 
@@ -52,6 +52,7 @@ Before we move on, let’s add a minimal `main.cpp` to test that the project bui
 
 ```cpp
 #include <print>
+
 #include <vglx/vglx.hpp>
 
 auto main() -> int {
@@ -73,119 +74,105 @@ After the build completes you should see the executable in the build directory.
 
 Run it and you should be greeted by your application.
 
-If CMake reports that it cannot find VGLX return to the [installation guide](/manual/installation) and verify that the library was installed to a prefix CMake can locate. Otherwise you are ready to move on to the application entrypoint.
+If CMake reports that it cannot find VGLX return to the [installation guide](/manual/installation) and verify that the library was installed to a prefix CMake can locate. Otherwise you are ready to move on to bringing up a window.
 
-## Application Runtime
+## Creating a Window
 
-The preferred way to create a VGLX application is using the application runtime. The runtime sets up the window, the rendering context, the main loop, and calls your hooks. You create a runtime instance by subclassing the [Application](/reference/core/application) class.
-
-We can add a runtime instance to our bare-bones `main.cpp` file:
+VGLX is a library, not a framework. You assemble its pieces from your own `main` function. Three objects do most of the work: a [Window](/reference/core/window) that owns the OS surface and event pump, a [Renderer](/reference/core/renderer) that draws to it, and a [Scene](/reference/scene/scene) that holds the world. Wire them together once, then drive them from a per-frame loop.
 
 ```cpp
+#include <print>
+
 #include <vglx/vglx.hpp>
 
-#include <memory>
-
-struct MyApp : public vglx::Application {
-    auto Configure() ->  Application::Parameters override {
-        return {
-            .title = "Hello VGLX",
-            .clear_color = {0x000000},
-            .width = 1280,
-            .height = 720,
-            .antialiasing = 4,
-            .vsync = false,
-            .show_stats = true,
-        };
-    }
-
-    auto CreateScene([[maybe_unused]] vglx::Camera* camera)
-      -> std::unique_ptr<vglx::Scene> override {
-        return vglx::Scene::Create();
-    }
-
-    auto Update([[maybe_unused]] float dt) -> bool override {
-        return true;
-    }
-};
+using namespace vglx;
 
 auto main() -> int {
-    auto app = MyApp {};
-    app.Start();
+    auto window = Window {{
+        .title = "Hello VGLX",
+        .width = 1280,
+        .height = 720,
+        .sample_count = 4,
+        .vsync = true
+    }};
+
+    if (auto result = window.Initialize(); !result.has_value()) {
+        std::println(stderr, "{}", result.error());
+        return 1;
+    }
+
+    auto renderer = Renderer {{
+        .framebuffer_width = window.FramebufferWidth(),
+        .framebuffer_height = window.FramebufferHeight(),
+        .sample_count = 4,
+        .clear_color = 0x000000
+    }};
+
+    if (auto result = renderer.Initialize(); !result.has_value()) {
+        std::println(stderr, "{}", result.error());
+        return 1;
+    }
 
     return 0;
 }
 ```
 
-Our class overrides three functions that initialize the runtime. [Configure](/reference/core/application#function-configure-0192d125) is optional but you will often implement it. It returns a small data object that describes how the application should start up. Using designated initializers keeps each field clear and easy to read.
+`Window` opens a 1280×720 window with 4× multisampling and v-sync. `Renderer` is told the framebuffer size up front so it can size its render targets to match. Both `Initialize` calls return a `std::expected<void, std::string>`; on failure we print the error and exit. There is no hidden runtime catching these errors for you.
 
-[CreateScene](/reference/core/application#function-create-scene-2b0beeb4) is required and returns the scene you want to render. At this stage we simply return an empty scene using its factory. VGLX uses unique pointers to manage nodes in the scene graph. The scene graph owns all nodes for their entire lifetime and built-in node types provide [Create](/reference/scene/scene#function-create-a8164366) helpers to construct them correctly.
-
-The last function, [Update](/reference/core/application#function-update-d40fe494), is also required. It is called once per frame and is where you add per-frame logic at the application level. Returning `true` keeps the application running. Returning `false` exits the main loop.
-
-In `main` we create an instance of the app and call [Start](/reference/core/application#function-start-28ef28d7) to launch it. If you build and run the project again you should see a window for your new VGLX application.
+Build and run. You should briefly see an empty window before the program exits. We still need a camera, a scene, and a loop to keep the window open and put something on screen.
 
 ## Creating a Scene
 
-Before you can put anything in your world you need a [Scene](/reference/scene/scene). The scene is the root of your graph: every node hangs from it, inherits its state, and contributes to the final frame. It’s the anchor that ties cameras, lights, and geometry into a coherent world the renderer can walk.
+The [Scene](/reference/scene/scene) is the root of your graph: every node hangs from it, inherits its state, and contributes to the final frame. It’s the anchor that ties cameras, lights, and geometry into a coherent world the renderer can walk.
 
-In the earlier example we returned an empty scene. You can attach nodes directly to that instance but it’s often cleaner to subclass [Scene](/reference/scene/scene). A custom scene gives you access to lifecycle hooks without cluttering the graph.
+You can build a scene by calling `Scene::Create()` and attaching nodes to it from `main`, but it’s often cleaner to subclass [Scene](/reference/scene/scene). A custom scene keeps setup code grouped with the data it owns and gives you a place to put per-frame logic.
 
-Add the following class definition above `MyApp`:
+Add the following class definition above `main`:
 
 ```cpp
-struct MyScene : public vglx::Scene {
-    MyScene(vglx::Camera* camera) {}
+struct MyScene : public Scene {
+    MyScene(Camera* camera) {}
 
     auto OnUpdate(float delta) -> void override {}
 };
 ```
 
-This defines a `MyScene` type that takes the active camera in its constructor and overrides one hook: [OnUpdate](/reference/scene/node#function-on-update-86a04f9c), called once per frame. The constructor receives the camera so we can position it or hand it to camera-aware nodes during setup. We’ll fill these in shortly. First, tell the runtime to use `MyScene`:
-
-```cpp
-auto CreateScene(vglx::Camera* camera) -> std::unique_ptr<vglx::Scene> override {
-    return std::make_unique<MyScene>(camera);
-}
-```
-
-Build and run the application again. If you still see an empty window, everything is working as intended. Now we can start putting things on screen.
+`MyScene` takes the active camera in its constructor so it can position the camera or hand it to camera-aware nodes during setup. It also overrides one hook: [OnUpdate](/reference/scene/node#function-on-update-86a04f9c), called once per frame. We’ll fill these in shortly.
 
 ## Populating the Scene
 
 In this guide we’ll build a small scene: a 3D cube, a couple of lights, and a simple animation to make things interesting.
 
-A scene is built from nodes: cameras, meshes, lights, and anything else you place in the world. To see anything on screen you need at least one of each and VGLX provides simple helpers to create and configure them. We’ll start with the camera.
+A scene is built from nodes: cameras, meshes, lights, and anything else you place in the world. We’ll start with the camera.
 
-The runtime gives you a default 3D camera unless you override [CreateCamera](/reference/core/application#function-get-camera-5f2d1639) so we’ll use that for now. By default the camera starts at the world origin $(0, 0, 0)$. We want our cube to sit at the origin, not the camera, so we need to push the camera back and have it look toward the center of the scene.
+A camera is constructed and owned in `main`, then handed to the scene. We use a [PerspectiveCamera](/reference/cameras/perspective_camera) with the window’s aspect ratio. By default the camera starts at the world origin $(0, 0, 0)$, so we push it back along `+Z` to leave the origin in front of it. VGLX uses a right-handed coordinate system.
 
-The runtime hands the active camera to your scene through the constructor, so we can position it directly during setup:
+Add this to `main`, just before the `return`:
 
 ```cpp
-struct MyScene : public vglx::Scene {
-    MyScene(vglx::Camera* camera) {
-        camera->TranslateZ(2.5f); // push the camera back
-    }
+auto camera = PerspectiveCamera::Create({
+    .fov = math::DegToRad(60.0f),
+    .aspect = window.AspectRatio(),
+    .near = 0.1f,
+    .far = 1000.0f
+});
+camera->TranslateZ(2.5f);
 
-    auto OnUpdate(float delta) -> void override {}
-};
+auto scene = std::make_unique<MyScene>(camera.get());
 ```
-VGLX uses a right-handed coordinate system so moving the camera along `+Z` pushes it back toward the viewer while leaving the origin in front of it. With the camera in place we can add something to look at.
 
-To render anything we need a renderable node. The most common one is a [Mesh](/reference/scene/mesh). A mesh combines two pieces: a [Geometry](/reference/geometries/geometry) which defines what to draw and a [Material](/reference/materials/material) which defines how it should be drawn.
+Now we have something to point a camera at. To render anything we need a renderable node. The most common one is a [Mesh](/reference/scene/mesh). A mesh combines two pieces: a [Geometry](/reference/geometries/geometry) which defines what to draw and a [Material](/reference/materials/material) which defines how it should be drawn.
 
-For a simple cube we can use the built-in [BoxGeometry](/reference/primitives/box_geometry) primitive, and because we want lighting in the scene we’ll pair it with a [PhongMaterial](/reference/materials/phong_material):
+For a simple cube we can use the built-in [BoxGeometry](/reference/primitives/box_geometry) primitive, and because we want lighting in the scene we’ll pair it with a [PhongMaterial](/reference/materials/phong_material). Update `MyScene`:
 
 ```cpp
-struct MyScene : public vglx::Scene {
-    vglx::Mesh* mesh {nullptr};
+struct MyScene : public Scene {
+    Mesh* mesh {nullptr};
 
-    MyScene(vglx::Camera* camera) {
-        camera->TranslateZ(2.5f);
-
-        mesh = Add(vglx::Mesh::Create(
-            vglx::BoxGeometry::Create(),
-            vglx::PhongMaterial::Create(0x049EF4)
+    MyScene(Camera* camera) {
+        mesh = Add(Mesh::Create(
+            BoxGeometry::Create(),
+            PhongMaterial::Create(0x049EF4)
         ));
     }
 
@@ -200,29 +187,51 @@ If we ran the application now we still wouldn’t see anything because the scene
 We can add and configure both lights in our scene’s constructor:
 
 ```cpp
-MyScene(vglx::Camera* camera) {
-    camera->TranslateZ(2.5f);
-
-    Add(vglx::AmbientLight::Create({
+MyScene(Camera* camera) {
+    Add(AmbientLight::Create({
         .color = 0xFFFFFF,
         .intensity = 0.5f
     }));
 
-    Add(vglx::PointLight::Create({
+    Add(PointLight::Create({
         .color = 0xFFFFFF,
         .intensity = 1.0f
     }))->transform.Translate({2.0f, 2.5f, 4.0f});
 
-    mesh = Add(vglx::Mesh::Create(
-        vglx::BoxGeometry::Create(),
-        vglx::PhongMaterial::Create(0x049EF4)
+    mesh = Add(Mesh::Create(
+        BoxGeometry::Create(),
+        PhongMaterial::Create(0x049EF4)
     ));
 }
 ```
 
 Both light sources need a color and an intensity. Unlike the ambient light, the point light is positional so we move it slightly up, to the right, and back to give the scene some depth.
 
-If you run the application now you should see a blue square in the center of the window. That’s the front face of the cube viewed straight on.
+## The Main Loop
+
+We have a window, a renderer, a camera, and a scene. What we don’t have yet is a loop to drive them. Add the following to `main`, after constructing the scene:
+
+```cpp
+window.OnResize([&](const ResizeParameters& params) {
+    renderer.SetViewport(0, 0,
+        params.framebuffer_width,
+        params.framebuffer_height
+    );
+    camera->Resize(params.window_width, params.window_height);
+});
+
+auto timer = FrameTimer {true};
+while (!window.ShouldClose()) {
+    window.PollEvents();
+    scene->Advance(timer.Tick());
+    renderer.Render(scene.get(), camera.get());
+    window.SwapBuffers();
+}
+```
+
+The resize callback fans out to the things that care about the new size: the renderer updates its viewport, and the camera recomputes its projection. Both are owned by us, so we wire them up directly — no hidden machinery in between.
+
+[FrameTimer](/reference/utilities/frame_timer) tracks elapsed time between frames. Inside the loop we poll events, advance the scene by the time delta, render the frame, and swap buffers. That’s the whole game loop. If you run the application now you should see a blue square in the center of the window. That’s the front face of the cube viewed straight on.
 
 Next we’ll animate it so the 3D shape becomes obvious.
 
@@ -232,7 +241,7 @@ To keep things simple we’ll animate the scene by rotating the cube around the 
 
 ```cpp
 auto OnUpdate(float delta) -> void override {
-    const auto rotation_speed = vglx::math::pi_over_2;
+    const auto rotation_speed = math::pi_over_2;
     mesh->RotateX(rotation_speed * delta);
     mesh->RotateY(rotation_speed * delta);
 }
@@ -246,73 +255,97 @@ If you run the application now, the square becomes a rotating cube, making the 3
 
 ## Conclusion
 
-In this guide we built a minimal VGLX application from scratch. We created a project, set up the application runtime, defined a custom scene, and populated it with a mesh, lights, and a camera. Finally, we added a simple animation to bring the scene to life.
+In this guide we built a minimal VGLX application from scratch. We created a project, opened a window, set up a renderer and a camera, defined a custom scene populated with a mesh and lights, and wrote a per-frame loop. Finally, we added a simple animation to bring the scene to life.
 
-This small example touches most of the core concepts you’ll use in any VGLX project: the application lifecycle, the scene graph, renderable nodes, lighting, transforms, and per-frame updates.
+This small example touches most of the core concepts you’ll use in any VGLX project: the window and renderer, the scene graph, renderable nodes, lighting, transforms, and per-frame updates. None of it is hidden behind a framework — every step is visible in your own `main`.
 
-From here you can start experimenting. Try adding more meshes, changing materials, or introducing different types of lights. When you’re ready to go further, take a look at camera controls, input handling, and custom materials in the [reference documentation](/reference/core/application).
+From here you can start experimenting. Try adding more meshes, changing materials, or introducing different types of lights. When you’re ready to go further, take a look at camera controls, input handling, and custom materials in the [reference documentation](/reference/).
 
 The complete source code for this example is shown below for reference:
 
 ```cpp
 #include <vglx/vglx.hpp>
 
-#include <memory>
+#include <print>
 
-struct MyScene : public vglx::Scene {
-    vglx::Mesh* mesh {nullptr};
+using namespace vglx;
 
-    MyScene(vglx::Camera* camera) {
-        camera->TranslateZ(2.5f);
+struct MyScene : public Scene {
+    Mesh* mesh {nullptr};
 
-        Add(vglx::AmbientLight::Create({
+    MyScene(Camera* camera) {
+        Add(AmbientLight::Create({
             .color = 0xFFFFFF,
             .intensity = 0.5f
         }));
 
-        Add(vglx::PointLight::Create({
+        Add(PointLight::Create({
             .color = 0xFFFFFF,
             .intensity = 1.0f
         }))->transform.Translate({2.0f, 2.5f, 4.0f});
 
-        mesh = Add(vglx::Mesh::Create(
-            vglx::BoxGeometry::Create(),
-            vglx::PhongMaterial::Create(0x049EF4)
+        mesh = Add(Mesh::Create(
+            BoxGeometry::Create(),
+            PhongMaterial::Create(0x049EF4)
         ));
     }
 
     auto OnUpdate(float delta) -> void override {
-        const auto rotation_speed = vglx::math::pi_over_2;
+        const auto rotation_speed = math::pi_over_2;
         mesh->RotateX(rotation_speed * delta);
         mesh->RotateY(rotation_speed * delta);
     }
 };
 
-struct MyApp : public vglx::Application {
-    auto Configure() ->  Application::Parameters override {
-        return {
-            .title = "Hello VGLX",
-            .clear_color = {0x000000},
-            .width = 1280,
-            .height = 720,
-            .antialiasing = 4,
-            .vsync = false,
-            .show_stats = true,
-        };
-    }
-
-    auto CreateScene(vglx::Camera* camera) -> std::unique_ptr<vglx::Scene> override {
-        return std::make_unique<MyScene>(camera);
-    }
-
-    auto Update([[maybe_unused]] float dt) -> bool override {
-        return true;
-    }
-};
-
 auto main() -> int {
-    auto app = MyApp {};
-    app.Start();
+    auto window = Window {{
+        .title = "Hello VGLX",
+        .width = 1280,
+        .height = 720,
+        .sample_count = 4,
+        .vsync = true
+    }};
+    if (auto result = window.Initialize(); !result.has_value()) {
+        std::println(stderr, "{}", result.error());
+        return 1;
+    }
+
+    auto renderer = Renderer {{
+        .framebuffer_width = window.FramebufferWidth(),
+        .framebuffer_height = window.FramebufferHeight(),
+        .sample_count = 4,
+        .clear_color = 0x000000
+    }};
+    if (auto result = renderer.Initialize(); !result.has_value()) {
+        std::println(stderr, "{}", result.error());
+        return 1;
+    }
+
+    auto camera = PerspectiveCamera::Create({
+        .fov = math::DegToRad(60.0f),
+        .aspect = window.AspectRatio(),
+        .near = 0.1f,
+        .far = 1000.0f
+    });
+    camera->TranslateZ(2.5f);
+
+    auto scene = std::make_unique<MyScene>(camera.get());
+
+    window.OnResize([&](const ResizeParameters& params) {
+        renderer.SetViewport(0, 0,
+            params.framebuffer_width,
+            params.framebuffer_height
+        );
+        camera->Resize(params.window_width, params.window_height);
+    });
+
+    auto timer = FrameTimer {true};
+    while (!window.ShouldClose()) {
+        window.PollEvents();
+        scene->Advance(timer.Tick());
+        renderer.Render(scene.get(), camera.get());
+        window.SwapBuffers();
+    }
 
     return 0;
 }

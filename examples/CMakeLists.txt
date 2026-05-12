@@ -36,31 +36,21 @@ set(SOURCE_CODE
     "scene_features/example_sprite.hpp"
 )
 
-add_executable(examples_launcher_runtime launcher_runtime.cpp ${SOURCE_CODE})
-add_executable(examples_launcher_direct launcher_direct.cpp ${SOURCE_CODE})
+add_executable(examples_launcher launcher.cpp ${SOURCE_CODE})
 
-set(BINARIES
-    examples_launcher_runtime
-    examples_launcher_direct
-)
-
-foreach(BINARY IN LISTS BINARIES)
-
-target_compile_options(${BINARY} PRIVATE
+target_compile_options(examples_launcher PRIVATE
     $<$<CXX_COMPILER_ID:GNU>:-fno-rtti -fno-exceptions>
     $<$<CXX_COMPILER_ID:Clang>:-fno-rtti -fno-exceptions>
     $<$<CXX_COMPILER_ID:AppleClang>:-fno-rtti -fno-exceptions>
     $<$<CXX_COMPILER_ID:MSVC>:/GR /EHsc>
 )
 
-target_include_directories(${BINARY} PUBLIC
+target_include_directories(examples_launcher PUBLIC
     $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/examples>
 )
 
-target_compile_definitions(${BINARY} PRIVATE
+target_compile_definitions(examples_launcher PRIVATE
     ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets"
 )
 
-target_link_libraries(${BINARY} PRIVATE vglx)
-
-endforeach()
+target_link_libraries(examples_launcher PRIVATE vglx)

@@ -51,43 +51,67 @@ The installer checks for CMake, detects your compiler, and asks for an installat
 ```cpp
 #include <vglx/vglx.hpp>
 
+#include <print>
+
 using namespace vglx;
 
-struct MyApp : public Application {
-    auto Configure() -> Application::Parameters override {
-        return { .title = "Hello VGLX" };
-    }
-
-    auto CreateScene(Camera* camera) -> std::unique_ptr<Scene> override {
-        camera->TranslateZ(3.0f);
-
-        auto scene = Scene::Create();
-
-        scene->Add(
-            PointLight::Create({
-                .color = 0xFFFFFF,
-                .intensity = 1.0f
-            })
-        )->transform.Translate({2.0f, 2.5f, 4.0f});
-
-        scene->Add(
-            Mesh::Create(
-                BoxGeometry::Create(),
-                PhongMaterial::Create(0x049EF4)
-            )
-        )->RotateY(math::DegToRad(45.0f));
-
-        return scene;
-    }
-
-    auto Update([[maybe_unused]] float dt) -> bool override {
-        return true;
-    }
-};
-
 auto main() -> int {
-    auto app = MyApp {};
-    app.Start();
+    auto window = Window {{
+        .title = "Hello VGLX",
+        .width = 1280,
+        .height = 720
+    }};
+
+    if (auto result = window.Initialize(); !result.has_value()) {
+        std::println(stderr, "{}", result.error());
+        return 1;
+    }
+
+    auto renderer = Renderer {{
+        .framebuffer_width = window.FramebufferWidth(),
+        .framebuffer_height = window.FramebufferHeight()
+    }};
+
+    if (auto result = renderer.Initialize(); !result.has_value()) {
+        std::println(stderr, "{}", result.error());
+        return 1;
+    }
+
+    auto camera = PerspectiveCamera::Create({
+        .fov = math::DegToRad(60.0f),
+        .aspect = window.AspectRatio(),
+        .near = 0.1f,
+        .far = 1000.0f
+    });
+
+    window.OnResize([&camera, &renderer](const ResizeParameters& p) {
+        renderer.SetViewport(0, 0, p.framebuffer_width, p.framebuffer_height);
+        camera->Resize(p.window_width, p.window_height);
+    });
+
+    auto scene = Scene::Create();
+
+    scene->Add(OrbitControls::Create(camera.get(), {
+        .radius = 3.0f,
+    }));
+
+    scene->Add(Mesh::Create(
+        BoxGeometry::Create(),
+        PhongMaterial::Create(0x049EF4)
+    ));
+
+    scene->Add(PointLight::Create({
+        .color = 0xFFFFFF,
+        .intensity = 1.0f
+    }))->transform.Translate({2.0f, 2.5f, 4.0f});
+
+    auto timer = FrameTimer {true};
+    while (!window.ShouldClose()) {
+        window.PollEvents();
+        scene->Advance(timer.Tick());
+        renderer.Render(scene.get(), camera.get());
+        window.SwapBuffers();
+    }
 
     return 0;
 }

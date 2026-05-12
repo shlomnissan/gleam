@@ -23,33 +23,21 @@ namespace vglx {
  * rendering 2D scenes and UI elements, amongst other things.
  *
  * Although multiple cameras can be added to the scene graph and inherit
- * transformations from their parent objects, only one camera can be active at
- * a time. The active camera is managed by the application’s runtime object:
+ * transformations from their parent objects, only one camera is rendered at
+ * a time, the one passed to @ref Renderer::Render. Construct it directly
+ * and pass it into the render call each frame.
  *
  * @code
- * class MyApp : public vglx::Application {
- * public:
- *   auto Configure() -> void override {}
+ * auto camera = vglx::OrthographicCamera::Create({
+ *   .left = 0.0f,
+ *   .right = 1280.0f,
+ *   .top = 0.0f,
+ *   .bottom = 720.0f,
+ *   .near = 0.1f,
+ *   .far = 100.0f
+ * });
  *
- *   auto CreateScene() -> std::unique_ptr<vglx::Scene> override {
- *     return vglx::Scene::Create();
- *   }
- *
- *   auto CreateCamera() -> std::unique_ptr<vglx::Camera> override {
- *     return vglx::OrthographicCamera::Create({
- *       .left = 0.0f,
- *       .right = 1280.0f,
- *       .top = 0.0f,
- *       .bottom = 720.0f,
- *       .near = 0.1f,
- *       .far = 100.0f
- *     });
- *   }
- *
- *   auto Update(float delta) -> bool override {
- *     return true;
- *   }
- * }
+ * renderer.Render(scene.get(), camera.get());
  * @endcode
  *
  * @ingroup CamerasGroup

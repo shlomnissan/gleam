@@ -43,9 +43,9 @@ using ResizeCallback = std::function<void(const ResizeParameters& params)>;
  * @brief Represents a cross-platform application window.
  *
  * This class creates and manages the operating system window, the
- * graphics context, and propagates input events from the OS. It is
- * typically constructed and controlled by the @ref Application runtime,
- * but can also be used directly in manual setups.
+ * graphics context, and propagates input events from the OS. Construct
+ * one in your @c main, call @ref Initialize, then drive it with
+ * @ref PollEvents and @ref SwapBuffers each frame.
  *
  * @code
  * vglx::Window window({

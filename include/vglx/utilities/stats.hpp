@@ -17,9 +17,8 @@ namespace vglx {
  * @brief Collects and visualizes runtime performance statistics.
  *
  * This class tracks frames per second, frame time, and the number of rendered
- * objects per frame. It is used by the runtime when @ref Application
- * "show_stats" is set to true to provide an on-screen performance overlay
- * during development and debugging.
+ * objects per frame. Use it in your main loop to provide an on-screen
+ * performance overlay during development and debugging.
  *
  * @code
  * while (running) {
