@@ -25,7 +25,7 @@ namespace vglx {
 
 namespace fs = std::filesystem;
 
-class Image;
+struct Image;
 class Texture2D;
 class CubeTexture;
 class Node;
