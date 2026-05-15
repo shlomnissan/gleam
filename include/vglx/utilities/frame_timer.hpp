@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include "vglx_export.h"
-
 #include "vglx/utilities/timer.hpp"
 
 #include <algorithm>
@@ -34,7 +32,7 @@ namespace vglx {
  *
  * @ingroup UtilitiesGroup
  */
-class VGLX_EXPORT FrameTimer {
+class FrameTimer {
 public:
     /**
      * @brief Constructs a frame timer.

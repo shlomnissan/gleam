@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include "vglx_export.h"
-
 #include "vglx/math/sphere.hpp"
 #include "vglx/math/utilities.hpp"
 #include "vglx/math/vector3.hpp"
@@ -25,7 +23,7 @@ namespace vglx {
  *
  * @ingroup MathGroup
  */
-struct VGLX_EXPORT Plane {
+struct Plane {
     /// @brief Plane normal vector.
     Vector3 normal {Vector3::Up()};
 

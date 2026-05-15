@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include "vglx_export.h"
-
 #include "vglx/math/vector3.hpp"
 #include "vglx/math/utilities.hpp"
 
@@ -25,7 +23,7 @@ namespace vglx {
  *
  * @ingroup MathGroup
  */
-struct VGLX_EXPORT Spherical {
+struct Spherical {
     /// @brief Radial distance from the origin.
     float radius = 1.0f;
 

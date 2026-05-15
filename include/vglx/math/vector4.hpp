@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include "vglx_export.h"
-
 #include "vglx/math/utilities.hpp"
 
 #include <algorithm>
@@ -28,7 +26,7 @@ auto constexpr Dot(const Vector4& a, const Vector4& b) -> float;
  *
  * @ingroup MathGroup
  */
-struct VGLX_EXPORT Vector4 {
+struct Vector4 {
     /// @brief X component.
     float x;
     /// @brief Y component.

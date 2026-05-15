@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include "vglx_export.h"
-
 #include "vglx/math/matrix3.hpp"
 #include "vglx/math/vector2.hpp"
 #include "vglx/math/utilities.hpp"
@@ -25,7 +23,7 @@ namespace vglx {
  *
  * @ingroup MathGroup
  */
-class VGLX_EXPORT Transform2 {
+class Transform2 {
 public:
     /// @brief Dirty flag indicating the cached matrix needs to be recomputed.
     bool touched {true};

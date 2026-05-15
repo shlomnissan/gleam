@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include "vglx_export.h"
-
 #include "vglx/math/box3.hpp"
 #include "vglx/math/matrix4.hpp"
 #include "vglx/math/sphere.hpp"
@@ -33,7 +31,7 @@ namespace vglx {
  *
  * @ingroup MathGroup
  */
-class VGLX_EXPORT Frustum {
+class Frustum {
 public:
     /**
      * @brief Constructs an uninitialized frustum.

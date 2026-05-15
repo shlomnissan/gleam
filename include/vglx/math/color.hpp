@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include "vglx_export.h"
-
 #include "vglx/math/utilities.hpp"
 
 #include <algorithm>
@@ -27,7 +25,7 @@ namespace vglx {
  *
  * @ingroup MathGroup
  */
-class VGLX_EXPORT Color  {
+class Color  {
 public:
     float r {1.0f}; ///< Red channel in $[0.0, 1.0]$.
     float g {1.0f}; ///< Green channel in $[0.0, 1.0]$.

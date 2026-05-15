@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include "vglx_export.h"
-
 #include <array>
 #include <bit>
 #include <cinttypes>
@@ -477,7 +475,7 @@ alignas(64) inline constexpr auto exp_val_table = std::array<uint32_t, 180> {
  * @param value The value to hash and combine into the seed.
  */
 template <typename T>
-VGLX_EXPORT inline auto HashCombine(size_t& seed, const T& value) -> void {
+inline auto HashCombine(size_t& seed, const T& value) -> void {
     seed ^= std::hash<T>{}(value) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 }
 
@@ -487,7 +485,7 @@ VGLX_EXPORT inline auto HashCombine(size_t& seed, const T& value) -> void {
  *
  * @return Random UUID as a string.
  */
-[[nodiscard]] VGLX_EXPORT inline auto GenerateUUID() -> std::string {
+[[nodiscard]] inline auto GenerateUUID() -> std::string {
     static std::vector<std::string> lut{
         "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "0a",
         "0b", "0c", "0d", "0e", "0f", "10", "11", "12", "13", "14", "15",

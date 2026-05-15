@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include "vglx_export.h"
-
 #include "vglx/math/matrix4.hpp"
 #include "vglx/math/utilities.hpp"
 #include "vglx/math/vector3.hpp"
@@ -27,7 +25,7 @@ namespace vglx {
  *
  * @ingroup MathGroup
  */
-struct VGLX_EXPORT Sphere {
+struct Sphere {
     /// @brief Sphere center in space.
     Vector3 center {Vector3::Zero()};
 

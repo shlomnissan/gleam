@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include "vglx_export.h"
-
 #include "vglx/math/vector3.hpp"
 #include "vglx/math/matrix4.hpp"
 
@@ -27,7 +25,7 @@ namespace vglx {
  *
  * @ingroup MathGroup
  */
-class VGLX_EXPORT Matrix3 {
+class Matrix3 {
 public:
     /**
      * @brief Constructs an uninitialized 3×3 matrix.

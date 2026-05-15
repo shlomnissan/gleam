@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include "vglx_export.h"
-
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -39,7 +37,7 @@ namespace vglx {
  *
  * @ingroup TexturesGroup
  */
-struct VGLX_EXPORT Image {
+struct Image {
     /**
      * @brief Parameters for constructing an @ref Image object.
      */

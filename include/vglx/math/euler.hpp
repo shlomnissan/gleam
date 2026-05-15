@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include "vglx_export.h"
-
 #include "vglx/math/matrix4.hpp"
 #include "vglx/math/utilities.hpp"
 
@@ -29,7 +27,7 @@ namespace vglx {
  *
  * @ingroup MathGroup
  */
-class VGLX_EXPORT Euler  {
+class Euler  {
 public:
     float pitch {0.0f}; ///< Rotation around the X-axis in radians.
     float yaw {0.0f}; ///< Rotation around the Y-axis in radians.

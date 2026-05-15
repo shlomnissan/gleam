@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include "vglx_export.h"
-
 #include "vglx/math/matrix4.hpp"
 #include "vglx/math/vector3.hpp"
 
@@ -30,7 +28,7 @@ namespace vglx {
  *
  * @ingroup MathGroup
  */
-struct VGLX_EXPORT Box3 {
+struct Box3 {
     /// @brief Minimum corner of the box.
     Vector3 min {std::numeric_limits<float>::max()};
 

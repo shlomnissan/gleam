@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include "vglx_export.h"
-
 #include "vglx/lights/light.hpp"
 
 #include <memory>
@@ -34,7 +32,7 @@ namespace vglx {
  *
  * @ingroup LightsGroup
  */
-class VGLX_EXPORT AmbientLight : public Light {
+class AmbientLight : public Light {
 public:
     /// @brief Parameters for constructing an @ref AmbientLight object.
     struct Parameters {
