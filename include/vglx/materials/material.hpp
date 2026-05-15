@@ -118,6 +118,8 @@ public:
      */
     [[nodiscard]] inline static auto TypeToString(Type type) -> std::string {
         switch(type) {
+            case Material::Type::PBRMaterial:
+                return "pbr_material";
             case Material::Type::PhongMaterial:
                 return "phong_material";
             case Material::Type::ShaderMaterial:

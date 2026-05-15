@@ -30,7 +30,7 @@ namespace vglx {
  * auto material = vglx::PBRMaterial::Create(0xFFFFFF);
  * material->metallic = 1.0f;
  * material->roughness = 0.4f;
- * material->base_color_map = texture;
+ * material->albedo_map = texture;
  *
  * my_scene->Add(vglx::Mesh::Create(geometry, material));
  * @endcode
@@ -66,8 +66,8 @@ public:
     /// @brief Ambient occlusion map sampled from the R channel; modulates the ambient term.
     std::shared_ptr<Texture> ao_map = nullptr;
 
-    /// @brief Base color map multiplied with @ref color per texel.
-    std::shared_ptr<Texture> base_color_map = nullptr;
+    /// @brief Albedo (base color) map multiplied with @ref color per texel.
+    std::shared_ptr<Texture> albedo_map = nullptr;
 
     /// @brief Emissive map modulating the emissive color per texel.
     std::shared_ptr<Texture> emissive_map = nullptr;

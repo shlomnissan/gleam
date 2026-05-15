@@ -112,6 +112,7 @@ set(PUBLIC_HEADERS
     "${PUBLIC_HEADERS_DIR}/lights/light.hpp"
     "${PUBLIC_HEADERS_DIR}/lights/point_light.hpp"
     "${PUBLIC_HEADERS_DIR}/materials/material.hpp"
+    "${PUBLIC_HEADERS_DIR}/materials/pbr_material.hpp"
     "${PUBLIC_HEADERS_DIR}/materials/phong_material.hpp"
     "${PUBLIC_HEADERS_DIR}/materials/shader_material.hpp"
     "${PUBLIC_HEADERS_DIR}/materials/sprite_material.hpp"
