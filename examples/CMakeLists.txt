@@ -10,6 +10,8 @@ set(SOURCE_CODE
     "lighting/example_point_light.hpp"
     "lighting/example_spot_light.cpp"
     "lighting/example_spot_light.hpp"
+    "materials/example_pbr_material.cpp"
+    "materials/example_pbr_material.hpp"
     "materials/example_phong_material.cpp"
     "materials/example_phong_material.hpp"
     "materials/example_shader_material.cpp"

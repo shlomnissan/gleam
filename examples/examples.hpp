@@ -19,6 +19,7 @@
 #include "lighting/example_directional_light.hpp"
 #include "lighting/example_point_light.hpp"
 #include "lighting/example_spot_light.hpp"
+#include "materials/example_pbr_material.hpp"
 #include "materials/example_phong_material.hpp"
 #include "materials/example_shader_material.hpp"
 #include "materials/example_unlit_material.hpp"
@@ -36,6 +37,7 @@ namespace {
 
     const auto examples = std::vector {
     "- Materials",
+    "PBR Material",
     "Unlit Material",
     "Phong Material",
     "Shader Material",
@@ -81,7 +83,7 @@ public:
         );
 
         if (ImGui::CollapsingHeader("Examples", ImGuiTreeNodeFlags_DefaultOpen)) {
-            if (ImGui::BeginListBox("##ListBox", {235, 384})) {
+            if (ImGui::BeginListBox("##ListBox", {235, 404})) {
                 for (auto i = 0; i < examples.size(); i++) {
                     const auto name = std::string_view {examples[i]};
                     if (name.starts_with("-")) {
@@ -115,6 +117,7 @@ public:
         auto scene = std::unique_ptr<ExampleScene> {nullptr};
         auto name = std::string_view {examples[current_scene_]};
 
+        if (name == "PBR Material") scene = std::make_unique<ExamplePBRMaterial>(camera_);
         if (name == "Unlit Material") scene = std::make_unique<ExampleUnlitMaterial>(camera_);
         if (name == "Phong Material") scene = std::make_unique<ExamplePhongMaterial>(camera_);
         if (name == "Shader Material") scene = std::make_unique<ExampleShaderMaterial>(camera_);
