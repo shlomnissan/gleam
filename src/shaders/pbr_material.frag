@@ -38,7 +38,7 @@ const float PI = 3.14159265358979;
 float distributionGGX(float NoH, float alpha) {
     float a2 = alpha * alpha;
     float denom = NoH * NoH * (a2 - 1.0) + 1.0;
-    return a2 / max(PI * denom * denom, 0.0001);
+    return a2 / (PI * denom * denom);
 }
 
 // Height-correlated Smith G2 with the 1/(4 NoL NoV) divisor folded in.
@@ -46,7 +46,7 @@ float visibilityGGX(float NoL, float NoV, float alpha) {
     float a2 = alpha * alpha;
     float gv = NoL * sqrt(a2 + (1.0 - a2) * NoV * NoV);
     float gl = NoV * sqrt(a2 + (1.0 - a2) * NoL * NoL);
-    return 0.5 / max(gv + gl, 0.0001);
+    return 0.5 / max(gv + gl, 1e-6);
 }
 
 vec3 fresnelSchlick(float cos_theta, vec3 F0) {

@@ -25,10 +25,6 @@ public:
 private:
     vglx::Mesh* mesh_ {nullptr};
 
-    std::shared_ptr<vglx::PhongMaterial> material_;
+    std::shared_ptr<vglx::PBRMaterial> material_;
     std::shared_ptr<vglx::Texture2D> texture_;
-
-    float metallic_ = 0.0f;
-    float roughness_ = 1.0f;
-    float ao_intensity_ = 1.0f;
 };

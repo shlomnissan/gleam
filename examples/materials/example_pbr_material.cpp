@@ -25,9 +25,7 @@ ExamplePBRMaterial::ExamplePBRMaterial(Camera* camera) {
     Add(OrbitControls::Create(camera, {.radius = 3.0f}));
 
     auto geometry = BoxGeometry::Create();
-    material_ = PhongMaterial::Create(0x049EF4);
-    material_->specular_color = {0.3f, 0.3f, 0.3f};
-    material_->shininess = 32.0f;
+    material_ = PBRMaterial::Create(0x049EF4);
     mesh_ = Add(Mesh::Create(geometry, material_));
 
     Add(AmbientLight::Create({
@@ -66,9 +64,9 @@ auto ExamplePBRMaterial::ContextMenu() -> void {
     };
 
     UIColor("color", &material_->color[0], _);
-    UISliderFloat("metallic", metallic_, 0.0f, 1.0f, _, 160.0f);
-    UISliderFloat("roughness", roughness_, 0.0f, 1.0f, _, 160.0f);
-    UISliderFloat("ao_intensity", ao_intensity_, 0.0f, 1.0f, _, 160.0f);
+    UISliderFloat("metallic", material_->metallic, 0.0f, 1.0f, _, 160.0f);
+    UISliderFloat("roughness", material_->roughness, 0.0f, 1.0f, _, 160.0f);
+    UISliderFloat("ao_intensity", material_->ao_intensity, 0.0f, 1.0f, _, 160.0f);
     UIDropDown("texture", textures, curr_texture,
       [this](std::string_view str) {
         curr_texture = str;
