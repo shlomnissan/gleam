@@ -78,8 +78,7 @@ vec3 cookTorranceShading(
 
     vec3 specular = D * V * F;
 
-    vec3 kD = (vec3(1.0) - F) * (1.0 - metallic);
-    vec3 diffuse = kD * base_color / PI;
+    vec3 diffuse = (1.0 - metallic) * base_color / PI;
 
     return (diffuse + specular) * light_color * NoL;
 }
@@ -224,7 +223,7 @@ void main() {
         ao = mix(1.0, ao_sample, u_AOIntensity);
     #endif
 
-    vec3 output_color = base_color * u_AmbientLight * ao;
+    vec3 output_color = base_color * (1.0 - metallic) * u_AmbientLight * ao / PI;
     #if NUM_LIGHTS > 0
         output_color += processLights(normal, base_color, metallic, roughness);
     #endif
