@@ -43,11 +43,14 @@ struct ProgramAttributes {
 
     bool albedo_map {false};
     bool alpha_map {false};
+    bool ao_map {false};
+    bool emissive_map {false};
+    bool metallic_map {false};
     bool normal_map {false};
+    bool roughness_map {false};
+    bool size_attenuation {false};
     bool specular_map {false};
     bool texture_map {false};
-    bool emissive_map {false};
-    bool size_attenuation {false};
 
     ProgramAttributes(
         Renderable* renderable,

@@ -7,6 +7,7 @@
 
 #include "core/shader_library.hpp"
 
+#include "vglx/materials/pbr_material.hpp"
 #include "vglx/materials/phong_material.hpp"
 #include "vglx/materials/shader_material.hpp"
 #include "vglx/materials/sprite_material.hpp"
@@ -14,6 +15,8 @@
 
 #include "utilities/logger.hpp"
 
+#include "shaders/headers/pbr_material_frag.h"
+#include "shaders/headers/pbr_material_vert.h"
 #include "shaders/headers/phong_material_frag.h"
 #include "shaders/headers/phong_material_vert.h"
 #include "shaders/headers/sprite_material_frag.h"
@@ -30,6 +33,16 @@
 namespace vglx {
 
 auto ShaderLibrary::GetShaderSource(const ProgramAttributes& attrs) const -> std::vector<ShaderInfo> {
+    if (attrs.type == Material::Type::PBRMaterial) {
+        return {{
+            ShaderType::kVertexShader,
+            ProcessShader(attrs, _SHADER_pbr_material_vert)
+        }, {
+            ShaderType::kFragmentShader,
+            ProcessShader(attrs, _SHADER_pbr_material_frag)
+        }};
+    }
+
     if (attrs.type == Material::Type::PhongMaterial) {
         return {{
             ShaderType::kVertexShader,
@@ -104,11 +117,14 @@ auto ShaderLibrary::InjectAttributes(
 
     if (attrs.albedo_map) features += "#define USE_ALBEDO_MAP\n";
     if (attrs.alpha_map) features += "#define USE_ALPHA_MAP\n";
-    if (attrs.specular_map) features += "#define USE_SPECULAR_MAP\n";
-    if (attrs.normal_map && attrs.tangent) features += "#define USE_NORMAL_MAP\n";
-    if (attrs.texture_map) features += "#define USE_TEXTURE_MAP\n";
+    if (attrs.ao_map) features += "#define USE_AO_MAP\n";
     if (attrs.emissive_map) features += "#define USE_EMISSIVE_MAP\n";
+    if (attrs.metallic_map) features += "#define USE_METALLIC_MAP\n";
+    if (attrs.normal_map && attrs.tangent) features += "#define USE_NORMAL_MAP\n";
+    if (attrs.roughness_map) features += "#define USE_ROUGHNESS_MAP\n";
     if (attrs.size_attenuation) features += "#define USE_SIZE_ATTENUATION\n";
+    if (attrs.specular_map) features += "#define USE_SPECULAR_MAP\n";
+    if (attrs.texture_map) features += "#define USE_TEXTURE_MAP\n";
 
     const auto lights = attrs.num_lights;
     features += "#define NUM_LIGHTS " + std::to_string(lights) + '\n';

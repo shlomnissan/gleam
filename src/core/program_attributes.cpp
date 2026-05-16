@@ -7,6 +7,7 @@
 
 #include "core/program_attributes.hpp"
 
+#include "vglx/materials/pbr_material.hpp"
 #include "vglx/materials/phong_material.hpp"
 #include "vglx/materials/shader_material.hpp"
 #include "vglx/materials/sprite_material.hpp"
@@ -26,6 +27,18 @@ ProgramAttributes::ProgramAttributes(
     auto material = renderable->GetMaterial().get();
 
     type = material->GetType();
+
+    if (type == Material::Type::PBRMaterial) {
+        auto m = static_cast<const PBRMaterial*>(material);
+        color = true;
+        albedo_map = m->albedo_map != nullptr;
+        alpha_map = m->alpha_map != nullptr;
+        ao_map = m->ao_map != nullptr;
+        emissive_map = m->emissive_map != nullptr;
+        metallic_map = m->metallic_map != nullptr;
+        normal_map = m->normal_map != nullptr;
+        roughness_map = m->roughness_map != nullptr;
+    }
 
     if (type == Material::Type::PhongMaterial) {
         auto m = static_cast<const PhongMaterial*>(material);
@@ -87,6 +100,9 @@ ProgramAttributes::ProgramAttributes(
     key |= (specular_map ? 1 : 0) << 27; // 1 bit
     key |= (texture_map ? 1 : 0) << 28; // 1 bit
     key |= (size_attenuation ? 1 : 0) << 29; // 1 bit
+    key |= (metallic_map ? 1ULL : 0ULL) << 30; // 1 bit
+    key |= (roughness_map ? 1ULL : 0ULL) << 31; // 1 bit
+    key |= (ao_map ? 1ULL : 0ULL) << 32; // 1 bit
 
     if (type == Material::Type::ShaderMaterial) {
         math::HashCombine(key, shader_material_id);

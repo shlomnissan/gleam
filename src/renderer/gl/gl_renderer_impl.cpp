@@ -9,6 +9,7 @@
 
 #include "renderer/gl/gl_textures.hpp"
 #include "vglx/core/render_target.hpp"
+#include "vglx/materials/pbr_material.hpp"
 #include "vglx/materials/phong_material.hpp"
 #include "vglx/materials/shader_material.hpp"
 #include "vglx/materials/sprite_material.hpp"
@@ -189,6 +190,15 @@ auto Renderer::Impl::SetUniforms(
             case GLTextureMapType::EmissiveMap:
                 program->SetUniform(Uniform::EmissiveMap, &type);
                 break;
+            case GLTextureMapType::MetallicMap:
+                program->SetUniform(Uniform::MetallicMap, &type);
+                break;
+            case GLTextureMapType::RoughnessMap:
+                program->SetUniform(Uniform::RoughnessMap, &type);
+                break;
+            case GLTextureMapType::AOMap:
+                program->SetUniform(Uniform::AOMap, &type);
+                break;
             default:
                 Logger::Log(LogLevel::Error, "Unable to bind unknown texture map type");
         }
@@ -209,6 +219,43 @@ auto Renderer::Impl::SetUniforms(
         }
     }
 
+    if (attrs->type == Material::Type::PBRMaterial) {
+        auto m = static_cast<PBRMaterial*>(material);
+        if (lights_.HasLights()) {
+            program->SetUniform(Uniform::AmbientLight, &lights_.ambient_light);
+            program->SetUniform(Uniform::MaterialColor, &m->color);
+            program->SetUniform(Uniform::MaterialMetallic, &m->metallic);
+            program->SetUniform(Uniform::MaterialRoughness, &m->roughness);
+        }
+
+        program->SetUniform(Uniform::EmissiveColor, &m->emissive_color);
+        program->SetUniform(Uniform::EmissiveIntensity, &m->emissive_intensity);
+
+        if (attrs->albedo_map) {
+            bind_texture(GLTextureMapType::AlbedoMap, m->albedo_map);
+        }
+        if (attrs->alpha_map) {
+            bind_texture(GLTextureMapType::AlphaMap, m->alpha_map);
+        }
+        if (attrs->ao_map) {
+            bind_texture(GLTextureMapType::AOMap, m->ao_map);
+            program->SetUniform(Uniform::AOIntensity, &m->ao_intensity);
+        }
+        if (attrs->emissive_map) {
+            bind_texture(GLTextureMapType::EmissiveMap, m->emissive_map);
+        }
+        if (attrs->normal_map) {
+            bind_texture(GLTextureMapType::NormalMap, m->normal_map);
+            program->SetUniform(Uniform::NormalIntensity, &m->normal_intensity);
+        }
+        if (attrs->metallic_map) {
+            bind_texture(GLTextureMapType::MetallicMap, m->metallic_map);
+        }
+        if (attrs->roughness_map) {
+            bind_texture(GLTextureMapType::RoughnessMap, m->roughness_map);
+        }
+    }
+
     if (attrs->type == Material::Type::PhongMaterial) {
         auto m = static_cast<PhongMaterial*>(material);
         if (lights_.HasLights()) {
@@ -221,18 +268,22 @@ auto Renderer::Impl::SetUniforms(
         program->SetUniform(Uniform::EmissiveColor, &m->emissive_color);
         program->SetUniform(Uniform::EmissiveIntensity, &m->emissive_intensity);
 
-        if (attrs->albedo_map)
+        if (attrs->albedo_map) {
             bind_texture(GLTextureMapType::AlbedoMap, m->albedo_map);
-        if (attrs->alpha_map)
+        }
+        if (attrs->alpha_map) {
             bind_texture(GLTextureMapType::AlphaMap, m->alpha_map);
+        }
+        if (attrs->emissive_map) {
+            bind_texture(GLTextureMapType::EmissiveMap, m->emissive_map);
+        }
         if (attrs->normal_map) {
             bind_texture(GLTextureMapType::NormalMap, m->normal_map);
             program->SetUniform(Uniform::NormalIntensity, &m->normal_intensity);
         }
-        if (attrs->specular_map)
+        if (attrs->specular_map) {
             bind_texture(GLTextureMapType::SpecularMap, m->specular_map);
-        if (attrs->emissive_map)
-            bind_texture(GLTextureMapType::EmissiveMap, m->emissive_map);
+        }
     }
 
     if (attrs->type == Material::Type::ShaderMaterial) {
@@ -260,18 +311,21 @@ auto Renderer::Impl::SetUniforms(
         program->SetUniform(Uniform::Color, &m->color);
         program->SetUniform(Uniform::Rotation, &r->rotation);
 
-        if (attrs->texture_map)
+        if (attrs->texture_map) {
             bind_texture(GLTextureMapType::TextureMap, m->texture_map);
+        }
     }
 
     if (attrs->type == Material::Type::UnlitMaterial) {
         auto m = static_cast<UnlitMaterial*>(material);
         program->SetUniform(Uniform::Color, &m->color);
 
-        if (attrs->texture_map)
-            bind_texture(GLTextureMapType::TextureMap, m->texture_map);
-        if (attrs->alpha_map)
+        if (attrs->alpha_map) {
             bind_texture(GLTextureMapType::AlphaMap, m->alpha_map);
+        }
+        if (attrs->texture_map) {
+            bind_texture(GLTextureMapType::TextureMap, m->texture_map);
+        }
     }
 }
 
