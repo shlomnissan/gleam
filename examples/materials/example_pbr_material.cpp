@@ -22,26 +22,37 @@
 using namespace vglx;
 
 ExamplePBRMaterial::ExamplePBRMaterial(Camera* camera) {
-    Add(OrbitControls::Create(camera, {.radius = 3.0f}));
+    Add(OrbitControls::Create(camera, {.radius = 5.0f}));
 
-    auto geometry = BoxGeometry::Create();
+    auto geometry = TorusKnotGeometry::Create({
+        .radius = 1.0f,
+        .tube = 0.3f,
+        .tubular_segments = 200,
+        .radial_segments = 32
+    });
+
     material_ = PBRMaterial::Create(0x049EF4);
     mesh_ = Add(Mesh::Create(geometry, material_));
 
     Add(AmbientLight::Create({
         .color = 0xFFFFFF,
-        .intensity = 0.3f
+        .intensity = 1.0f
     }));
 
-    Add(PointLight::Create({
+    Add(DirectionalLight::Create({
         .color = 0xFFFFFF,
-        .intensity = 1.0f,
-        .attenuation = {
-            .base = 1.0f,
-            .linear = 0.0f,
-            .quadratic = 0.0f
-        }
-    }))->transform.Translate({2.0f, 2.0f, 2.0f});
+        .intensity = 3.0f,
+    }))->transform.Translate({0.0f, 200.0f, 0.0f});
+
+    Add(DirectionalLight::Create({
+        .color = 0xFFFFFF,
+        .intensity = 3.0f,
+    }))->transform.Translate({100.0f, 200.0f, 100.0f});
+
+    Add(DirectionalLight::Create({
+        .color = 0xFFFFFF,
+        .intensity = 3.0f,
+    }))->transform.Translate({-100.0f, -200.0f, -100.0f});
 
     auto texture = LoadTexture(ASSETS_DIR "/checker/checker.png");
     if (texture.has_value()) {

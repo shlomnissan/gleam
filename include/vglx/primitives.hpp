@@ -17,3 +17,4 @@
 #include "vglx/primitives/cylinder_geometry.hpp"
 #include "vglx/primitives/plane_geometry.hpp"
 #include "vglx/primitives/sphere_geometry.hpp"
+#include "vglx/primitives/torus_knot_geometry.hpp"
