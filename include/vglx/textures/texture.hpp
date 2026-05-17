@@ -119,6 +119,17 @@ public:
     /// @brief Magnification filter used when sampling the texture.
     MagFilter mag_filter = MagFilter::Linear;
 
+    /**
+     * @brief Maximum anisotropy used when sampling this texture.
+     *
+     * Values greater than 1 enable anisotropic filtering, which improves
+     * texture quality at oblique viewing angles. The value is clamped to
+     * the driver-reported maximum at upload time. Only takes effect when
+     * the texture is sampled with a mipmapped minification filter.
+     * Defaults to 1 (isotropic).
+     */
+    float anisotropy {1.0f};
+
     /// @brief Enables automatic mipmap generation for this texture.
     bool generate_mipamps {false};
 

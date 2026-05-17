@@ -21,6 +21,39 @@
 
 namespace vglx {
 
+// GL_EXT_texture_filter_anisotropic tokens. GLAD is configured for GL 4.1
+// (macOS cap), but the extension is universally supported on desktop and
+// the enum values match GL 4.6 core.
+#ifndef GL_TEXTURE_MAX_ANISOTROPY
+#define GL_TEXTURE_MAX_ANISOTROPY 0x84FE
+#endif
+#ifndef GL_MAX_TEXTURE_MAX_ANISOTROPY
+#define GL_MAX_TEXTURE_MAX_ANISOTROPY 0x84FF
+#endif
+
+namespace {
+
+auto gl_max_anisotropy() -> GLfloat {
+    static const GLfloat value = [] {
+        auto v = GLfloat {1.0f};
+        glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &v);
+        return v;
+    }();
+    return value;
+}
+
+auto apply_sampler_params(GLenum target, const Texture* tex) -> void {
+    glTexParameteri(target, GL_TEXTURE_MIN_FILTER, to_gl_min_filter(tex->min_filter));
+    glTexParameteri(target, GL_TEXTURE_MAG_FILTER, to_gl_mag_filter(tex->mag_filter));
+
+    if (tex->anisotropy > 1.0f) {
+        const auto anisotropy = std::clamp(tex->anisotropy, 1.0f, gl_max_anisotropy());
+        glTexParameterf(target, GL_TEXTURE_MAX_ANISOTROPY, anisotropy);
+    }
+}
+
+}
+
 auto GLTextures::Bind(const std::shared_ptr<Texture>& texture, int tex_unit) -> void {
     VGLX_ASSERT(
         tex_unit >= 0 && tex_unit < kMaxTextureUnits,
@@ -79,8 +112,7 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
         );
 
         if (tex->generate_mipamps) glGenerateMipmap(GL_TEXTURE_2D);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, to_gl_min_filter(tex->min_filter));
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, to_gl_mag_filter(tex->mag_filter));
+        apply_sampler_params(GL_TEXTURE_2D, tex);
     }
 
     if (texture->GetType() == Texture::Type::DynamicTexture2D) {
@@ -105,8 +137,7 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
         auto max_mip = static_cast<GLint>(tex->mips - 1);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, max_mip);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, to_gl_min_filter(tex->min_filter));
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, to_gl_mag_filter(tex->mag_filter));
+        apply_sampler_params(GL_TEXTURE_2D, tex);
     }
 
     if (texture->GetType() == Texture::Type::CubeTexture) {
@@ -190,8 +221,7 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
         );
 
         if (tex->generate_mipamps) glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, to_gl_min_filter(tex->min_filter));
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, to_gl_mag_filter(tex->mag_filter));
+        apply_sampler_params(GL_TEXTURE_CUBE_MAP, tex);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);

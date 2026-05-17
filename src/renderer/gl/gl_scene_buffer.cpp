@@ -21,6 +21,15 @@ namespace {
 constexpr GLenum kColorFormat = GL_RGBA16F;
 constexpr GLenum kDepthStencilFormat = GL_DEPTH24_STENCIL8;
 
+auto gl_max_samples() -> GLint {
+    static const GLint value = [] {
+        auto v = GLint {0};
+        glGetIntegerv(GL_MAX_SAMPLES, &v);
+        return v;
+    }();
+    return value;
+}
+
 }
 
 struct GLSceneBuffer::Impl {
@@ -49,9 +58,7 @@ struct GLSceneBuffer::Impl {
         }
 
         if (is_msaa) {
-            auto max_samples = GLint {0};
-            glGetIntegerv(GL_MAX_SAMPLES, &max_samples);
-            samples = std::min(samples, static_cast<int>(max_samples));
+            samples = std::min(samples, static_cast<int>(gl_max_samples()));
         }
 
         DeleteBuffers();
