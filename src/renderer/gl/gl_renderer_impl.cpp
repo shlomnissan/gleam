@@ -274,6 +274,10 @@ auto Renderer::Impl::SetUniforms(
         if (attrs->alpha_map) {
             bind_texture(GLTextureMapType::AlphaMap, m->alpha_map);
         }
+        if (attrs->ao_map) {
+            bind_texture(GLTextureMapType::AOMap, m->ao_map);
+            program->SetUniform(Uniform::AOIntensity, &m->ao_intensity);
+        }
         if (attrs->emissive_map) {
             bind_texture(GLTextureMapType::EmissiveMap, m->emissive_map);
         }

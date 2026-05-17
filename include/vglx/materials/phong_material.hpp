@@ -47,6 +47,9 @@ public:
     /// @brief Emissive color added to the final shaded result, independent of lighting.
     Color emissive_color = 0x000000;
 
+    /// @brief Strength of the ambient occlusion contribution; 0 disables, 1 applies fully.
+    float ao_intensity = 1.0f;
+
     /// @brief Controls the glossiness of highlights; higher values yield sharper specular peaks.
     float shininess = 32.0f;
 
@@ -61,6 +64,9 @@ public:
 
     /// @brief Alpha map defining per-pixel opacity.
     std::shared_ptr<Texture> alpha_map = nullptr;
+
+    /// @brief Ambient occlusion map sampled from the R channel; modulates the ambient term.
+    std::shared_ptr<Texture> ao_map = nullptr;
 
     /// @brief Emissive map modulating the emissive color per texel.
     std::shared_ptr<Texture> emissive_map = nullptr;

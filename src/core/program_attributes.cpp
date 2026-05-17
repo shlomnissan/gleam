@@ -45,6 +45,7 @@ ProgramAttributes::ProgramAttributes(
         color = true;
         albedo_map = m->albedo_map != nullptr;
         alpha_map = m->alpha_map != nullptr;
+        ao_map = m->ao_map != nullptr;
         normal_map = m->normal_map != nullptr;
         specular_map = m->specular_map != nullptr;
         emissive_map = m->emissive_map != nullptr;

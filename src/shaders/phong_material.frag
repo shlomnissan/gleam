@@ -21,11 +21,13 @@ uniform PhongMaterial u_Material;
 
 uniform vec3 u_AmbientLight;
 uniform vec3 u_EmissiveColor;
+uniform float u_AOIntensity;
 uniform float u_EmissiveIntensity;
 uniform float u_NormalIntensity;
 
 uniform sampler2D u_AlbedoMap;
 uniform sampler2D u_AlphaMap;
+uniform sampler2D u_AOMap;
 uniform sampler2D u_NormalMap;
 uniform sampler2D u_SpecularMap;
 uniform sampler2D u_EmissiveMap;
@@ -175,7 +177,13 @@ void main() {
         specular_factor = texture(u_SpecularMap, v_TexCoord).r;
     #endif
 
-    vec3 output_color = diffuse_color * u_AmbientLight;
+    float ao = 1.0;
+    #ifdef USE_AO_MAP
+        float ao_sample = texture(u_AOMap, v_TexCoord).r;
+        ao = mix(1.0, ao_sample, u_AOIntensity);
+    #endif
+
+    vec3 output_color = diffuse_color * u_AmbientLight * ao;
     #if NUM_LIGHTS > 0
         output_color += processLights(normal, diffuse_color, specular_factor);
     #endif
