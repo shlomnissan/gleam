@@ -12,6 +12,7 @@
 #include "vglx/textures/texture.hpp"
 #include "vglx/textures/texture_2d.hpp"
 
+#include "renderer/gl/gl_device.hpp"
 #include "utilities/logger.hpp"
 #include "utilities/assert.hpp"
 
@@ -21,33 +22,19 @@
 
 namespace vglx {
 
-// GL_EXT_texture_filter_anisotropic tokens. GLAD is configured for GL 4.1
-// (macOS cap), but the extension is universally supported on desktop and
-// the enum values match GL 4.6 core.
+// GL_EXT_texture_filter_anisotropic; core in GL 4.6 but GLAD targets 4.1 on macOS.
 #ifndef GL_TEXTURE_MAX_ANISOTROPY
 #define GL_TEXTURE_MAX_ANISOTROPY 0x84FE
 #endif
-#ifndef GL_MAX_TEXTURE_MAX_ANISOTROPY
-#define GL_MAX_TEXTURE_MAX_ANISOTROPY 0x84FF
-#endif
 
 namespace {
-
-auto gl_max_anisotropy() -> GLfloat {
-    static const GLfloat value = [] {
-        auto v = GLfloat {1.0f};
-        glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &v);
-        return v;
-    }();
-    return value;
-}
 
 auto apply_sampler_params(GLenum target, const Texture* tex) -> void {
     glTexParameteri(target, GL_TEXTURE_MIN_FILTER, to_gl_min_filter(tex->min_filter));
     glTexParameteri(target, GL_TEXTURE_MAG_FILTER, to_gl_mag_filter(tex->mag_filter));
 
     if (tex->anisotropy > 1.0f) {
-        const auto anisotropy = std::clamp(tex->anisotropy, 1.0f, gl_max_anisotropy());
+        const auto anisotropy = std::min(tex->anisotropy, gl::limits().max_anisotropy);
         glTexParameterf(target, GL_TEXTURE_MAX_ANISOTROPY, anisotropy);
     }
 }

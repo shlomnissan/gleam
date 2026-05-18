@@ -7,6 +7,7 @@
 
 #include "renderer/gl/gl_scene_buffer.hpp"
 
+#include "renderer/gl/gl_device.hpp"
 #include "utilities/assert.hpp"
 #include "utilities/logger.hpp"
 
@@ -20,15 +21,6 @@ namespace {
 
 constexpr GLenum kColorFormat = GL_RGBA16F;
 constexpr GLenum kDepthStencilFormat = GL_DEPTH24_STENCIL8;
-
-auto gl_max_samples() -> GLint {
-    static const GLint value = [] {
-        auto v = GLint {0};
-        glGetIntegerv(GL_MAX_SAMPLES, &v);
-        return v;
-    }();
-    return value;
-}
 
 }
 
@@ -58,7 +50,7 @@ struct GLSceneBuffer::Impl {
         }
 
         if (is_msaa) {
-            samples = std::min(samples, static_cast<int>(gl_max_samples()));
+            samples = std::min(samples, gl::limits().max_samples);
         }
 
         DeleteBuffers();

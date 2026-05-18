@@ -12,6 +12,7 @@
 
 #include "renderer/gl/gl_background_pass.hpp"
 #include "renderer/gl/gl_camera.hpp"
+#include "renderer/gl/gl_device.hpp"
 #include "renderer/gl/gl_framebuffers.hpp"
 #include "renderer/gl/gl_lights.hpp"
 #include "renderer/gl/gl_present_pass.hpp"
@@ -49,6 +50,14 @@ public:
 
     [[nodiscard]] auto RenderedObjectsPerFrame() const {
         return rendered_objects_per_frame_;
+    }
+
+    [[nodiscard]] auto GetLimits() const -> const Renderer::Limits& {
+        return gl::limits();
+    }
+
+    [[nodiscard]] auto GetDriverInfo() const -> const Renderer::DriverInfo& {
+        return gl::driver_info();
     }
 
     ~Impl();

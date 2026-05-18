@@ -44,6 +44,14 @@ auto Renderer::RenderedObjectsPerFrame() const -> size_t {
     return impl_->RenderedObjectsPerFrame();
 }
 
+auto Renderer::GetLimits() const -> const Limits& {
+    return impl_->GetLimits();
+}
+
+auto Renderer::GetDriverInfo() const -> const DriverInfo& {
+    return impl_->GetDriverInfo();
+}
+
 Renderer::~Renderer() = default;
 
 }

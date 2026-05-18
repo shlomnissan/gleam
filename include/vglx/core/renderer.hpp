@@ -65,6 +65,28 @@ public:
     };
 
     /**
+     * @brief Hardware limits reported by the rendering backend.
+     */
+    struct Limits {
+        float max_anisotropy {1.0f}; ///< Max anisotropy for texture sampling.
+        int max_samples {0}; ///< Max MSAA sample count.
+        int max_texture_units {0}; ///< Max texture units per shader.
+        int max_texture_size {0}; ///< Max 2D texture dimension.
+        int max_cube_map_size {0}; ///< Max cube map face dimension.
+        int max_renderbuffer_size {0}; ///< Max renderbuffer dimension.
+    };
+
+    /**
+     * @brief Driver and hardware identity strings reported by the rendering backend.
+     */
+    struct DriverInfo {
+        std::string vendor; ///< Driver vendor string.
+        std::string renderer; ///< Hardware renderer string.
+        std::string version; ///< Graphics API version string.
+        std::string glsl_version; ///< Shading language version string.
+    };
+
+    /**
      * @brief Constructs a renderer.
      *
      * GPU resources are not created until @ref Initialize is called.
@@ -135,6 +157,20 @@ public:
      * Intended for statistics overlays and debugging.
      */
     [[nodiscard]] auto RenderedObjectsPerFrame() const -> size_t;
+
+    /**
+     * @brief Returns hardware limits reported by the rendering backend.
+     *
+     * Must be called after @ref Initialize has succeeded.
+     */
+    [[nodiscard]] auto GetLimits() const -> const Limits&;
+
+    /**
+     * @brief Returns driver and hardware identity strings reported by the rendering backend.
+     *
+     * Must be called after @ref Initialize has succeeded.
+     */
+    [[nodiscard]] auto GetDriverInfo() const -> const DriverInfo&;
 
     /**
      * @brief Returns the color texture associated with an offscreen render target.
