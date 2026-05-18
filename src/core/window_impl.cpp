@@ -15,7 +15,6 @@
 
 #include <memory>
 #include <string>
-#include <thread>
 #include <utility>
 
 #ifdef VGLX_USE_IMGUI
@@ -82,7 +81,6 @@ auto Window::Impl::Initialize() -> std::expected<void, std::string> {
         return std::unexpected("Failed to initialize GLAD OpenGL loader");
     }
 
-    LogContextInfo();
     glfwSwapInterval(params_.vsync ? 1 : 0);
     glfwSetWindowUserPointer(window_, this);
     glfwGetFramebufferSize(window_, &framebuffer_width, &framebuffer_height);
@@ -150,25 +148,6 @@ auto Window::Impl::SetTitle(std::string_view title) -> void {
 
 auto Window::Impl::SetResizeCallback(ResizeCallback callback) -> void {
     resize_callback_ = std::move(callback);
-}
-
-auto Window::Impl::LogContextInfo() const -> void {
-    const auto getString = [](GLenum name) {
-        return reinterpret_cast<const char*>(glGetString(name));
-    };
-
-    const auto getInteger = [](GLenum name) {
-        GLint out {0};
-        glGetIntegerv(name, &out);
-        return out;
-    };
-
-    Logger::Log(LogLevel::Info, "Vendor: {}", getString(GL_VENDOR));
-    Logger::Log(LogLevel::Info, "Renderer: {}", getString(GL_RENDERER));
-    Logger::Log(LogLevel::Info, "Version: {}", getString(GL_VERSION));
-    Logger::Log(LogLevel::Info, "GLSL Version: {}", getString(GL_SHADING_LANGUAGE_VERSION));
-    Logger::Log(LogLevel::Info, "Sample Count: {}", getInteger(GL_SAMPLES));
-    Logger::Log(LogLevel::Info, "Hardware Threads: {}", std::thread::hardware_concurrency());
 }
 
 Window::Impl::~Impl() {

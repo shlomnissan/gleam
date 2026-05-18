@@ -64,8 +64,6 @@ private:
     ResizeCallback resize_callback_ {nullptr};
 
     bool should_close_ {false};
-
-    auto LogContextInfo() const -> void;
 };
 
 }

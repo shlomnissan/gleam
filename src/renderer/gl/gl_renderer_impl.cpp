@@ -44,6 +44,12 @@ Renderer::Impl::Impl(const Renderer::Parameters& params)
 }
 
 auto Renderer::Impl::Initialize() -> std::expected<void, std::string> {
+    const auto& info = gl::driver_info();
+    Logger::Log(LogLevel::Info, "Vendor: {}", info.vendor);
+    Logger::Log(LogLevel::Info, "Renderer: {}", info.renderer);
+    Logger::Log(LogLevel::Info, "Version: {}", info.version);
+    Logger::Log(LogLevel::Info, "GLSL Version: {}", info.glsl_version);
+
     if (auto result = scene_buffer_.Initialize(); !result.has_value()) {
         return std::unexpected(result.error());
     }
