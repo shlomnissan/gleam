@@ -11,10 +11,6 @@
 
 #include <print>
 
-#include <vglx/helpers.hpp>
-#include <vglx/loaders.hpp>
-#include <vglx/primitives.hpp>
-
 using namespace vglx;
 
 namespace {

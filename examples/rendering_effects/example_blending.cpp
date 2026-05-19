@@ -9,11 +9,6 @@
 
 #include "ui_helpers.hpp"
 
-#include <vglx/helpers.hpp>
-#include <vglx/lights.hpp>
-#include <vglx/primitives.hpp>
-#include <vglx/scene.hpp>
-
 using namespace vglx;
 
 ExampleBlending::ExampleBlending(Camera* camera) {

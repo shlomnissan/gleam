@@ -9,12 +9,6 @@
 
 #include "ui_helpers.hpp"
 
-#include <vglx/core.hpp>
-#include <vglx/helpers.hpp>
-#include <vglx/lights.hpp>
-#include <vglx/loaders.hpp>
-#include <vglx/primitives.hpp>
-
 #include <print>
 
 using namespace vglx;

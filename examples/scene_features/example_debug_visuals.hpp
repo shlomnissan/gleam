@@ -10,8 +10,7 @@
 #include <memory>
 #include <string>
 
-#include <vglx/helpers.hpp>
-#include <vglx/scene.hpp>
+#include <vglx/vglx.hpp>
 
 #include "example_scene.hpp"
 

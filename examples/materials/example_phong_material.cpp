@@ -11,13 +11,6 @@
 
 #include <print>
 
-#include <vglx/core.hpp>
-#include <vglx/helpers.hpp>
-#include <vglx/lights.hpp>
-#include <vglx/loaders.hpp>
-#include <vglx/primitives.hpp>
-#include <vglx/textures.hpp>
-
 #include <print>
 
 using namespace vglx;

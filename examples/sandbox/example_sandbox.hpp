@@ -9,8 +9,7 @@
 
 #include "example_scene.hpp"
 
-#include <vglx/core.hpp>
-#include <vglx/scene.hpp>
+#include <vglx/vglx.hpp>
 
 #include <memory>
 

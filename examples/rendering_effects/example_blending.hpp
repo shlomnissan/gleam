@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <vglx/materials.hpp>
+#include <vglx/vglx.hpp>
 
 #include <array>
 #include <memory>

@@ -7,10 +7,6 @@
 
 #include "example_sprite.hpp"
 
-#include <vglx/core.hpp>
-#include <vglx/helpers.hpp>
-#include <vglx/loaders.hpp>
-
 #include <print>
 
 using namespace vglx;

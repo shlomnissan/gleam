@@ -9,14 +9,6 @@
 
 #include <print>
 
-#include <vglx/helpers.hpp>
-#include <vglx/lights.hpp>
-#include <vglx/loaders.hpp>
-#include <vglx/materials.hpp>
-#include <vglx/math.hpp>
-#include <vglx/primitives.hpp>
-#include <vglx/textures.hpp>
-
 using namespace vglx;
 
 ExampleSandbox::ExampleSandbox(Camera* camera) {

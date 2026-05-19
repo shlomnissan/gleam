@@ -11,8 +11,7 @@
 
 #include <memory>
 
-#include <vglx/lights.hpp>
-#include <vglx/materials.hpp>
+#include <vglx/vglx.hpp>
 
 class ExamplePointLight : public ExampleScene {
 public:

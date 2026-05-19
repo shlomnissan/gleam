@@ -7,10 +7,7 @@
 
 #pragma once
 
-#include <vglx/core.hpp>
-#include <vglx/materials.hpp>
-#include <vglx/scene.hpp>
-#include <vglx/utilities.hpp>
+#include <vglx/vglx.hpp>
 
 #include <memory>
 

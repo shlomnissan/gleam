@@ -9,11 +9,6 @@
 
 #include "ui_helpers.hpp"
 
-#include <vglx/geometries.hpp>
-#include <vglx/helpers.hpp>
-#include <vglx/lights.hpp>
-#include <vglx/materials.hpp>
-
 using namespace vglx;
 using namespace vglx::math;
 
