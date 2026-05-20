@@ -45,19 +45,19 @@ public:
     /// @brief Emissive color added to the final shaded result, independent of lighting.
     Color emissive_color = 0x000000;
 
-    /// @brief Strength of the ambient occlusion contribution; 0 disables, 1 applies fully.
+    /// @brief Strength of the ambient occlusion contribution.
     float ao_intensity = 1.0f;
 
     /// @brief Scalar multiplier for emissive contribution.
     float emissive_intensity = 1.0f;
 
-    /// @brief Metallic factor; 0 for dielectrics, 1 for metals.
+    /// @brief Metallic factor.
     float metallic = 0.0f;
 
-    /// @brief Scalar multiplier for normal map perturbation; 0 disables, 1 applies fully.
+    /// @brief Scalar multiplier for normal map perturbation.
     float normal_intensity = 1.0f;
 
-    /// @brief Roughness factor; 0 produces sharp mirror reflections, 1 yields a fully rough surface.
+    /// @brief Roughness factor.
     float roughness = 1.0f;
 
     /// @brief Alpha map defining per-pixel opacity.

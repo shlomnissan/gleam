@@ -11,6 +11,7 @@
 
 #include "vglx/materials/material.hpp"
 #include "vglx/math/color.hpp"
+#include "vglx/textures/cube_texture.hpp"
 #include "vglx/textures/texture_2d.hpp"
 
 #include <memory>
@@ -47,7 +48,7 @@ public:
     /// @brief Emissive color added to the final shaded result, independent of lighting.
     Color emissive_color = 0x000000;
 
-    /// @brief Strength of the ambient occlusion contribution; 0 disables, 1 applies fully.
+    /// @brief Strength of the ambient occlusion contribution.
     float ao_intensity = 1.0f;
 
     /// @brief Controls the glossiness of highlights; higher values yield sharper specular peaks.
@@ -56,8 +57,11 @@ public:
     /// @brief Scalar multiplier for emissive contribution.
     float emissive_intensity = 1.0f;
 
-    /// @brief Scalar multiplier for normal map perturbation; 0 disables, 1 applies fully.
+    /// @brief Scalar multiplier for normal map perturbation.
     float normal_intensity = 1.0f;
+
+    /// @brief Strength of the environment map reflection contribution.
+    float reflectivity = 1.0f;
 
     /// @brief Albedo (diffuse) map defining base color and optional alpha channel.
     std::shared_ptr<Texture> albedo_map = nullptr;
@@ -70,6 +74,9 @@ public:
 
     /// @brief Emissive map modulating the emissive color per texel.
     std::shared_ptr<Texture> emissive_map = nullptr;
+
+    /// @brief Environment cube map sampled for reflection contribution.
+    std::shared_ptr<CubeTexture> environment_map = nullptr;
 
     /// @brief Normal map for per-pixel surface detail and lighting variation.
     std::shared_ptr<Texture> normal_map = nullptr;
