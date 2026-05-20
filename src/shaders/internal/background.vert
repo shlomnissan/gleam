@@ -16,5 +16,6 @@ void main() {
     );
 
     v_TexCoords = uvs[gl_VertexID];
-    gl_Position = vec4(positions[gl_VertexID], 0.0, 1.0);
+    // z = 1.0 puts depth at the far plane so opaque fragments occlude the background
+    gl_Position = vec4(positions[gl_VertexID], 1.0, 1.0);
 }
