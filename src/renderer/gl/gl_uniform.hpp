@@ -34,16 +34,17 @@ enum class UniformType {
 };
 
 enum class Uniform {
+    AOIntensity,
+    AOMap,
     AlbedoMap,
     AlphaMap,
     AmbientLight,
     Anchor,
-    AOIntensity,
-    AOMap,
     Color,
     EmissiveColor,
     EmissiveIntensity,
     EmissiveMap,
+    EnvironmentMap,
     FogColor,
     FogDensity,
     FogFar,
@@ -60,6 +61,7 @@ enum class Uniform {
     NormalIntensity,
     NormalMap,
     Opacity,
+    Reflectivity,
     Resolution,
     Rotation,
     RoughnessMap,
@@ -71,16 +73,17 @@ enum class Uniform {
 
 constexpr auto get_uniform_loc(std::string_view str) {
     using enum Uniform;
+    if (str == "u_AOIntensity") return static_cast<int>(AOIntensity);
+    if (str == "u_AOMap") return static_cast<int>(AOMap);
     if (str == "u_AlbedoMap") return static_cast<int>(AlbedoMap);
     if (str == "u_AlphaMap") return static_cast<int>(AlphaMap);
     if (str == "u_AmbientLight") return static_cast<int>(AmbientLight);
     if (str == "u_Anchor") return static_cast<int>(Anchor);
-    if (str == "u_AOIntensity") return static_cast<int>(AOIntensity);
-    if (str == "u_AOMap") return static_cast<int>(AOMap);
     if (str == "u_Color") return static_cast<int>(Color);
     if (str == "u_EmissiveColor") return static_cast<int>(EmissiveColor);
     if (str == "u_EmissiveIntensity") return static_cast<int>(EmissiveIntensity);
     if (str == "u_EmissiveMap") return static_cast<int>(EmissiveMap);
+    if (str == "u_EnvironmentMap") return static_cast<int>(EnvironmentMap);
     if (str == "u_Fog.Color") return static_cast<int>(FogColor);
     if (str == "u_Fog.Density") return static_cast<int>(FogDensity);
     if (str == "u_Fog.Far") return static_cast<int>(FogFar);
@@ -97,6 +100,7 @@ constexpr auto get_uniform_loc(std::string_view str) {
     if (str == "u_NormalIntensity") return static_cast<int>(NormalIntensity);
     if (str == "u_NormalMap") return static_cast<int>(NormalMap);
     if (str == "u_Opacity") return static_cast<int>(Opacity);
+    if (str == "u_Reflectivity") return static_cast<int>(Reflectivity);
     if (str == "u_Resolution") return static_cast<int>(Resolution);
     if (str == "u_Rotation") return static_cast<int>(Rotation);
     if (str == "u_RoughnessMap") return static_cast<int>(RoughnessMap);

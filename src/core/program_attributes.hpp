@@ -45,6 +45,7 @@ struct ProgramAttributes {
     bool alpha_map {false};
     bool ao_map {false};
     bool emissive_map {false};
+    bool environment_map {false};
     bool metallic_map {false};
     bool normal_map {false};
     bool roughness_map {false};

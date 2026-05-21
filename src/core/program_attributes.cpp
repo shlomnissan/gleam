@@ -46,9 +46,10 @@ ProgramAttributes::ProgramAttributes(
         albedo_map = m->albedo_map != nullptr;
         alpha_map = m->alpha_map != nullptr;
         ao_map = m->ao_map != nullptr;
+        emissive_map = m->emissive_map != nullptr;
+        environment_map = m->environment_map != nullptr;
         normal_map = m->normal_map != nullptr;
         specular_map = m->specular_map != nullptr;
-        emissive_map = m->emissive_map != nullptr;
     }
 
     auto shader_material_id = 0;
@@ -84,26 +85,27 @@ ProgramAttributes::ProgramAttributes(
     static_assert(std::to_underlying(Material::Type::Length) <= 15);
 
     key |= (std::to_underlying(type) & 0xF); // (0–15) → 4 bits
-    key |= (color ? 1 : 0)  << 4; // 1 bit
-    key |= (flat_shaded ? 1 : 0) << 9; // 1 bit
-    key |= (fog ? 1 : 0) << 10; // 1 bit
+    key |= (color ? 1ULL : 0ULL)  << 4; // 1 bit
+    key |= (flat_shaded ? 1ULL : 0ULL) << 9; // 1 bit
+    key |= (fog ? 1ULL : 0ULL) << 10; // 1 bit
     key |= (lights.directional & 0xF) << 5; // (0–15) → 4 bits
     key |= (lights.point & 0xF) << 11; // (0–15) → 4 bits
     key |= (lights.spot & 0xF) << 15; // (0–15) → 4 bits
-    key |= (albedo_map ? 1 : 0) << 19; // 1 bit
-    key |= (alpha_map ? 1 : 0) << 20; // 1 bit
-    key |= (normal_map ? 1 : 0) << 21; // 1 bit
-    key |= (emissive_map ? 1 : 0) << 22; // 1 bit
-    key |= (two_sided ? 1 : 0) << 23; // 1 bit
-    key |= (instancing ? 1 : 0) << 24; // 1 bit
-    key |= (vertex_color ? 1 : 0) << 25; // 1 bit
-    key |= (tangent ? 1 : 0) << 26; // 1 bit
-    key |= (specular_map ? 1 : 0) << 27; // 1 bit
-    key |= (texture_map ? 1 : 0) << 28; // 1 bit
-    key |= (size_attenuation ? 1 : 0) << 29; // 1 bit
+    key |= (albedo_map ? 1ULL : 0ULL) << 19; // 1 bit
+    key |= (alpha_map ? 1ULL : 0ULL) << 20; // 1 bit
+    key |= (normal_map ? 1ULL : 0ULL) << 21; // 1 bit
+    key |= (emissive_map ? 1ULL : 0ULL) << 22; // 1 bit
+    key |= (two_sided ? 1ULL : 0ULL) << 23; // 1 bit
+    key |= (instancing ? 1ULL : 0ULL) << 24; // 1 bit
+    key |= (vertex_color ? 1ULL : 0ULL) << 25; // 1 bit
+    key |= (tangent ? 1ULL : 0ULL) << 26; // 1 bit
+    key |= (specular_map ? 1ULL : 0ULL) << 27; // 1 bit
+    key |= (texture_map ? 1ULL : 0ULL) << 28; // 1 bit
+    key |= (size_attenuation ? 1ULL : 0ULL) << 29; // 1 bit
     key |= (metallic_map ? 1ULL : 0ULL) << 30; // 1 bit
     key |= (roughness_map ? 1ULL : 0ULL) << 31; // 1 bit
     key |= (ao_map ? 1ULL : 0ULL) << 32; // 1 bit
+    key |= (environment_map ? 1ULL : 0ULL) << 33; // 1 bit
 
     if (type == Material::Type::ShaderMaterial) {
         math::HashCombine(key, shader_material_id);

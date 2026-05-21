@@ -196,6 +196,9 @@ auto Renderer::Impl::SetUniforms(
             case GLTextureMapType::EmissiveMap:
                 program->SetUniform(Uniform::EmissiveMap, &type);
                 break;
+            case GLTextureMapType::EnvironmentMap:
+                program->SetUniform(Uniform::EnvironmentMap, &type);
+                break;
             case GLTextureMapType::MetallicMap:
                 program->SetUniform(Uniform::MetallicMap, &type);
                 break;
@@ -286,6 +289,10 @@ auto Renderer::Impl::SetUniforms(
         }
         if (attrs->emissive_map) {
             bind_texture(GLTextureMapType::EmissiveMap, m->emissive_map);
+        }
+        if (attrs->environment_map) {
+            bind_texture(GLTextureMapType::EnvironmentMap, m->environment_map);
+            program->SetUniform(Uniform::Reflectivity, &m->reflectivity);
         }
         if (attrs->normal_map) {
             bind_texture(GLTextureMapType::NormalMap, m->normal_map);

@@ -28,6 +28,7 @@ enum class GLTextureMapType {
     MetallicMap = 6,
     RoughnessMap = 7,
     AOMap = 8,
+    EnvironmentMap = 9,
     Reserved
 };
 

@@ -119,6 +119,7 @@ auto ShaderLibrary::InjectAttributes(
     if (attrs.alpha_map) features += "#define USE_ALPHA_MAP\n";
     if (attrs.ao_map) features += "#define USE_AO_MAP\n";
     if (attrs.emissive_map) features += "#define USE_EMISSIVE_MAP\n";
+    if (attrs.environment_map) features += "#define USE_ENVIRONMENT_MAP\n";
     if (attrs.metallic_map) features += "#define USE_METALLIC_MAP\n";
     if (attrs.normal_map && attrs.tangent) features += "#define USE_NORMAL_MAP\n";
     if (attrs.roughness_map) features += "#define USE_ROUGHNESS_MAP\n";
