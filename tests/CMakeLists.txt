@@ -22,18 +22,12 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/src)
 include_directories(${CMAKE_CURRENT_LIST_DIR})
 
-foreach(TEST IN LISTS TEST_SOURCES)
-    get_filename_component(FILE_NAME ${TEST} NAME)
-    string(REGEX REPLACE "\\.[^.]*$" "" NAME_NO_EXT ${FILE_NAME})
-    message(STATUS "🧪 Adding test ${FILE_NAME}")
+add_executable(run_tests ${TEST_SOURCES} test_helpers.hpp)
 
-    set(TEST_TARGET run_${NAME_NO_EXT})
-    add_executable(${TEST_TARGET} test_helpers.hpp ${TEST})
+target_compile_definitions(run_tests PRIVATE
+    ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets"
+)
 
-    target_compile_definitions(${TEST_TARGET} PRIVATE
-        ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets"
-    )
+target_link_libraries(run_tests PRIVATE GTest::gtest_main GTest::gmock vglx)
 
-    target_link_libraries(${TEST_TARGET} PRIVATE GTest::gtest_main GTest::gmock vglx)
-    add_test(${NAME_NO_EXT} ${TEST_TARGET})
-endforeach()
+add_test(vglx_tests run_tests)

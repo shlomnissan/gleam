@@ -27,7 +27,7 @@ TEST(Box3, DefaultConstructor) {
     static_assert(box.max == std::numeric_limits<float>::lowest());
 }
 
-TEST(Vector3, ConstructorParameterized) {
+TEST(Box3, ConstructorParameterized) {
     constexpr auto box = vglx::Box3 {
         {-1.0f, -1.0f, -1.0f},
         {1.0f, 1.0f, 1.0f}

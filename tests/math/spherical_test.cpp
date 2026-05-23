@@ -15,7 +15,7 @@
 
 #pragma region Constructors
 
-TEST(Sphere, DefaultConstructor) {
+TEST(Spherical, DefaultConstructor) {
     constexpr auto phi = vglx::math::DegToRad(45.0f);
     constexpr auto theta = vglx::math::DegToRad(90.0f);
     constexpr auto s = vglx::Spherical {2.5f, phi, theta};
