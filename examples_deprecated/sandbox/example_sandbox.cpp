@@ -50,4 +50,3 @@ ExampleSandbox::ExampleSandbox(Camera* camera) {
         std::println(stderr, "{}", texture.error());
     }
 }
-
