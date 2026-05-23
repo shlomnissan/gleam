@@ -22,12 +22,12 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/src)
 include_directories(${CMAKE_CURRENT_LIST_DIR})
 
-add_executable(run_tests ${TEST_SOURCES} test_helpers.hpp)
+add_executable(run_unit_tests ${TEST_SOURCES} test_helpers.hpp)
 
-target_compile_definitions(run_tests PRIVATE
+target_compile_definitions(run_unit_tests PRIVATE
     ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets"
 )
 
-target_link_libraries(run_tests PRIVATE GTest::gtest_main GTest::gmock vglx)
+target_link_libraries(run_unit_tests PRIVATE GTest::gtest_main GTest::gmock vglx)
 
-add_test(vglx_tests run_tests)
+add_test(vglx_tests run_unit_tests)
