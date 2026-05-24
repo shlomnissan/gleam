@@ -19,5 +19,5 @@ foreach(SCENE IN LISTS SCENES)
         ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets"
     )
 
-    target_link_libraries(${TARGET} PRIVATE example_runner)
+    target_link_libraries(${TARGET} PRIVATE example_runner vglx)
 endforeach()
