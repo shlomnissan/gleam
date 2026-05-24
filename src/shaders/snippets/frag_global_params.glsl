@@ -31,3 +31,8 @@ in vec4 v_Position;
 
 uniform float u_Opacity;
 uniform vec3 u_Color;
+
+layout(std140) uniform ub_Camera {
+    mat4 u_Projection;
+    mat4 u_View;
+};

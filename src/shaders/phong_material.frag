@@ -11,6 +11,11 @@
     in mat3 v_TBN;
 #endif
 
+#ifdef USE_ENVIRONMENT_MAP
+    uniform samplerCube u_EnvironmentMap;
+    uniform float u_Reflectivity;
+#endif
+
 struct PhongMaterial {
     vec3 DiffuseColor;
     vec3 SpecularColor;
@@ -36,6 +41,7 @@ vec3 phongShading(
     const in vec3 light_dir,
     const in vec3 light_color,
     const in vec3 normal,
+    const in vec3 view_dir,
     const in vec3 diffuse_color,
     const in float specular_factor
 ) {
@@ -46,7 +52,7 @@ vec3 phongShading(
     // and no light contribution should be calculated, so we skip specular calculation.
     vec3 specular = vec3(0.0);
     if (diffuse_factor > 0.0) {
-        vec3 halfway = normalize(light_dir + v_ViewDir);
+        vec3 halfway = normalize(light_dir + view_dir);
         specular = light_color * (u_Material.SpecularColor * specular_factor) *
                    pow(max(dot(halfway, normal), 0.0), max(u_Material.Shininess, 1.0));
     }
@@ -81,6 +87,7 @@ float attenuation(in float dist, in Light light) {
 
 vec3 processLights(
     const in vec3 normal,
+    const in vec3 view_dir,
     const in vec3 diffuse_color,
     const in float specular_factor
 ) {
@@ -93,6 +100,7 @@ vec3 processLights(
                 light.Direction,
                 light.Color,
                 normal,
+                view_dir,
                 diffuse_color,
                 specular_factor
             );
@@ -105,6 +113,7 @@ vec3 processLights(
                 light_dir,
                 light.Color,
                 normal,
+                view_dir,
                 diffuse_color,
                 specular_factor
             );
@@ -120,6 +129,7 @@ vec3 processLights(
                     light_dir,
                     spot_color,
                     normal,
+                    view_dir,
                     diffuse_color,
                     specular_factor
                 );
@@ -132,6 +142,8 @@ vec3 processLights(
 #endif
 
 void main() {
+    vec3 view_dir = normalize(v_ViewDir);
+
     #ifdef USE_FLAT_SHADED
         vec3 fdx = dFdx(v_Position.xyz);
         vec3 fdy = dFdy(v_Position.xyz);
@@ -185,7 +197,7 @@ void main() {
 
     vec3 output_color = diffuse_color * u_AmbientLight * ao;
     #if NUM_LIGHTS > 0
-        output_color += processLights(normal, diffuse_color, specular_factor);
+        output_color += processLights(normal, view_dir, diffuse_color, specular_factor);
     #endif
 
     vec3 emissive = u_EmissiveColor;
@@ -195,6 +207,13 @@ void main() {
 
     emissive *= u_EmissiveIntensity;
     output_color += emissive;
+
+    #ifdef USE_ENVIRONMENT_MAP
+        vec3 view_reflect = reflect(-view_dir, normal);
+        vec3 world_reflect = transpose(mat3(u_View)) * view_reflect;
+        vec3 environment_color = texture(u_EnvironmentMap, world_reflect).rgb;
+        output_color = mix(output_color, environment_color, u_Reflectivity);
+    #endif
 
     #ifdef USE_FOG
         applyFog(output_color, v_ViewDepth);

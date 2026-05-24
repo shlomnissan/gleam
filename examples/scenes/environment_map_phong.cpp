@@ -17,7 +17,7 @@ auto GetCamera() {
         .far = 1000.0f
     });
 
-    camera->TranslateZ(3.0f);
+    camera->TranslateZ(5.0f);
 
     return camera;
 }
@@ -48,7 +48,7 @@ auto GetScene() {
 
     auto material = vglx::PhongMaterial::Create({0xFFFFFF});
     material->environment_map = env_map.value();
-    material->reflectivity = 0.5f;
+    material->reflectivity = 0.7f;
 
     scene->Add(vglx::Mesh::Create(geometry, material));
 
