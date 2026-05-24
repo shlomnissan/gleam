@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <string_view>
+#include <string>
 
 #include <vglx/vglx.hpp>
 
@@ -15,4 +15,9 @@ constexpr int kWindowWidth = 1024;
 constexpr int kWindowHeight = 768;
 constexpr int kSampleCount = 4;
 
-auto RunExample(vglx::Scene* scene, vglx::Camera* camera, std::string_view window_title) -> int;
+struct ExampleSettings {
+    std::string window_title = "Example";
+    vglx::Color clear_color = 0x000000;
+};
+
+auto RunExample(vglx::Scene* scene, vglx::Camera* camera, const ExampleSettings& settings) -> int;

@@ -5,9 +5,11 @@
 ===========================================================================
 */
 
-#include "example_runner.hpp"
-
+#include <expected>
 #include <print>
+#include <string>
+
+#include "example_runner.hpp"
 
 auto GetCamera() {
     auto camera = vglx::PerspectiveCamera::Create({
@@ -22,7 +24,7 @@ auto GetCamera() {
     return camera;
 }
 
-auto GetScene() {
+auto GetScene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
     auto scene = vglx::Scene::Create();
 
     auto env_map = vglx::LoadCubeTexture({
@@ -34,12 +36,11 @@ auto GetScene() {
         .negative_z = ASSETS_DIR "/skybox/negative_z.jpg",
     });
 
-    if (env_map.has_value()) {
-        scene->background = env_map.value();
-    } else {
-        std::print(stderr, "{}", env_map.error());
-        return std::unique_ptr<vglx::Scene>(nullptr);
+    if (!env_map.has_value()) {
+        return std::unexpected(env_map.error());
     }
+
+    scene->background = *env_map;
 
     auto geometry = vglx::SphereGeometry::Create({
         .width_segments = 64,
@@ -47,7 +48,7 @@ auto GetScene() {
     });
 
     auto material = vglx::PhongMaterial::Create({0xFFFFFF});
-    material->environment_map = env_map.value();
+    material->environment_map = *env_map;
     material->reflectivity = 0.7f;
 
     scene->Add(vglx::Mesh::Create(geometry, material));
@@ -77,11 +78,13 @@ auto GetScene() {
 
 auto main() -> int {
     auto camera = GetCamera();
-
     auto scene = GetScene();
-    if (scene == nullptr) {
+    if (!scene.has_value()) {
+        std::print(stderr, "{}", scene.error());
         return 1;
     }
 
-    return RunExample(scene.get(), camera.get(), "Environment Map Phong");
+    return RunExample(scene->get(), camera.get(), {
+        .window_title = "Environment Map Phong"
+    });
 }

@@ -8,11 +8,10 @@
 #include "example_runner.hpp"
 
 #include <print>
-#include <string>
 
-auto RunExample(vglx::Scene* scene, vglx::Camera* camera, std::string_view window_title) -> int {
+auto RunExample(vglx::Scene* scene, vglx::Camera* camera, const ExampleSettings& settings) -> int {
     auto window = vglx::Window {{
-        .title = std::string(window_title),
+        .title = settings.window_title,
         .width = kWindowWidth,
         .height = kWindowHeight,
         .vsync = true
@@ -27,7 +26,7 @@ auto RunExample(vglx::Scene* scene, vglx::Camera* camera, std::string_view windo
         .framebuffer_width = window.FramebufferWidth(),
         .framebuffer_height = window.FramebufferHeight(),
         .sample_count = kSampleCount,
-        .clear_color = 0x000000
+        .clear_color = settings.clear_color
     }};
 
     if (auto result = renderer.Initialize(); !result.has_value()) {
