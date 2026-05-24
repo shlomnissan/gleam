@@ -79,7 +79,6 @@ public:
         std::string title; ///< Window title.
         int width; ///< Client-area width in pixels.
         int height; ///< Client-area height in pixels.
-        int sample_count; ///< Anti-aliasing sample count (hint).
         bool vsync; ///< Enable or disable vertical sync.
     };
 
@@ -182,11 +181,6 @@ public:
      * @brief Returns the aspect ratio (width / height).
      */
     [[nodiscard]] auto AspectRatio() const -> float;
-
-    /**
-     * @brief Returns the resolved anti-aliasing sample count.
-     */
-    [[nodiscard]] auto SampleCount() const -> int;
 
     /**
      * @brief Updates the window title.

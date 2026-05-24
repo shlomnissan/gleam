@@ -26,7 +26,6 @@ auto main() -> int {
         .title = "Examples (Direct Initialization)",
         .width = kWindowWidth,
         .height = kWindowHeight,
-        .sample_count = kSampleCount,
         .vsync = true
     }};
 

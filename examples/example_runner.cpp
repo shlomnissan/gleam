@@ -15,7 +15,6 @@ auto RunExample(vglx::Scene* scene, vglx::Camera* camera, std::string_view windo
         .title = std::string(window_title),
         .width = kWindowWidth,
         .height = kWindowHeight,
-        .sample_count = kSampleCount,
         .vsync = true
     }};
 
@@ -27,7 +26,7 @@ auto RunExample(vglx::Scene* scene, vglx::Camera* camera, std::string_view windo
     auto renderer = vglx::Renderer {{
         .framebuffer_width = window.FramebufferWidth(),
         .framebuffer_height = window.FramebufferHeight(),
-        .sample_count = window.SampleCount(),
+        .sample_count = kSampleCount,
         .clear_color = 0x000000
     }};
 

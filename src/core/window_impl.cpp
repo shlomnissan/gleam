@@ -46,10 +46,6 @@ auto Window::Impl::Initialize() -> std::expected<void, std::string> {
         return std::unexpected("Failed to initialize GLFW " + glfw_get_error());
     }
 
-    if (params_.sample_count == 1) {
-        params_.sample_count = 0;
-    }
-
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
@@ -58,7 +54,6 @@ auto Window::Impl::Initialize() -> std::expected<void, std::string> {
     glfwWindowHint(GLFW_ALPHA_BITS, 8);
     glfwWindowHint(GLFW_DEPTH_BITS, 24);
     glfwWindowHint(GLFW_STENCIL_BITS, 8);
-    glfwWindowHint(GLFW_SAMPLES, params_.sample_count);
 
     #ifdef __APPLE__
         glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_TRUE);
@@ -96,15 +91,6 @@ auto Window::Impl::Initialize() -> std::expected<void, std::string> {
 #ifdef VGLX_USE_IMGUI
     imgui_initialize(window_);
 #endif
-
-    glGetIntegerv(GL_SAMPLES, &sample_count);
-    if (sample_count != params_.sample_count) {
-        Logger::Log(
-            LogLevel::Warning, "Sample count mismatch "
-            "(request: {}, received: {}).",
-            params_.sample_count, sample_count
-        );
-    }
 
     return {};
 }

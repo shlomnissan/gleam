@@ -49,6 +49,7 @@ struct GLSceneBuffer::Impl {
             return std::unexpected("Scene buffer invalid size");
         }
 
+        const auto requested_samples = samples;
         if (is_msaa) {
             samples = std::min(samples, gl::limits().max_samples);
         }
@@ -91,7 +92,7 @@ struct GLSceneBuffer::Impl {
             return std::unexpected("Failed to create a scene buffer");
         }
 
-        return is_msaa ? InitWithMSAA() : InitWithoutMSAA();
+        return is_msaa ? InitWithMSAA(requested_samples) : InitWithoutMSAA();
     }
 
     auto InitWithoutMSAA() -> std::expected<void, std::string> {
@@ -125,7 +126,7 @@ struct GLSceneBuffer::Impl {
         return {};
     }
 
-    auto InitWithMSAA() -> std::expected<void, std::string> {
+    auto InitWithMSAA(int requested_samples) -> std::expected<void, std::string> {
         glGenFramebuffers(1, &msaa_fbo);
         glBindFramebuffer(GL_FRAMEBUFFER, msaa_fbo);
 
@@ -138,6 +139,15 @@ struct GLSceneBuffer::Impl {
             width,
             height
         );
+
+        glGetRenderbufferParameteriv(GL_RENDERBUFFER, GL_RENDERBUFFER_SAMPLES, &samples);
+        if (requested_samples != samples) {
+            Logger::Log(
+                LogLevel::Warning, "Sample count mismatch "
+                "(requested: {}, resolved: {}).",
+                requested_samples, samples
+            );
+        }
 
         glFramebufferRenderbuffer(
             GL_FRAMEBUFFER,

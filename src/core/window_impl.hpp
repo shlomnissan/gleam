@@ -26,7 +26,6 @@ public:
     int framebuffer_height {0};
     int window_width {0};
     int window_height {0};
-    int sample_count {0};
 
     bool did_resize {false};
 
