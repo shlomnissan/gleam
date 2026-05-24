@@ -97,6 +97,15 @@ auto Window::Impl::Initialize() -> std::expected<void, std::string> {
     imgui_initialize(window_);
 #endif
 
+    glGetIntegerv(GL_SAMPLES, &sample_count);
+    if (sample_count != params_.sample_count) {
+        Logger::Log(
+            LogLevel::Warning, "Sample count mismatch "
+            "(request: {}, received: {}).",
+            params_.sample_count, sample_count
+        );
+    }
+
     return {};
 }
 

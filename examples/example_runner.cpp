@@ -27,7 +27,7 @@ auto RunExample(vglx::Scene* scene, vglx::Camera* camera, std::string_view windo
     auto renderer = vglx::Renderer {{
         .framebuffer_width = window.FramebufferWidth(),
         .framebuffer_height = window.FramebufferHeight(),
-        .sample_count = kSampleCount,
+        .sample_count = window.SampleCount(),
         .clear_color = 0x000000
     }};
 
