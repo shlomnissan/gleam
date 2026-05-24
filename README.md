@@ -59,7 +59,8 @@ auto main() -> int {
     auto window = Window {{
         .title = "Hello VGLX",
         .width = 1280,
-        .height = 720
+        .height = 720,
+        .vsync = true
     }};
 
     if (auto result = window.Initialize(); !result.has_value()) {
@@ -69,7 +70,8 @@ auto main() -> int {
 
     auto renderer = Renderer {{
         .framebuffer_width = window.FramebufferWidth(),
-        .framebuffer_height = window.FramebufferHeight()
+        .framebuffer_height = window.FramebufferHeight(),
+        .sample_count = 4,
     }};
 
     if (auto result = renderer.Initialize(); !result.has_value()) {

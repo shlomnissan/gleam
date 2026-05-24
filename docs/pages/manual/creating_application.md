@@ -92,7 +92,6 @@ auto main() -> int {
         .title = "Hello VGLX",
         .width = 1280,
         .height = 720,
-        .sample_count = 4,
         .vsync = true
     }};
 
@@ -302,7 +301,6 @@ auto main() -> int {
         .title = "Hello VGLX",
         .width = 1280,
         .height = 720,
-        .sample_count = 4,
         .vsync = true
     }};
     if (auto result = window.Initialize(); !result.has_value()) {
