@@ -308,12 +308,12 @@ auto Renderer::Impl::SetUniforms(
     if (attrs->type == Material::Type::ShaderMaterial) {
         auto m = static_cast<ShaderMaterial*>(material);
         for (const auto& [name, value] : m->uniforms_) {
-            program->SetUnknownUniform(name, &value);
+            program->SetUniform(name, &value);
         }
         for (const auto& [name, tex] : m->textures_) {
             const int tex_unit = kReservedTextureUnits + next_texture_unit_++;
             textures_.Bind(tex, tex_unit);
-            program->SetUnknownUniform(name, &tex_unit);
+            program->SetUniform(name, &tex_unit);
 
             if (tex->GetType() == Texture::Type::Texture2D) {
                 const auto& transform = static_cast<Texture2D*>(tex.get())->GetTransform();

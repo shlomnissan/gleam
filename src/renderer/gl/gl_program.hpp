@@ -42,7 +42,7 @@ public:
 
     auto Id() const { return program_; }
 
-    auto SetUnknownUniform(const std::string& name, const void* v) -> void;
+    auto SetUniform(const std::string& name, const void* v) -> void;
 
     auto SetUniform(Uniform uniform, const void* v) -> void;
 

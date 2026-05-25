@@ -59,8 +59,8 @@ public:
      * @brief Tone mapping operator applied to the final HDR frame before display.
      */
     enum class ToneMapping {
-        None, ///< No tone mapping; HDR values are clamped to [0, 1].
-        ACESFilmic ///< ACES filmic curve; compresses highlights and preserves shadows.
+        None, ///< No tone mapping. HDR values are clamped to [0, 1].
+        ACESFilmic ///< ACES filmic curve. Compresses highlights and preserves shadows.
     };
 
     /// @brief Parameters for constructing a @ref Renderer object.

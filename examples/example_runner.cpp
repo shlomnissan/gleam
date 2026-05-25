@@ -26,7 +26,9 @@ auto RunExample(vglx::Scene* scene, vglx::Camera* camera, const ExampleSettings&
         .framebuffer_width = window.FramebufferWidth(),
         .framebuffer_height = window.FramebufferHeight(),
         .sample_count = kSampleCount,
-        .clear_color = settings.clear_color
+        .clear_color = settings.clear_color,
+        .tone_mapping = settings.tone_mapping,
+        .exposure = settings.exposure
     }};
 
     if (auto result = renderer.Initialize(); !result.has_value()) {

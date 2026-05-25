@@ -46,7 +46,13 @@ auto GLPresentPass::Present(
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, scene_buffer.GetResolvedColorTexture());
 
-    // TODO: set tone mapping and exposure uniforms
+    const int resolved_texture_unit = 0;
+    const int tm = static_cast<int>(tone_mapping);
+
+    program_->SetUniform("u_ResolvedTexture", &resolved_texture_unit);
+    program_->SetUniform("u_ToneMapping", &tm);
+    program_->SetUniform("u_Exposure", &exposure);
+    program_->UpdateUniforms();
 
     glBindVertexArray(vao_);
     glDrawArrays(GL_TRIANGLES, 0, 3);

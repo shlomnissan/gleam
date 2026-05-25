@@ -125,7 +125,7 @@ private:
 
     UniformType type_;
 
-    bool needs_upload_ {false};
+    bool needs_upload_ {true};
 
     union {
         GLboolean b;
@@ -136,7 +136,7 @@ private:
         Vector2 v2;
         Vector3 v3;
         Vector4 v4;
-    } data_;
+    } data_ {};
 };
 
 }

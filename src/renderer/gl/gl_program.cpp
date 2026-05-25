@@ -79,7 +79,7 @@ auto GLProgram::UpdateUniforms() -> void {
     }
 }
 
-auto GLProgram::SetUnknownUniform(const std::string& name, const void* v) -> void {
+auto GLProgram::SetUniform(const std::string& name, const void* v) -> void {
     unknown_uniforms_.at(name).SetValue(v);
 }
 

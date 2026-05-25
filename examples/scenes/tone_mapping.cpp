@@ -71,6 +71,7 @@ auto main() -> int {
 
     return RunExample(scene.get(), camera.get(), {
         .window_title = "Tone Mapping",
-        .clear_color = 0x000000
+        .clear_color = 0x000000,
+        .tone_mapping = vglx::Renderer::ToneMapping::None
     });
 }
