@@ -70,7 +70,7 @@ GLProgram::GLProgram(const std::vector<ShaderInfo>& shaders) {
 }
 
 auto GLProgram::UpdateUniforms() -> void {
-    for (auto& [_, uniform] : unknown_uniforms_) {
+    for (auto& [_, uniform] : named_uniforms_) {
         uniform.UploadIfNeeded();
     }
 
@@ -80,7 +80,12 @@ auto GLProgram::UpdateUniforms() -> void {
 }
 
 auto GLProgram::SetUniform(const std::string& name, const void* v) -> void {
-    unknown_uniforms_.at(name).SetValue(v);
+    auto it = named_uniforms_.find(name);
+    if (it == named_uniforms_.end()) {
+        Logger::Log(LogLevel::Warning, "Unknown uniform {}", name);
+        return;
+    }
+    it->second.SetValue(v);
 }
 
 auto GLProgram::SetUniform(Uniform uniform, const void* v) -> void {
@@ -137,7 +142,7 @@ auto GLProgram::ProcessUniforms() -> void {
         if (idx != -1) {
             uniforms_[idx] = std::make_unique<GLUniform>(name, GetUniformLoc(name), type);
         } else {
-            unknown_uniforms_.try_emplace(name, name, GetUniformLoc(name), type);
+            named_uniforms_.try_emplace(name, name, GetUniformLoc(name), type);
         }
     }
 }

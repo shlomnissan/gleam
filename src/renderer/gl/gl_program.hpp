@@ -51,7 +51,7 @@ public:
     ~GLProgram();
 
 private:
-    std::unordered_map<std::string, GLUniform> unknown_uniforms_ {};
+    std::unordered_map<std::string, GLUniform> named_uniforms_ {};
 
     std::array<std::unique_ptr<GLUniform>, uniforms_len> uniforms_ {nullptr};
 

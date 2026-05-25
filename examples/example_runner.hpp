@@ -15,8 +15,6 @@ constexpr int kWindowWidth = 1024;
 constexpr int kWindowHeight = 768;
 constexpr int kSampleCount = 4;
 
-using enum vglx::Renderer::ToneMapping;
-
 struct ExampleSettings {
     std::string window_title = "Example";
     vglx::Color clear_color = 0x000000;
