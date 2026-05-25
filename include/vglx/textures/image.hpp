@@ -9,6 +9,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <variant>
 #include <vector>
 
 namespace vglx {
@@ -18,8 +19,9 @@ namespace vglx {
  *
  * An image holds raw pixel data along with its dimensions. Images are
  * typically loaded using an image loader and shared between
- * texture instances. To learn more see the
- * [Importing Assets Guide](/manual/importing_assets).
+ * texture instances. Pixel data is stored as either 8-bit bytes for
+ * standard LDR images, or 32-bit floats for HDR images. To learn more
+ * see the [Importing Assets Guide](/manual/importing_assets).
  *
  * @code
  * auto image = vglx::LoadImage("assets/heightmap.png");
@@ -38,11 +40,14 @@ namespace vglx {
  * @ingroup TexturesGroup
  */
 struct Image {
+    /// @brief Pixel data storage; LDR (8-bit) or HDR (32-bit float).
+    using PixelData = std::variant<std::vector<uint8_t>, std::vector<float>>;
+
     /**
      * @brief Parameters for constructing an @ref Image object.
      */
     struct Parameters {
-        std::vector<uint8_t> data {}; ///< Raw pixel bytes.
+        PixelData data {}; ///< Raw pixel data.
         unsigned width {0}; ///< Image width in pixels.
         unsigned height {0}; ///< Image height in pixels.
     };
@@ -80,7 +85,7 @@ struct Image {
     }
 
     /// @brief Raw pixel data.
-    std::vector<uint8_t> data;
+    PixelData data;
 
     /// @brief Image width in pixels.
     unsigned width;

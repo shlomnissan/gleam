@@ -410,7 +410,6 @@ auto Renderer::Impl::CreateTextureFromRenderTarget(RenderTarget* target) -> std:
     }
 
     auto texture = Texture2D::Create(Image::Create({
-        .data = {},
         .width = static_cast<unsigned int>(target->width),
         .height = static_cast<unsigned int>(target->height),
     }));

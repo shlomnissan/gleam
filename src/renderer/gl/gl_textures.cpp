@@ -19,8 +19,19 @@
 #include <algorithm>
 #include <memory>
 #include <utility>
+#include <variant>
 
 namespace vglx {
+
+namespace {
+
+template<typename T> constexpr GLenum gl_pixel_type() {
+    if constexpr (std::is_same_v<T, std::uint8_t>) return GL_UNSIGNED_BYTE;
+    else if constexpr (std::is_same_v<T, float>) return GL_FLOAT;
+    else static_assert(!sizeof(T*), "unsupported image pixel type");
+}
+
+}
 
 // GL_EXT_texture_filter_anisotropic; core in GL 4.6 but GLAD targets 4.1 on macOS.
 #ifndef GL_TEXTURE_MAX_ANISOTROPY
@@ -86,17 +97,20 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
             : Texture::Format::SRGBA8;
 
         auto format = to_gl_tex_format(tex->format);
-        glTexImage2D(
-            GL_TEXTURE_2D,
-            0,
-            format.internal_format,
-            tex->image->width,
-            tex->image->height,
-            0,
-            format.source_format,
-            format.type,
-            tex->image->data.data()
-        );
+        std::visit([&](const auto& pixels) {
+            using T = typename std::decay_t<decltype(pixels)>::value_type;
+            glTexImage2D(
+                GL_TEXTURE_2D,
+                0,
+                format.internal_format,
+                tex->image->width,
+                tex->image->height,
+                0,
+                format.source_format,
+                gl_pixel_type<T>(),
+                pixels.data()
+            );
+        }, tex->image->data);
 
         if (tex->generate_mipamps) glGenerateMipmap(GL_TEXTURE_2D);
         apply_sampler_params(GL_TEXTURE_2D, tex);
@@ -135,77 +149,29 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
 
         auto format = to_gl_tex_format(tex->format);
 
-        glTexImage2D(
-            GL_TEXTURE_CUBE_MAP_POSITIVE_X,
-            0,
-            format.internal_format,
-            tex->images.positive_x->width,
-            tex->images.positive_x->height,
-            0,
-            format.source_format,
-            format.type,
-            tex->images.positive_x->data.data()
-        );
+        auto upload_face = [&](GLenum target, const Image& img) {
+            std::visit([&](const auto& pixels) {
+                using T = typename std::decay_t<decltype(pixels)>::value_type;
+                glTexImage2D(
+                    target,
+                    0,
+                    format.internal_format,
+                    img.width,
+                    img.height,
+                    0,
+                    format.source_format,
+                    gl_pixel_type<T>(),
+                    pixels.data()
+                );
+            }, img.data);
+        };
 
-        glTexImage2D(
-            GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
-            0,
-            format.internal_format,
-            tex->images.negative_x->width,
-            tex->images.negative_x->height,
-            0,
-            format.source_format,
-            format.type,
-            tex->images.negative_x->data.data()
-        );
-
-        glTexImage2D(
-            GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-            0,
-            format.internal_format,
-            tex->images.positive_y->width,
-            tex->images.positive_y->height,
-            0,
-            format.source_format,
-            format.type,
-            tex->images.positive_y->data.data()
-        );
-
-        glTexImage2D(
-            GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
-            0,
-            format.internal_format,
-            tex->images.negative_y->width,
-            tex->images.negative_y->height,
-            0,
-            format.source_format,
-            format.type,
-            tex->images.negative_y->data.data()
-        );
-
-        glTexImage2D(
-            GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
-            0,
-            format.internal_format,
-            tex->images.positive_z->width,
-            tex->images.positive_z->height,
-            0,
-            format.source_format,
-            format.type,
-            tex->images.positive_z->data.data()
-        );
-
-        glTexImage2D(
-            GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
-            0,
-            format.internal_format,
-            tex->images.negative_z->width,
-            tex->images.negative_z->height,
-            0,
-            format.source_format,
-            format.type,
-            tex->images.negative_z->data.data()
-        );
+        upload_face(GL_TEXTURE_CUBE_MAP_POSITIVE_X, *tex->images.positive_x);
+        upload_face(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, *tex->images.negative_x);
+        upload_face(GL_TEXTURE_CUBE_MAP_POSITIVE_Y, *tex->images.positive_y);
+        upload_face(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, *tex->images.negative_y);
+        upload_face(GL_TEXTURE_CUBE_MAP_POSITIVE_Z, *tex->images.positive_z);
+        upload_face(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, *tex->images.negative_z);
 
         if (tex->generate_mipamps) glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
         apply_sampler_params(GL_TEXTURE_CUBE_MAP, tex);
