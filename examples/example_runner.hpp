@@ -15,9 +15,13 @@ constexpr int kWindowWidth = 1024;
 constexpr int kWindowHeight = 768;
 constexpr int kSampleCount = 4;
 
+using enum vglx::Renderer::ToneMapping;
+
 struct ExampleSettings {
     std::string window_title = "Example";
     vglx::Color clear_color = 0x000000;
+    vglx::Renderer::ToneMapping tone_mapping = vglx::Renderer::ToneMapping::ACESFilmic;
+    float tone_mapping_exposure {1.0f};
 };
 
 auto RunExample(vglx::Scene* scene, vglx::Camera* camera, const ExampleSettings& settings) -> int;

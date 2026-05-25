@@ -55,13 +55,22 @@ class RenderTarget;
  */
 class VGLX_EXPORT Renderer {
 public:
+    /**
+     * @brief Tone mapping operator applied to the final HDR frame before display.
+     */
+    enum class ToneMapping {
+        None, ///< No tone mapping; HDR values are clamped to [0, 1].
+        ACESFilmic ///< ACES filmic curve; compresses highlights and preserves shadows.
+    };
+
     /// @brief Parameters for constructing a @ref Renderer object.
     struct Parameters {
         int framebuffer_width {1280}; ///< Current framebuffer width in pixels.
         int framebuffer_height {720}; ///< Current framebuffer height in pixels.
         int sample_count {1}; ///< Antialiasing level (e.g., 4x MSAA).
         Color clear_color {0x000000}; ///< Clear color used at the start of a frame.
-        bool reverse_z {false}; ///< Enables Reverse-Z depth mapping for improved precision.
+        ToneMapping tone_mapping {ToneMapping::ACESFilmic}; ///< Tone mapping operator applied to the final frame.
+        float exposure {1.0f}; ///< Exposure scale applied to HDR values before tone mapping.
     };
 
     /**
@@ -150,6 +159,26 @@ public:
      * @param color Clear color in RGB format.
      */
     auto SetClearColor(const Color& color) -> void;
+
+    /**
+     * @brief Sets the tone mapping operator for subsequent frames.
+     *
+     * Changes how HDR color values are mapped to the display range. Takes
+     * effect immediately on the next call to @ref Render.
+     *
+     * @param tone_mapping Tone mapping operator to apply.
+     */
+    auto SetToneMapping(ToneMapping tone_mapping) -> void;
+
+    /**
+     * @brief Sets the exposure scale for subsequent frames.
+     *
+     * Multiplies HDR color values before tone mapping is applied. Higher
+     * values brighten the image; lower values darken it.
+     *
+     * @param exposure Linear exposure multiplier. Defaults to 1.0.
+     */
+    auto SetExposure(float exposure) -> void;
 
     /**
      * @brief Returns the number of renderable objects drawn in the last frame.

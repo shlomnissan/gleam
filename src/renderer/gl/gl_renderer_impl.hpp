@@ -46,6 +46,10 @@ public:
 
     auto SetClearColor(const Color& color) -> void;
 
+    auto SetToneMapping(ToneMapping tone_mapping) -> void;
+
+    auto SetExposure(float exposure) -> void;
+
     auto CreateTextureFromRenderTarget(RenderTarget* target) -> std::shared_ptr<Texture2D>;
 
     [[nodiscard]] auto RenderedObjectsPerFrame() const {
@@ -80,6 +84,10 @@ private:
 
     size_t rendered_objects_counter_ {0};
     size_t rendered_objects_per_frame_ {0};
+
+    Renderer::ToneMapping tone_mapping_ {Renderer::ToneMapping::ACESFilmic};
+
+    float exposure_ {1.0f};
 
     int next_texture_unit_ {0};
 

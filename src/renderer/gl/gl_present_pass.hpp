@@ -9,6 +9,8 @@
 
 #include "renderer/gl/gl_program.hpp"
 
+#include "vglx/core/renderer.hpp"
+
 #include <expected>
 #include <memory>
 #include <string>
@@ -33,7 +35,11 @@ public:
 
     auto Initialize() -> std::expected<void, std::string>;
 
-    auto Present(const GLSceneBuffer& scene_buffer) const -> void;
+    auto Present(
+        const GLSceneBuffer& scene_buffer,
+        Renderer::ToneMapping tone_mapping,
+        float exposure
+    ) const -> void;
 
     ~GLPresentPass();
 

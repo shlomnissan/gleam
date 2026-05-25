@@ -37,7 +37,9 @@ Renderer::Impl::Impl(const Renderer::Parameters& params)
         params.sample_count,
     }),
     params_(params),
-    render_lists_(std::make_unique<RenderLists>())
+    render_lists_(std::make_unique<RenderLists>()),
+    tone_mapping_(params.tone_mapping),
+    exposure_(params.exposure)
 {
     state_.SetViewport(0, 0, params.framebuffer_width, params.framebuffer_height);
     state_.SetClearColor(params.clear_color);
@@ -379,7 +381,7 @@ auto Renderer::Impl::Render(Scene* scene, Camera* camera, RenderTarget* target) 
     state_.Reset();
 
     if (use_default_target) {
-        present_pass_.Present(scene_buffer_);
+        present_pass_.Present(scene_buffer_, tone_mapping_, exposure_);
     }
 }
 
@@ -390,6 +392,14 @@ auto Renderer::Impl::SetViewport(int x, int y, int width, int height) -> void {
 
 auto Renderer::Impl::SetClearColor(const Color& color) -> void {
     state_.SetClearColor(color);
+}
+
+auto Renderer::Impl::SetToneMapping(ToneMapping tone_mapping) -> void {
+    tone_mapping_ = tone_mapping;
+}
+
+auto Renderer::Impl::SetExposure(float exposure) -> void {
+    exposure_ = exposure;
 }
 
 auto Renderer::Impl::CreateTextureFromRenderTarget(RenderTarget* target) -> std::shared_ptr<Texture2D> {

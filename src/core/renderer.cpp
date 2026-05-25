@@ -36,6 +36,14 @@ auto Renderer::SetClearColor(const Color& color) -> void {
     impl_->SetClearColor(color);
 }
 
+auto Renderer::SetToneMapping(ToneMapping tone_mapping) -> void {
+    impl_->SetToneMapping(tone_mapping);
+}
+
+auto Renderer::SetExposure(float exposure) -> void {
+    impl_->SetExposure(exposure);
+}
+
 auto Renderer:: CreateTextureFromRenderTarget(RenderTarget* target) -> std::shared_ptr<Texture2D> {
     return impl_->CreateTextureFromRenderTarget(target);
 }

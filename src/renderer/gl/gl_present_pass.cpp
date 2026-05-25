@@ -36,11 +36,17 @@ auto GLPresentPass::Initialize() -> std::expected<void, std::string> {
     return {};
 }
 
-auto GLPresentPass::Present(const GLSceneBuffer& scene_buffer) const -> void {
+auto GLPresentPass::Present(
+    const GLSceneBuffer& scene_buffer,
+    Renderer::ToneMapping tone_mapping,
+    float exposure
+) const -> void {
     glUseProgram(program_->Id());
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, scene_buffer.GetResolvedColorTexture());
+
+    // TODO: set tone mapping and exposure uniforms
 
     glBindVertexArray(vao_);
     glDrawArrays(GL_TRIANGLES, 0, 3);
