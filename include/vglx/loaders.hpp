@@ -65,6 +65,30 @@ struct CubeTexturePaths {
 ) -> std::expected<std::shared_ptr<Image>, std::string>;
 
 /**
+ * @brief Loads raw HDR image data from disk.
+ *
+ * Loads a high dynamic range image (e.g. Radiance `.hdr`) as an
+ * @ref Image whose pixel data is stored as 32-bit floats. For 8-bit
+ * LDR images use @ref LoadImage.
+ *
+ * @code
+ * auto image = vglx::LoadHDRImage("assets/sunset.hdr");
+ * if (image.has_value()) {
+ *     // use image.value()
+ * } else {
+ *     std::println(stderr, "{}", image.error());
+ * }
+ * @endcode
+ *
+ * @param path Filesystem path to the HDR image asset.
+ *
+ * @ingroup LoadersGroup
+ */
+[[nodiscard]] VGLX_EXPORT auto LoadHDRImage(
+    const fs::path& path
+) -> std::expected<std::shared_ptr<Image>, std::string>;
+
+/**
  * @brief Loads a 2D texture from disk.
  *
  * @code
@@ -84,6 +108,31 @@ struct CubeTexturePaths {
 [[nodiscard]] VGLX_EXPORT auto LoadTexture(
     const fs::path& path,
     Texture::ColorSpace color_space = Texture::ColorSpace::sRGB
+) -> std::expected<std::shared_ptr<Texture2D>, std::string>;
+
+/**
+ * @brief Loads an HDR 2D texture from disk.
+ *
+ * Loads a high dynamic range image (e.g. Radiance `.hdr`) as a
+ * floating-point @ref Texture2D. The texture's color space is always
+ * @ref Texture::ColorSpace::Linear since HDR data is by definition
+ * stored in linear space.
+ *
+ * @code
+ * auto texture = vglx::LoadHDRTexture("assets/sunset.hdr");
+ * if (texture.has_value()) {
+ *     // use texture.value()
+ * } else {
+ *     std::println(stderr, "{}", texture.error());
+ * }
+ * @endcode
+ *
+ * @param path Filesystem path to the HDR texture asset.
+ *
+ * @ingroup LoadersGroup
+ */
+[[nodiscard]] VGLX_EXPORT auto LoadHDRTexture(
+    const fs::path& path
 ) -> std::expected<std::shared_ptr<Texture2D>, std::string>;
 
 /**

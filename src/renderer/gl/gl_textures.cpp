@@ -25,10 +25,25 @@ namespace vglx {
 
 namespace {
 
-template<typename T> constexpr GLenum gl_pixel_type() {
-    if constexpr (std::is_same_v<T, std::uint8_t>) return GL_UNSIGNED_BYTE;
-    else if constexpr (std::is_same_v<T, float>) return GL_FLOAT;
-    else static_assert(!sizeof(T*), "unsupported image pixel type");
+template<class... Ts> struct overload : Ts... { using Ts::operator()...; };
+template<class... Ts> overload(Ts...) -> overload<Ts...>;
+
+constexpr auto gl_pixel_type = overload {
+    [](const std::vector<std::uint8_t>&) -> GLenum { return GL_UNSIGNED_BYTE; },
+    [](const std::vector<float>&) -> GLenum { return GL_FLOAT; }
+};
+
+auto pick_image_format(const Image& img, Texture::ColorSpace color_space) -> Texture::Format {
+    return std::visit(overload {
+        [](const std::vector<float>&) {
+            return Texture::Format::RGBA16F;
+        },
+        [&](const std::vector<std::uint8_t>&) {
+            return color_space == Texture::ColorSpace::Linear
+                ? Texture::Format::RGBA8
+                : Texture::Format::SRGBA8;
+        }
+    }, img.data);
 }
 
 }
@@ -92,13 +107,10 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
 
     if (texture->GetType() == Texture::Type::Texture2D) {
         auto tex = static_cast<Texture2D*>(texture);
-        tex->format = tex->color_space == Texture::ColorSpace::Linear
-            ? Texture::Format::RGBA8
-            : Texture::Format::SRGBA8;
+        tex->format = pick_image_format(*tex->image, tex->color_space);
 
         auto format = to_gl_tex_format(tex->format);
         std::visit([&](const auto& pixels) {
-            using T = typename std::decay_t<decltype(pixels)>::value_type;
             glTexImage2D(
                 GL_TEXTURE_2D,
                 0,
@@ -107,7 +119,7 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
                 tex->image->height,
                 0,
                 format.source_format,
-                gl_pixel_type<T>(),
+                gl_pixel_type(pixels),
                 pixels.data()
             );
         }, tex->image->data);
@@ -143,15 +155,12 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
 
     if (texture->GetType() == Texture::Type::CubeTexture) {
         auto tex = static_cast<CubeTexture*>(texture);
-        tex->format = tex->color_space == Texture::ColorSpace::Linear
-            ? Texture::Format::RGBA8
-            : Texture::Format::SRGBA8;
+        tex->format = pick_image_format(*tex->images.positive_x, tex->color_space);
 
         auto format = to_gl_tex_format(tex->format);
 
         auto upload_face = [&](GLenum target, const Image& img) {
             std::visit([&](const auto& pixels) {
-                using T = typename std::decay_t<decltype(pixels)>::value_type;
                 glTexImage2D(
                     target,
                     0,
@@ -160,7 +169,7 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
                     img.height,
                     0,
                     format.source_format,
-                    gl_pixel_type<T>(),
+                    gl_pixel_type(pixels),
                     pixels.data()
                 );
             }, img.data);
