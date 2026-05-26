@@ -6,6 +6,7 @@
 */
 
 #include <expected>
+#include <memory>
 #include <print>
 #include <string>
 

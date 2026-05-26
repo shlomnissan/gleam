@@ -5,6 +5,11 @@
 ===========================================================================
 */
 
+#include <expected>
+#include <memory>
+#include <print>
+#include <string>
+
 #include "example_runner.hpp"
 
 auto GetCamera() {
@@ -20,8 +25,15 @@ auto GetCamera() {
     return camera;
 }
 
-auto GetScene() {
+auto GetScene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
     auto scene = vglx::Scene::Create();
+
+    auto hdri_background = vglx::LoadHDRTexture(ASSETS_DIR "/hdri/rogland_clear_night.hdr");
+    if (!hdri_background.has_value()) {
+        return std::unexpected(hdri_background.error());
+    }
+
+    scene->background = *hdri_background;
 
     auto sphere = vglx::SphereGeometry::Create({
         .width_segments = 64,
@@ -68,8 +80,12 @@ auto GetScene() {
 auto main() -> int {
     auto camera = GetCamera();
     auto scene = GetScene();
+    if (!scene.has_value()) {
+        std::print(stderr, "{}", scene.error());
+        return 1;
+    }
 
-    return RunExample(scene.get(), camera.get(), {
+    return RunExample(scene->get(), camera.get(), {
         .window_title = "Tone Mapping",
         .clear_color = 0x000000,
         .tone_mapping = vglx::Renderer::ToneMapping::ACESFilmic
