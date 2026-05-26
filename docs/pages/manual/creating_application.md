@@ -155,7 +155,7 @@ auto camera = PerspectiveCamera::Create({
     .near = 0.1f,
     .far = 1000.0f
 });
-camera->TranslateZ(2.5f);
+camera->transform.Translate({0.0f, 0.0f, 2.5f});
 
 auto scene = std::make_unique<MyScene>(camera.get());
 ```
@@ -241,8 +241,8 @@ To keep things simple we’ll animate the scene by rotating the cube around the 
 ```cpp
 auto OnUpdate(float delta) -> void override {
     const auto rotation_speed = math::pi_over_2;
-    mesh->RotateX(rotation_speed * delta);
-    mesh->RotateY(rotation_speed * delta);
+    mesh->transform.Rotate(Vector3::Right(), rotation_speed * delta);
+    mesh->transform.Rotate(Vector3::Up(), rotation_speed * delta);
 }
 ```
 
@@ -291,8 +291,8 @@ struct MyScene : public Scene {
 
     auto OnUpdate(float delta) -> void override {
         const auto rotation_speed = math::pi_over_2;
-        mesh->RotateX(rotation_speed * delta);
-        mesh->RotateY(rotation_speed * delta);
+        mesh->transform.Rotate(Vector3::Right(), rotation_speed * delta);
+        mesh->transform.Rotate(Vector3::Up(), rotation_speed * delta);
     }
 };
 
@@ -325,7 +325,7 @@ auto main() -> int {
         .near = 0.1f,
         .far = 1000.0f
     });
-    camera->TranslateZ(2.5f);
+    camera->transform.Translate({0.0f, 0.0f, 2.5f});
 
     auto scene = std::make_unique<MyScene>(camera.get());
 

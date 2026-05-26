@@ -39,7 +39,7 @@ struct PointLight::Impl {
     }
 
     auto UpdateDebugMesh(PointLight* self) -> void {
-        sphere->SetScale(debug_mesh_size);
+        sphere->transform.SetScale(debug_mesh_size);
         material->color = self->color;
     }
 

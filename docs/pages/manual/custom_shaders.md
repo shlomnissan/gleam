@@ -25,7 +25,7 @@ struct MyScene : public vglx::Scene {
     vglx::Mesh* mesh {nullptr};
 
     MyScene(vglx::Camera* camera) {
-        camera->TranslateZ(2.5f);
+        camera->transform.Translate({0.0f, 0.0f, 2.5f});
 
         mesh = Add(vglx::Mesh::Create(
             vglx::BoxGeometry::Create(),
@@ -35,8 +35,8 @@ struct MyScene : public vglx::Scene {
 
     auto OnUpdate(float delta) -> void override {
         const auto rotation_speed = vglx::math::pi_over_2;
-        mesh->RotateX(rotation_speed * delta);
-        mesh->RotateY(rotation_speed * delta);
+        mesh->transform.Rotate(vglx::Vector3::Right(), rotation_speed * delta);
+        mesh->transform.Rotate(vglx::Vector3::Up(), rotation_speed * delta);
     }
 };
 ```

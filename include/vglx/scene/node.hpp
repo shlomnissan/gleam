@@ -282,55 +282,6 @@ public:
      */
     virtual auto LookAt(const Vector3& target) -> void;
 
-    /**
-     * @brief Translates the node along its local X axis.
-     *
-     * @param value Offset in local X.
-     */
-    auto TranslateX(float value) -> void { transform.Translate({value, 0.0f, 0.0f}); }
-
-    /**
-     * @brief Translates the node along its local Y axis.
-     *
-     * @param value Offset in local Y.
-     */
-    auto TranslateY(float value) -> void { transform.Translate({0.0f, value, 0.0f}); }
-
-    /**
-     * @brief Translates the node along its local Z axis.
-     *
-     * @param value Offset in local Z.
-     */
-    auto TranslateZ(float value) -> void { transform.Translate({0.0f, 0.0f, value}); }
-
-    /**
-     * @brief Rotates the node around its local X axis.
-     *
-     * @param angle Angle in radians.
-     */
-    auto RotateX(float angle) -> void { transform.Rotate(Vector3::Right(), angle); }
-
-    /**
-     * @brief Rotates the node around its local Y axis.
-     *
-     * @param angle Angle in radians.
-     */
-    auto RotateY(float angle) -> void { transform.Rotate(Vector3::Up(), angle); }
-
-    /**
-     * @brief Rotates the node around its local Z axis.
-     *
-     * @param angle Angle in radians.
-     */
-    auto RotateZ(float angle) -> void { transform.Rotate(Vector3::Forward(), angle); }
-
-    /**
-     * @brief Sets the local scale of the node.
-     *
-     * @param value New scale vector.
-     */
-    auto SetScale(const Vector3& value) -> void { transform.SetScale(value); }
-
     /// @}
 
     /**

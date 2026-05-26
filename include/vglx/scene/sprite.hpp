@@ -32,7 +32,7 @@ namespace vglx {
  *   auto texture = LoadTexture("assets/sprite.png");
  *   if (texture.has_value()) {
  *     auto material = vglx::SpriteMaterial::Create(texture.value());
- *     Add(vglx::Sprite::Create(material))->SetScale(0.5f);
+ *     Add(vglx::Sprite::Create(material))->transform.SetScale(0.5f);
  *   } else {
  *     std::println(stderr, "{}", texture.error());
  *   }

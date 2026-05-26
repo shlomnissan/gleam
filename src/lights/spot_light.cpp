@@ -77,7 +77,7 @@ struct SpotLight::Impl {
         const auto cone_width = std::tan(self->angle) * cone_length;
 
         cone->LookAt(target_world_pos);
-        cone->SetScale({cone_width, cone_width, cone_length});
+        cone->transform.SetScale({cone_width, cone_width, cone_length});
         material->color = self->color;
     }
 

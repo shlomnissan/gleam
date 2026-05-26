@@ -66,8 +66,8 @@ struct DirectionalLight::Impl {
         material->color = self->color;
 
         const auto length = (target_world_pos - self->GetWorldPosition()).Length();
-        plane->SetScale(debug_mesh_size);
-        line->SetScale({1.0f, 1.0f, length});
+        plane->transform.SetScale(debug_mesh_size);
+        line->transform.SetScale({1.0f, 1.0f, length});
     }
 
     auto RemoveDebugMesh(DirectionalLight* self) -> void {

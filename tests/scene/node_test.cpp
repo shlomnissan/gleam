@@ -85,7 +85,7 @@ TEST(Node, IsChildWithNullptr) {
 
 TEST(Node, UpdateTransformsWithoutParent) {
     auto node = vglx::Node::Create();
-    node->SetScale(2.0f);
+    node->transform.SetScale(2.0f);
 
     node->UpdateTransformHierarchy();
 
@@ -101,7 +101,7 @@ TEST(Node, UpdateTransformsWithParent) {
     auto parent = vglx::Node::Create();
     auto child = parent->Add(vglx::Node::Create());
 
-    parent->SetScale(2.0f);
+    parent->transform.SetScale(2.0f);
     parent->UpdateTransformHierarchy();
 
     EXPECT_MAT4_EQ(child->GetWorldTransform(), {
@@ -117,7 +117,7 @@ TEST(Node, DisableTransformAutoUpdate) {
     auto child = parent->Add(vglx::Node::Create());
     child->transform_auto_update = false;
 
-    parent->SetScale(2.0f);
+    parent->transform.SetScale(2.0f);
     parent->UpdateTransformHierarchy();
 
     EXPECT_MAT4_EQ(parent->GetWorldTransform(), {
@@ -161,7 +161,7 @@ TEST(Node, MarkDetachedNodesAsTouched) {
 
 TEST(Node, ShouldUpdateTransformWhenDirty) {
     auto node = vglx::Node::Create();
-    node->SetScale(0.5f);
+    node->transform.SetScale(0.5f);
 
     EXPECT_TRUE(node->ShouldUpdateWorldTransform());
 }

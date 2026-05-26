@@ -27,7 +27,7 @@ struct MyScene : public vglx::Scene {
     vglx::Mesh* mesh {nullptr};
 
     MyScene(vglx::Camera* camera) {
-        camera->TranslateZ(2.5f);
+        camera->transform.Translate({0.0f, 0.0f, 2.5f});
 
         auto texture = vglx::LoadTexture("crate_texture_low.jpg");
         if (!texture.has_value()) {
@@ -45,8 +45,8 @@ struct MyScene : public vglx::Scene {
     auto OnUpdate(float delta) -> void override {
         if (mesh != nullptr) {
             const auto rotation_speed = vglx::math::pi_over_2;
-            mesh->RotateX(rotation_speed * delta);
-            mesh->RotateY(rotation_speed * delta);
+            mesh->transform.Rotate(vglx::Vector3::Right(), rotation_speed * delta);
+            mesh->transform.Rotate(vglx::Vector3::Up(), rotation_speed * delta);
         }
     }
 };
@@ -79,7 +79,7 @@ The following example loads the mesh and renders it with basic lighting:
 
 struct MyScene : public vglx::Scene {
     MyScene(vglx::Camera* camera) {
-        camera->TranslateZ(3.5f);
+        camera->transform.Translate({0.0f, 0.0f, 3.5f});
 
         Add(vglx::AmbientLight::Create({
             .color = 0xFFFFFF,
@@ -98,7 +98,7 @@ struct MyScene : public vglx::Scene {
         }
 
         // Transfer ownership of the loaded node to the scene graph.
-        Add(std::move(root.value()))->RotateY(vglx::math::DegToRad(90.0f));
+        Add(std::move(root.value()))->transform.Rotate(vglx::Vector3::Up(), vglx::math::DegToRad(90.0f));
     }
 };
 ```

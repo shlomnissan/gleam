@@ -57,7 +57,7 @@ auto GetScene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
 
     scene->Add(
         vglx::Mesh::Create(plane, plane_material)
-    )->RotateX(vglx::math::DegToRad(-90.0f));
+    )->transform.Rotate(vglx::Vector3::Right(), vglx::math::DegToRad(-90.0f));
 
     scene->Add(vglx::AmbientLight::Create({
         .color = 0xFFFFFF,

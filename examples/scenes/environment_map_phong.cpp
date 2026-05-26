@@ -20,7 +20,7 @@ auto GetCamera() {
         .far = 1000.0f
     });
 
-    camera->TranslateZ(5.0f);
+    camera->transform.Translate({0.0f, 0.0f, 5.0f});
 
     return camera;
 }
