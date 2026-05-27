@@ -18,7 +18,7 @@ constexpr int kSampleCount = 4;
 struct ExampleSettings {
     std::string window_title = "Example";
     vglx::Color clear_color = 0x000000;
-    vglx::Renderer::ToneMapping tone_mapping = vglx::Renderer::ToneMapping::ACESFilmic;
+    vglx::Renderer::ToneMapping tone_mapping = vglx::Renderer::ToneMapping::None;
     float exposure {1.0f};
 };
 

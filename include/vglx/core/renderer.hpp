@@ -69,7 +69,7 @@ public:
         int framebuffer_height {720}; ///< Current framebuffer height in pixels.
         int sample_count {1}; ///< Antialiasing level (e.g., 4x MSAA).
         Color clear_color {0x000000}; ///< Clear color used at the start of a frame.
-        ToneMapping tone_mapping {ToneMapping::ACESFilmic}; ///< Tone mapping operator applied to the final frame.
+        ToneMapping tone_mapping {ToneMapping::None}; ///< Tone mapping operator applied to the final frame.
         float exposure {1.0f}; ///< Exposure scale applied to HDR values before tone mapping.
     };
 
