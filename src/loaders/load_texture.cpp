@@ -21,8 +21,8 @@ auto LoadTexture(
     }
 
     auto out = Texture2D::Create(image.value());
-    out->generate_mipamps = true;
-    out->min_filter = Texture::MinFilter::LinearMipmapLinear;
+    out->generate_mipamps = false;
+    out->min_filter = Texture::MinFilter::Linear;
     out->mag_filter = Texture::MagFilter::Linear;
     out->color_space = color_space;
     out->SetName(path.filename().string());
@@ -38,8 +38,8 @@ auto LoadHDRTexture(
     }
 
     auto out = Texture2D::Create(image.value());
-    out->generate_mipamps = true;
-    out->min_filter = Texture::MinFilter::LinearMipmapLinear;
+    out->generate_mipamps = false;
+    out->min_filter = Texture::MinFilter::Linear;
     out->mag_filter = Texture::MagFilter::Linear;
     out->color_space = Texture::ColorSpace::Linear;
     out->SetName(path.filename().string());

@@ -55,10 +55,6 @@ auto GetScene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
     plane_material->metallic = 0.0f;
     plane_material->roughness = 0.8f;
 
-    scene->Add(
-        vglx::Mesh::Create(plane, plane_material)
-    )->transform.Rotate(vglx::Vector3::Right(), vglx::math::DegToRad(-90.0f));
-
     scene->Add(vglx::AmbientLight::Create({
         .color = 0xFFFFFF,
         .intensity = .05f
@@ -88,6 +84,7 @@ auto main() -> int {
     return RunExample(scene->get(), camera.get(), {
         .window_title = "Tone Mapping",
         .clear_color = 0x000000,
-        .tone_mapping = vglx::Renderer::ToneMapping::ACESFilmic
+        .tone_mapping = vglx::Renderer::ToneMapping::ACESFilmic,
+        .exposure = 0.6f
     });
 }

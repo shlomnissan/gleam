@@ -77,6 +77,15 @@ auto Renderer::Impl::RenderObjects(Scene* scene, Camera* camera) -> void {
     state_.SetDepthWrites(false);
 
     if (scene->background) {
+        // Background draws at the far plane (clip-space z = 1.0), so it needs
+        // LessEqual depth to pass against the cleared depth buffer. Cull-face
+        // is off because a cube skybox is viewed from inside, where its
+        // outward-wound faces would otherwise be culled.
+        state_.SetDepthTest(true);
+        state_.SetDepthFunction(Material::Depth::LessEqual);
+        state_.SetBackfaceCulling(false);
+        state_.SetBlending(Material::Blending::None);
+
         textures_.Bind(scene->background, 0);
         background_pass_.Render(scene->background);
     }

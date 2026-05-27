@@ -28,7 +28,7 @@ vec3 toneMap(vec3 color) {
     if (u_ToneMapping == 1) {
         return acesFilmic(color);
     }
-    return color;
+    return clamp(color, 0.0, 1.0);
 }
 
 void main() {
