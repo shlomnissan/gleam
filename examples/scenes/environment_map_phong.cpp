@@ -44,17 +44,28 @@ auto GetScene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
     scene->background = *env_map;
 
     auto geometry = vglx::SphereGeometry::Create({
+        .radius = 0.8f,
         .width_segments = 64,
         .height_segments = 32
     });
 
-    auto material = vglx::PhongMaterial::Create({
+    scene->Add(vglx::Mesh::Create(geometry, vglx::PhongMaterial::Create({
         .color = 0xFFFFFF,
         .reflectivity = 0.7f,
         .environment_map = *env_map
-    });
+    })));
 
-    scene->Add(vglx::Mesh::Create(geometry, material));
+    scene->Add(vglx::Mesh::Create(geometry, vglx::PhongMaterial::Create({
+        .color = 0xFF0000,
+        .reflectivity = 0.4f,
+        .environment_map = *env_map
+    })))->transform.Translate({-2.3f, 0.0f, 0.0f});
+
+    scene->Add(vglx::Mesh::Create(geometry, vglx::PhongMaterial::Create({
+        .color = 0x0000FF,
+        .reflectivity = 0.8f,
+        .environment_map = *env_map
+    })))->transform.Translate({2.3f, 0.0f, 0.0f});
 
     scene->Add(vglx::AmbientLight::Create({
         .color = 0xFFFFFF,

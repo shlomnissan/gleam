@@ -26,9 +26,9 @@ namespace vglx {
  *
  * @code
  * auto geometry = vglx::SphereGeometry::Create({
- *     .radius = 1.5f,
- *     .width_segments = 48,
- *     .height_segments = 24
+ *     .radius = 1.0f,
+ *     .width_segments = 64,
+ *     .height_segments = 32
  * });
  *
  * auto material = vglx::PhongMaterial::Create({.color = 0x049EF4});
