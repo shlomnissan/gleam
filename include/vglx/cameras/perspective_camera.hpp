@@ -46,8 +46,8 @@ public:
     struct Parameters {
         float fov; ///< Vertical field of view in radians.
         float aspect; ///< Aspect ratio.
-        float near; ///< Distance to the near clipping plane
-        float far; ///< Distance to the far clipping plane
+        float near; ///< Distance to the near clipping plane.
+        float far; ///< Distance to the far clipping plane.
     };
 
     /**

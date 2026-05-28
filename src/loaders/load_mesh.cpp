@@ -91,7 +91,7 @@ auto LoadMesh(
 
         auto material = has_material
             ? materials[entry.material_index]
-            : PhongMaterial::Create(0xFFFFFF);
+            : PhongMaterial::Create();
 
         auto mesh = Mesh::Create(entry.geometry, material);
         mesh->SetName(entry.name);

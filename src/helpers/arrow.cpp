@@ -30,7 +30,7 @@ auto line_geometry(float length) {
 }
 
 Arrow::Arrow(const Parameters& params) {
-    const auto material = UnlitMaterial::Create(params.color);
+    const auto material = UnlitMaterial::Create({.color = params.color});
     const auto cone = Add(Mesh::Create(
         ConeGeometry::Create({.radius = 0.03f, .height = kConeHeight}),
         material

@@ -27,10 +27,12 @@ namespace vglx {
  * polished metals.
  *
  * @code
- * auto material = vglx::PBRMaterial::Create(0xFFFFFF);
- * material->metallic = 1.0f;
- * material->roughness = 0.4f;
- * material->albedo_map = texture;
+ * auto material = vglx::PBRMaterial::Create({
+ *   .color = 0xFFFFFF,
+ *   .metallic = 1.0f,
+ *   .roughness = 0.4f,
+ *   .albedo_map = texture
+ * });
  *
  * my_scene->Add(vglx::Mesh::Create(geometry, material));
  * @endcode
@@ -39,62 +41,108 @@ namespace vglx {
  */
 class VGLX_EXPORT PBRMaterial : public Material {
 public:
+    /**
+     * @brief Parameters for constructing a @ref PBRMaterial object.
+     */
+    struct Parameters {
+        Color color = 0xFFFFFF; ///< Base surface color.
+        Color emissive_color = 0x000000; ///< Emissive color independent of lighting.
+        float ao_intensity = 1.0f; ///< AO contribution strength.
+        float emissive_intensity = 1.0f; ///< Emissive multiplier.
+        float metallic = 0.0f; ///< Metallic factor.
+        float normal_intensity = 1.0f; ///< Normal map strength.
+        float roughness = 1.0f; ///< Roughness factor.
+        std::shared_ptr<Texture> alpha_map = nullptr; ///< Per-pixel opacity map.
+        std::shared_ptr<Texture> ao_map = nullptr; ///< Ambient occlusion map (R channel).
+        std::shared_ptr<Texture> albedo_map = nullptr; ///< Base color map.
+        std::shared_ptr<Texture> emissive_map = nullptr; ///< Emissive color map.
+        std::shared_ptr<Texture> metallic_map = nullptr; ///< Metallic map (B channel).
+        std::shared_ptr<Texture> normal_map = nullptr; ///< Surface normal map.
+        std::shared_ptr<Texture> roughness_map = nullptr; ///< Roughness map (G channel).
+    };
+
     /// @brief Base surface color; for metals this acts as the specular tint.
-    Color color = 0xFFFFFF;
+    Color color;
 
     /// @brief Emissive color added to the final shaded result, independent of lighting.
-    Color emissive_color = 0x000000;
+    Color emissive_color;
 
     /// @brief Strength of the ambient occlusion contribution.
-    float ao_intensity = 1.0f;
+    float ao_intensity;
 
     /// @brief Scalar multiplier for emissive contribution.
-    float emissive_intensity = 1.0f;
+    float emissive_intensity;
 
     /// @brief Metallic factor.
-    float metallic = 0.0f;
+    float metallic;
 
     /// @brief Scalar multiplier for normal map perturbation.
-    float normal_intensity = 1.0f;
+    float normal_intensity;
 
     /// @brief Roughness factor.
-    float roughness = 1.0f;
+    float roughness;
 
     /// @brief Alpha map defining per-pixel opacity.
-    std::shared_ptr<Texture> alpha_map = nullptr;
+    std::shared_ptr<Texture> alpha_map;
 
     /// @brief Ambient occlusion map sampled from the R channel; modulates the ambient term.
-    std::shared_ptr<Texture> ao_map = nullptr;
+    std::shared_ptr<Texture> ao_map;
 
     /// @brief Albedo (base color) map multiplied with @ref color per texel.
-    std::shared_ptr<Texture> albedo_map = nullptr;
+    std::shared_ptr<Texture> albedo_map;
 
     /// @brief Emissive map modulating the emissive color per texel.
-    std::shared_ptr<Texture> emissive_map = nullptr;
+    std::shared_ptr<Texture> emissive_map;
 
     /// @brief Metallic map sampled from the B channel; multiplied with @ref metallic per texel.
-    std::shared_ptr<Texture> metallic_map = nullptr;
+    std::shared_ptr<Texture> metallic_map;
 
     /// @brief Normal map for per-pixel surface detail and lighting variation.
-    std::shared_ptr<Texture> normal_map = nullptr;
+    std::shared_ptr<Texture> normal_map;
 
     /// @brief Roughness map sampled from the G channel; multiplied with @ref roughness per texel.
-    std::shared_ptr<Texture> roughness_map = nullptr;
+    std::shared_ptr<Texture> roughness_map;
 
     /**
-     * @brief Constructs a PBR material with a given base color.
-     *
-     * @param color Base color of the material.
+     * @brief Constructs a PBR material with default parameters.
      */
-    explicit PBRMaterial(const Color& color) : color(color) {}
+    PBRMaterial() : PBRMaterial(Parameters{}) {}
+
+    /**
+     * @brief Constructs a PBR material from the given parameters.
+     *
+     * @param params @ref PBRMaterial::Parameters "Initialization parameters".
+     */
+    explicit PBRMaterial(const Parameters& params)
+      : color(params.color),
+        emissive_color(params.emissive_color),
+        ao_intensity(params.ao_intensity),
+        emissive_intensity(params.emissive_intensity),
+        metallic(params.metallic),
+        normal_intensity(params.normal_intensity),
+        roughness(params.roughness),
+        alpha_map(params.alpha_map),
+        ao_map(params.ao_map),
+        albedo_map(params.albedo_map),
+        emissive_map(params.emissive_map),
+        metallic_map(params.metallic_map),
+        normal_map(params.normal_map),
+        roughness_map(params.roughness_map) {}
+
+    /**
+     * @brief Creates a shared instance of @ref PBRMaterial with default parameters.
+     */
+    [[nodiscard]] static auto Create() -> std::shared_ptr<PBRMaterial> {
+        return std::make_shared<PBRMaterial>();
+    }
 
     /**
      * @brief Creates a shared instance of @ref PBRMaterial.
      *
-     * @param color Base color of the material.
+     * @param params @ref PBRMaterial::Parameters "Initialization parameters".
      */
-    [[nodiscard]] static auto Create(const Color& color = 0xFFFFFF) -> std::shared_ptr<PBRMaterial> {
-        return std::make_shared<PBRMaterial>(color);
+    [[nodiscard]] static auto Create(const Parameters& params) -> std::shared_ptr<PBRMaterial> {
+        return std::make_shared<PBRMaterial>(params);
     }
 
     /**

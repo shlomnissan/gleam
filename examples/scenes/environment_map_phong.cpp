@@ -48,9 +48,11 @@ auto GetScene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
         .height_segments = 32
     });
 
-    auto material = vglx::PhongMaterial::Create({0xFFFFFF});
-    material->environment_map = *env_map;
-    material->reflectivity = 0.7f;
+    auto material = vglx::PhongMaterial::Create({
+        .color = 0xFFFFFF,
+        .reflectivity = 0.7f,
+        .environment_map = *env_map
+    });
 
     scene->Add(vglx::Mesh::Create(geometry, material));
 

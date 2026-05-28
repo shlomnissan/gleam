@@ -48,7 +48,7 @@ namespace vglx {
  *
  * geometry->SetAttribute({vglx::Geometry::VertexAttributeType::Position, 3});
  *
- * auto material = vglx::PhongMaterial::Create(0x049EF4);
+ * auto material = vglx::PhongMaterial::Create({.color = 0x049EF4});
  *
  * my_scene->Add(vglx::Mesh::Create(geometry, material));
  * @endcode

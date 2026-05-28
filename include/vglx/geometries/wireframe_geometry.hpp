@@ -31,7 +31,7 @@ namespace vglx {
  * @code
  * auto solid = vglx::BoxGeometry::Create();
  * auto wireframe  = vglx::WireframeGeometry::Create(solid.get());
- * auto material = vglx::UnlitMaterial::Create(0xFFFFFF);
+ * auto material = vglx::UnlitMaterial::Create({.color = 0xFFFFFF});
  *
  * my_scene->Add(vglx::Mesh::Create(wireframe, material));
  * @endcode

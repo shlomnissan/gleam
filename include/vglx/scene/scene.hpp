@@ -33,7 +33,7 @@ namespace vglx {
  *
  * scene->Add(vglx::Mesh::Create(
  *   vglx::BoxGeometry::Create(),
- *   vglx::PhongMaterial::Create(0x049EF4)
+ *   vglx::PhongMaterial::Create({.color = 0x049EF4})
  * ));
  *
  * // Inside the main loop:

@@ -99,7 +99,7 @@ auto main() -> int {
 
     scene->Add(Mesh::Create(
         BoxGeometry::Create(),
-        PhongMaterial::Create(0x049EF4)
+        PhongMaterial::Create({.color = 0x049EF4})
     ));
 
     scene->Add(PointLight::Create({

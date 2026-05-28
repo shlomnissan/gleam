@@ -171,7 +171,7 @@ struct MyScene : public Scene {
     MyScene(Camera* camera) {
         mesh = Add(Mesh::Create(
             BoxGeometry::Create(),
-            PhongMaterial::Create(0x049EF4)
+            PhongMaterial::Create({.color = 0x049EF4})
         ));
     }
 
@@ -199,7 +199,7 @@ MyScene(Camera* camera) {
 
     mesh = Add(Mesh::Create(
         BoxGeometry::Create(),
-        PhongMaterial::Create(0x049EF4)
+        PhongMaterial::Create({.color = 0x049EF4})
     ));
 }
 ```
@@ -285,7 +285,7 @@ struct MyScene : public Scene {
 
         mesh = Add(Mesh::Create(
             BoxGeometry::Create(),
-            PhongMaterial::Create(0x049EF4)
+            PhongMaterial::Create({.color = 0x049EF4})
         ));
     }
 

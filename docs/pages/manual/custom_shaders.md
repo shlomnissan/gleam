@@ -29,7 +29,7 @@ struct MyScene : public vglx::Scene {
 
         mesh = Add(vglx::Mesh::Create(
             vglx::BoxGeometry::Create(),
-            vglx::UnlitMaterial::Create(0xFF00FF)
+            vglx::UnlitMaterial::Create({.color = 0xFF00FF})
         ));
     }
 

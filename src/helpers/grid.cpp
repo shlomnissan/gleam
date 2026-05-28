@@ -37,7 +37,7 @@ Grid::Grid(const Parameters& params) {
     geometry->primitive = Geometry::PrimitiveType::Lines;
     geometry->SetName("grid");
 
-    Add(Mesh::Create(geometry, UnlitMaterial::Create(params.color)));
+    Add(Mesh::Create(geometry, UnlitMaterial::Create({.color = params.color})));
 }
 
 }

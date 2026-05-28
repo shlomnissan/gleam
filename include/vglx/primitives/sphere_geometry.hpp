@@ -31,7 +31,7 @@ namespace vglx {
  *     .height_segments = 24
  * });
  *
- * auto material = vglx::PhongMaterial::Create(0x049EF4);
+ * auto material = vglx::PhongMaterial::Create({.color = 0x049EF4});
  *
  * my_scene->Add(vglx::Mesh::Create(geometry, material));
  * @endcode

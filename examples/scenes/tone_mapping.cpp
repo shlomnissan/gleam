@@ -40,9 +40,11 @@ auto GetScene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
         .height_segments = 32
     });
 
-    auto sphere_material = vglx::PBRMaterial::Create(0xB3B3B3);
-    sphere_material->metallic = 1.0f;
-    sphere_material->roughness = 0.2f;
+    auto sphere_material = vglx::PBRMaterial::Create({
+        .color = 0xB3B3B3,
+        .metallic = 1.0f,
+        .roughness = 0.2f
+    });
 
     scene->Add(vglx::Mesh::Create(sphere, sphere_material));
 
@@ -51,9 +53,11 @@ auto GetScene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
         .height = 20.0f
     });
 
-    auto plane_material = vglx::PBRMaterial::Create(0x808080);
-    plane_material->metallic = 0.0f;
-    plane_material->roughness = 0.8f;
+    auto plane_material = vglx::PBRMaterial::Create({
+        .color = 0x808080,
+        .metallic = 0.0f,
+        .roughness = 0.8f
+    });
 
     scene->Add(vglx::AmbientLight::Create({
         .color = 0xFFFFFF,

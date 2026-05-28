@@ -36,8 +36,10 @@ struct MyScene : public vglx::Scene {
         }
 
         auto geometry = vglx::BoxGeometry::Create();
-        auto material = vglx::UnlitMaterial::Create(0xFFFFFF);
-        material->texture_map = texture.value();
+        auto material = vglx::UnlitMaterial::Create({
+            .color = 0xFFFFFF,
+            .texture_map = texture.value()
+        });
 
         mesh = Add(vglx::Mesh::Create(geometry, material));
     }

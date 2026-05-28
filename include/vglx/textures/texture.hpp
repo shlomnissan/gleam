@@ -72,7 +72,7 @@ public:
         OneByte = 1, ///< 1-byte alignment (tightly packed).
         TwoBytes = 2, ///< 2-byte alignment.
         FourBytes = 4, ///< 4-byte alignment (default).
-        EightBytes = 8 ///< 8-byte alignment
+        EightBytes = 8 ///< 8-byte alignment.
     };
 
     /**

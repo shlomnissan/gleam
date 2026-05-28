@@ -70,7 +70,7 @@ auto create_geometry(const Sphere& sphere) {
 }
 
 BoundingSphere::BoundingSphere(const Sphere& sphere, const Color& color) {
-    Add(Mesh::Create(create_geometry(sphere), UnlitMaterial::Create(color)));
+    Add(Mesh::Create(create_geometry(sphere), UnlitMaterial::Create({.color = color})));
 }
 
 }
