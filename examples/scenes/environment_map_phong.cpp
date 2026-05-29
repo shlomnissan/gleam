@@ -20,7 +20,7 @@ auto GetCamera() {
         .far = 1000.0f
     });
 
-    camera->transform.Translate({0.0f, 0.0f, 5.0f});
+    camera->transform.Translate({0.0f, 0.0f, 6.0f});
 
     return camera;
 }
@@ -41,8 +41,6 @@ auto GetScene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
         return std::unexpected(env_map.error());
     }
 
-    scene->background = *env_map;
-
     auto geometry = vglx::SphereGeometry::Create({
         .radius = 0.8f,
         .width_segments = 64,
@@ -51,19 +49,19 @@ auto GetScene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
 
     scene->Add(vglx::Mesh::Create(geometry, vglx::PhongMaterial::Create({
         .color = 0xFFFFFF,
+        .reflectivity = 0.5f,
+        .environment_map = *env_map
+    })))->transform.Translate({-2.3f, 0.0f, 0.0f});
+
+    scene->Add(vglx::Mesh::Create(geometry, vglx::PhongMaterial::Create({
+        .color = 0xFF0000,
         .reflectivity = 0.7f,
         .environment_map = *env_map
     })));
 
     scene->Add(vglx::Mesh::Create(geometry, vglx::PhongMaterial::Create({
-        .color = 0xFF0000,
-        .reflectivity = 0.4f,
-        .environment_map = *env_map
-    })))->transform.Translate({-2.3f, 0.0f, 0.0f});
-
-    scene->Add(vglx::Mesh::Create(geometry, vglx::PhongMaterial::Create({
         .color = 0x0000FF,
-        .reflectivity = 0.8f,
+        .reflectivity = 0.9f,
         .environment_map = *env_map
     })))->transform.Translate({2.3f, 0.0f, 0.0f});
 
