@@ -29,12 +29,12 @@ auto GetScene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
     auto scene = vglx::Scene::Create();
 
     auto env_map = vglx::LoadCubeTexture({
-        .positive_x = ASSETS_DIR "/skybox/positive_x.jpg",
-        .negative_x = ASSETS_DIR "/skybox/negative_x.jpg",
-        .positive_y = ASSETS_DIR "/skybox/positive_y.jpg",
-        .negative_y = ASSETS_DIR "/skybox/negative_y.jpg",
-        .positive_z = ASSETS_DIR "/skybox/positive_z.jpg",
-        .negative_z = ASSETS_DIR "/skybox/negative_z.jpg",
+        .positive_x = ASSETS_DIR "/skybox_mountains/positive_x.jpg",
+        .negative_x = ASSETS_DIR "/skybox_mountains/negative_x.jpg",
+        .positive_y = ASSETS_DIR "/skybox_mountains/positive_y.jpg",
+        .negative_y = ASSETS_DIR "/skybox_mountains/negative_y.jpg",
+        .positive_z = ASSETS_DIR "/skybox_mountains/positive_z.jpg",
+        .negative_z = ASSETS_DIR "/skybox_mountains/negative_z.jpg",
     });
 
     if (!env_map.has_value()) {

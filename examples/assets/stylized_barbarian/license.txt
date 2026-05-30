@@ -1,0 +1,11 @@
+Model Information:
+* title:	STYLIZED BARBARIAN
+* source:	https://sketchfab.com/3d-models/stylized-barbarian-822d9856c23c4c82886666614cd7133f
+* author:	Fabian Orrego (https://sketchfab.com/fabian_orrego)
+
+Model License:
+* license type:	CC-BY-NC-ND-4.0 (http://creativecommons.org/licenses/by-nc-nd/4.0/)
+* requirements:	Author must be credited. No commercial use. Modified versions can not be distributed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "STYLIZED BARBARIAN" (https://sketchfab.com/3d-models/stylized-barbarian-822d9856c23c4c82886666614cd7133f) by Fabian Orrego (https://sketchfab.com/fabian_orrego) licensed under CC-BY-NC-ND-4.0 (http://creativecommons.org/licenses/by-nc-nd/4.0/)
