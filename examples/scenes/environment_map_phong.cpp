@@ -28,7 +28,7 @@ auto GetCamera() {
 auto GetScene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
     auto scene = vglx::Scene::Create();
 
-    auto env_map = vglx::LoadCubeTexture({
+    auto result = vglx::LoadCubeTexture({
         .positive_x = ASSETS_DIR "/skybox_mountains/positive_x.jpg",
         .negative_x = ASSETS_DIR "/skybox_mountains/negative_x.jpg",
         .positive_y = ASSETS_DIR "/skybox_mountains/positive_y.jpg",
@@ -37,9 +37,13 @@ auto GetScene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
         .negative_z = ASSETS_DIR "/skybox_mountains/negative_z.jpg",
     });
 
-    if (!env_map.has_value()) {
-        return std::unexpected(env_map.error());
+    if (!result.has_value()) {
+        return std::unexpected(result.error());
     }
+
+    auto env_map = *result;
+
+    scene->background = env_map;
 
     auto geometry = vglx::SphereGeometry::Create({
         .radius = 0.8f,
@@ -50,24 +54,24 @@ auto GetScene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
     scene->Add(vglx::Mesh::Create(geometry, vglx::PhongMaterial::Create({
         .color = 0xFFFFFF,
         .reflectivity = 0.5f,
-        .environment_map = *env_map
+        .environment_map = env_map
     })))->transform.Translate({-2.3f, 0.0f, 0.0f});
 
     scene->Add(vglx::Mesh::Create(geometry, vglx::PhongMaterial::Create({
         .color = 0xFF0000,
         .reflectivity = 0.7f,
-        .environment_map = *env_map
+        .environment_map = env_map
     })));
 
     scene->Add(vglx::Mesh::Create(geometry, vglx::PhongMaterial::Create({
         .color = 0x0000FF,
         .reflectivity = 0.9f,
-        .environment_map = *env_map
+        .environment_map = env_map
     })))->transform.Translate({2.3f, 0.0f, 0.0f});
 
     scene->Add(vglx::AmbientLight::Create({
         .color = 0xFFFFFF,
-        .intensity = .3f
+        .intensity = 0.3f
     }));
 
     scene->Add(vglx::DirectionalLight::Create({
