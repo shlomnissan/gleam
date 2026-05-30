@@ -37,6 +37,11 @@ Files generated from upstream web instance:
 
 Collection of single-file libraries used in VGLX components.
 
+- `cgltf.hpp`
+  * Upstream: https://github.com/jkuhlmann/cgltf
+  * Version: 1.15
+  * License: MIT
+
 - `stb_image.hpp`
   * Upstream: https://github.com/nothings/stb
   * Version: 2.30
