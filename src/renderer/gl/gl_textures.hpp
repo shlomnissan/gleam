@@ -50,6 +50,8 @@ auto to_gl_min_filter(Texture::MinFilter f) -> int;
 
 auto to_gl_mag_filter(Texture::MagFilter f) -> int;
 
+auto to_gl_wrap(Texture::Wrapping w) -> int;
+
 class DynamicTexture2D;
 
 class GLTextures {

@@ -48,7 +48,8 @@ auto pick_image_format(const Image& img, Texture::ColorSpace color_space) -> Tex
 
 }
 
-// GL_EXT_texture_filter_anisotropic; core in GL 4.6 but GLAD targets 4.1 on macOS.
+// GL_EXT_texture_filter_anisotropic is core in GL 4.6
+// but vglx currently targets 4.1 for macOS.
 #ifndef GL_TEXTURE_MAX_ANISOTROPY
 #define GL_TEXTURE_MAX_ANISOTROPY 0x84FE
 #endif
@@ -58,6 +59,9 @@ namespace {
 auto apply_sampler_params(GLenum target, const Texture* tex) -> void {
     glTexParameteri(target, GL_TEXTURE_MIN_FILTER, to_gl_min_filter(tex->min_filter));
     glTexParameteri(target, GL_TEXTURE_MAG_FILTER, to_gl_mag_filter(tex->mag_filter));
+
+    glTexParameteri(target, GL_TEXTURE_WRAP_S, to_gl_wrap(tex->wrap_s));
+    glTexParameteri(target, GL_TEXTURE_WRAP_T, to_gl_wrap(tex->wrap_t));
 
     if (tex->anisotropy > 1.0f) {
         const auto anisotropy = std::min(tex->anisotropy, gl::limits().max_anisotropy);
@@ -184,6 +188,8 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
 
         if (tex->generate_mipamps) glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
         apply_sampler_params(GL_TEXTURE_CUBE_MAP, tex);
+
+        // Cube maps always clamp to edge to avoid seams across faces.
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
@@ -308,6 +314,16 @@ auto to_gl_mag_filter(Texture::MagFilter f) -> int {
     switch (f) {
         case Filter::Nearest: return GL_NEAREST;
         case Filter::Linear: return GL_LINEAR;
+        default: VGLX_UNREACHABLE();
+    }
+}
+
+auto to_gl_wrap(Texture::Wrapping w) -> int {
+    using Wrap = Texture::Wrapping;
+    switch (w) {
+        case Wrap::Repeat: return GL_REPEAT;
+        case Wrap::ClampToEdge: return GL_CLAMP_TO_EDGE;
+        case Wrap::MirroredRepeat: return GL_MIRRORED_REPEAT;
         default: VGLX_UNREACHABLE();
     }
 }

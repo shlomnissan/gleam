@@ -103,6 +103,21 @@ public:
     };
 
     /**
+     * @brief Enumerates supported texture wrapping modes.
+     *
+     * Wrapping modes control how a texture is sampled when texture coordinates
+     * fall outside the $[0.0, 1.0]$ range, applied independently per axis.
+     *
+     * Cube maps ignore these modes and always clamp to edge to avoid visible
+     * seams where faces meet.
+     */
+    enum class Wrapping {
+        Repeat, ///< Tiles the texture, ignoring the integer part of the coordinate.
+        ClampToEdge, ///< Clamps the coordinate to the edge texel.
+        MirroredRepeat ///< Tiles the texture, mirroring on each repetition.
+    };
+
+    /**
      * @brief Renderer-specific texture handle.
      *
      * Typically corresponds to the underlying graphics API object identifier,
@@ -118,6 +133,12 @@ public:
 
     /// @brief Magnification filter used when sampling the texture.
     MagFilter mag_filter = MagFilter::Linear;
+
+    /// @brief Wrapping mode applied to the horizontal (U) texture coordinate.
+    Wrapping wrap_s = Wrapping::Repeat;
+
+    /// @brief Wrapping mode applied to the vertical (V) texture coordinate.
+    Wrapping wrap_t = Wrapping::Repeat;
 
     /**
      * @brief Maximum anisotropy used when sampling this texture.
