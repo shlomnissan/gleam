@@ -34,6 +34,7 @@ set(SOURCE_CODE
     "loaders/detail/image_import.hpp"
     "loaders/detail/obj_import.cpp"
     "loaders/detail/obj_import.hpp"
+    "loaders/detail/texture_ref.hpp"
     "loaders/load_cube_texture.cpp"
     "loaders/load_image.cpp"
     "loaders/load_mesh.cpp"

@@ -253,8 +253,8 @@ auto generate_tangents(
     }
 }
 
-auto parse_material(const tinyobj::material_t& material) -> MaterialDescriptor {
-    auto desc = MaterialDescriptor {};
+auto parse_material(const tinyobj::material_t& material) -> PhongMaterialDescriptor {
+    auto desc = PhongMaterialDescriptor {};
 
     desc.name = material.name;
     desc.diffuse = {material.diffuse[0], material.diffuse[1], material.diffuse[2]};
@@ -288,7 +288,7 @@ auto parse_material(const tinyobj::material_t& material) -> MaterialDescriptor {
 auto parse_shape(
     const tinyobj::shape_t& shape,
     const tinyobj::attrib_t& attrib
-) -> ObjEntry {
+) -> OBJMeshEntry {
     auto& mesh = shape.mesh;
 
     auto seen_vertices = VertexMap {};
@@ -382,7 +382,7 @@ auto parse_shape(
 
 } // unnamed namespace
 
-auto import(const fs::path& path) -> std::expected<ObjResult, std::string> {
+auto import(const fs::path& path) -> std::expected<OBJResult, std::string> {
     auto reader_config = tinyobj::ObjReaderConfig {};
     auto reader = tinyobj::ObjReader {};
 
@@ -396,7 +396,7 @@ auto import(const fs::path& path) -> std::expected<ObjResult, std::string> {
     auto& shapes = reader.GetShapes();
     auto& tinyobj_materials = reader.GetMaterials();
 
-    auto result = ObjResult {};
+    auto result = OBJResult {};
 
     result.materials.reserve(tinyobj_materials.size());
     for (const auto& material : tinyobj_materials) {

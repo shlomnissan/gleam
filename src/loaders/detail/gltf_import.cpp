@@ -13,8 +13,8 @@
 
 namespace vglx::detail::gltf {
 
-auto import(const fs::path& path) -> void {
-    // TODO: implement
+auto import(const fs::path& path) -> std::expected<GLTFResult, std::string> {
+    return std::unexpected("implement");
 }
 
 }

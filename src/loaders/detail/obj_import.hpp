@@ -20,7 +20,7 @@ namespace vglx::detail::obj {
 
 namespace fs = std::filesystem;
 
-struct MaterialDescriptor {
+struct PhongMaterialDescriptor {
     std::string name;
 
     Color diffuse {1.0f, 1.0f, 1.0f};
@@ -36,17 +36,17 @@ struct MaterialDescriptor {
     std::string tex_emissive;
 };
 
-struct ObjEntry {
+struct OBJMeshEntry {
     std::string name;
     std::shared_ptr<Geometry> geometry;
     int material_index {-1};
 };
 
-struct ObjResult {
-    std::vector<ObjEntry> entries;
-    std::vector<MaterialDescriptor> materials;
+struct OBJResult {
+    std::vector<OBJMeshEntry> entries;
+    std::vector<PhongMaterialDescriptor> materials;
 };
 
-[[nodiscard]] auto import(const fs::path& path) -> std::expected<ObjResult, std::string>;
+[[nodiscard]] auto import(const fs::path& path) -> std::expected<OBJResult, std::string>;
 
 }

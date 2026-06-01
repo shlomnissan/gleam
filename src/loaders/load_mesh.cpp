@@ -36,7 +36,7 @@ auto load_texture(const fs::path& path, Texture::ColorSpace color_space) -> std:
     return nullptr;
 }
 
-auto build_material(const detail::obj::MaterialDescriptor& desc, const fs::path& base_dir) {
+auto load_obj_material(const detail::obj::PhongMaterialDescriptor& desc, const fs::path& base_dir) {
     auto material = PhongMaterial::Create();
 
     material->color = desc.diffuse;
@@ -56,20 +56,7 @@ auto build_material(const detail::obj::MaterialDescriptor& desc, const fs::path&
     return material;
 }
 
-}
-
-auto LoadMesh(
-    const fs::path& path
-) -> std::expected<std::unique_ptr<Node>, std::string> {
-    if (!fs::exists(path)) {
-        return std::unexpected(std::format("Can't find mesh {}", path.string()));
-    }
-
-    auto ext = path.extension().string();
-    if (ext != ".obj") {
-        return std::unexpected(std::format("Unsupported file extension {}", ext));
-    }
-
+auto load_obj_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>, std::string> {
     auto result = detail::obj::import(path);
     if (!result) {
         return std::unexpected(result.error());
@@ -81,7 +68,7 @@ auto LoadMesh(
     auto materials = std::vector<std::shared_ptr<PhongMaterial>> {};
     materials.reserve(obj.materials.size());
     for (const auto& desc : obj.materials) {
-        materials.emplace_back(build_material(desc, base_dir));
+        materials.emplace_back(load_obj_material(desc, base_dir));
     }
 
     auto root = std::make_unique<Node>();
@@ -100,6 +87,28 @@ auto LoadMesh(
     }
 
     return root;
+}
+
+auto load_gltf_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>, std::string> {
+    return std::unexpected("implement");
+}
+
+}
+
+auto LoadMesh(
+    const fs::path& path
+) -> std::expected<std::unique_ptr<Node>, std::string> {
+    if (!fs::exists(path)) {
+        return std::unexpected(std::format("Can't find mesh {}", path.string()));
+    }
+
+    auto ext = path.extension().string();
+
+    if (ext == ".obj") return load_obj_mesh(path);
+
+    if (ext == ".gltf") return load_gltf_mesh(path);
+
+    return std::unexpected(std::format("Unsupported file extension {}", ext));
 }
 
 }
