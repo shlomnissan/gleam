@@ -68,46 +68,14 @@ public:
     }
 
     /**
-     * @brief Returns the UV transformation matrix.
+     * @brief UV transform applied to texture coordinates when sampling.
      *
-     * The transform can be modified through translation, scaling, or rotation
-     * using the provided helper methods. This affects how the texture is
-     * sampled during rendering.
+     * Modify it directly through the @ref Transform2 interface (for example
+     * @ref Transform2::SetScale, @ref Transform2::SetPosition, or
+     * @ref Transform2::SetRotation) to translate, scale, or rotate the
+     * texture. The renderer reads the resulting matrix each frame.
      */
-    [[nodiscard]] auto GetTransform() -> Matrix3 {
-        return transform_.Get();
-    }
-
-    /**
-     * @brief Applies a translation offset along the X-axis.
-     *
-     * @param value Offset value in pixels.
-     */
-    auto OffsetX(float value) { transform_.Translate({value, 0.0f}); }
-
-    /**
-     * @brief Applies a translation offset along the Y-axis.
-     *
-     * @param value Offset value in pixels.
-     */
-    auto OffsetY(float value) { transform_.Translate({0.0f, value}); }
-
-    /**
-     * @brief Applies a uniform scale to the texture coordinates.
-     *
-     * @param value Scale factor.
-     */
-    auto Scale(float value) { transform_.Scale({value, value}); }
-
-    /**
-     * @brief Applies a rotation to the texture coordinates.
-     *
-     * @param angle Rotation angle in radians.
-     */
-    auto Rotate(float angle) { transform_.Rotate(angle); }
-
-private:
-    Transform2 transform_;
+    Transform2 transform;
 };
 
 }

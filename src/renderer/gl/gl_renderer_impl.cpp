@@ -184,7 +184,7 @@ auto Renderer::Impl::SetUniforms(
     const auto bind_texture = [&](GLTextureMapType type, std::shared_ptr<Texture> tex) {
         textures_.Bind(tex, std::to_underlying(type));
         if (tex->GetType() == Texture::Type::Texture2D) {
-            const auto& transform = static_cast<Texture2D*>(tex.get())->GetTransform();
+            const auto& transform = static_cast<Texture2D*>(tex.get())->transform.Get();
             program->SetUniform(Uniform::TextureTransform, &transform);
         }
 
@@ -325,7 +325,7 @@ auto Renderer::Impl::SetUniforms(
             program->SetUniform(name, &tex_unit);
 
             if (tex->GetType() == Texture::Type::Texture2D) {
-                const auto& transform = static_cast<Texture2D*>(tex.get())->GetTransform();
+                const auto& transform = static_cast<Texture2D*>(tex.get())->transform.Get();
                 program->SetUniform(Uniform::TextureTransform, &transform);
             }
         }
