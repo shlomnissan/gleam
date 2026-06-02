@@ -14,6 +14,7 @@
 
 #include "loaders/detail/image_import.hpp"
 #include "loaders/detail/obj_import.hpp"
+#include "loaders/detail/texture_ref.hpp"
 
 #include "utilities/logger.hpp"
 
@@ -21,19 +22,34 @@ namespace vglx {
 
 namespace {
 
-auto load_texture(const fs::path& path, Texture::ColorSpace color_space) -> std::shared_ptr<Texture2D> {
+auto load_texture(
+    const detail::TextureRef& ref,
+    const fs::path& base_dir,
+    Texture::ColorSpace color_space
+) -> std::shared_ptr<Texture2D> {
+    if (ref.empty()) return nullptr;
+
+    auto path = base_dir / ref.uri;
     if (fs::is_directory(path)) return nullptr;
 
-    auto texture = LoadTexture(path, color_space);
-    if (texture.has_value()) {
-        return texture.value();
+    auto result = LoadTexture(path, color_space);
+    if (!result.has_value()) {
+        Logger::Log(LogLevel::Error,
+            "Failed to load texture for mesh {}", path.string()
+        );
+        return nullptr;
     }
 
-    Logger::Log(LogLevel::Error,
-        "Failed to load texture for mesh {}", path.string()
-    );
+    auto texture = result.value();
+    texture->wrap_s = ref.wrap_s;
+    texture->wrap_t = ref.wrap_t;
+    texture->min_filter = ref.min_filter;
+    texture->mag_filter = ref.mag_filter;
+    texture->transform.SetScale(ref.uv_scale);
+    texture->transform.SetPosition(ref.uv_offset);
+    texture->transform.SetRotation(ref.uv_rotation);
 
-    return nullptr;
+    return texture;
 }
 
 auto load_obj_material(const detail::obj::PhongMaterialDescriptor& desc, const fs::path& base_dir) {
@@ -43,11 +59,11 @@ auto load_obj_material(const detail::obj::PhongMaterialDescriptor& desc, const f
     material->specular_color = desc.specular;
     material->emissive_color = desc.emission;
     material->shininess = desc.shininess;
-    material->albedo_map = load_texture(base_dir / desc.tex_diffuse, Texture::ColorSpace::sRGB);
-    material->alpha_map = load_texture(base_dir / desc.tex_alpha, Texture::ColorSpace::Linear);
-    material->normal_map = load_texture(base_dir / desc.tex_normal, Texture::ColorSpace::Linear);
-    material->specular_map = load_texture(base_dir / desc.tex_specular, Texture::ColorSpace::Linear);
-    material->emissive_map = load_texture(base_dir / desc.tex_emissive, Texture::ColorSpace::sRGB);
+    material->albedo_map = load_texture(desc.tex_diffuse, base_dir, Texture::ColorSpace::sRGB);
+    material->alpha_map = load_texture(desc.tex_alpha, base_dir, Texture::ColorSpace::Linear);
+    material->normal_map = load_texture(desc.tex_normal, base_dir, Texture::ColorSpace::Linear);
+    material->specular_map = load_texture(desc.tex_specular, base_dir, Texture::ColorSpace::Linear);
+    material->emissive_map = load_texture(desc.tex_emissive, base_dir, Texture::ColorSpace::sRGB);
 
     if (material->albedo_map) {
         material->color = 0xFFFFFF;

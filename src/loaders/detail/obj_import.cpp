@@ -253,6 +253,33 @@ auto generate_tangents(
     }
 }
 
+auto make_texture_ref(
+    const std::string& name,
+    const tinyobj::texture_option_t& opt
+) -> TextureRef {
+    auto ref = TextureRef {};
+    ref.uri = name;
+
+    const auto wrap = opt.clamp ?
+        Texture::Wrapping::ClampToEdge :
+        Texture::Wrapping::Repeat;
+
+    ref.wrap_s = wrap;
+    ref.wrap_t = wrap;
+
+    ref.uv_offset = {
+        static_cast<float>(opt.origin_offset[0]),
+        static_cast<float>(opt.origin_offset[1])
+    };
+
+    ref.uv_scale = {
+        static_cast<float>(opt.scale[0]),
+        static_cast<float>(opt.scale[1])
+    };
+
+    return ref;
+}
+
 auto parse_material(const tinyobj::material_t& material) -> PhongMaterialDescriptor {
     auto desc = PhongMaterialDescriptor {};
 
@@ -274,13 +301,15 @@ auto parse_material(const tinyobj::material_t& material) -> PhongMaterialDescrip
         desc.emission = {1.0f, 1.0f, 1.0f};
     }
 
-    desc.tex_diffuse = material.diffuse_texname;
-    desc.tex_alpha = material.alpha_texname;
-    desc.tex_specular = material.specular_texname;
-    desc.tex_emissive = material.emissive_texname;
+    desc.tex_diffuse = make_texture_ref(material.diffuse_texname, material.diffuse_texopt);
+    desc.tex_alpha = make_texture_ref(material.alpha_texname, material.alpha_texopt);
+    desc.tex_specular = make_texture_ref(material.specular_texname, material.specular_texopt);
+    desc.tex_emissive = make_texture_ref(material.emissive_texname, material.emissive_texopt);
+
+    // Prefer an explicit normal map, falling back to the bump map slot.
     desc.tex_normal = material.normal_texname.empty()
-        ? material.bump_texname
-        : material.normal_texname;
+        ? make_texture_ref(material.bump_texname, material.bump_texopt)
+        : make_texture_ref(material.normal_texname, material.normal_texopt);
 
     return desc;
 }

@@ -10,6 +10,8 @@
 #include "vglx/geometries/geometry.hpp"
 #include "vglx/math/color.hpp"
 
+#include "texture_ref.hpp"
+
 #include <expected>
 #include <filesystem>
 #include <memory>
@@ -29,11 +31,11 @@ struct PhongMaterialDescriptor {
 
     float shininess {32.0f};
 
-    std::string tex_diffuse;
-    std::string tex_alpha;
-    std::string tex_normal;
-    std::string tex_specular;
-    std::string tex_emissive;
+    TextureRef tex_diffuse;
+    TextureRef tex_alpha;
+    TextureRef tex_normal;
+    TextureRef tex_specular;
+    TextureRef tex_emissive;
 };
 
 struct OBJMeshEntry {
