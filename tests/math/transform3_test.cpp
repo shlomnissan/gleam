@@ -8,6 +8,7 @@
 #include <gtest/gtest.h>
 #include <test_helpers.hpp>
 
+#include <vglx/math/quaternion.hpp>
 #include <vglx/math/transform3.hpp>
 #include <vglx/math/utilities.hpp>
 
@@ -59,51 +60,62 @@ TEST(Transform3, SetScale) {
     static_assert(t2.scale.z == 3.0f);
 }
 
-TEST(Transform3, SetRotation) {
+TEST(Transform3, SetRotationFromEuler) {
+    constexpr auto e = vglx::Euler {0.1f, 0.2f, 0.3f};
+
     auto t1 = vglx::Transform3 {};
-    auto p = vglx::math::pi_over_2;
-    t1.SetRotation(vglx::Euler {p + 0.1f, p + 0.2f, p + 0.3f});
+    t1.SetRotation(e);
 
-    const auto rotation = t1.rotation;
-    EXPECT_NEAR(rotation.pitch, p + 0.1f, 0.0001f);
-    EXPECT_NEAR(rotation.yaw, p + 0.2f, 0.0001f);
-    EXPECT_NEAR(rotation.roll, p + 0.3f, 0.0001f);
+    // The rotation is stored as a quaternion; Get() reproduces the Euler matrix.
+    EXPECT_MAT4_NEAR(t1.Get(), e.GetMatrix(), 1e-4);
 
-    const auto cos_p = vglx::math::Cos(rotation.pitch);
-    const auto sin_p = vglx::math::Sin(rotation.pitch);
-    const auto cos_y = vglx::math::Cos(rotation.yaw);
-    const auto sin_y = vglx::math::Sin(rotation.yaw);
-    const auto cos_r = vglx::math::Cos(rotation.roll);
-    const auto sin_r = vglx::math::Sin(rotation.roll);
-
-    EXPECT_MAT4_EQ(t1.Get(), {
-        cos_r * cos_y - sin_r * sin_p * sin_y, -sin_r * cos_p, cos_r * sin_y + sin_r * sin_p * cos_y, 0.0f,
-        sin_r * cos_y + cos_r * sin_p * sin_y, cos_r * cos_p, sin_r * sin_y - cos_r * sin_p * cos_y, 0.0f,
-        -cos_p * sin_y, sin_p, cos_p * cos_y, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f
-    });
+    // Euler read-back is well defined away from gimbal lock.
+    const auto out = t1.GetEuler();
+    EXPECT_NEAR(out.pitch, e.pitch, 1e-4);
+    EXPECT_NEAR(out.yaw, e.yaw, 1e-4);
+    EXPECT_NEAR(out.roll, e.roll, 1e-4);
 
     constexpr auto t2 = []() {
         auto t = vglx::Transform3 {};
-        auto p = vglx::math::pi_over_2;
-        t.SetRotation(vglx::Euler {p + 0.1f, p + 0.2f, p + 0.3f});
+        t.SetRotation(vglx::Euler {0.1f, 0.2f, 0.3f});
         return t;
     }();
+
+    static_assert(ApproxEqual(t2.GetEuler().pitch, 0.1f));
+}
+
+TEST(Transform3, SetRotationFromQuaternion) {
+    constexpr auto q = vglx::Quaternion::FromAxisAngle(vglx::Vector3::Up(), vglx::math::pi_over_2);
+
+    auto t1 = vglx::Transform3 {};
+    t1.SetRotation(q);
+
+    EXPECT_EQ(t1.rotation, q);
+    EXPECT_MAT4_NEAR(t1.Get(), q.GetMatrix(), 1e-4);
+
+    constexpr auto t2 = []() {
+        auto t = vglx::Transform3 {};
+        t.SetRotation(vglx::Quaternion::FromAxisAngle(vglx::Vector3::Up(), vglx::math::pi_over_2));
+        return t;
+    }();
+
+    static_assert(t2.rotation == q);
 }
 
 TEST(Transform3, MultipleTransformations) {
-    auto t = vglx::Transform3 {};
-    t.SetPosition({2.0f, 1.0f, 3.0f});
-    t.SetScale({2.0f, 1.0f, 3.0f});
-    t.SetRotation(vglx::Euler {
+    constexpr auto rotation = vglx::Euler {
         vglx::math::pi_over_2 + 0.1f,
         vglx::math::pi_over_2 + 0.2f,
         vglx::math::pi_over_2 + 0.3f
-    });
+    };
+    constexpr auto position = vglx::Vector3 {2.0f, 1.0f, 3.0f};
+    constexpr auto scale = vglx::Vector3 {2.0f, 1.0f, 3.0f};
 
-    const auto& rotation = t.rotation;
-    const auto& position = t.position;
-    const auto& scale = t.scale;
+    auto t = vglx::Transform3 {};
+    t.SetPosition(position);
+    t.SetScale(scale);
+    t.SetRotation(rotation);
+
     const auto cos_p = vglx::math::Cos(rotation.pitch);
     const auto sin_p = vglx::math::Sin(rotation.pitch);
     const auto cos_y = vglx::math::Cos(rotation.yaw);
@@ -111,7 +123,7 @@ TEST(Transform3, MultipleTransformations) {
     const auto cos_r = vglx::math::Cos(rotation.roll);
     const auto sin_r = vglx::math::Sin(rotation.roll);
 
-    EXPECT_MAT4_EQ(t.Get(), {
+    EXPECT_MAT4_NEAR(t.Get(), {
         scale.x * (cos_r * cos_y - sin_r * sin_p * sin_y),
         scale.y * (-sin_r * cos_p),
         scale.z * (cos_r * sin_y + sin_r * sin_p * cos_y),
@@ -128,7 +140,7 @@ TEST(Transform3, MultipleTransformations) {
         position.z,
 
         0.0f, 0.0f, 0.0f, 1.0f
-    });
+    }, 1e-4);
 }
 
 #pragma endregion
@@ -193,12 +205,12 @@ TEST(Transform3, RotateX) {
     constexpr auto c = vglx::math::Cos(vglx::math::pi_over_2 + 0.1f);
     constexpr auto s = vglx::math::Sin(vglx::math::pi_over_2 + 0.1f);
 
-    EXPECT_MAT4_EQ(t.Get(), {
+    EXPECT_MAT4_NEAR(t.Get(), {
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, c, -s, 0.0f,
         0.0f, s, c, 0.0f,
         0.0f, 0.0f, 0.0f, 1.0f
-    });
+    }, 1e-4);
 
     constexpr auto m = []() {
         auto t = vglx::Transform3 {};
@@ -207,10 +219,10 @@ TEST(Transform3, RotateX) {
         return t.Get();
     }();
 
-    static_assert(m[1].y == c);
-    static_assert(m[1].z == s);
-    static_assert(m[2].y == -s);
-    static_assert(m[2].z == c);
+    static_assert(ApproxEqual(m[1].y, c));
+    static_assert(ApproxEqual(m[1].z, s));
+    static_assert(ApproxEqual(m[2].y, -s));
+    static_assert(ApproxEqual(m[2].z, c));
 }
 
 TEST(Transform3, RotateY) {
@@ -221,12 +233,12 @@ TEST(Transform3, RotateY) {
     constexpr auto c = vglx::math::Cos(vglx::math::pi_over_2 + 0.1f);
     constexpr auto s = vglx::math::Sin(vglx::math::pi_over_2 + 0.1f);
 
-    EXPECT_MAT4_EQ(t.Get(), {
+    EXPECT_MAT4_NEAR(t.Get(), {
         c, 0.0f, s, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f,
         -s, 0.0f, c, 0.0f,
         0.0f, 0.0f, 0.0f, 1.0f
-    });
+    }, 1e-4);
 
     constexpr auto m = []() {
         auto t = vglx::Transform3 {};
@@ -235,10 +247,10 @@ TEST(Transform3, RotateY) {
         return t.Get();
     }();
 
-    static_assert(m[0].x == c);
-    static_assert(m[0].z == -s);
-    static_assert(m[2].x == s);
-    static_assert(m[2].z == c);
+    static_assert(ApproxEqual(m[0].x, c));
+    static_assert(ApproxEqual(m[0].z, -s));
+    static_assert(ApproxEqual(m[2].x, s));
+    static_assert(ApproxEqual(m[2].z, c));
 }
 
 TEST(Transform3, RotateZ) {
@@ -249,12 +261,12 @@ TEST(Transform3, RotateZ) {
     constexpr auto c = vglx::math::Cos(vglx::math::pi_over_2 + 0.1f);
     constexpr auto s = vglx::math::Sin(vglx::math::pi_over_2 + 0.1f);
 
-    EXPECT_MAT4_EQ(t.Get(), {
+    EXPECT_MAT4_NEAR(t.Get(), {
         c, -s, 0.0f, 0.0f,
         s, c, 0.0f, 0.0f,
         0.0f, 0.0f, 1.0f, 0.0f,
         0.0f, 0.0f, 0.0f, 1.0f
-    });
+    }, 1e-4);
 
     constexpr auto m = []() {
         auto t = vglx::Transform3 {};
@@ -263,10 +275,31 @@ TEST(Transform3, RotateZ) {
         return t.Get();
     }();
 
-    static_assert(m[0].x == c);
-    static_assert(m[0].y == s);
-    static_assert(m[1].x == -s);
-    static_assert(m[1].y == c);
+    static_assert(ApproxEqual(m[0].x, c));
+    static_assert(ApproxEqual(m[0].y, s));
+    static_assert(ApproxEqual(m[1].x, -s));
+    static_assert(ApproxEqual(m[1].y, c));
+}
+
+TEST(Transform3, RotateArbitraryAxis) {
+    constexpr auto axis = vglx::Vector3 {1.0f, 2.0f, 3.0f};
+    constexpr auto angle = 1.0f;
+
+    auto t = vglx::Transform3 {};
+    t.Rotate(axis, angle);
+
+    EXPECT_MAT4_NEAR(t.Get(), vglx::Quaternion::FromAxisAngle(axis, angle).GetMatrix(), 1e-4);
+
+    constexpr auto m = []() {
+        auto t = vglx::Transform3 {};
+        t.Rotate(vglx::Vector3 {1.0f, 2.0f, 3.0f}, 1.0f);
+        return t.Get();
+    }();
+
+    constexpr auto expected = vglx::Quaternion::FromAxisAngle(axis, angle).GetMatrix();
+    static_assert(ApproxEqual(m[0].x, expected[0].x));
+    static_assert(ApproxEqual(m[1].y, expected[1].y));
+    static_assert(ApproxEqual(m[2].z, expected[2].z));
 }
 
 #pragma endregion
@@ -278,12 +311,12 @@ TEST(Transform3, TranslateBeforeRotation) {
     t.Translate({0.0f, 0.0f, 1.0f});
     t.Rotate(vglx::Vector3::Up(), vglx::math::pi_over_2);
 
-    EXPECT_MAT4_EQ(t.Get(), {
+    EXPECT_MAT4_NEAR(t.Get(), {
          0.0f, 0.0f, 1.0f, 0.0f,
          0.0f, 1.0f, 0.0f, 0.0f,
         -1.0f, 0.0f, 0.0f, 1.0f,
          0.0f, 0.0f, 0.0f, 1.0f
-    });
+    }, 1e-4);
 
     constexpr auto m = []() {
         auto t = vglx::Transform3 {};
@@ -292,18 +325,18 @@ TEST(Transform3, TranslateBeforeRotation) {
         return t.Get();
     }();
 
-    static_assert(m[0].x == 0.0f);
-    static_assert(m[0].y == 0.0f);
-    static_assert(m[0].z == -1.0f);
-    static_assert(m[1].x == 0.0f);
-    static_assert(m[1].y == 1.0f);
-    static_assert(m[1].z == 0.0f);
-    static_assert(m[2].x == 1.0f);
-    static_assert(m[2].y == 0.0f);
-    static_assert(m[2].z == 0.0f);
-    static_assert(m[3].x == 0.0f);
-    static_assert(m[3].y == 0.0f);
-    static_assert(m[3].z == 1.0f);
+    static_assert(ApproxEqual(m[0].x, 0.0f));
+    static_assert(ApproxEqual(m[0].y, 0.0f));
+    static_assert(ApproxEqual(m[0].z, -1.0f));
+    static_assert(ApproxEqual(m[1].x, 0.0f));
+    static_assert(ApproxEqual(m[1].y, 1.0f));
+    static_assert(ApproxEqual(m[1].z, 0.0f));
+    static_assert(ApproxEqual(m[2].x, 1.0f));
+    static_assert(ApproxEqual(m[2].y, 0.0f));
+    static_assert(ApproxEqual(m[2].z, 0.0f));
+    static_assert(ApproxEqual(m[3].x, 0.0f));
+    static_assert(ApproxEqual(m[3].y, 0.0f));
+    static_assert(ApproxEqual(m[3].z, 1.0f));
 }
 
 TEST(Transform3, TranslateAfterRotation) {
@@ -311,12 +344,12 @@ TEST(Transform3, TranslateAfterRotation) {
     t.Rotate(vglx::Vector3::Up(), vglx::math::pi_over_2);
     t.Translate({0.0f, 0.0f, 1.0f});
 
-    EXPECT_MAT4_EQ(t.Get(), {
+    EXPECT_MAT4_NEAR(t.Get(), {
          0.0f, 0.0f, 1.0f, 1.0f,
          0.0f, 1.0f, 0.0f, 0.0f,
         -1.0f, 0.0f, 0.0f, 0.0f,
          0.0f, 0.0f, 0.0f, 1.0f
-    });
+    }, 1e-4);
 
     constexpr auto m = []() {
         auto t = vglx::Transform3 {};
@@ -325,18 +358,18 @@ TEST(Transform3, TranslateAfterRotation) {
         return t.Get();
     }();
 
-    static_assert(m[0].x == 0.0f);
-    static_assert(m[0].y == 0.0f);
-    static_assert(m[0].z == -1.0f);
-    static_assert(m[1].x == 0.0f);
-    static_assert(m[1].y == 1.0f);
-    static_assert(m[1].z == 0.0f);
-    static_assert(m[2].x == 1.0f);
-    static_assert(m[2].y == 0.0f);
-    static_assert(m[2].z == 0.0f);
-    static_assert(m[3].x == 1.0f);
-    static_assert(m[3].y == 0.0f);
-    static_assert(m[3].z == 0.0f);
+    static_assert(ApproxEqual(m[0].x, 0.0f));
+    static_assert(ApproxEqual(m[0].y, 0.0f));
+    static_assert(ApproxEqual(m[0].z, -1.0f));
+    static_assert(ApproxEqual(m[1].x, 0.0f));
+    static_assert(ApproxEqual(m[1].y, 1.0f));
+    static_assert(ApproxEqual(m[1].z, 0.0f));
+    static_assert(ApproxEqual(m[2].x, 1.0f));
+    static_assert(ApproxEqual(m[2].y, 0.0f));
+    static_assert(ApproxEqual(m[2].z, 0.0f));
+    static_assert(ApproxEqual(m[3].x, 1.0f));
+    static_assert(ApproxEqual(m[3].y, 0.0f));
+    static_assert(ApproxEqual(m[3].z, 0.0f));
 }
 
 #pragma endregion

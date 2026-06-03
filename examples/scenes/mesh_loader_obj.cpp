@@ -40,8 +40,8 @@ auto GetScene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
     }
 
     auto mesh = sphere->Add(std::move(result.value()));
-    mesh->transform.Rotate(vglx::Vector3::Up(), vglx::math::DegToRad(90.0f));
     mesh->transform.Rotate(vglx::Vector3::Right(), vglx::math::DegToRad(15.0f));
+    mesh->transform.Rotate(vglx::Vector3::Up(), vglx::math::DegToRad(90.0f));
 
     sphere->Add(vglx::AmbientLight::Create({
         .color = 0xFFFFFF,

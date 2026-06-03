@@ -9,6 +9,7 @@
 
 #include "vglx/math/euler.hpp"
 #include "vglx/math/matrix4.hpp"
+#include "vglx/math/quaternion.hpp"
 #include "vglx/math/utilities.hpp"
 #include "vglx/math/vector3.hpp"
 
@@ -18,7 +19,7 @@ namespace vglx {
  * @brief 3D affine transform with position, rotation, and scale.
  *
  * Transform3 represents a 3D transform combining translation, non-uniform
- * scaling, and Euler-based rotation. It lazily builds a @ref Matrix4
+ * scaling, and quaternion-based rotation. It lazily builds a @ref Matrix4
  * suitable for use as a world transform in scene graphs and rendering code.
  *
  * @ingroup MathGroup
@@ -34,8 +35,8 @@ public:
     /// @brief Non-uniform scale in 3D.
     Vector3 scale {1.0f};
 
-     /// @brief Rotation stored as Euler angles.
-    Euler rotation {};
+    /// @brief Rotation stored as a unit quaternion.
+    Quaternion rotation {};
 
     /**
      * @brief Constructs an identity transform.
@@ -51,7 +52,7 @@ public:
      * @param value Translation vector.
      */
     constexpr auto Translate(const Vector3& value) -> void {
-        position += rotation.IsEmpty() ? value : rotation.GetMatrix() * value;
+        position += rotation * value;
         touched = true;
     }
 
@@ -66,23 +67,16 @@ public:
     }
 
     /**
-     * @brief Applies an additional rotation around a principal axis.
+     * @brief Applies an additional rotation around an axis in local space.
      *
-     * Only the canonical axes @ref Vector3::Right, @ref Vector3::Up, and
-     * @ref Vector3::Forward are supported.
+     * The rotation is composed after the current orientation, so the axis is
+     * interpreted in the transform's local frame.
      *
-     * @param axis Rotation axis.
+     * @param axis Rotation axis; normalized internally.
      * @param angle Rotation angle in radians.
      */
     constexpr auto Rotate(const Vector3& axis, float angle) -> void {
-        assert(axis == Vector3::Right() || axis == Vector3::Up() || axis == Vector3::Forward());
-        if (axis == Vector3::Right()) {
-            rotation.pitch += angle;
-        }else if (axis == Vector3::Up()) {
-            rotation.yaw += angle;
-        } else if (axis == Vector3::Forward()) {
-            rotation.roll += angle;
-        }
+        rotation = rotation * Quaternion::FromAxisAngle(axis, angle);
         touched = true;
     }
 
@@ -120,7 +114,7 @@ public:
         right.Normalize();
         auto up = Cross(forward, right);
 
-        rotation = Euler {{
+        rotation = Quaternion {{
             right.x, up.x, forward.x, 0.0f,
             right.y, up.y, forward.y, 0.0f,
             right.z, up.z, forward.z, 0.0f,
@@ -157,13 +151,36 @@ public:
     /**
      * @brief Sets the rotation component.
      *
-     * @param rotation New Euler rotation.
+     * @param rotation New rotation quaternion.
      */
-    constexpr auto SetRotation(const Euler& rotation) -> void {
+    constexpr auto SetRotation(const Quaternion& rotation) -> void {
         if (this->rotation != rotation) {
             this->rotation = rotation;
             touched = true;
         }
+    }
+
+    /**
+     * @brief Sets the rotation component from Euler angles.
+     *
+     * Provided as a convenience; the angles are converted to and stored as a
+     * quaternion.
+     *
+     * @param rotation New Euler rotation.
+     */
+    constexpr auto SetRotation(const Euler& rotation) -> void {
+        SetRotation(Quaternion {rotation.GetMatrix()});
+    }
+
+    /**
+     * @brief Returns the rotation as Euler angles.
+     *
+     * Provided as a convenience for inspection; the conversion is lossy near
+     * gimbal lock and only resolves angles within the @ref Euler reconstruction
+     * range. The quaternion remains the authoritative representation.
+     */
+    [[nodiscard]] constexpr auto GetEuler() const -> Euler {
+        return Euler {rotation.GetMatrix()};
     }
 
     /**
@@ -174,29 +191,12 @@ public:
      */
     [[nodiscard]] constexpr auto Get() -> Matrix4 {
         if (touched) {
-            const auto cos_p = math::Cos(rotation.pitch);
-            const auto sin_p = math::Sin(rotation.pitch);
-            const auto cos_y = math::Cos(rotation.yaw);
-            const auto sin_y = math::Sin(rotation.yaw);
-            const auto cos_r = math::Cos(rotation.roll);
-            const auto sin_r = math::Sin(rotation.roll);
+            const auto r = rotation.GetMatrix();
 
             transform_ = {
-                scale.x * (cos_r * cos_y - sin_r * sin_p * sin_y),
-                scale.y * (-sin_r * cos_p),
-                scale.z * (cos_r * sin_y + sin_r * sin_p * cos_y),
-                position.x,
-
-                scale.x * (sin_r * cos_y + cos_r * sin_p * sin_y),
-                scale.y * (cos_r * cos_p),
-                scale.z * (sin_r * sin_y - cos_r * sin_p * cos_y),
-                position.y,
-
-                scale.x * (-cos_p * sin_y),
-                scale.y * sin_p,
-                scale.z * (cos_p * cos_y),
-                position.z,
-
+                scale.x * r(0, 0), scale.y * r(0, 1), scale.z * r(0, 2), position.x,
+                scale.x * r(1, 0), scale.y * r(1, 1), scale.z * r(1, 2), position.y,
+                scale.x * r(2, 0), scale.y * r(2, 1), scale.z * r(2, 2), position.z,
                 0.0f, 0.0f, 0.0f, 1.0f
             };
 
