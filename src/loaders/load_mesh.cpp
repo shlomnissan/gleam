@@ -14,7 +14,7 @@
 
 #include "loaders/detail/image_import.hpp"
 #include "loaders/detail/obj_import.hpp"
-#include "loaders/detail/texture_ref.hpp"
+#include "loaders/detail/shared.hpp"
 
 #include "utilities/logger.hpp"
 

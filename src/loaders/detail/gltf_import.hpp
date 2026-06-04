@@ -11,7 +11,7 @@
 #include "vglx/math/color.hpp"
 #include "vglx/math/matrix4.hpp"
 
-#include "texture_ref.hpp"
+#include "shared.hpp"
 
 #include <expected>
 #include <filesystem>
