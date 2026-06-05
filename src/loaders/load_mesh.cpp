@@ -12,6 +12,7 @@
 #include "vglx/scene/node.hpp"
 #include "vglx/textures/texture_2d.hpp"
 
+#include "loaders/detail/gltf_import.hpp"
 #include "loaders/detail/image_import.hpp"
 #include "loaders/detail/obj_import.hpp"
 #include "loaders/detail/shared.hpp"
@@ -106,7 +107,13 @@ auto load_obj_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>,
 }
 
 auto load_gltf_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>, std::string> {
-    return std::unexpected("implement");
+    auto result = detail::gltf::import(path);
+    if (!result) {
+        return std::unexpected(result.error());
+    }
+
+    auto root = std::make_unique<Node>();
+    return root;
 }
 
 }

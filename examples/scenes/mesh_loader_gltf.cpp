@@ -27,36 +27,18 @@ auto GetCamera() {
 
 auto GetScene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
     auto scene = vglx::Scene::Create();
-    auto sphere = scene->Add(vglx::Mesh::Create(
-        vglx::SphereGeometry::Create({.radius = 5.0f}),
-        vglx::PhongMaterial::Create({.color = 0x000011})
-    ));
 
-    sphere->GetMaterial()->two_sided = true;
-
-    auto result = vglx::LoadMesh(ASSETS_DIR "/lps_head/lps_head.obj");
+    auto result = vglx::LoadMesh(ASSETS_DIR "/barbarian/scene.gltf");
     if (!result.has_value()) {
         return std::unexpected(result.error());
     }
 
-    auto mesh = sphere->Add(std::move(result.value()));
-    mesh->transform.Rotate(vglx::Vector3::Right(), vglx::math::DegToRad(15.0f));
-    mesh->transform.Rotate(vglx::Vector3::Up(), vglx::math::DegToRad(90.0f));
+    scene->Add(std::move(result.value()));
 
-    sphere->Add(vglx::AmbientLight::Create({
+    scene->Add(vglx::AmbientLight::Create({
         .color = 0xFFFFFF,
-        .intensity = 0.3f
+        .intensity = 1.0
     }));
-
-    sphere->Add(vglx::PointLight::Create({
-        .color = 0xFFFFFF,
-        .intensity = 0.9f
-    }))->transform.Translate({2.0f, 6.0f, 10.0f});
-
-    sphere->Add(vglx::PointLight::Create({
-        .color = 0xFAA916,
-        .intensity = 1.0f
-    }))->transform.Translate({-2.0f, 6.0f, -4.0f});
 
     return scene;
 }
@@ -70,6 +52,7 @@ auto main() -> int {
     }
 
     return RunExample(scene->get(), camera.get(), {
-        .window_title = "Mesh Loader OBJ",
+        .window_title = "Mesh Loader glTF",
+        .clear_color = vglx::Color {0x000080}
     });
 }
