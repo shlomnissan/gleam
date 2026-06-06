@@ -33,12 +33,24 @@ auto GetScene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
         return std::unexpected(result.error());
     }
 
+    result.value()->transform.Translate({0.0f, -1.1f, 0.0f});
+
     scene->Add(std::move(result.value()));
 
     scene->Add(vglx::AmbientLight::Create({
         .color = 0xFFFFFF,
         .intensity = 1.0
     }));
+
+    scene->Add(vglx::PointLight::Create({
+        .color = 0xFFFFFF,
+        .intensity = 1.5f
+    }))->transform.Translate({2.0f, 6.0f, 10.0f});
+
+    scene->Add(vglx::PointLight::Create({
+        .color = 0xFAA916,
+        .intensity = 1.5f
+    }))->transform.Translate({-2.0f, 6.0f, -4.0f});
 
     return scene;
 }
@@ -53,6 +65,6 @@ auto main() -> int {
 
     return RunExample(scene->get(), camera.get(), {
         .window_title = "Mesh Loader glTF",
-        .clear_color = vglx::Color {0x000080}
+        .clear_color = vglx::Color {0xC9C9C9}
     });
 }

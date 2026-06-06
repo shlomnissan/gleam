@@ -81,7 +81,7 @@ auto create_geometry(cgltf_primitive* primitive) -> std::shared_ptr<vglx::Geomet
             cgltf_accessor_read_float(tex_ptr, i, fl2, 2);
 
             vertex_data[offset + 0] = fl2[0];
-            vertex_data[offset + 1] = fl2[1];
+            vertex_data[offset + 1] = 1.0f - fl2[1];
         }
 
         if (layout.has_tangents && has_tangents) {

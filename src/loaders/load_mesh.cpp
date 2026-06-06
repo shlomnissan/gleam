@@ -7,7 +7,9 @@
 
 #include "vglx/loaders.hpp"
 
+#include "vglx/materials/pbr_material.hpp"
 #include "vglx/materials/phong_material.hpp"
+#include "vglx/math/quaternion.hpp"
 #include "vglx/scene/mesh.hpp"
 #include "vglx/scene/node.hpp"
 #include "vglx/textures/texture_2d.hpp"
@@ -46,6 +48,12 @@ auto load_texture(
     texture->wrap_t = ref.wrap_t;
     texture->min_filter = ref.min_filter;
     texture->mag_filter = ref.mag_filter;
+    texture->generate_mipamps =
+        ref.min_filter == Texture::MinFilter::NearestMipmapNearest ||
+        ref.min_filter == Texture::MinFilter::LinearMipmapNearest  ||
+        ref.min_filter == Texture::MinFilter::NearestMipmapLinear  ||
+        ref.min_filter == Texture::MinFilter::LinearMipmapLinear;
+
     texture->transform.SetScale(ref.uv_scale);
     texture->transform.SetPosition(ref.uv_offset);
     texture->transform.SetRotation(ref.uv_rotation);
@@ -106,13 +114,103 @@ auto load_obj_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>,
     return root;
 }
 
+auto load_gltf_material(const detail::gltf::PBRMaterialDescriptor& desc, const fs::path& base_dir) {
+        return PBRMaterial::Create({
+        .color = desc.base_color,
+        .emissive_color = desc.emissive,
+        .ao_intensity = desc.ao_intensity,
+        .emissive_intensity = desc.emissive_intensity,
+        .metallic = desc.metallic,
+        .normal_intensity = desc.normal_intensity,
+        .roughness = desc.roughness,
+        .ao_map = load_texture(desc.tex_occlusion, base_dir, Texture::ColorSpace::Linear),
+        .albedo_map = load_texture(desc.tex_base_color, base_dir, Texture::ColorSpace::sRGB),
+        .emissive_map = load_texture(desc.tex_emissive, base_dir, Texture::ColorSpace::sRGB),
+        .metallic_map = load_texture(desc.tex_metallic_roughness, base_dir, Texture::ColorSpace::Linear),
+        .normal_map = load_texture(desc.tex_normal, base_dir, Texture::ColorSpace::Linear),
+        .roughness_map = load_texture(desc.tex_metallic_roughness, base_dir, Texture::ColorSpace::Linear),
+    });
+}
+
+auto set_transform(Node* node, const Matrix4& m) -> void {
+    node->transform.SetPosition({m(0, 3), m(1, 3), m(2, 3)});
+
+    const auto col0 = Vector3 {m(0, 0), m(1, 0), m(2, 0)};
+    const auto col1 = Vector3 {m(0, 1), m(1, 1), m(2, 1)};
+    const auto col2 = Vector3 {m(0, 2), m(1, 2), m(2, 2)};
+
+    const auto sx = col0.Length();
+    const auto sy = col1.Length();
+    const auto sz = col2.Length();
+
+    node->transform.SetScale({sx, sy, sz});
+
+    const auto rotation = Matrix4 {
+        m(0, 0) / sx, m(0, 1) / sy, m(0, 2) / sz, 0.0f,
+        m(1, 0) / sx, m(1, 1) / sy, m(1, 2) / sz, 0.0f,
+        m(2, 0) / sx, m(2, 1) / sy, m(2, 2) / sz, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f
+    };
+
+    node->transform.SetRotation(Quaternion {rotation});
+}
+
 auto load_gltf_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>, std::string> {
     auto result = detail::gltf::import(path);
     if (!result) {
         return std::unexpected(result.error());
     }
 
+    auto& gltf = result.value();
+    auto base_dir = path.parent_path();
+
+    auto materials = std::vector<std::shared_ptr<PBRMaterial>> {};
+    materials.reserve(gltf.materials.size());
+    for (const auto& desc : gltf.materials) {
+        materials.emplace_back(load_gltf_material(desc, base_dir));
+    }
+
+    auto nodes_count = static_cast<int>(gltf.nodes.size());
+    auto nodes = std::vector<std::unique_ptr<Node>>(nodes_count);
+    auto node_ptrs = std::vector<Node*>(nodes_count);
+
+    for (auto i = 0; i < nodes_count; ++i) {
+        nodes[i] = Node::Create();
+        node_ptrs[i] = nodes[i].get();
+    }
+
+    for (auto i = 0; i < nodes_count; ++i) {
+        const auto& entry = gltf.nodes[i];
+        auto* node = node_ptrs[i];
+
+        if (!entry.name.empty()) {
+            node->SetName(entry.name);
+        }
+
+        set_transform(node, entry.transform);
+
+        for (const auto& primitive : entry.primitives) {
+            auto has_material =
+                primitive.material_index >= 0 &&
+                primitive.material_index < static_cast<int>(materials.size());
+
+            auto material = has_material
+                ? materials[primitive.material_index]
+                : PBRMaterial::Create();
+
+            node->Add(Mesh::Create(primitive.geometry, material));
+        }
+
+        for (const auto child_idx :entry.children) {
+            node_ptrs[i]->Add(std::move(nodes[child_idx]));
+        }
+    }
+
     auto root = std::make_unique<Node>();
+    for (const auto root_idx : gltf.roots) {
+        root->Add(std::move(nodes[root_idx]));
+    }
+
     return root;
 }
 
