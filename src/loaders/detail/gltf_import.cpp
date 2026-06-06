@@ -8,6 +8,7 @@
 #define CGLTF_IMPLEMENTATION
 
 #include "loaders/detail/gltf_import.hpp"
+#include "utilities/assert.hpp"
 #include "utilities/logger.hpp"
 
 #include "misc/cgltf.hpp"
@@ -166,11 +167,129 @@ auto parse_primitives(const cgltf_data* data) {
     return output;
 }
 
+auto get_min_filter(cgltf_filter_type type) {
+    switch(type) {
+        case cgltf_filter_type_nearest:
+            return Texture::MinFilter::Nearest;
+        case cgltf_filter_type_linear:
+            return Texture::MinFilter::Linear;
+        case cgltf_filter_type_nearest_mipmap_nearest:
+            return Texture::MinFilter::NearestMipmapNearest;
+        case cgltf_filter_type_linear_mipmap_nearest:
+            return Texture::MinFilter::LinearMipmapNearest;
+        case cgltf_filter_type_nearest_mipmap_linear:
+            return Texture::MinFilter::NearestMipmapLinear;
+        case cgltf_filter_type_linear_mipmap_linear:
+            return Texture::MinFilter::LinearMipmapLinear;
+        default: VGLX_UNREACHABLE();
+    }
+}
+
+auto get_mag_filter(cgltf_filter_type type) {
+    return type == cgltf_filter_type_nearest
+        ? Texture::MagFilter::Nearest
+        : Texture::MagFilter::Linear;
+}
+
+auto get_wrap_mode(cgltf_wrap_mode mode) {
+    switch(mode) {
+        case cgltf_wrap_mode_clamp_to_edge:
+            return Texture::Wrapping::ClampToEdge;
+        case cgltf_wrap_mode_mirrored_repeat:
+            return Texture::Wrapping::MirroredRepeat;
+        case cgltf_wrap_mode_repeat:
+            return Texture::Wrapping::Repeat;
+        default: VGLX_UNREACHABLE();
+    }
+}
+
+auto parse_texture(const cgltf_texture_view* view) {
+    auto desc = TextureRef {};
+
+    if (view->texture == nullptr) return desc;
+
+    if (view->texture->image && view->texture->image->uri) {
+        desc.uri = view->texture->image->uri;
+    }
+
+    if (const auto sampler = view->texture->sampler) {
+        desc.min_filter = get_min_filter(sampler->min_filter);
+        desc.mag_filter = get_mag_filter(sampler->mag_filter);
+        desc.wrap_s = get_wrap_mode(sampler->wrap_s);
+        desc.wrap_t = get_wrap_mode(sampler->wrap_t);
+    }
+
+    if (view->has_transform) {
+        desc.uv_offset = {view->transform.offset[0], view->transform.offset[1]};
+        desc.uv_scale = {view->transform.scale[0],  view->transform.scale[1]};
+        desc.uv_rotation = view->transform.rotation;
+    }
+
+    return desc;
+}
+
 auto parse_materials(const cgltf_data* data) {
     auto output = std::vector<PBRMaterialDescriptor> {};
+    output.reserve(data->materials_count);
 
     for (cgltf_size i = 0; i < data->materials_count; ++i) {
-        auto material = &data->materials[i];
+        const auto* mat = &data->materials[i];
+        auto desc = PBRMaterialDescriptor {};
+
+        if (mat->name) desc.name = mat->name;
+
+        if (mat->has_pbr_specular_glossiness) {
+            Logger::Log(
+                LogLevel::Warning,
+                "glTF import doesn't support PBR specular glossiness"
+            );
+        }
+
+        if (mat->has_pbr_metallic_roughness) {
+            const auto& pbr = mat->pbr_metallic_roughness;
+
+            desc.metallic = pbr.metallic_factor;
+            desc.roughness = pbr.roughness_factor;
+            desc.base_color = {
+                pbr.base_color_factor[0],
+                pbr.base_color_factor[1],
+                pbr.base_color_factor[2]
+            };
+
+            if (pbr.base_color_texture.texture) {
+                desc.tex_base_color = parse_texture(&pbr.base_color_texture);
+            }
+
+            if (pbr.metallic_roughness_texture.texture) {
+                desc.tex_metallic_roughness = parse_texture(&pbr.metallic_roughness_texture);
+            }
+        }
+
+        desc.emissive = {
+            mat->emissive_factor[0],
+            mat->emissive_factor[1],
+            mat->emissive_factor[2]
+        };
+
+        if (mat->has_emissive_strength) {
+            desc.emissive_intensity = mat->emissive_strength.emissive_strength;
+        }
+
+        if (mat->normal_texture.texture) {
+            desc.normal_intensity = mat->normal_texture.scale;
+            desc.tex_normal = parse_texture(&mat->normal_texture);
+        }
+
+        if (mat->occlusion_texture.texture) {
+            desc.ao_intensity = mat->occlusion_texture.scale;
+            desc.tex_occlusion = parse_texture(&mat->occlusion_texture);
+        }
+
+        if (mat->emissive_texture.texture) {
+            desc.tex_emissive = parse_texture(&mat->emissive_texture);
+        }
+
+        output.emplace_back(std::move(desc));
     }
 
     return output;
