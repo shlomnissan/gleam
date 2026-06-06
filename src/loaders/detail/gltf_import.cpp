@@ -21,7 +21,7 @@ auto create_geometry(cgltf_primitive* primitive) -> std::shared_ptr<vglx::Geomet
     if (primitive->type != cgltf_primitive_type_triangles) {
         Logger::Log(
             LogLevel::Warning,
-            "glTF import only supports triangle primitives"
+            "glTF only supports triangle primitives"
         );
         return nullptr;
     }
@@ -34,7 +34,7 @@ auto create_geometry(cgltf_primitive* primitive) -> std::shared_ptr<vglx::Geomet
     if (pos_ptr == nullptr) {
         Logger::Log(
             LogLevel::Warning,
-            "glTF import skipped primitive without vertex positions"
+            "glTF skipped primitive without vertex positions"
         );
         return nullptr;
     }
@@ -172,6 +172,7 @@ auto get_min_filter(cgltf_filter_type type) {
         case cgltf_filter_type_nearest:
             return Texture::MinFilter::Nearest;
         case cgltf_filter_type_linear:
+        case cgltf_filter_type_undefined:
             return Texture::MinFilter::Linear;
         case cgltf_filter_type_nearest_mipmap_nearest:
             return Texture::MinFilter::NearestMipmapNearest;
@@ -241,7 +242,7 @@ auto parse_materials(const cgltf_data* data) {
         if (mat->has_pbr_specular_glossiness) {
             Logger::Log(
                 LogLevel::Warning,
-                "glTF import doesn't support PBR specular glossiness"
+                "glTF doesn't support PBR specular glossiness"
             );
         }
 
@@ -295,6 +296,53 @@ auto parse_materials(const cgltf_data* data) {
     return output;
 }
 
+auto parse_nodes(const cgltf_data* data) {
+    auto output = std::vector<GLTFNodeEntry>(data->nodes_count);
+    auto primitives = parse_primitives(data);
+
+    for (cgltf_size i = 0; i < data->nodes_count; ++i) {
+        const auto* node = &data->nodes[i];
+        auto& entry = output[i];
+
+        if (node->name) entry.name = node->name;
+
+        float m[16];
+        cgltf_node_transform_local(node, m);
+        entry.transform = Matrix4 {
+            Vector4(m[0],  m[1],  m[2],  m[3]),
+            Vector4(m[4],  m[5],  m[6],  m[7]),
+            Vector4(m[8],  m[9],  m[10], m[11]),
+            Vector4(m[12], m[13], m[14], m[15])
+        };
+
+        entry.children.reserve(node->children_count);
+        for (cgltf_size j = 0; j < node->children_count; ++j) {
+            entry.children.emplace_back(
+                static_cast<int>(cgltf_node_index(data, node->children[j]))
+            );
+        }
+
+        if (node->mesh) {
+            entry.primitives = primitives[cgltf_mesh_index(data, node->mesh)];
+        }
+    }
+
+    return output;
+}
+
+auto get_roots(const cgltf_data* data) {
+    auto output = std::vector<int> {};
+    output.reserve(data->scene->nodes_count);
+
+    for (cgltf_size i = 0; i < data->scene->nodes_count; ++i) {
+        output.emplace_back(
+            static_cast<int>(cgltf_node_index(data, data->scene->nodes[i]))
+        );
+    }
+
+    return output;
+}
+
 }
 
 auto import(const fs::path& path) -> std::expected<GLTFResult, std::string> {
@@ -303,23 +351,28 @@ auto import(const fs::path& path) -> std::expected<GLTFResult, std::string> {
     cgltf_data* data = nullptr;
 
     if (cgltf_parse_file(&options, path.string().c_str(), &data) != cgltf_result_success) {
-        return std::unexpected("Error: Failed to parse glTF file structure");
+        return std::unexpected("glTF failed to parse file structure");
     }
 
     auto guard = std::unique_ptr<cgltf_data, decltype(&cgltf_free)>{data, cgltf_free};
 
     if (cgltf_load_buffers(&options, data, path.string().c_str()) != cgltf_result_success) {
-        return std::unexpected("Error: Failed to load glTF buffers");
+        return std::unexpected("glTF failed to load buffers");
     }
 
     if (cgltf_validate(data) != cgltf_result_success) {
-        return std::unexpected("Error: glTF validation failed, file may be malformed");
+        return std::unexpected("glTF validation failed, file may be malformed");
     }
 
-    auto primitives = parse_primitives(data);
-    auto materials = parse_materials(data);
+    if (data->scene == nullptr) {
+        return std::unexpected("glTF file has no default scene");
+    }
 
-    return std::unexpected("implementing...");
+    return GLTFResult {
+        .nodes = parse_nodes(data),
+        .roots = get_roots(data),
+        .materials = parse_materials(data)
+    };
 }
 
 }
