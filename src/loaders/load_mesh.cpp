@@ -21,29 +21,53 @@
 
 #include "utilities/logger.hpp"
 
+#include <vector>
+
 namespace vglx {
 
 namespace {
 
+using ImageRef = std::pair<std::string, std::shared_ptr<Image>>;
+
 auto load_texture(
     const detail::TextureRef& ref,
     const fs::path& base_dir,
-    Texture::ColorSpace color_space
+    Texture::ColorSpace color_space,
+    std::vector<ImageRef>& image_cache
 ) -> std::shared_ptr<Texture2D> {
     if (ref.empty()) return nullptr;
 
     auto path = base_dir / ref.uri;
-    if (fs::is_directory(path)) return nullptr;
-
-    auto result = LoadTexture(path, color_space);
-    if (!result.has_value()) {
-        Logger::Log(LogLevel::Error,
-            "Failed to load texture for mesh {}", path.string()
-        );
+    if (fs::is_directory(path)) {
         return nullptr;
     }
 
-    auto texture = result.value();
+    auto image = std::shared_ptr<Image> {nullptr};
+
+    auto it = std::find_if(
+        image_cache.begin(), image_cache.end(), [&path](const auto& e) {
+            return path == e.first;
+        }
+    );
+
+    if (it == image_cache.end()) {
+        auto result = LoadImage(path);
+        if (!result.has_value()) {
+            Logger::Log(LogLevel::Error,
+                "Failed to load texture for mesh {}", path.string()
+            );
+            return nullptr;
+        }
+
+        image_cache.emplace_back(path.string(), std::move(result.value()));
+        image = image_cache.back().second;
+    } else {
+        image = it->second;
+    }
+
+    auto texture = Texture2D::Create(image);
+
+    texture->color_space = color_space;
     texture->wrap_s = ref.wrap_s;
     texture->wrap_t = ref.wrap_t;
     texture->min_filter = ref.min_filter;
@@ -61,18 +85,24 @@ auto load_texture(
     return texture;
 }
 
-auto load_obj_material(const detail::obj::PhongMaterialDescriptor& desc, const fs::path& base_dir) {
+auto load_obj_material(
+    const detail::obj::PhongMaterialDescriptor& desc,
+    const fs::path& dir,
+    std::vector<ImageRef>& image_cache
+) {
+    using enum Texture::ColorSpace;
+
     auto material = PhongMaterial::Create();
 
     material->color = desc.diffuse;
     material->specular_color = desc.specular;
     material->emissive_color = desc.emission;
     material->shininess = desc.shininess;
-    material->albedo_map = load_texture(desc.tex_diffuse, base_dir, Texture::ColorSpace::sRGB);
-    material->alpha_map = load_texture(desc.tex_alpha, base_dir, Texture::ColorSpace::Linear);
-    material->normal_map = load_texture(desc.tex_normal, base_dir, Texture::ColorSpace::Linear);
-    material->specular_map = load_texture(desc.tex_specular, base_dir, Texture::ColorSpace::Linear);
-    material->emissive_map = load_texture(desc.tex_emissive, base_dir, Texture::ColorSpace::sRGB);
+    material->albedo_map = load_texture(desc.tex_diffuse, dir, sRGB, image_cache);
+    material->alpha_map = load_texture(desc.tex_alpha, dir, Linear, image_cache);
+    material->normal_map = load_texture(desc.tex_normal, dir, Linear, image_cache);
+    material->specular_map = load_texture(desc.tex_specular, dir, Linear, image_cache);
+    material->emissive_map = load_texture(desc.tex_emissive, dir, sRGB, image_cache);
 
     if (material->albedo_map) {
         material->color = 0xFFFFFF;
@@ -90,10 +120,11 @@ auto load_obj_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>,
     auto base_dir = path.parent_path();
     auto obj = result.value();
 
+    auto image_cache = std::vector<ImageRef> {};
     auto materials = std::vector<std::shared_ptr<PhongMaterial>> {};
     materials.reserve(obj.materials.size());
     for (const auto& desc : obj.materials) {
-        materials.emplace_back(load_obj_material(desc, base_dir));
+        materials.emplace_back(load_obj_material(desc, base_dir, image_cache));
     }
 
     auto root = std::make_unique<Node>();
@@ -114,7 +145,13 @@ auto load_obj_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>,
     return root;
 }
 
-auto load_gltf_material(const detail::gltf::PBRMaterialDescriptor& desc, const fs::path& base_dir) {
+auto load_gltf_material(
+    const detail::gltf::PBRMaterialDescriptor& desc,
+    const fs::path& dir,
+    std::vector<ImageRef>& image_cache
+) {
+    using enum Texture::ColorSpace;
+
     return PBRMaterial::Create({
         .color = desc.base_color,
         .emissive_color = desc.emissive,
@@ -123,17 +160,18 @@ auto load_gltf_material(const detail::gltf::PBRMaterialDescriptor& desc, const f
         .metallic = desc.metallic,
         .normal_intensity = desc.normal_intensity,
         .roughness = desc.roughness,
-        .ao_map = load_texture(desc.tex_occlusion, base_dir, Texture::ColorSpace::Linear),
-        .albedo_map = load_texture(desc.tex_base_color, base_dir, Texture::ColorSpace::sRGB),
-        .emissive_map = load_texture(desc.tex_emissive, base_dir, Texture::ColorSpace::sRGB),
-        .metallic_map = load_texture(desc.tex_metallic_roughness, base_dir, Texture::ColorSpace::Linear),
-        .normal_map = load_texture(desc.tex_normal, base_dir, Texture::ColorSpace::Linear),
-        .roughness_map = load_texture(desc.tex_metallic_roughness, base_dir, Texture::ColorSpace::Linear),
+        .ao_map = load_texture(desc.tex_occlusion, dir, Linear, image_cache),
+        .albedo_map = load_texture(desc.tex_base_color, dir, sRGB, image_cache),
+        .emissive_map = load_texture(desc.tex_emissive, dir, sRGB, image_cache),
+        .metallic_map = load_texture(desc.tex_metallic_roughness, dir, Linear, image_cache),
+        .normal_map = load_texture(desc.tex_normal, dir, Linear, image_cache),
+        .roughness_map = load_texture(desc.tex_metallic_roughness, dir, Linear, image_cache),
     });
 }
 
-
 auto load_gltf_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>, std::string> {
+    auto t = ScopedTimer {"glTF mesh", ScopedTimer::Unit::Milliseconds};
+
     auto result = detail::gltf::import(path);
     if (!result) {
         return std::unexpected(result.error());
@@ -142,10 +180,11 @@ auto load_gltf_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>
     auto& gltf = result.value();
     auto base_dir = path.parent_path();
 
+    auto image_cache = std::vector<ImageRef> {};
     auto materials = std::vector<std::shared_ptr<PBRMaterial>> {};
     materials.reserve(gltf.materials.size());
     for (const auto& desc : gltf.materials) {
-        materials.emplace_back(load_gltf_material(desc, base_dir));
+        materials.emplace_back(load_gltf_material(desc, base_dir, image_cache));
     }
 
     auto nodes_count = static_cast<int>(gltf.nodes.size());
