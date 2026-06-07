@@ -91,6 +91,8 @@ set(SOURCE_CODE
     "utilities/logger.hpp"
     "utilities/scoped_timer.hpp"
     "utilities/stats.cpp"
+    "utilities/thread_pool.cpp"
+    "utilities/thread_pool.hpp"
     "utilities/timer.cpp"
 )
 
