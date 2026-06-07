@@ -20,7 +20,9 @@
 #include "loaders/detail/shared.hpp"
 
 #include "utilities/logger.hpp"
+#include "utilities/thread_pool.hpp"
 
+#include <algorithm>
 #include <vector>
 
 namespace vglx {
@@ -33,7 +35,7 @@ auto load_texture(
     const detail::TextureRef& ref,
     const fs::path& base_dir,
     Texture::ColorSpace color_space,
-    std::vector<ImageRef>& image_cache
+    std::vector<ImageRef>& images
 ) -> std::shared_ptr<Texture2D> {
     if (ref.empty()) return nullptr;
 
@@ -42,30 +44,20 @@ auto load_texture(
         return nullptr;
     }
 
-    auto image = std::shared_ptr<Image> {nullptr};
-
     auto it = std::find_if(
-        image_cache.begin(), image_cache.end(), [&path](const auto& e) {
-            return path == e.first;
+        images.begin(), images.end(), [&path](const auto& e) {
+            return path.string() == e.first;
         }
     );
 
-    if (it == image_cache.end()) {
-        auto result = LoadImage(path);
-        if (!result.has_value()) {
-            Logger::Log(LogLevel::Error,
-                "Failed to load texture for mesh {}", path.string()
-            );
-            return nullptr;
-        }
-
-        image_cache.emplace_back(path.string(), std::move(result.value()));
-        image = image_cache.back().second;
-    } else {
-        image = it->second;
+    if (it == images.end()) {
+        Logger::Log(LogLevel::Error,
+            "Failed to load texture {}", path.string()
+        );
+        return nullptr;
     }
 
-    auto texture = Texture2D::Create(image);
+    auto texture = Texture2D::Create(it->second);
 
     texture->color_space = color_space;
     texture->wrap_s = ref.wrap_s;
@@ -85,10 +77,35 @@ auto load_texture(
     return texture;
 }
 
+auto load_images(std::vector<fs::path> uris) {
+    std::sort(uris.begin(), uris.end());
+    auto it = std::unique(uris.begin(), uris.end());
+    uris.erase(it, uris.end());
+
+    auto threads = ThreadPool {};
+    auto futures = std::vector<std::future<std::shared_ptr<Image>>>{};
+    futures.reserve(uris.size());
+
+    for (const auto& uri : uris) {
+        futures.emplace_back(threads.Submit([uri] {
+            return LoadImage(uri).value_or(nullptr);
+        }));
+    }
+
+    auto output = std::vector<ImageRef> {};
+    for (std::size_t i = 0; i < uris.size(); ++i) {
+        if (auto image = futures[i].get()) {
+            output.emplace_back(uris[i].string(), image);
+        }
+    }
+
+    return output;
+}
+
 auto load_obj_material(
     const detail::obj::PhongMaterialDescriptor& desc,
     const fs::path& dir,
-    std::vector<ImageRef>& image_cache
+    std::vector<ImageRef>& images
 ) {
     using enum Texture::ColorSpace;
 
@@ -98,17 +115,34 @@ auto load_obj_material(
     material->specular_color = desc.specular;
     material->emissive_color = desc.emission;
     material->shininess = desc.shininess;
-    material->albedo_map = load_texture(desc.tex_diffuse, dir, sRGB, image_cache);
-    material->alpha_map = load_texture(desc.tex_alpha, dir, Linear, image_cache);
-    material->normal_map = load_texture(desc.tex_normal, dir, Linear, image_cache);
-    material->specular_map = load_texture(desc.tex_specular, dir, Linear, image_cache);
-    material->emissive_map = load_texture(desc.tex_emissive, dir, sRGB, image_cache);
+    material->albedo_map = load_texture(desc.tex_diffuse, dir, sRGB, images);
+    material->alpha_map = load_texture(desc.tex_alpha, dir, Linear, images);
+    material->normal_map = load_texture(desc.tex_normal, dir, Linear, images);
+    material->specular_map = load_texture(desc.tex_specular, dir, Linear, images);
+    material->emissive_map = load_texture(desc.tex_emissive, dir, sRGB, images);
 
     if (material->albedo_map) {
         material->color = 0xFFFFFF;
     }
 
     return material;
+}
+
+auto load_obj_images(
+    const std::vector<detail::obj::PhongMaterialDescriptor>& materials,
+    const fs::path& base_dir
+) {
+    auto uris = std::vector<fs::path> {};
+
+    for (const auto& desc : materials) {
+        if (!desc.tex_diffuse.empty()) uris.emplace_back(base_dir / desc.tex_diffuse.uri);
+        if (!desc.tex_alpha.empty()) uris.emplace_back(base_dir / desc.tex_alpha.uri);
+        if (!desc.tex_normal.empty()) uris.emplace_back(base_dir / desc.tex_normal.uri);
+        if (!desc.tex_specular.empty()) uris.emplace_back(base_dir / desc.tex_specular.uri);
+        if (!desc.tex_emissive.empty()) uris.emplace_back(base_dir / desc.tex_emissive.uri);
+    }
+
+    return load_images(uris);
 }
 
 auto load_obj_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>, std::string> {
@@ -120,11 +154,11 @@ auto load_obj_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>,
     auto base_dir = path.parent_path();
     auto obj = result.value();
 
-    auto image_cache = std::vector<ImageRef> {};
+    auto images = load_obj_images(obj.materials, base_dir);
     auto materials = std::vector<std::shared_ptr<PhongMaterial>> {};
     materials.reserve(obj.materials.size());
     for (const auto& desc : obj.materials) {
-        materials.emplace_back(load_obj_material(desc, base_dir, image_cache));
+        materials.emplace_back(load_obj_material(desc, base_dir, images));
     }
 
     auto root = std::make_unique<Node>();
@@ -148,7 +182,7 @@ auto load_obj_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>,
 auto load_gltf_material(
     const detail::gltf::PBRMaterialDescriptor& desc,
     const fs::path& dir,
-    std::vector<ImageRef>& image_cache
+    std::vector<ImageRef>& images
 ) {
     using enum Texture::ColorSpace;
 
@@ -160,13 +194,30 @@ auto load_gltf_material(
         .metallic = desc.metallic,
         .normal_intensity = desc.normal_intensity,
         .roughness = desc.roughness,
-        .ao_map = load_texture(desc.tex_occlusion, dir, Linear, image_cache),
-        .albedo_map = load_texture(desc.tex_base_color, dir, sRGB, image_cache),
-        .emissive_map = load_texture(desc.tex_emissive, dir, sRGB, image_cache),
-        .metallic_map = load_texture(desc.tex_metallic_roughness, dir, Linear, image_cache),
-        .normal_map = load_texture(desc.tex_normal, dir, Linear, image_cache),
-        .roughness_map = load_texture(desc.tex_metallic_roughness, dir, Linear, image_cache),
+        .ao_map = load_texture(desc.tex_occlusion, dir, Linear, images),
+        .albedo_map = load_texture(desc.tex_base_color, dir, sRGB, images),
+        .emissive_map = load_texture(desc.tex_emissive, dir, sRGB, images),
+        .metallic_map = load_texture(desc.tex_metallic_roughness, dir, Linear, images),
+        .normal_map = load_texture(desc.tex_normal, dir, Linear, images),
+        .roughness_map = load_texture(desc.tex_metallic_roughness, dir, Linear, images),
     });
+}
+
+auto load_gltf_images(
+    const std::vector<detail::gltf::PBRMaterialDescriptor>& materials,
+    const fs::path& base_dir
+) {
+    auto uris = std::vector<fs::path> {};
+
+    for (const auto& desc : materials) {
+        if (!desc.tex_occlusion.empty()) uris.emplace_back(base_dir / desc.tex_occlusion.uri);
+        if (!desc.tex_base_color.empty()) uris.emplace_back(base_dir / desc.tex_base_color.uri);
+        if (!desc.tex_emissive.empty()) uris.emplace_back(base_dir / desc.tex_emissive.uri);
+        if (!desc.tex_metallic_roughness.empty()) uris.emplace_back(base_dir / desc.tex_metallic_roughness.uri);
+        if (!desc.tex_normal.empty()) uris.emplace_back(base_dir / desc.tex_normal.uri);
+    }
+
+    return load_images(uris);
 }
 
 auto load_gltf_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>, std::string> {
@@ -178,11 +229,12 @@ auto load_gltf_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>
     auto& gltf = result.value();
     auto base_dir = path.parent_path();
 
-    auto image_cache = std::vector<ImageRef> {};
+    auto images = load_gltf_images(gltf.materials, base_dir);
     auto materials = std::vector<std::shared_ptr<PBRMaterial>> {};
     materials.reserve(gltf.materials.size());
+
     for (const auto& desc : gltf.materials) {
-        materials.emplace_back(load_gltf_material(desc, base_dir, image_cache));
+        materials.emplace_back(load_gltf_material(desc, base_dir, images));
     }
 
     auto nodes_count = static_cast<int>(gltf.nodes.size());
