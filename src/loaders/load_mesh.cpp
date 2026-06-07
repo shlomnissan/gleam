@@ -170,8 +170,6 @@ auto load_gltf_material(
 }
 
 auto load_gltf_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>, std::string> {
-    auto t = ScopedTimer {"glTF mesh", ScopedTimer::Unit::Milliseconds};
-
     auto result = detail::gltf::import(path);
     if (!result) {
         return std::unexpected(result.error());
