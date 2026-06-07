@@ -7,9 +7,8 @@
 
 #pragma once
 
-#pragma once
-
 #include <functional>
+#include <future>
 #include <memory>
 #include <thread>
 
@@ -26,6 +25,18 @@ public:
     auto operator=(const ThreadPool&) -> ThreadPool& = delete;
 
     auto Enqueue(std::function<void()> job) -> bool;
+
+    template <typename F>
+    auto Submit(F&& func) -> std::future<std::invoke_result_t<F>> {
+        using Result = std::invoke_result_t<F>;
+
+        auto task = std::make_shared<std::packaged_task<Result()>>(std::forward<F>(func));
+        auto future = task->get_future();
+
+        Enqueue([task]() { (*task)(); });
+
+        return future;
+    }
 
     ~ThreadPool();
 
