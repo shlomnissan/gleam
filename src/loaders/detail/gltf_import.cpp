@@ -209,8 +209,12 @@ auto parse_texture(const cgltf_texture_view* view) {
 
     if (view->texture == nullptr) return desc;
 
-    if (view->texture->image && view->texture->image->uri) {
-        desc.uri = view->texture->image->uri;
+    if (view->texture->image) {
+        if (view->texture->image->uri) {
+            desc.uri = view->texture->image->uri;
+        } else {
+            Logger::Log(LogLevel::Warning, "glTF embedded textures are not supported");
+        }
     }
 
     if (const auto sampler = view->texture->sampler) {
@@ -296,6 +300,29 @@ auto parse_materials(const cgltf_data* data) {
     return output;
 }
 
+auto decompose_matrix (GLTFNodeEntry &entry, const cgltf_float* mat) {
+    auto sx = Vector3 {mat[0], mat[1], mat[2]}.Length();
+    auto sy = Vector3 {mat[4], mat[5], mat[6]}.Length();
+    auto sz = Vector3 {mat[8], mat[9], mat[10]}.Length();
+
+    const auto n0 = Vector3 {mat[0]/sx, mat[1]/sx, mat[2]/sx};
+    const auto n1 = Vector3 {mat[4]/sy, mat[5]/sy, mat[6]/sy};
+    const auto n2 = Vector3 {mat[8]/sz, mat[9]/sz, mat[10]/sz};
+
+    if (Dot(Cross(n0, n1), n2) < 0.0f) sz = -sz;
+
+    const auto rotation = Matrix4 {
+        mat[0]/sx, mat[4]/sy, mat[8]/sz,  0.0f,
+        mat[1]/sx, mat[5]/sy, mat[9]/sz,  0.0f,
+        mat[2]/sx, mat[6]/sy, mat[10]/sz, 0.0f,
+        0.0f, 0.0f, 0.0f, 1.0f
+    };
+
+    entry.position = {mat[12], mat[13], mat[14]};
+    entry.scale = {sx, sy, sz};
+    entry.rotation = Quaternion {rotation};
+}
+
 auto parse_nodes(const cgltf_data* data) {
     auto output = std::vector<GLTFNodeEntry>(data->nodes_count);
     auto primitives = parse_primitives(data);
@@ -306,14 +333,17 @@ auto parse_nodes(const cgltf_data* data) {
 
         if (node->name) entry.name = node->name;
 
-        float m[16];
-        cgltf_node_transform_local(node, m);
-        entry.transform = Matrix4 {
-            Vector4(m[0],  m[1],  m[2],  m[3]),
-            Vector4(m[4],  m[5],  m[6],  m[7]),
-            Vector4(m[8],  m[9],  m[10], m[11]),
-            Vector4(m[12], m[13], m[14], m[15])
-        };
+        if (node->has_matrix) {
+            decompose_matrix (entry, node->matrix);
+        } else {
+            auto& t = node->translation;
+            auto& r = node->rotation;
+            auto& s = node->scale;
+
+            entry.position = {t[0], t[1], t[2]};
+            entry.rotation = {r[0], r[1], r[2], r[3]};
+            entry.scale = {s[0], s[1], s[2]};
+        }
 
         entry.children.reserve(node->children_count);
         for (cgltf_size j = 0; j < node->children_count; ++j) {

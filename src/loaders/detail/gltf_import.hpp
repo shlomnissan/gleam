@@ -9,7 +9,8 @@
 
 #include "vglx/geometries/geometry.hpp"
 #include "vglx/math/color.hpp"
-#include "vglx/math/matrix4.hpp"
+#include "vglx/math/quaternion.hpp"
+#include "vglx/math/vector3.hpp"
 
 #include "shared.hpp"
 
@@ -50,7 +51,9 @@ struct GLTFPrimitive {
 
 struct GLTFNodeEntry {
     std::string name;
-    Matrix4 transform {Matrix4::Identity()};
+    Vector3 position {};
+    Vector3 scale {1.0f};
+    Quaternion rotation {};
     std::vector<int> children;
     std::vector<GLTFPrimitive> primitives;
 };

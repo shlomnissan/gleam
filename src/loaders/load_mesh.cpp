@@ -115,7 +115,7 @@ auto load_obj_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>,
 }
 
 auto load_gltf_material(const detail::gltf::PBRMaterialDescriptor& desc, const fs::path& base_dir) {
-        return PBRMaterial::Create({
+    return PBRMaterial::Create({
         .color = desc.base_color,
         .emissive_color = desc.emissive,
         .ao_intensity = desc.ao_intensity,
@@ -132,28 +132,6 @@ auto load_gltf_material(const detail::gltf::PBRMaterialDescriptor& desc, const f
     });
 }
 
-auto set_transform(Node* node, const Matrix4& m) -> void {
-    node->transform.SetPosition({m(0, 3), m(1, 3), m(2, 3)});
-
-    const auto col0 = Vector3 {m(0, 0), m(1, 0), m(2, 0)};
-    const auto col1 = Vector3 {m(0, 1), m(1, 1), m(2, 1)};
-    const auto col2 = Vector3 {m(0, 2), m(1, 2), m(2, 2)};
-
-    const auto sx = col0.Length();
-    const auto sy = col1.Length();
-    const auto sz = col2.Length();
-
-    node->transform.SetScale({sx, sy, sz});
-
-    const auto rotation = Matrix4 {
-        m(0, 0) / sx, m(0, 1) / sy, m(0, 2) / sz, 0.0f,
-        m(1, 0) / sx, m(1, 1) / sy, m(1, 2) / sz, 0.0f,
-        m(2, 0) / sx, m(2, 1) / sy, m(2, 2) / sz, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f
-    };
-
-    node->transform.SetRotation(Quaternion {rotation});
-}
 
 auto load_gltf_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>, std::string> {
     auto result = detail::gltf::import(path);
@@ -187,7 +165,9 @@ auto load_gltf_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>
             node->SetName(entry.name);
         }
 
-        set_transform(node, entry.transform);
+        node->transform.SetPosition(entry.position);
+        node->transform.SetScale(entry.scale);
+        node->transform.SetRotation(entry.rotation);
 
         for (const auto& primitive : entry.primitives) {
             auto has_material =
