@@ -17,11 +17,12 @@
 namespace vglx {
 
 struct ThreadPool::Impl {
-    std::stop_source stop_source;
-    std::vector<std::jthread> workers;
+    std::vector<std::thread> workers;
     std::queue<std::function<void()>> jobs;
     std::mutex mutex;
-    std::condition_variable_any cv;
+    std::condition_variable cv;
+
+    bool stop {false};
 
     Impl(size_t thread_count) {
         if (thread_count == 0) {
@@ -34,18 +35,18 @@ struct ThreadPool::Impl {
 
         workers.reserve(thread_count);
         for (size_t i = 0; i < thread_count; ++i) {
-            workers.emplace_back([this, token = stop_source.get_token()] {
-                WorkerLoop(token);
-            });
+            workers.emplace_back([this] { WorkerLoop(); });
         }
     }
 
-    auto WorkerLoop(std::stop_token st) -> void {
+    auto WorkerLoop() -> void {
         while (true) {
             auto job = std::function<void()> {};
             {
                 auto lock = std::unique_lock {mutex};
-                if (!cv.wait(lock, st, [this] { return !jobs.empty(); })) {
+
+                cv.wait(lock, [this] { return !jobs.empty() || stop; });
+                if (stop && jobs.empty()) {
                     return;
                 }
 
@@ -59,7 +60,7 @@ struct ThreadPool::Impl {
     auto Enqueue(std::function<void()> job) -> bool {
         {
             auto lock = std::scoped_lock {mutex};
-            if (stop_source.stop_requested()) return false;
+            if (stop) return false;
             jobs.push(std::move(job));
         }
 
@@ -69,8 +70,17 @@ struct ThreadPool::Impl {
     }
 
     auto StopAndJoin() noexcept -> void {
-        stop_source.request_stop();
+        {
+            auto lock = std::scoped_lock {mutex};
+            if (stop) return;
+            stop = true;
+        }
+
         cv.notify_all();
+        for (auto& t : workers) {
+            if (t.joinable()) t.join();
+        }
+
         workers.clear();
     }
 };
