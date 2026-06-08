@@ -41,6 +41,8 @@
 .VPHomeHero .name.clip {
     color: transparent;
     -webkit-text-fill-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .VPHomeHero .name::before {

@@ -9,6 +9,7 @@ export default defineConfig({
   title: 'VGLX',
   description: '3D Rendering in Modern C++',
   cleanUrls: true,
+  appearance: 'force-dark',
   markdown: {
     config: (md) => {
         md.use(mathjax3)
