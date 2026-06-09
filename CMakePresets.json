@@ -52,6 +52,20 @@
         "VGLX_LOG_LEVEL": "1",
         "BUILD_SHARED_LIBS": "ON"
       }
+    },
+    {
+      "name": "benchmark",
+      "binaryDir": "${sourceDir}/build/benchmark",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "VGLX_BUILD_DOCS": "OFF",
+        "VGLX_BUILD_EXAMPLES": "OFF",
+        "VGLX_BUILD_IMGUI": "ON",
+        "VGLX_BUILD_TESTS": "OFF",
+        "VGLX_BUILD_BENCHMARKS": "ON",
+        "VGLX_LOG_LEVEL": "1",
+        "BUILD_SHARED_LIBS": "OFF"
+      }
     }
   ]
 }

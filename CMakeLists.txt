@@ -16,6 +16,7 @@ option(VGLX_BUILD_DOCS "Build API documentation using Doxygen" OFF)
 option(VGLX_BUILD_EXAMPLES "Build example application" ON)
 option(VGLX_BUILD_IMGUI "Build and integrate ImGui from the vendored source" ON)
 option(VGLX_BUILD_TESTS "Build unit tests and test infrastructure using GTest" ON)
+option(VGLX_BUILD_BENCHMARKS "Build microbenchmarks using Google Benchmark" OFF)
 
 add_subdirectory("vendor")
 add_subdirectory("src")
@@ -23,6 +24,10 @@ add_subdirectory("src")
 if (VGLX_BUILD_TESTS)
     include(CTest)
     add_subdirectory("tests")
+endif()
+
+if (VGLX_BUILD_BENCHMARKS)
+    add_subdirectory("benchmark")
 endif()
 
 if (VGLX_BUILD_EXAMPLES)
