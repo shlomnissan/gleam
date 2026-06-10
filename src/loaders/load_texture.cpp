@@ -25,6 +25,7 @@ auto LoadTexture(
     out->min_filter = Texture::MinFilter::Linear;
     out->mag_filter = Texture::MagFilter::Linear;
     out->color_space = color_space;
+    out->mapping = Texture::Mapping::UV;
     out->SetName(path.filename().string());
     return out;
 }
@@ -42,6 +43,7 @@ auto LoadHDRTexture(
     out->min_filter = Texture::MinFilter::Linear;
     out->mag_filter = Texture::MagFilter::Linear;
     out->color_space = Texture::ColorSpace::Linear;
+    out->mapping = Texture::Mapping::Equirectangular;
     out->SetName(path.filename().string());
     return out;
 }

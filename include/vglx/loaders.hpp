@@ -116,7 +116,10 @@ struct CubeTexturePaths {
  * Loads a high dynamic range image (e.g. Radiance `.hdr`) as a
  * floating-point @ref Texture2D. The texture's color space is always
  * @ref Texture::ColorSpace::Linear since HDR data is by definition
- * stored in linear space.
+ * stored in linear space. The mapping mode defaults to
+ * @ref Texture::Mapping::Equirectangular since HDR images are typically
+ * panoramas used as backgrounds or environments. Set @ref Texture::mapping
+ * to @ref Texture::Mapping::UV for regular texture sampling.
  *
  * @code
  * auto texture = vglx::LoadHDRTexture("assets/sunset.hdr");

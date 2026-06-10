@@ -118,6 +118,21 @@ public:
     };
 
     /**
+     * @brief Enumerates supported texture mapping modes.
+     *
+     * Mapping describes how the texture's content should be interpreted when
+     * sampled rather than how it is stored. A 2D texture marked as
+     *
+     * @ref Mapping "Mapping::Equirectangular" holds a full 360° panorama
+     * (e.g. an HDR environment) and is sampled by direction instead of
+     * texture coordinates.
+     */
+    enum class Mapping {
+        UV, ///< Sampled with texture coordinates (default).
+        Equirectangular ///< Panorama sampled by direction.
+    };
+
+    /**
      * @brief Renderer-specific texture handle.
      *
      * Typically corresponds to the underlying graphics API object identifier,
@@ -139,6 +154,9 @@ public:
 
     /// @brief Wrapping mode applied to the vertical (V) texture coordinate.
     Wrapping wrap_t = Wrapping::Repeat;
+
+    /// @brief Mapping mode used to interpret the texture's content.
+    Mapping mapping = Mapping::UV;
 
     /**
      * @brief Maximum anisotropy used when sampling this texture.
