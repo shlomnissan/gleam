@@ -57,6 +57,20 @@ public:
     }
 
     /**
+     * @brief Translates the transform a distance along an axis in local space.
+     *
+     * Convenience overload mirroring @ref Rotate. The axis is normalized
+     * internally, so `distance` is a true distance along it. For an arbitrary
+     * offset, use the single-vector overload instead.
+     *
+     * @param axis Translation axis; normalized internally.
+     * @param distance Distance to translate along the axis.
+     */
+    constexpr auto Translate(const Vector3& axis, float distance) -> void {
+        Translate(Normalize(axis) * distance);
+    }
+
+    /**
      * @brief Scales the transform.
      *
      * @param value Scale factors to apply.
