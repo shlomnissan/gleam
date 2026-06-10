@@ -43,12 +43,17 @@ private:
 
     std::unique_ptr<GLProgram> background_2d_ {nullptr};
     std::unique_ptr<GLProgram> background_cube_ {nullptr};
+    std::unique_ptr<GLProgram> background_equirect_ {nullptr};
 
     GLuint vbo_ {0};
+
+    auto GenerateVAOs() -> std::expected<void, std::string>;
 
     auto InitializeBackground2D() -> std::expected<void, std::string>;
 
     auto InitializeBackgroundCube() -> std::expected<void, std::string>;
+
+    auto InitializeBackgroundEquirect() -> std::expected<void, std::string>;
 };
 
 }
