@@ -32,6 +32,8 @@ public:
 
     auto SetViewport(int x, int y, int width, int height) const -> void;
 
+    auto SetSeamlessCubemapFiltering() -> void;
+
     auto ProcessMaterial(const Material* material) -> void;
 
     auto UseProgram(unsigned int program_id) -> void;

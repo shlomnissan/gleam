@@ -56,6 +56,10 @@ auto GLState::SetDepthWrites(bool enabled) -> void {
     }
 }
 
+auto GLState::SetSeamlessCubemapFiltering() -> void {
+    Enable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+}
+
 auto GLState::UseProgram(unsigned int program_id) -> void {
     if (curr_program_ != program_id) {
         glUseProgram(program_id);

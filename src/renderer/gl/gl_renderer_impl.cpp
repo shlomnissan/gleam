@@ -65,6 +65,7 @@ auto Renderer::Impl::Initialize() -> std::expected<void, std::string> {
     }
 
     state_.SetDepthFunction(Material::Depth::LessEqual);
+    state_.SetSeamlessCubemapFiltering();
 
     return {};
 }
