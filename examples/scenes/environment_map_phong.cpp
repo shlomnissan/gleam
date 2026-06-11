@@ -12,7 +12,7 @@
 
 #include "example_runner.hpp"
 
-auto GetCamera() {
+auto get_camera() {
     auto camera = vglx::PerspectiveCamera::Create({
         .fov = vglx::math::DegToRad(60.0f),
         .aspect = static_cast<float>(kWindowWidth) / static_cast<float>(kWindowHeight),
@@ -25,7 +25,7 @@ auto GetCamera() {
     return camera;
 }
 
-auto GetScene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
+auto get_scene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
     auto scene = vglx::Scene::Create();
 
     auto result = vglx::LoadCubeTexture({
@@ -93,14 +93,14 @@ auto GetScene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
 }
 
 auto main() -> int {
-    auto camera = GetCamera();
-    auto scene = GetScene();
+    auto camera = get_camera();
+    auto scene = get_scene();
     if (!scene.has_value()) {
         std::print(stderr, "{}", scene.error());
         return 1;
     }
 
-    return RunExample(scene->get(), camera.get(), {
+    return run_example(scene->get(), camera.get(), {
         .window_title = "Environment Map Phong"
     });
 }

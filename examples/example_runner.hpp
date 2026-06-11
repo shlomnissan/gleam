@@ -22,4 +22,4 @@ struct ExampleSettings {
     float exposure {1.0f};
 };
 
-auto RunExample(vglx::Scene* scene, vglx::Camera* camera, const ExampleSettings& settings) -> int;
+auto run_example(vglx::Scene* scene, vglx::Camera* camera, const ExampleSettings& settings) -> int;

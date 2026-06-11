@@ -9,7 +9,7 @@
 
 #include <print>
 
-auto RunExample(vglx::Scene* scene, vglx::Camera* camera, const ExampleSettings& settings) -> int {
+auto run_example(vglx::Scene* scene, vglx::Camera* camera, const ExampleSettings& settings) -> int {
     auto window = vglx::Window {{
         .title = settings.window_title,
         .width = kWindowWidth,

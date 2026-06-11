@@ -12,7 +12,7 @@
 
 #include "example_runner.hpp"
 
-auto GetCamera() {
+auto get_camera() {
     auto camera = vglx::PerspectiveCamera::Create({
         .fov = vglx::math::DegToRad(60.0f),
         .aspect = static_cast<float>(kWindowWidth) / static_cast<float>(kWindowHeight),
@@ -20,12 +20,10 @@ auto GetCamera() {
         .far = 1000.0f
     });
 
-    camera->transform.Translate({0.0f, 0.0f, 3.5f});
-
     return camera;
 }
 
-auto GetScene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
+auto get_scene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
     auto scene = vglx::Scene::Create();
 
     auto result = vglx::LoadMesh(ASSETS_DIR "/barbarian/scene.gltf");
@@ -56,14 +54,16 @@ auto GetScene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
 }
 
 auto main() -> int {
-    auto camera = GetCamera();
-    auto scene = GetScene();
+    auto camera = get_camera();
+    auto scene = get_scene();
     if (!scene.has_value()) {
         std::print(stderr, "{}", scene.error());
         return 1;
     }
 
-    return RunExample(scene->get(), camera.get(), {
+    scene->get()->Add(vglx::OrbitControls::Create(camera.get(), {.radius = 3.5f}));
+
+    return run_example(scene->get(), camera.get(), {
         .window_title = "Mesh Loader glTF",
         .clear_color = vglx::Color {0xC9C9C9}
     });
