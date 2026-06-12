@@ -37,5 +37,4 @@ void main() {
     #endif
 
     v_FragColor = vec4(output_color, opacity);
-    v_FragColor = clamp(v_FragColor, 0.0, 1.0);
 }

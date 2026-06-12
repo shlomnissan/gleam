@@ -200,6 +200,13 @@ void main() {
         output_color += processLights(normal, view_dir, diffuse_color, specular_factor);
     #endif
 
+    #ifdef USE_ENVIRONMENT_MAP
+        vec3 view_reflect = reflect(-view_dir, normal);
+        vec3 world_reflect = transpose(mat3(u_View)) * view_reflect;
+        vec3 environment_color = texture(u_EnvironmentMap, world_reflect).rgb;
+        output_color = mix(output_color, environment_color, u_Reflectivity);
+    #endif
+
     vec3 emissive = u_EmissiveColor;
     #ifdef USE_EMISSIVE_MAP
         emissive *= texture(u_EmissiveMap, v_TexCoord).rgb;
@@ -207,13 +214,6 @@ void main() {
 
     emissive *= u_EmissiveIntensity;
     output_color += emissive;
-
-    #ifdef USE_ENVIRONMENT_MAP
-        vec3 view_reflect = reflect(-view_dir, normal);
-        vec3 world_reflect = transpose(mat3(u_View)) * view_reflect;
-        vec3 environment_color = texture(u_EnvironmentMap, world_reflect).rgb;
-        output_color = mix(output_color, environment_color, u_Reflectivity);
-    #endif
 
     #ifdef USE_FOG
         applyFog(output_color, v_ViewDepth);

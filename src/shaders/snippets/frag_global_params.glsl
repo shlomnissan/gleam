@@ -4,12 +4,15 @@ This fragment shader snippet defines global parameters, including the main
 output color, varyings, and uniforms accessible within the fragment shader.
 
 @out vec4 v_FragColor - Output color of the fragment
+@varying float v_ViewDepth - Depth of the fragment in view space
 @varying vec2 v_TexCoord - Texture coordinates
-@varying vec3 v_Normal - Normal vector (see frag_main_normal.glsl)
-@varying vec3 v_ViewDir - View direction vector
+@varying vec3 v_Normal - Normal vector in view space; normalize before use
+@varying vec3 v_ViewDir - View vector from the fragment to the camera in view space; unnormalized, normalize before use
 @varying vec4 v_Position - Fragment position in view space
 @uniform vec3 u_Color - Base color of the fragment
 @uniform float u_Opacity - Fragment opacity
+@uniform mat4 u_Projection - Projection transformation matrix (ub_Camera)
+@uniform mat4 u_View - View transformation matrix (ub_Camera)
 
 */
 

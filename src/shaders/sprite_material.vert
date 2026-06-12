@@ -16,7 +16,7 @@ bool isPerspectiveMatrix(in mat4 m) {
 void main() {
     #include "snippets/vert_main_varyings.glsl"
 
-    vec4 position = u_ModelView[3];
+    vec4 position = model_view[3];
     vec2 scale = vec2(length(u_Model[0].xyz), length(u_Model[1].xyz));
 
     #ifndef USE_SIZE_ATTENUATION

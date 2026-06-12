@@ -57,6 +57,7 @@ vec3 cookTorranceShading(
     const in vec3 light_dir,
     const in vec3 light_color,
     const in vec3 normal,
+    const in vec3 view_dir,
     const in vec3 base_color,
     const in float metallic,
     const in float roughness
@@ -64,10 +65,10 @@ vec3 cookTorranceShading(
     float NoL = max(dot(normal, light_dir), 0.0);
     if (NoL <= 0.0) return vec3(0.0);
 
-    vec3 halfway = normalize(light_dir + v_ViewDir);
-    float NoV = max(dot(normal, v_ViewDir), 0.0);
+    vec3 halfway = normalize(light_dir + view_dir);
+    float NoV = max(dot(normal, view_dir), 0.0);
     float NoH = max(dot(normal, halfway), 0.0);
-    float VoH = max(dot(v_ViewDir, halfway), 0.0);
+    float VoH = max(dot(view_dir, halfway), 0.0);
 
     float alpha = roughness * roughness;
     vec3 F0 = mix(vec3(0.04), base_color, metallic);
@@ -110,6 +111,7 @@ float attenuation(in float dist, in Light light) {
 
 vec3 processLights(
     const in vec3 normal,
+    const in vec3 view_dir,
     const in vec3 base_color,
     const in float metallic,
     const in float roughness
@@ -123,6 +125,7 @@ vec3 processLights(
                 light.Direction,
                 light.Color,
                 normal,
+                view_dir,
                 base_color,
                 metallic,
                 roughness
@@ -136,6 +139,7 @@ vec3 processLights(
                 light_dir,
                 light.Color,
                 normal,
+                view_dir,
                 base_color,
                 metallic,
                 roughness
@@ -152,6 +156,7 @@ vec3 processLights(
                     light_dir,
                     spot_color,
                     normal,
+                    view_dir,
                     base_color,
                     metallic,
                     roughness
@@ -165,6 +170,8 @@ vec3 processLights(
 #endif
 
 void main() {
+    vec3 view_dir = normalize(v_ViewDir);
+
     #ifdef USE_FLAT_SHADED
         vec3 fdx = dFdx(v_Position.xyz);
         vec3 fdy = dFdy(v_Position.xyz);
@@ -225,7 +232,7 @@ void main() {
 
     vec3 output_color = base_color * (1.0 - metallic) * u_AmbientLight * ao / PI;
     #if NUM_LIGHTS > 0
-        output_color += processLights(normal, base_color, metallic, roughness);
+        output_color += processLights(normal, view_dir, base_color, metallic, roughness);
     #endif
 
     vec3 emissive = u_EmissiveColor;

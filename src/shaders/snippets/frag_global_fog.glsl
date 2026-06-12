@@ -5,9 +5,9 @@ distance from the camera. It supports two fog types: linear and exponential,
 but only one can be active at a time. To use the fog effect, call the
 applyFog function with the color and depth as arguments.
 
-@func void applyFog(inout vec4 color, float depth)
+@func void applyFog(inout vec3 color, const in float depth)
 - @desc Applies the fog effect to the color based on the depth
-- @param inout vec4 color - The color to be modified by the fog effect
+- @param inout vec3 color - The color to be modified by the fog effect
 - @param const in float depth - The depth of the fragment in view space
 - @return void
 

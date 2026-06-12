@@ -15,7 +15,7 @@ void main() {
     #include "snippets/vert_main_varyings.glsl"
 
     #ifdef USE_NORMAL_MAP
-        vec3 tangent = normalize(mat3(u_ModelView) * a_Tangent.xyz);
+        vec3 tangent = normalize(mat3(model_view) * a_Tangent.xyz);
         vec3 bitangent = normalize(cross(v_Normal, tangent)) * a_Tangent.w;
         v_TBN = mat3(tangent, bitangent, v_Normal);
     #endif
