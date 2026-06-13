@@ -52,6 +52,14 @@ public:
     std::shared_ptr<Texture> background {nullptr};
 
     /**
+     * @brief Optional environment map used as the image-based lighting source.
+     */
+    std::shared_ptr<Texture> environment {nullptr};
+
+    /// @brief Scalar multiplier applied to the @ref environment lighting contribution.
+    float environment_intensity {1.0f};
+
+    /**
      * @brief Constructs a scene object.
      */
     Scene();

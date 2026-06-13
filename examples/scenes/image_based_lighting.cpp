@@ -26,7 +26,7 @@ auto get_camera() {
 auto get_scene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
     auto scene = vglx::Scene::Create();
 
-    auto result = vglx::LoadHDRTexture(ASSETS_DIR "/hdri/ferndale_studio_04_4k.hdr");
+    auto result = vglx::LoadHDRTexture(ASSETS_DIR "/hdri/qwantani_dusk_2_puresky_4k.hdr");
     if (!result.has_value()) {
         return std::unexpected(result.error());
     }
@@ -47,6 +47,7 @@ auto main() -> int {
     scene->get()->Add(vglx::OrbitControls::Create(camera.get(), {.radius = 6.0f}));
 
     return run_example(scene->get(), camera.get(), {
-        .window_title = "Image-Based Lighting"
+        .window_title = "Image-Based Lighting",
+        .tone_mapping = vglx::Renderer::ToneMapping::ACESFilmic
     });
 }

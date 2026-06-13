@@ -49,6 +49,7 @@ public:
         Color emissive_color = 0x000000; ///< Emissive color independent of lighting.
         float ao_intensity = 1.0f; ///< AO contribution strength.
         float emissive_intensity = 1.0f; ///< Emissive multiplier.
+        float environment_intensity = 1.0f; ///< Environment lighting multiplier.
         float metallic = 0.0f; ///< Metallic factor.
         float normal_intensity = 1.0f; ///< Normal map strength.
         float roughness = 1.0f; ///< Roughness factor.
@@ -73,6 +74,9 @@ public:
     /// @brief Scalar multiplier for emissive contribution.
     float emissive_intensity;
 
+    /// @brief Scalar multiplier for environment lighting. Multiplies @ref Scene::environment_intensity.
+    float environment_intensity;
+
     /// @brief Metallic factor.
     float metallic;
 
@@ -85,7 +89,7 @@ public:
     /// @brief Alpha map defining per-pixel opacity.
     std::shared_ptr<Texture> alpha_map;
 
-    /// @brief Ambient occlusion map sampled from the R channel; modulates the ambient term.
+    /// @brief Ambient occlusion map that modulates the ambient term.
     std::shared_ptr<Texture> ao_map;
 
     /// @brief Albedo (base color) map multiplied with @ref color per texel.
@@ -118,6 +122,7 @@ public:
         emissive_color(params.emissive_color),
         ao_intensity(params.ao_intensity),
         emissive_intensity(params.emissive_intensity),
+        environment_intensity(params.environment_intensity),
         metallic(params.metallic),
         normal_intensity(params.normal_intensity),
         roughness(params.roughness),

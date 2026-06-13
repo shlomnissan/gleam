@@ -48,7 +48,7 @@ def render_variable(v: VarDoc, resolver: Resolver):
         f"{resolver.member_id_to_anchor(v.id)}\n"
         f"</div>"
         f"<div class=\"description\">\n\n"
-        f"{v.brief} {v.details}\n"
+        f"{v.brief}\n\n {v.details}\n"
         f"```cpp\n{_t_str(v.type)} {v.name} {init_value};\n```\n"
         f"</div>"
         f"</div>"
