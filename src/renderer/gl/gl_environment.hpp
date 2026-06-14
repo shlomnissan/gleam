@@ -32,13 +32,13 @@ class GLEnvironment {
 public:
     GLEnvironment() = default;
 
-    // delete copy constructor and assignment operator
+    // Non-copyable
     GLEnvironment(const GLEnvironment&) = delete;
-    GLEnvironment& operator=(const GLEnvironment&) = delete;
+    auto operator=(const GLEnvironment&) -> GLEnvironment& = delete;
 
-    // delete move constructor and assignment operator
+    // Non-moveable
     GLEnvironment(GLEnvironment&&) = delete;
-    GLEnvironment& operator=(GLEnvironment&&) = delete;
+    auto operator=(GLEnvironment&&) -> GLEnvironment& = delete;
 
     auto Initialize() -> std::expected<void, std::string>;
 

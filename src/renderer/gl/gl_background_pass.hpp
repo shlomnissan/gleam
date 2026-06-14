@@ -30,7 +30,7 @@ public:
 
     // Non-moveable
     GLBackgroundPass(GLBackgroundPass&&) = delete;
-    auto operator=(const GLBackgroundPass&&) -> GLBackgroundPass& = delete;
+    auto operator=(GLBackgroundPass&&) -> GLBackgroundPass& = delete;
 
     auto Initialize() -> std::expected<void, std::string>;
 
