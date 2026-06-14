@@ -52,6 +52,8 @@ set(SOURCE_CODE
     "renderer/gl/gl_camera.hpp"
     "renderer/gl/gl_device.cpp"
     "renderer/gl/gl_device.hpp"
+    "renderer/gl/gl_environment.cpp"
+    "renderer/gl/gl_environment.hpp"
     "renderer/gl/gl_framebuffers.cpp"
     "renderer/gl/gl_framebuffers.hpp"
     "renderer/gl/gl_lights.cpp"
