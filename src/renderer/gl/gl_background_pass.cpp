@@ -98,12 +98,11 @@ auto GLBackgroundPass::GenerateVAOs() -> std::expected<void, std::string> {
 }
 
 auto GLBackgroundPass::InitializeBackground2D() -> std::expected<void, std::string> {
-    auto sources = std::vector<ShaderInfo> {
+    background_2d_ = std::make_unique<GLProgram>(std::vector<ShaderInfo> {
         {.type = ShaderType::kVertexShader, .source = _SHADER_background_vert},
         {.type = ShaderType::kFragmentShader, .source = _SHADER_background_frag}
-    };
+    });
 
-    background_2d_ = std::make_unique<GLProgram>(sources);
     if (!background_2d_->IsValid()) {
         return std::unexpected("Unable to create 2d background pass program");
     }
@@ -112,12 +111,11 @@ auto GLBackgroundPass::InitializeBackground2D() -> std::expected<void, std::stri
 }
 
 auto GLBackgroundPass::InitializeBackgroundCube() -> std::expected<void, std::string> {
-    auto sources = std::vector<ShaderInfo> {
+    background_cube_ = std::make_unique<GLProgram>(std::vector<ShaderInfo> {
         {.type = ShaderType::kVertexShader, .source = _SHADER_background_cube_vert},
         {.type = ShaderType::kFragmentShader, .source = _SHADER_background_cube_frag}
-    };
+    });
 
-    background_cube_ = std::make_unique<GLProgram>(sources);
     if (!background_cube_->IsValid()) {
         return std::unexpected("Unable to create cube background pass program");
     }
@@ -126,12 +124,11 @@ auto GLBackgroundPass::InitializeBackgroundCube() -> std::expected<void, std::st
 }
 
 auto GLBackgroundPass::InitializeBackgroundEquirect() -> std::expected<void, std::string> {
-    auto sources = std::vector<ShaderInfo> {
+    background_equirect_ = std::make_unique<GLProgram>(std::vector<ShaderInfo> {
         {.type = ShaderType::kVertexShader, .source = _SHADER_background_cube_vert},
         {.type = ShaderType::kFragmentShader, .source = _SHADER_background_equirect_frag}
-    };
+    });
 
-    background_equirect_ = std::make_unique<GLProgram>(sources);
     if (!background_equirect_->IsValid()) {
         return std::unexpected("Unable to create equirect background pass program");
     }

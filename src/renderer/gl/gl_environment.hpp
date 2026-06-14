@@ -47,8 +47,6 @@ public:
     ~GLEnvironment();
 
 private:
-    auto Process(const std::shared_ptr<Texture>& source) -> GLEnvironmentMaps;
-
     auto EquirectToCube(GLuint src_equirect, GLuint dst_cube, int size) -> void;
 
     std::unique_ptr<GLProgram> equirect_to_cube_;
