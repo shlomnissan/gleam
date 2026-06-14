@@ -56,8 +56,7 @@ private:
     std::vector<std::pair<Texture*, GLEnvironmentMaps>> cache_;
 
     GLuint fbo_ {0};
-    GLuint cube_vao_ {0};
-    GLuint cube_vbo_ {0};
+    GLuint vao_ {0};
 };
 
 }

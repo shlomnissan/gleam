@@ -15,10 +15,6 @@ namespace vglx {
 
 namespace {
 
-auto bind_cube_face(GLuint cube, int face, int mip, int size) {
-    return;
-}
-
 auto dispose(GLEnvironmentMaps& maps) {
     if (maps.base_cube) glDeleteTextures(1, &maps.base_cube);
     if (maps.irradiance) glDeleteTextures(1, &maps.irradiance);
@@ -27,10 +23,6 @@ auto dispose(GLEnvironmentMaps& maps) {
     maps.base_cube = 0;
     maps.irradiance = 0;
     maps.prefiltered = 0;
-}
-
-auto create_cube(int size, bool mips) -> GLuint {
-    return 0;
 }
 
 }
@@ -55,8 +47,7 @@ GLEnvironment::~GLEnvironment() {
     for (auto& [_, map] : cache_) dispose(map);
 
     if (fbo_) glDeleteFramebuffers(1, &fbo_);
-    if (cube_vao_) glDeleteVertexArrays(1, &cube_vao_);
-    if (cube_vbo_) glDeleteBuffers(1, &cube_vbo_);
+    if (vao_) glDeleteVertexArrays(1, &vao_);
 }
 
 }
