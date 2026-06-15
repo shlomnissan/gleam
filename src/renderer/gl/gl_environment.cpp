@@ -45,11 +45,43 @@ auto dispose(GLEnvironmentMaps& maps) {
 }
 
 auto create_cube_texture(int size, bool mips) -> GLuint {
-    return 0;
+    auto output = GLuint {0};
+    glGenTextures(1, &output);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, output);
+
+    for (auto i = 0; i < 6; ++i) {
+        glTexImage2D(
+            GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+            0,
+            GL_RGBA16F,
+            size,
+            size,
+            0,
+            GL_RGBA,
+            GL_HALF_FLOAT,
+            nullptr
+        );
+    }
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, mips ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+    return output;
 }
 
-auto bind_cube_face(GLuint cube, int face, int mip, int size) {
-    return;
+auto bind_cube_face(GLuint texture, int face, int mip) {
+    glFramebufferTexture2D(
+        GL_FRAMEBUFFER,
+        GL_COLOR_ATTACHMENT0,
+        GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
+        texture,
+        mip
+    );
 }
 
 }
@@ -83,6 +115,13 @@ auto GLEnvironment::GetOrProcess(const std::shared_ptr<Texture>& source) -> std:
         return it->second;
     }
 
+    if (source->GetType() != Texture::Type::Texture2D ||
+        source->mapping != Texture::Mapping::Equirectangular)
+    {
+        Logger::Log(LogLevel::Error, "Environment source must be an equirectangular 2D texture");
+        return std::nullopt;
+    }
+
     if (source->renderer_id == 0) {
         Logger::Log(
             LogLevel::Error,
@@ -93,12 +132,38 @@ auto GLEnvironment::GetOrProcess(const std::shared_ptr<Texture>& source) -> std:
 
     auto output = GLEnvironmentMaps {.base_size = kBaseCubeSize};
 
-    // TODO: implement
+    output.base_cube = create_cube_texture(kBaseCubeSize, true);
+    if (output.base_cube == 0) {
+        Logger::Log(
+            LogLevel::Error,
+            "Failed to allocate storage for environment map processing"
+        );
+        return std::nullopt;
+    }
+
+    EquirectToCube(source->renderer_id, output.base_cube, output.base_size);
+
+    glBindTexture(GL_TEXTURE_CUBE_MAP, output.base_cube);
+    glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+
+    cache_.emplace_back(source.get(), output);
+
+    source->OnDispose([this](Disposable* target) {
+        auto it = std::ranges::find(
+            cache_, static_cast<Texture*>(target),
+            &std::pair<Texture*, GLEnvironmentMaps>::first
+        );
+
+        if (it != cache_.end()) {
+            dispose(it->second);
+            cache_.erase(it);
+        }
+    });
 
     return output;
 }
 
-auto GLEnvironment::EquirectToCube(GLuint src_equirect, GLuint dst_cube, int size) -> void {
+auto GLEnvironment::EquirectToCube(GLuint src, GLuint dst, int size) -> void {
     // TODO: implement
 
     return;

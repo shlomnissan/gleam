@@ -47,7 +47,7 @@ public:
     ~GLEnvironment();
 
 private:
-    auto EquirectToCube(GLuint src_equirect, GLuint dst_cube, int size) -> void;
+    auto EquirectToCube(GLuint src, GLuint dst, int size) -> void;
 
     std::unique_ptr<GLProgram> equirect_to_cube_;
 
