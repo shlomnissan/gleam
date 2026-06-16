@@ -15,6 +15,7 @@
 #include "shaders/internal/headers/equirect_to_cube_frag.h"
 #include "shaders/internal/headers/equirect_to_cube_vert.h"
 #include "utilities/logger.hpp"
+#include "utilities/assert.hpp"
 
 #include <algorithm>
 #include <array>
@@ -164,9 +165,33 @@ auto GLEnvironment::GetOrProcess(const std::shared_ptr<Texture>& source) -> std:
 }
 
 auto GLEnvironment::EquirectToCube(GLuint src, GLuint dst, int size) -> void {
-    // TODO: implement
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
+    glUseProgram(equirect_to_cube_->Id());
+    glViewport(0, 0, size, size);
 
-    return;
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, src);
+    glBindVertexArray(vao_);
+
+    const auto unit = 0;
+    equirect_to_cube_->SetUniform("u_EquirectTexture", &unit);
+
+    for (auto i = 0; i < 6; ++i) {
+        bind_cube_face(dst, i, 0);
+
+        if (i == 0) {
+            VGLX_ASSERT(
+                glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE,
+                "Environment framebuffer is incomplete"
+            );
+        }
+
+        equirect_to_cube_->SetUniform("u_FaceBasis", &kFaceBases[i]);
+        equirect_to_cube_->UpdateUniforms();
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 GLEnvironment::~GLEnvironment() {
