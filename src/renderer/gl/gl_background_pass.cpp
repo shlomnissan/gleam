@@ -162,14 +162,12 @@ auto GLBackgroundPass::Render(const std::shared_ptr<Texture>& background) const 
     if (background->GetType() == Texture::Type::Texture2D) {
         if (background->mapping == Texture::Mapping::UV) {
             glUseProgram(background_2d_->Id());
-            glActiveTexture(GL_TEXTURE0);
             glBindVertexArray(vao_[0]);
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
 
         if (background->mapping == Texture::Mapping::Equirectangular) {
             glUseProgram(background_equirect_->Id());
-            glActiveTexture(GL_TEXTURE0);
             glBindVertexArray(vao_[1]);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
@@ -177,10 +175,15 @@ auto GLBackgroundPass::Render(const std::shared_ptr<Texture>& background) const 
 
     if (background->GetType() == Texture::Type::CubeTexture) {
         glUseProgram(background_cube_->Id());
-        glActiveTexture(GL_TEXTURE0);
         glBindVertexArray(vao_[1]);
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
+}
+
+auto GLBackgroundPass::DebugPresentCubeMap() const -> void {
+    glUseProgram(background_cube_->Id());
+    glBindVertexArray(vao_[1]);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 }
 
 GLBackgroundPass::~GLBackgroundPass() {

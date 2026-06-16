@@ -45,7 +45,7 @@ auto dispose(GLEnvironmentMaps& maps) {
     maps.prefiltered = 0;
 }
 
-auto create_cube_texture(int size, bool mips) -> GLuint {
+auto create_cube_texture(int size, bool mips) {
     auto output = GLuint {0};
     glGenTextures(1, &output);
     glBindTexture(GL_TEXTURE_CUBE_MAP, output);
@@ -149,7 +149,9 @@ auto GLEnvironment::GetOrProcess(const std::shared_ptr<Texture>& source) -> std:
 
     cache_.emplace_back(source.get(), output);
 
-    source->OnDispose([this](Disposable* target) {
+    source->OnDispose([this, alive = std::weak_ptr(alive_)](Disposable* target) {
+        if (alive.expired()) return; // GLEnvironment already destroyed
+
         auto it = std::ranges::find(
             cache_, static_cast<Texture*>(target),
             &std::pair<Texture*, GLEnvironmentMaps>::first
@@ -195,6 +197,8 @@ auto GLEnvironment::EquirectToCube(GLuint src, GLuint dst, int size) -> void {
 }
 
 GLEnvironment::~GLEnvironment() {
+    alive_.reset();
+
     for (auto& [_, map] : cache_) dispose(map);
 
     if (fbo_) glDeleteFramebuffers(1, &fbo_);

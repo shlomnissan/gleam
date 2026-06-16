@@ -13,6 +13,7 @@
 #include "renderer/gl/gl_background_pass.hpp"
 #include "renderer/gl/gl_camera.hpp"
 #include "renderer/gl/gl_device.hpp"
+#include "renderer/gl/gl_environment.hpp"
 #include "renderer/gl/gl_framebuffers.hpp"
 #include "renderer/gl/gl_lights.hpp"
 #include "renderer/gl/gl_present_pass.hpp"
@@ -69,6 +70,7 @@ public:
 private:
     GLBackgroundPass background_pass_;
     GLCamera camera_ubo_;
+    GLEnvironment environment_;
     GLFramebuffers framebuffers_;
     GLLights lights_;
     GLPresentPass present_pass_;
@@ -90,6 +92,8 @@ private:
     float exposure_ {1.0f};
 
     int next_texture_unit_ {0};
+
+    unsigned int debug_env_cube_ {0};
 
     auto ProcessLights(Camera* camera) -> void;
 

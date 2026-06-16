@@ -64,6 +64,10 @@ auto Renderer::Impl::Initialize() -> std::expected<void, std::string> {
         return std::unexpected(result.error());
     }
 
+    if (auto result = environment_.Initialize(); !result.has_value()) {
+        return std::unexpected(result.error());
+    }
+
     state_.SetDepthFunction(Material::Depth::LessEqual);
     state_.SetSeamlessCubemapFiltering();
 
@@ -87,8 +91,14 @@ auto Renderer::Impl::RenderObjects(Scene* scene, Camera* camera) -> void {
         state_.SetBackfaceCulling(false);
         state_.SetBlending(Material::Blending::None);
 
-        textures_.Bind(scene->background, 0);
-        background_pass_.Render(scene->background);
+        if (debug_env_cube_) {
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, debug_env_cube_);
+            background_pass_.DebugPresentCubeMap();
+        } else {
+            textures_.Bind(scene->background, 0);
+            background_pass_.Render(scene->background);
+        }
     }
 
     if (!render_lists_->Transparent().empty())
@@ -369,8 +379,15 @@ auto Renderer::Impl::ProcessLights(Camera* camera) -> void {
 }
 
 auto Renderer::Impl::Render(Scene* scene, Camera* camera, RenderTarget* target) -> void {
-    const auto use_default_target = target == nullptr;
+    if (scene->environment) {
+        textures_.Bind(scene->environment, 0);
+        auto env_maps = environment_.GetOrProcess(scene->environment);
+        if (env_maps.has_value()) {
+            debug_env_cube_ = env_maps->base_cube;
+        }
+    }
 
+    const auto use_default_target = target == nullptr;
     use_default_target ? scene_buffer_.Begin() : framebuffers_.Begin(target);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

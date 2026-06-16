@@ -36,6 +36,8 @@ public:
 
     auto Render(const std::shared_ptr<Texture>& background) const -> void;
 
+    auto DebugPresentCubeMap() const -> void;
+
     ~GLBackgroundPass();
 
 private:

@@ -53,6 +53,10 @@ private:
 
     std::vector<std::pair<Texture*, GLEnvironmentMaps>> cache_;
 
+    // Lifetime guard for dispose callbacks we register on source textures.
+    // Each callback holds a weak_ptr to this token.
+    std::shared_ptr<int> alive_ = std::make_shared<int>(0);
+
     GLuint fbo_ {0};
     GLuint vao_ {0};
 };
