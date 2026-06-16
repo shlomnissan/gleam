@@ -47,9 +47,14 @@ public:
     ~GLEnvironment();
 
 private:
-    auto EquirectToCube(GLuint src, GLuint dst, int size) -> void;
+    auto RenderToCubeFaces(GLProgram* program, GLuint dst, int size) -> void;
 
-    std::unique_ptr<GLProgram> equirect_to_cube_;
+    auto EquirectToCubeMap(GLuint src, GLuint dst) -> void;
+
+    auto IrradianceMap(GLuint src, GLuint dst) -> void;
+
+    std::unique_ptr<GLProgram> prg_equirect_to_cube_;
+    std::unique_ptr<GLProgram> prg_irradiance_cube_;
 
     std::vector<std::pair<Texture*, GLEnvironmentMaps>> cache_;
 

@@ -383,7 +383,7 @@ auto Renderer::Impl::Render(Scene* scene, Camera* camera, RenderTarget* target) 
         textures_.Bind(scene->environment, 0);
         auto env_maps = environment_.GetOrProcess(scene->environment);
         if (env_maps.has_value()) {
-            debug_env_cube_ = env_maps->base_cube;
+            debug_env_cube_ = env_maps->irradiance;
         }
     }
 

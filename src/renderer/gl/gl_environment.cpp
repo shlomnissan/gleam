@@ -14,6 +14,7 @@
 #include "renderer/gl/gl_program.hpp"
 #include "shaders/internal/headers/equirect_to_cube_frag.h"
 #include "shaders/internal/headers/equirect_to_cube_vert.h"
+#include "shaders/internal/headers/irradiance_cube_frag.h"
 #include "utilities/logger.hpp"
 #include "utilities/assert.hpp"
 
@@ -25,6 +26,7 @@ namespace vglx {
 namespace {
 
 constexpr auto kBaseCubeSize = 512;
+constexpr auto kIrradianceSize = 32;
 
 constexpr auto kFaceBases = std::array<Matrix3, 6> {
     Matrix3(Vector3 { 0.0f,  0.0f, -1.0f}, Vector3 { 0.0f, -1.0f,  0.0f}, Vector3 { 1.0f,  0.0f,  0.0f}), // +X
@@ -98,13 +100,22 @@ auto GLEnvironment::Initialize() -> std::expected<void, std::string> {
         return std::unexpected("Environment manager failed to generate vertex array object");
     }
 
-    equirect_to_cube_ = std::make_unique<GLProgram>(std::vector<ShaderInfo> {
+    prg_equirect_to_cube_ = std::make_unique<GLProgram>(std::vector<ShaderInfo> {
         {.type = ShaderType::kVertexShader, .source = _SHADER_equirect_to_cube_vert},
         {.type = ShaderType::kFragmentShader, .source = _SHADER_equirect_to_cube_frag}
     });
 
-    if (!equirect_to_cube_->IsValid()) {
+    if (!prg_equirect_to_cube_->IsValid()) {
         return std::unexpected("Unable to create equirect to cube program");
+    }
+
+    prg_irradiance_cube_ = std::make_unique<GLProgram>(std::vector<ShaderInfo> {
+        {.type = ShaderType::kVertexShader, .source = _SHADER_equirect_to_cube_vert},
+        {.type = ShaderType::kFragmentShader, .source = _SHADER_irradiance_cube_frag}
+    });
+
+    if (!prg_irradiance_cube_->IsValid()) {
+        return std::unexpected("Unable to create irradiance cube program");
     }
 
     return {};
@@ -134,7 +145,9 @@ auto GLEnvironment::GetOrProcess(const std::shared_ptr<Texture>& source) -> std:
     auto output = GLEnvironmentMaps {.base_size = kBaseCubeSize};
 
     output.base_cube = create_cube_texture(kBaseCubeSize, true);
-    if (output.base_cube == 0) {
+    output.irradiance = create_cube_texture(kIrradianceSize, false);
+
+    if (output.base_cube == 0 || output.irradiance == 0) {
         Logger::Log(
             LogLevel::Error,
             "Failed to allocate storage for environment map processing"
@@ -142,10 +155,12 @@ auto GLEnvironment::GetOrProcess(const std::shared_ptr<Texture>& source) -> std:
         return std::nullopt;
     }
 
-    EquirectToCube(source->renderer_id, output.base_cube, output.base_size);
+    EquirectToCubeMap(source->renderer_id, output.base_cube);
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, output.base_cube);
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+
+    IrradianceMap(output.base_cube, output.irradiance);
 
     cache_.emplace_back(source.get(), output);
 
@@ -166,17 +181,10 @@ auto GLEnvironment::GetOrProcess(const std::shared_ptr<Texture>& source) -> std:
     return output;
 }
 
-auto GLEnvironment::EquirectToCube(GLuint src, GLuint dst, int size) -> void {
+auto GLEnvironment::RenderToCubeFaces(GLProgram* program, GLuint dst, int size) -> void {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
-    glUseProgram(equirect_to_cube_->Id());
+    glUseProgram(program->Id());
     glViewport(0, 0, size, size);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, src);
-    glBindVertexArray(vao_);
-
-    const auto unit = 0;
-    equirect_to_cube_->SetUniform("u_EquirectTexture", &unit);
 
     for (auto i = 0; i < 6; ++i) {
         bind_cube_face(dst, i, 0);
@@ -188,12 +196,34 @@ auto GLEnvironment::EquirectToCube(GLuint src, GLuint dst, int size) -> void {
             );
         }
 
-        equirect_to_cube_->SetUniform("u_FaceBasis", &kFaceBases[i]);
-        equirect_to_cube_->UpdateUniforms();
+        program->SetUniform("u_FaceBasis", &kFaceBases[i]);
+        program->UpdateUniforms();
         glDrawArrays(GL_TRIANGLES, 0, 3);
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+auto GLEnvironment::EquirectToCubeMap(GLuint src, GLuint dst) -> void {
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, src);
+    glBindVertexArray(vao_);
+
+    const auto unit = 0;
+    prg_equirect_to_cube_->SetUniform("u_EquirectTexture", &unit);
+
+    RenderToCubeFaces(prg_equirect_to_cube_.get(), dst, kBaseCubeSize);
+}
+
+auto GLEnvironment::IrradianceMap(GLuint src, GLuint dst) -> void {
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, src);
+    glBindVertexArray(vao_);
+
+    const auto unit = 0;
+    prg_irradiance_cube_->SetUniform("u_EnvironmentMap", &unit);
+
+    RenderToCubeFaces(prg_irradiance_cube_.get(), dst, kIrradianceSize);
 }
 
 GLEnvironment::~GLEnvironment() {
