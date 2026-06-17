@@ -15,6 +15,7 @@
 #include "shaders/internal/headers/equirect_to_cube_frag.h"
 #include "shaders/internal/headers/equirect_to_cube_vert.h"
 #include "shaders/internal/headers/irradiance_cube_frag.h"
+#include "shaders/internal/headers/prefiltered_cube_frag.h"
 #include "utilities/logger.hpp"
 #include "utilities/assert.hpp"
 
@@ -27,6 +28,8 @@ namespace {
 
 constexpr auto kBaseCubeSize = 512;
 constexpr auto kIrradianceSize = 32;
+constexpr auto kPrefilterSize = 128;
+constexpr auto kPrefilteredMips = 5;
 
 constexpr auto kFaceBases = std::array<Matrix3, 6> {
     Matrix3(Vector3 { 0.0f,  0.0f, -1.0f}, Vector3 { 0.0f, -1.0f,  0.0f}, Vector3 { 1.0f,  0.0f,  0.0f}), // +X
@@ -71,6 +74,9 @@ auto create_cube_texture(int size, bool mips) {
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    // Allocate the chain, garbage content gets overwritten
+    if (mips) glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
@@ -118,6 +124,15 @@ auto GLEnvironment::Initialize() -> std::expected<void, std::string> {
         return std::unexpected("Unable to create irradiance cube program");
     }
 
+    prg_prefiltered_cube_ = std::make_unique<GLProgram>(std::vector<ShaderInfo>{
+        {.type = ShaderType::kVertexShader, .source = _SHADER_equirect_to_cube_vert},
+        {.type = ShaderType::kFragmentShader, .source = _SHADER_prefiltered_cube_frag},
+    });
+
+    if (!prg_prefiltered_cube_->IsValid()) {
+        return std::unexpected("Unable to create prefiltered cube program");
+    }
+
     return {};
 }
 
@@ -142,12 +157,17 @@ auto GLEnvironment::GetOrProcess(const std::shared_ptr<Texture>& source) -> std:
         return std::nullopt;
     }
 
-    auto output = GLEnvironmentMaps {.base_size = kBaseCubeSize};
+    auto output = GLEnvironmentMaps {
+        .base_size = kBaseCubeSize,
+        .prefiltered_mips = kPrefilteredMips,
+    };
 
     output.base_cube = create_cube_texture(kBaseCubeSize, true);
     output.irradiance = create_cube_texture(kIrradianceSize, false);
+    output.prefiltered = create_cube_texture(kPrefilterSize, true);
 
-    if (output.base_cube == 0 || output.irradiance == 0) {
+    if (output.base_cube == 0 || output.irradiance == 0 || output.prefiltered == 0) {
+        dispose(output);
         Logger::Log(
             LogLevel::Error,
             "Failed to allocate storage for environment map processing"
@@ -161,6 +181,7 @@ auto GLEnvironment::GetOrProcess(const std::shared_ptr<Texture>& source) -> std:
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
     IrradianceMap(output.base_cube, output.irradiance);
+    PrefilterMap(output.base_cube, output.prefiltered);
 
     cache_.emplace_back(source.get(), output);
 
@@ -181,13 +202,13 @@ auto GLEnvironment::GetOrProcess(const std::shared_ptr<Texture>& source) -> std:
     return output;
 }
 
-auto GLEnvironment::RenderToCubeFaces(GLProgram* program, GLuint dst, int size) -> void {
+auto GLEnvironment::RenderToCubeFaces(GLProgram* program, GLuint dst, int size, int mip) -> void {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
     glUseProgram(program->Id());
     glViewport(0, 0, size, size);
 
     for (auto i = 0; i < 6; ++i) {
-        bind_cube_face(dst, i, 0);
+        bind_cube_face(dst, i, mip);
 
         if (i == 0) {
             VGLX_ASSERT(
@@ -224,6 +245,22 @@ auto GLEnvironment::IrradianceMap(GLuint src, GLuint dst) -> void {
     prg_irradiance_cube_->SetUniform("u_EnvironmentMap", &unit);
 
     RenderToCubeFaces(prg_irradiance_cube_.get(), dst, kIrradianceSize);
+}
+
+auto GLEnvironment::PrefilterMap(GLuint src, GLuint dst) -> void {
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, src);
+    glBindVertexArray(vao_);
+
+    const auto unit = 0;
+    prg_prefiltered_cube_->SetUniform("u_EnvironmentMap", &unit);
+
+    for (auto mip = 0; mip < kPrefilteredMips; ++mip) {
+        auto size = kPrefilterSize >> mip;
+        auto roughness = mip / static_cast<float>(kPrefilteredMips - 1);
+        prg_prefiltered_cube_->SetUniform("u_Roughness", &roughness);
+        RenderToCubeFaces(prg_prefiltered_cube_.get(), dst, size, mip);
+    }
 }
 
 GLEnvironment::~GLEnvironment() {
