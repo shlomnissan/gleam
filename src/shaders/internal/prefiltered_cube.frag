@@ -5,6 +5,7 @@ layout(location = 0) out vec4 v_FragColor;
 in vec3 v_TexDir;
 
 uniform samplerCube u_EnvironmentMap;
+
 uniform float u_Roughness;
 
 const float PI = 3.14159265358979;

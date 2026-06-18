@@ -181,7 +181,7 @@ auto GLEnvironment::GetOrProcess(const std::shared_ptr<Texture>& source) -> std:
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
     IrradianceMap(output.base_cube, output.irradiance);
-    PrefilterMap(output.base_cube, output.prefiltered);
+    PrefilteredMap(output.base_cube, output.prefiltered);
 
     cache_.emplace_back(source.get(), output);
 
@@ -247,7 +247,7 @@ auto GLEnvironment::IrradianceMap(GLuint src, GLuint dst) -> void {
     RenderToCubeFaces(prg_irradiance_cube_.get(), dst, kIrradianceSize);
 }
 
-auto GLEnvironment::PrefilterMap(GLuint src, GLuint dst) -> void {
+auto GLEnvironment::PrefilteredMap(GLuint src, GLuint dst) -> void {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, src);
     glBindVertexArray(vao_);

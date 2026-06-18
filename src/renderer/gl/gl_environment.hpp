@@ -53,7 +53,7 @@ private:
 
     auto IrradianceMap(GLuint src, GLuint dst) -> void;
 
-    auto PrefilterMap(GLuint src, GLuint dst) -> void;
+    auto PrefilteredMap(GLuint src, GLuint dst) -> void;
 
     std::unique_ptr<GLProgram> prg_equirect_to_cube_;
     std::unique_ptr<GLProgram> prg_irradiance_cube_;

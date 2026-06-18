@@ -26,13 +26,30 @@ auto get_camera() {
 auto get_scene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
     auto scene = vglx::Scene::Create();
 
-    auto result = vglx::LoadHDRTexture(ASSETS_DIR "/hdri/ferndale_studio_04_4k.hdr");
-    if (!result.has_value()) {
-        return std::unexpected(result.error());
+    auto result_background = vglx::LoadHDRTexture(ASSETS_DIR "/hdri/ferndale_studio_04_4k.hdr");
+    if (!result_background.has_value()) {
+        return std::unexpected(result_background.error());
     }
 
-    scene->background = *result;
-    scene->environment = *result;
+    scene->background = *result_background;
+    scene->environment = *result_background;
+
+    auto result_model = vglx::LoadMesh(ASSETS_DIR "/damaged_helmet/damaged_helmet.gltf");
+    if (!result_model.has_value()) {
+        return std::unexpected(result_model.error());
+    }
+
+    scene->Add(std::move(result_model.value()));
+
+    scene->Add(vglx::AmbientLight::Create({
+        .color = 0xFFFFFF,
+        .intensity = 1.0
+    }));
+
+    scene->Add(vglx::PointLight::Create({
+        .color = 0xFFFFFF,
+        .intensity = 1.5f
+    }))->transform.Translate({2.0f, 6.0f, 10.0f});
 
     return scene;
 }
@@ -45,7 +62,10 @@ auto main() -> int {
         return 1;
     }
 
-    scene->get()->Add(vglx::OrbitControls::Create(camera.get(), {.radius = 6.0f}));
+    scene->get()->Add(vglx::OrbitControls::Create(camera.get(), {
+        .radius = 3.0f,
+        .yaw = 0.5f,
+    }));
 
     return run_example(scene->get(), camera.get(), {
         .window_title = "Image-Based Lighting",
