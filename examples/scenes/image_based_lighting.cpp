@@ -26,7 +26,7 @@ auto get_camera() {
 auto get_scene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
     auto scene = vglx::Scene::Create();
 
-    auto result_background = vglx::LoadHDRTexture(ASSETS_DIR "/hdri/ferndale_studio_04_4k.hdr");
+    auto result_background = vglx::LoadHDRTexture(ASSETS_DIR "/hdri/qwantani_dusk_2_puresky_4k.hdr");
     if (!result_background.has_value()) {
         return std::unexpected(result_background.error());
     }

@@ -33,6 +33,14 @@ uniform sampler2D u_MetallicMap;
 uniform sampler2D u_RoughnessMap;
 uniform sampler2D u_AOMap;
 
+#ifdef USE_IBL
+    uniform samplerCube u_IrradianceMap;
+    uniform samplerCube u_PrefilteredMap;
+    uniform sampler2D u_BrdfLut;
+    uniform float u_PrefilteredMaxLod;
+    uniform float u_EnvironmentIntensity;
+#endif
+
 const float PI = 3.14159265358979;
 
 float distributionGGX(float NoH, float alpha) {
@@ -52,6 +60,12 @@ float visibilityGGX(float NoL, float NoV, float alpha) {
 vec3 fresnelSchlick(float cos_theta, vec3 F0) {
     return F0 + (vec3(1.0) - F0) * pow(clamp(1.0 - cos_theta, 0.0, 1.0), 5.0);
 }
+
+#ifdef USE_IBL
+vec3 fresnelSchlickRoughness(float cos_theta, vec3 F0, float roughness) {
+    return F0 + (max(vec3(1.0 - roughness), F0) - F0) * pow(clamp(1.0 - cos_theta, 0.0, 1.0), 5.0);
+}
+#endif
 
 vec3 cookTorranceShading(
     const in vec3 light_dir,
@@ -230,7 +244,28 @@ void main() {
         ao = mix(1.0, ao_sample, u_AOIntensity);
     #endif
 
-    vec3 output_color = base_color * (1.0 - metallic) * u_AmbientLight * ao / PI;
+    #ifdef USE_IBL
+        float NoV = max(dot(normal, view_dir), 0.0);
+        vec3 F0 = mix(vec3(0.04), base_color, metallic);
+        vec3 F = fresnelSchlickRoughness(NoV, F0, roughness);
+        vec3 kD = (1.0 - F) * (1.0 - metallic);
+
+        // Cubes are world space but the varyings are view space, so rotate the
+        // lookup directions back to world (u_View is rigid, so transpose = inverse).
+        mat3 view_to_world = transpose(mat3(u_View));
+        vec3 N_world = normalize(view_to_world * normal);
+        vec3 R_world = normalize(view_to_world * reflect(-view_dir, normal));
+
+        vec3 diffuse = texture(u_IrradianceMap, N_world).rgb * base_color;
+
+        vec3 prefiltered = textureLod(u_PrefilteredMap, R_world, roughness * u_PrefilteredMaxLod).rgb;
+        vec2 ab = texture(u_BrdfLut, vec2(NoV, roughness)).rg;
+        vec3 specular = prefiltered * (F0 * ab.x + ab.y);
+
+        vec3 output_color = (kD * diffuse + specular) * ao * u_EnvironmentIntensity;
+    #else
+        vec3 output_color = base_color * (1.0 - metallic) * u_AmbientLight * ao / PI;
+    #endif
     #if NUM_LIGHTS > 0
         output_color += processLights(normal, view_dir, base_color, metallic, roughness);
     #endif

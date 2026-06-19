@@ -89,11 +89,11 @@ private:
 
     Renderer::ToneMapping tone_mapping_ {Renderer::ToneMapping::ACESFilmic};
 
+    GLEnvironmentMaps env_maps_ {};
+
     float exposure_ {1.0f};
 
     int next_texture_unit_ {0};
-
-    unsigned int debug_env_cube_ {0};
 
     auto ProcessLights(Camera* camera) -> void;
 

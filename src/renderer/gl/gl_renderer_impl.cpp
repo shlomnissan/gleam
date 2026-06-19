@@ -90,15 +90,8 @@ auto Renderer::Impl::RenderObjects(Scene* scene, Camera* camera) -> void {
         state_.SetDepthFunction(Material::Depth::LessEqual);
         state_.SetBackfaceCulling(false);
         state_.SetBlending(Material::Blending::None);
-
-        if (debug_env_cube_) {
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_CUBE_MAP, debug_env_cube_);
-            background_pass_.DebugPresentCubeMap();
-        } else {
-            textures_.Bind(scene->background, 0);
-            background_pass_.Render(scene->background);
-        }
+        textures_.Bind(scene->background, 0);
+        background_pass_.Render(scene->background);
     }
 
     if (!render_lists_->Transparent().empty())
@@ -252,6 +245,31 @@ auto Renderer::Impl::SetUniforms(
 
     if (attrs->type == Material::Type::PBRMaterial) {
         auto m = static_cast<PBRMaterial*>(material);
+
+        if (attrs->ibl) {
+            glActiveTexture(GL_TEXTURE0 + std::to_underlying(GLTextureMapType::IrradianceMap));
+            glBindTexture(GL_TEXTURE_CUBE_MAP, env_maps_.irradiance);
+
+            glActiveTexture(GL_TEXTURE0 + std::to_underlying(GLTextureMapType::PrefilteredMap));
+            glBindTexture(GL_TEXTURE_CUBE_MAP, env_maps_.prefiltered);
+
+            glActiveTexture(GL_TEXTURE0 + std::to_underlying(GLTextureMapType::BrdfLutMap));
+            glBindTexture(GL_TEXTURE_2D, environment_.BrdfLut());
+
+            const auto irradiance_unit = std::to_underlying(GLTextureMapType::IrradianceMap);
+            const auto prefiltered_unit = std::to_underlying(GLTextureMapType::PrefilteredMap);
+            const auto brdf_lut_unit = std::to_underlying(GLTextureMapType::BrdfLutMap);
+            const auto prefiltered_max_lod = static_cast<float>(env_maps_.prefiltered_mips - 1);
+
+            program->SetUniform("u_IrradianceMap", &irradiance_unit);
+            program->SetUniform("u_PrefilteredMap", &prefiltered_unit);
+            program->SetUniform("u_BrdfLut", &brdf_lut_unit);
+            program->SetUniform("u_PrefilteredMaxLod", &prefiltered_max_lod);
+
+            const auto env_intensity = scene->environment_intensity * m->environment_intensity;
+            program->SetUniform("u_EnvironmentIntensity", &env_intensity);
+        }
+
         if (lights_.HasLights()) {
             program->SetUniform(Uniform::AmbientLight, &lights_.ambient_light);
             program->SetUniform(Uniform::MaterialColor, &m->color);
@@ -383,7 +401,7 @@ auto Renderer::Impl::Render(Scene* scene, Camera* camera, RenderTarget* target) 
         textures_.Bind(scene->environment, 0);
         auto env_maps = environment_.GetOrProcess(scene->environment);
         if (env_maps.has_value()) {
-            debug_env_cube_ = env_maps->irradiance;
+            env_maps_ = env_maps.value();
         }
     }
 

@@ -252,6 +252,11 @@ auto GLEnvironment::GetOrProcess(const std::shared_ptr<Texture>& source) -> std:
     IrradianceMap(output.base_cube, output.irradiance);
     PrefilteredMap(output.base_cube, output.prefiltered);
 
+    // The chain allocates more levels than we convolve so we cap sampling
+    glBindTexture(GL_TEXTURE_CUBE_MAP, output.prefiltered);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, kPrefilteredMips - 1);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
     cache_.emplace_back(source.get(), output);
 
     source->OnDispose([this, alive = std::weak_ptr(alive_)](Disposable* target) {

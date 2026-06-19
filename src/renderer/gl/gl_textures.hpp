@@ -29,6 +29,9 @@ enum class GLTextureMapType {
     RoughnessMap = 7,
     AOMap = 8,
     EnvironmentMap = 9,
+    IrradianceMap = 10,
+    PrefilteredMap = 11,
+    BrdfLutMap = 12,
     Reserved
 };
 

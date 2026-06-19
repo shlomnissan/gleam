@@ -38,6 +38,7 @@ ProgramAttributes::ProgramAttributes(
         metallic_map = m->metallic_map != nullptr;
         normal_map = m->normal_map != nullptr;
         roughness_map = m->roughness_map != nullptr;
+        ibl = scene->environment != nullptr;
     }
 
     if (type == Material::Type::PhongMaterial) {
@@ -106,6 +107,7 @@ ProgramAttributes::ProgramAttributes(
     key |= (roughness_map ? 1ULL : 0ULL) << 31; // 1 bit
     key |= (ao_map ? 1ULL : 0ULL) << 32; // 1 bit
     key |= (environment_map ? 1ULL : 0ULL) << 33; // 1 bit
+    key |= (ibl ? 1ULL : 0ULL) << 34; // 1 bit
 
     if (type == Material::Type::ShaderMaterial) {
         math::HashCombine(key, shader_material_id);

@@ -36,6 +36,7 @@ struct ProgramAttributes {
     bool color {false};
     bool flat_shaded {false};
     bool fog {false};
+    bool ibl {false};
     bool instancing {false};
     bool tangent {false};
     bool two_sided {false};
