@@ -1,12 +1,8 @@
 #version 410 core
 
-layout(location = 0) out vec4 v_FragColor;
+layout(location = 0) out vec2 v_FragColor;
 
-in vec3 v_TexDir;
-
-uniform samplerCube u_EnvironmentMap;
-
-uniform float u_Roughness;
+in vec2 v_TexCoords;
 
 const float PI = 3.14159265358979;
 
@@ -41,45 +37,44 @@ vec3 importanceSampleGGX(vec2 xi, vec3 N, float roughness) {
     return normalize(tangent * H.x + bitangent * H.y + N * H.z);
 }
 
-float distributionGGX(vec3 N, vec3 H, float roughness) {
-    float a = roughness * roughness;
-    float a2 = a * a;
-    float n_dot_h = max(dot(N, H), 0.0);
-    float denom = n_dot_h * n_dot_h * (a2 - 1.0) + 1.0;
-    return a2 / (PI * denom * denom);
+float geometrySchlickGGX(float n_dot_x, float roughness) {
+    float k = (roughness * roughness) / 2.0;
+    return n_dot_x / (n_dot_x * (1.0 - k) + k);
 }
 
-void main() {
-    vec3 N = normalize(v_TexDir);
-    vec3 V = N;
+float geometrySmith(float n_dot_v, float n_dot_l, float roughness) {
+    return geometrySchlickGGX(n_dot_v, roughness) * geometrySchlickGGX(n_dot_l, roughness);
+}
 
-    float resolution = float(textureSize(u_EnvironmentMap, 0).x);
-    float sa_texel = 4.0 * PI / (6.0 * resolution * resolution);
+vec2 integrateBRDF(float n_dot_v, float roughness) {
+    vec3 V = vec3(sqrt(1.0 - n_dot_v * n_dot_v), 0.0, n_dot_v);
+    vec3 N = vec3(0.0, 0.0, 1.0);
 
-    vec3 prefiltered = vec3(0.0);
-    float total_weight = 0.0;
+    float A = 0.0;
+    float B = 0.0;
 
     for (uint i = 0u; i < kSampleCount; ++i) {
         vec2 xi = hammersley(i, kSampleCount);
-        vec3 H = importanceSampleGGX(xi, N, u_Roughness);
+        vec3 H = importanceSampleGGX(xi, N, roughness);
         vec3 L = normalize(2.0 * dot(V, H) * H - V);
 
-        float n_dot_l = max(dot(N, L), 0.0);
+        float n_dot_l = max(L.z, 0.0);
+        float n_dot_h = max(H.z, 0.0);
+        float v_dot_h = max(dot(V, H), 0.0);
+
         if (n_dot_l > 0.0) {
-            float D = distributionGGX(N, H, u_Roughness);
-            float n_dot_h = max(dot(N, H), 0.0);
-            float h_dot_v = max(dot(H, V), 0.0);
-            float pdf = (D * n_dot_h / (4.0 * h_dot_v)) + 0.0001;
+            float G = geometrySmith(n_dot_v, n_dot_l, roughness);
+            float g_vis = (G * v_dot_h) / (n_dot_h * n_dot_v);
+            float fc = pow(1.0 - v_dot_h, 5.0);
 
-            float sa_sample = 1.0 / (float(kSampleCount) * pdf + 0.0001);
-            float mip = u_Roughness == 0.0 ? 0.0 : 0.5 * log2(sa_sample / sa_texel);
-
-            prefiltered += textureLod(u_EnvironmentMap, L, mip).rgb * n_dot_l;
-            total_weight += n_dot_l;
+            A += (1.0 - fc) * g_vis;
+            B += fc * g_vis;
         }
     }
 
-    prefiltered /= total_weight;
+    return vec2(A, B) / float(kSampleCount);
+}
 
-    v_FragColor = vec4(prefiltered, 1.0);
+void main() {
+    v_FragColor = integrateBRDF(v_TexCoords.x, v_TexCoords.y);
 }

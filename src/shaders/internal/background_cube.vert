@@ -11,6 +11,5 @@ out vec3 v_TexDir;
 
 void main() {
     v_TexDir = a_Position;
-    // z = w puts depth at the far plane so opaque fragments occlude the background
     gl_Position = (u_Projection * mat4(mat3(u_View)) * vec4(a_Position, 1.0)).xyww;
 }

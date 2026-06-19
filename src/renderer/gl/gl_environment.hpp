@@ -44,9 +44,26 @@ public:
 
     auto GetOrProcess(const std::shared_ptr<Texture>& source) -> std::optional<GLEnvironmentMaps>;
 
+    auto BrdfLut() const { return lut_; }
+
     ~GLEnvironment();
 
 private:
+    // Lifetime guard for dispose callbacks we register on source textures.
+    // Each callback holds a weak_ptr to this token.
+    std::shared_ptr<int> alive_ = std::make_shared<int>(0);
+
+    std::unique_ptr<GLProgram> prg_equirect_to_cube_;
+    std::unique_ptr<GLProgram> prg_irradiance_cube_;
+    std::unique_ptr<GLProgram> prg_prefiltered_cube_;
+    std::unique_ptr<GLProgram> prg_brdf_lut_;
+
+    std::vector<std::pair<Texture*, GLEnvironmentMaps>> cache_;
+
+    GLuint fbo_ {0};
+    GLuint vao_ {0};
+    GLuint lut_ {0};
+
     auto RenderToCubeFaces(GLProgram* program, GLuint dst, int size, int mip = 0) -> void;
 
     auto EquirectToCubeMap(GLuint src, GLuint dst) -> void;
@@ -55,18 +72,7 @@ private:
 
     auto PrefilteredMap(GLuint src, GLuint dst) -> void;
 
-    std::unique_ptr<GLProgram> prg_equirect_to_cube_;
-    std::unique_ptr<GLProgram> prg_irradiance_cube_;
-    std::unique_ptr<GLProgram> prg_prefiltered_cube_;
-
-    std::vector<std::pair<Texture*, GLEnvironmentMaps>> cache_;
-
-    // Lifetime guard for dispose callbacks we register on source textures.
-    // Each callback holds a weak_ptr to this token.
-    std::shared_ptr<int> alive_ = std::make_shared<int>(0);
-
-    GLuint fbo_ {0};
-    GLuint vao_ {0};
+    auto GenerateBrdfLut() -> void;
 };
 
 }

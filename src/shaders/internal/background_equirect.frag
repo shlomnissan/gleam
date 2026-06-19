@@ -16,7 +16,5 @@ vec2 directionToEquirectUV(const in vec3 dir) {
 
 void main() {
     vec2 uv = directionToEquirectUV(normalize(v_TexDir));
-    // lod 0 avoids a visible seam where the U coordinate wraps, since the
-    // discontinuity produces large derivatives that skew mip selection
     v_FragColor = vec4(textureLod(u_BackgroundTexture, uv, 0.0).rgb, 1.0);
 }

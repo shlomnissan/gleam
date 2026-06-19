@@ -16,6 +16,8 @@
 #include "shaders/internal/headers/equirect_to_cube_vert.h"
 #include "shaders/internal/headers/irradiance_cube_frag.h"
 #include "shaders/internal/headers/prefiltered_cube_frag.h"
+#include "shaders/internal/headers/fullscreen_triangle_vert.h"
+#include "shaders/internal/headers/brdf_lut_frag.h"
 #include "utilities/logger.hpp"
 #include "utilities/assert.hpp"
 
@@ -29,6 +31,7 @@ namespace {
 constexpr auto kBaseCubeSize = 512;
 constexpr auto kIrradianceSize = 32;
 constexpr auto kPrefilterSize = 128;
+constexpr auto kLutSize = 512;
 constexpr auto kPrefilteredMips = 5;
 
 constexpr auto kFaceBases = std::array<Matrix3, 6> {
@@ -83,6 +86,33 @@ auto create_cube_texture(int size, bool mips) {
     return output;
 }
 
+auto create_2d_texture(int size, GLint internal_format) {
+    auto output = GLuint {0};
+    glGenTextures(1, &output);
+    glBindTexture(GL_TEXTURE_2D, output);
+
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0,
+        internal_format,
+        size,
+        size,
+        0,
+        GL_RG,
+        GL_HALF_FLOAT,
+        nullptr
+    );
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    return output;
+}
+
 auto bind_cube_face(GLuint texture, int face, int mip) {
     glFramebufferTexture2D(
         GL_FRAMEBUFFER,
@@ -133,7 +163,46 @@ auto GLEnvironment::Initialize() -> std::expected<void, std::string> {
         return std::unexpected("Unable to create prefiltered cube program");
     }
 
+    prg_brdf_lut_ = std::make_unique<GLProgram>(std::vector<ShaderInfo>{
+        {.type = ShaderType::kVertexShader, .source = _SHADER_fullscreen_triangle_vert},
+        {.type = ShaderType::kFragmentShader, .source = _SHADER_brdf_lut_frag},
+    });
+
+    if (!prg_brdf_lut_->IsValid()) {
+        return std::unexpected("Unable to create brdf lut program");
+    }
+
+    lut_ = create_2d_texture(kLutSize, GL_RG16F);
+    if (lut_ == 0) {
+        return std::unexpected("Failed to allocate storage for BRDF LUT");
+    }
+
+    GenerateBrdfLut();
+
     return {};
+}
+
+auto GLEnvironment::GenerateBrdfLut() -> void {
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
+    glFramebufferTexture2D(
+        GL_FRAMEBUFFER,
+        GL_COLOR_ATTACHMENT0,
+        GL_TEXTURE_2D,
+        lut_,
+        0
+    );
+
+    VGLX_ASSERT(
+        glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE,
+        "BRDF LUT framebuffer is incomplete"
+    );
+
+    glUseProgram(prg_brdf_lut_->Id());
+    glViewport(0, 0, kLutSize, kLutSize);
+    glBindVertexArray(vao_);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 auto GLEnvironment::GetOrProcess(const std::shared_ptr<Texture>& source) -> std::optional<GLEnvironmentMaps> {
@@ -242,7 +311,7 @@ auto GLEnvironment::IrradianceMap(GLuint src, GLuint dst) -> void {
     glBindVertexArray(vao_);
 
     const auto unit = 0;
-    prg_irradiance_cube_->SetUniform("u_EnvironmentMap", &unit);
+    prg_irradiance_cube_->SetUniform(Uniform::EnvironmentMap, &unit);
 
     RenderToCubeFaces(prg_irradiance_cube_.get(), dst, kIrradianceSize);
 }
@@ -253,7 +322,7 @@ auto GLEnvironment::PrefilteredMap(GLuint src, GLuint dst) -> void {
     glBindVertexArray(vao_);
 
     const auto unit = 0;
-    prg_prefiltered_cube_->SetUniform("u_EnvironmentMap", &unit);
+    prg_prefiltered_cube_->SetUniform(Uniform::EnvironmentMap, &unit);
 
     for (auto mip = 0; mip < kPrefilteredMips; ++mip) {
         auto size = kPrefilterSize >> mip;
@@ -270,6 +339,7 @@ GLEnvironment::~GLEnvironment() {
 
     if (fbo_) glDeleteFramebuffers(1, &fbo_);
     if (vao_) glDeleteVertexArrays(1, &vao_);
+    if (lut_) glDeleteTextures(1, &lut_);
 }
 
 }
