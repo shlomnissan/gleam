@@ -206,15 +206,20 @@ auto GLEnvironment::GenerateBrdfLut() -> void {
 }
 
 auto GLEnvironment::GetOrProcess(const std::shared_ptr<Texture>& source) -> std::optional<GLEnvironmentMaps> {
+    using enum Texture::Type;
+    using enum Texture::Mapping;
+
     auto it = std::ranges::find(cache_, source.get(), &std::pair<Texture*, GLEnvironmentMaps>::first);
     if (it != cache_.end()) {
         return it->second;
     }
 
-    if (source->GetType() != Texture::Type::Texture2D ||
-        source->mapping != Texture::Mapping::Equirectangular)
-    {
-        Logger::Log(LogLevel::Error, "Environment source must be an equirectangular 2D texture");
+    const auto type = source->GetType();
+    const auto is_equirect_tex = type == Texture2D && source->mapping == Equirectangular;
+    const auto is_cube_tex = type == CubeTexture;
+
+    if (!is_equirect_tex && !is_cube_tex) {
+        Logger::Log(LogLevel::Error, "Environment source must be equirectangular or a cube texture");
         return std::nullopt;
     }
 
@@ -227,15 +232,13 @@ auto GLEnvironment::GetOrProcess(const std::shared_ptr<Texture>& source) -> std:
     }
 
     auto output = GLEnvironmentMaps {
-        .base_size = kBaseCubeSize,
         .prefiltered_mips = kPrefilteredMips,
     };
 
-    output.base_cube = create_cube_texture(kBaseCubeSize, true);
     output.irradiance = create_cube_texture(kIrradianceSize, false);
     output.prefiltered = create_cube_texture(kPrefilterSize, true);
 
-    if (output.base_cube == 0 || output.irradiance == 0 || output.prefiltered == 0) {
+    if (output.irradiance == 0 || output.prefiltered == 0) {
         dispose(output);
         Logger::Log(
             LogLevel::Error,
@@ -244,13 +247,38 @@ auto GLEnvironment::GetOrProcess(const std::shared_ptr<Texture>& source) -> std:
         return std::nullopt;
     }
 
-    EquirectToCubeMap(source->renderer_id, output.base_cube);
+    auto convolve_src = source->renderer_id;
 
-    glBindTexture(GL_TEXTURE_CUBE_MAP, output.base_cube);
+    if (is_equirect_tex) {
+        output.base_cube = create_cube_texture(kBaseCubeSize, true);
+        if (output.base_cube == 0) {
+            dispose(output);
+            Logger::Log(
+                LogLevel::Error,
+                "Failed to allocate storage for environment map processing"
+            );
+            return std::nullopt;
+        }
+        EquirectToCubeMap(source->renderer_id, output.base_cube);
+        convolve_src = output.base_cube;
+    }
+
+    glBindTexture(GL_TEXTURE_CUBE_MAP, convolve_src);
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
-    IrradianceMap(output.base_cube, output.irradiance);
-    PrefilteredMap(output.base_cube, output.prefiltered);
+    if (is_cube_tex) {
+        // Source cubes upload with a non-mipmap min filter but the convolution
+        // shaders sample explicit levels via textureLod which only reaches above
+        // the base level with a mipmap filter.
+        glTexParameteri(
+            GL_TEXTURE_CUBE_MAP,
+            GL_TEXTURE_MIN_FILTER,
+            GL_LINEAR_MIPMAP_LINEAR
+        );
+    }
+
+    IrradianceMap(convolve_src, output.irradiance);
+    PrefilteredMap(convolve_src, output.prefiltered);
 
     // The chain allocates more levels than we convolve so we cap sampling
     glBindTexture(GL_TEXTURE_CUBE_MAP, output.prefiltered);

@@ -21,7 +21,6 @@ class GLProgram;
 class Texture;
 
 struct GLEnvironmentMaps {
-    int base_size {0};
     int prefiltered_mips {0};
     GLuint base_cube {0};
     GLuint irradiance {0};
