@@ -12,6 +12,9 @@ const float PI = 3.14159265358979;
 
 const uint kSampleCount = 1024u;
 
+const float kRadianceClamp = 10.0; // cap per-sample radiance (firefly control)
+const float kSourceMipBias = 2.0;  // extra source mips at roughness 1.0, scaled by roughness
+
 float radicalInverseVdC(uint bits) {
     bits = (bits << 16u) | (bits >> 16u);
     bits = ((bits & 0x55555555u) << 1u) | ((bits & 0xAAAAAAAAu) >> 1u);
@@ -72,9 +75,15 @@ void main() {
             float pdf = (D * n_dot_h / (4.0 * h_dot_v)) + 0.0001;
 
             float sa_sample = 1.0 / (float(kSampleCount) * pdf + 0.0001);
-            float mip = u_Roughness == 0.0 ? 0.0 : 0.5 * log2(sa_sample / sa_texel);
 
-            prefiltered += textureLod(u_EnvironmentMap, L, mip).rgb * n_dot_l;
+            // Scaled mip bias pre-blurs the source more as roughness grows, so
+            // bright lights converge to a soft glow (not a sparkly spot) while
+            // near-mirror reflections stay sharp.
+            float mip = u_Roughness == 0.0 ? 0.0
+                      : 0.5 * log2(sa_sample / sa_texel) + kSourceMipBias * u_Roughness;
+
+            vec3 radiance = min(textureLod(u_EnvironmentMap, L, mip).rgb, vec3(kRadianceClamp));
+            prefiltered += radiance * n_dot_l;
             total_weight += n_dot_l;
         }
     }
