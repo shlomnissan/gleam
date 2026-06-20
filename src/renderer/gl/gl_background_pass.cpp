@@ -180,12 +180,6 @@ auto GLBackgroundPass::Render(const std::shared_ptr<Texture>& background) const 
     }
 }
 
-auto GLBackgroundPass::DebugPresentCubeMap() const -> void {
-    glUseProgram(background_cube_->Id());
-    glBindVertexArray(vao_[1]);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-}
-
 GLBackgroundPass::~GLBackgroundPass() {
     if (vao_[0]) glDeleteVertexArrays(2, vao_.data());
     if (vbo_) glDeleteBuffers(1, &vbo_);
