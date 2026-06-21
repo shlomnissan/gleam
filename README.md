@@ -21,8 +21,8 @@ VGLX is a scene-oriented rendering engine for modern C++ focused on immediacy an
 
 #### Documentation
 
-- Manual: https://vglx.org/manual/
-- API reference: https://vglx.org/reference/
+- Manual: https://www.vglx.org/manual/
+- API reference: https://www.vglx.org/reference/
 - Starter template: https://github.com/shlomnissan/vglx-starter
 
 ## Community driven
