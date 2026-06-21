@@ -1,6 +1,4 @@
-![Scene by Karthik Naidu rendered in VGLX](/hero.webp "Scene by Karthik Naidu rendered in VGLX")
-
-## Introduction
+# Introduction
 
 [VGLX](https://github.com/shlomnissan/vglx) is a scene-oriented rendering engine for modern C++ with a simple philosophy: building things in 3D should feel good again. The engine aims to bring back the sense of immediacy that early rendering APIs once had while still giving full access to the power of today’s GPUs. It is fully cross-platform and runs on Windows, macOS and Linux with identical behavior.
 
