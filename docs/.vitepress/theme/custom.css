@@ -38,6 +38,10 @@
     height: 30px;
 }
 
+.VPNavBar .github-stars {
+  margin-left: 20px;
+}
+
 .VPHomeHero .name.clip {
     color: transparent;
     -webkit-text-fill-color: transparent;
