@@ -69,6 +69,7 @@ cmake --build build --config Debug
 ```
 
 After the build completes you should see the executable in the build directory.
+
 - Linux/macOS: `build/hello-vglx`
 - Windows: `build/Debug/hello-vglx.exe`
 

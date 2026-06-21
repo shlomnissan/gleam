@@ -6,10 +6,10 @@ This keeps the workflow simple. Assets go straight from your content tools into 
 
 #### Supported Formats
 
-| Asset Type | Supported Formats       |
-| ---------- | ----------------------- |
-| Textures   | PNG, JPEG, TGA, BMP, HDR |
-| Meshes     | OBJ (glTF support coming soon)                    |
+| Asset Type | Supported Formats              |
+| ---------- | ------------------------------ |
+| Textures   | PNG, JPEG, TGA, BMP, HDR       |
+| Meshes     | OBJ (glTF support coming soon) |
 
 ## Loading Textures
 
@@ -18,6 +18,7 @@ In this section we load a texture and apply it to a simple primitive. The image 
 Textures are loaded with the free function `vglx::LoadTexture`. It returns a `std::expected` that holds either the loaded texture or a string describing why the load failed.
 
 The following example revisits the rotating cube scene from the [previous guide](/manual/creating_application):
+
 ```cpp
 #include <vglx/vglx.h>
 

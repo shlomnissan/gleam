@@ -1,11 +1,14 @@
 {
   "devDependencies": {
+    "prettier": "3.8.4",
     "vitepress": "^2.0.0-alpha.12"
   },
   "scripts": {
     "dev": "vitepress dev",
     "build": "vitepress build",
-    "preview": "vitepress preview"
+    "preview": "vitepress preview",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "markdown-it-mathjax3": "^4.3.2"

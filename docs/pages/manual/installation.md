@@ -1,6 +1,7 @@
 # Installation
 
 This page covers how to build VGLX, install it, and use it in your own project. The goal is to keep the setup simple. All dependencies are included in the repository, and you do not need anything system-wide beyond a C++ compiler, CMake and an OpenGL driver.
+
 ## Requirements
 
 VGLX builds with a C++23-capable toolchain, [CMake](https://cmake.org/) 3.20 or newer, and an OpenGL 4.1+ context. It is regularly tested on the major platforms:
@@ -17,13 +18,14 @@ VGLX builds with a C++23-capable toolchain, [CMake](https://cmake.org/) 3.20 or 
 
 VGLX vendors all of its dependencies directly inside the repository. Nothing is downloaded at build time, and no external package managers are required. The runtime pieces are:
 
-| Dependency | Version  | Location        | Description |
-|------------|----------|----------------|-------------|
-| [Glad](https://glad.dav1d.de/)   | 0.1.36   | `vendor/glad`  | OpenGL function loader generated from [glad.dav1d.de](https://glad.dav1d.de/). |
-| [GLFW](https://glfw.org/)   | 3.5.0    | `vendor/glfw`  | Cross-platform window/input/context management (with minor internal modifications). |
-| [ImGui](https://github.com/ocornut/imgui)  | 1.92.1   | `vendor/imgui` | **Optional** immediate-mode UI library for in-engine tools and examples. |
+| Dependency                                | Version | Location       | Description                                                                         |
+| ----------------------------------------- | ------- | -------------- | ----------------------------------------------------------------------------------- |
+| [Glad](https://glad.dav1d.de/)            | 0.1.36  | `vendor/glad`  | OpenGL function loader generated from [glad.dav1d.de](https://glad.dav1d.de/).      |
+| [GLFW](https://glfw.org/)                 | 3.5.0   | `vendor/glfw`  | Cross-platform window/input/context management (with minor internal modifications). |
+| [ImGui](https://github.com/ocornut/imgui) | 1.92.1  | `vendor/imgui` | **Optional** immediate-mode UI library for in-engine tools and examples.            |
 
 Each dependency includes its license inside the `vendor/` directory.
+
 ## VGLX Installer
 
 The easiest way to install VGLX is using the Python installer included in the repository. It guides you through the process and builds the engine using the right presets for your system.
@@ -40,6 +42,7 @@ python3 -m tools.installer.main
 The installer checks for a working version of CMake, detects your compiler and asks for an installation prefix.
 
 If you encounter issues, see the [Getting Help](#getting-help) section below.
+
 ## Creating a New Project
 
 The quickest way to get started is cloning [the starter template](https://github.com/shlomnissan/vglx-starter):
@@ -82,9 +85,11 @@ g++ main.cpp -o MyApp -I/usr/local/include -L/usr/local/lib -lvglx
 ```
 
 Adjust include paths and library paths to match your system and compiler.
+
 ## Build From Source
 
 The project includes several presets that streamline the process:
+
 - `dev-debug` – Debug build with everything enabled
 - `dev-release` – Optimized build with examples and tools
 - `install-debug` – Debug install target (MSVC)
@@ -105,27 +110,30 @@ cmake .. --preset dev-debug --config Debug
 # build the engine
 cmake --build . --config Debug
 ```
+
 #### Configuration Options
 
 VGLX includes optional build components. You can enable or disable them using standard CMake flags:
 
-| Option                     | Description                              |
-| -------------------------- | ---------------------------------------- |
-| `VGLX_BUILD_DOCS`          | Build Doxygen documentation.             |
-| `VGLX_BUILD_EXAMPLES`      | Build example applications.              |
-| `VGLX_BUILD_IMGUI`         | Enable ImGui support for debug UI/tools. |
-| `VGLX_BUILD_TESTS`         | Build unit tests.                        |
+| Option                | Description                              |
+| --------------------- | ---------------------------------------- |
+| `VGLX_BUILD_DOCS`     | Build Doxygen documentation.             |
+| `VGLX_BUILD_EXAMPLES` | Build example applications.              |
+| `VGLX_BUILD_IMGUI`    | Enable ImGui support for debug UI/tools. |
+| `VGLX_BUILD_TESTS`    | Build unit tests.                        |
 
 Release presets build a shared library by default. If you prefer a static build, use:
 
 ```cmake
 -DBUILD_SHARED_LIBS=OFF
 ```
+
 #### Verifying Build
 
 If examples are enabled (default in debug presets), two executables will appear:
 `example_launcher_direct` and `example_launcher_runtime`.
 Both run the same sandbox environment and help confirm that everything is set up correctly.
+
 #### Manual Installation
 
 If you want full control over the installation process, you can use CMake directly:

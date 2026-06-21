@@ -1,0 +1,22 @@
+# Dependencies and build output
+node_modules
+.vitepress/cache
+.vitepress/dist
+
+# Auto-generated
+.vitepress/auto-reference-sidebar.ts
+pages/reference
+
+# Lockfile
+package-lock.json
+
+# Static assets
+pages/public
+
+# Source code — prettier reflows and restyles quotes/semicolons here;
+# we only want it for indent/spacing on docs content.
+*.ts
+*.mts
+*.vue
+*.js
+*.mjs

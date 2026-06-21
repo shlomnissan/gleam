@@ -171,7 +171,6 @@ Vertex attributes describe per-vertex data supplied by the geometry. These are t
 | `a_InstanceColor`     | `vec3` | `vert_global_params.glsl`  | Per-instance color modifier     |
 | `a_InstanceTransform` | `mat4` | `vert_global_params.glsl`  | Per-instance model transform    |
 
-
 #### Uniforms
 
 Built-in uniforms provide per-draw or per-frame state supplied by the engine. These uniforms are declared in shader snippets and are populated automatically:
@@ -214,15 +213,15 @@ Custom uniforms are values defined by the application and consumed by shader pro
 
 The following table lists accepted uniform value types and the GLSL types they map to:
 
-| Application Type | GLSL Type | Example |
-| ---------------- | --------- | ------- |
-| `int`            | `int`     | `{1}` |
-| `float`          | `float`   | `{1.5f}` |
-| `Color`          | `vec3`    | `vglx::Color {0xFF00FF}` |
-| `Matrix3`        | `mat3`    | `vglx::Matrix3 {1.0f}` |
-| `Matrix4`        | `mat4`    | `vglx::Matrix4 {1.0f}` |
-| `Vector2`        | `vec2`    | `vglx::Vector2 {1.0f, 0.0f}` |
-| `Vector3`        | `vec3`    | `vglx::Vector3 {1.0f, 0.0f, 1.0f}` |
+| Application Type | GLSL Type | Example                                  |
+| ---------------- | --------- | ---------------------------------------- |
+| `int`            | `int`     | `{1}`                                    |
+| `float`          | `float`   | `{1.5f}`                                 |
+| `Color`          | `vec3`    | `vglx::Color {0xFF00FF}`                 |
+| `Matrix3`        | `mat3`    | `vglx::Matrix3 {1.0f}`                   |
+| `Matrix4`        | `mat4`    | `vglx::Matrix4 {1.0f}`                   |
+| `Vector2`        | `vec2`    | `vglx::Vector2 {1.0f, 0.0f}`             |
+| `Vector3`        | `vec3`    | `vglx::Vector3 {1.0f, 0.0f, 1.0f}`       |
 | `Vector4`        | `vec4`    | `vglx::Vector4 {1.0f, 0.0f, 1.0f, 0.0f}` |
 
 Uniform values can be updated after creation by mutating the material’s uniform map. Updates take effect the next time the material is rendered.
@@ -232,6 +231,7 @@ Uniform values can be updated after creation by mutating the material’s unifor
 Shaders can be difficult to debug. A single mistake may result in a black screen, incorrect colors, or missing geometry. When you run into problems start from the smallest shader that works and add features back incrementally.
 
 Start with simple checks inside the shader:
+
 - Output a constant color to confirm the fragment shader is running.
 - Visualize inputs such as normals, UVs, or depth by writing them as colors.
 - Clamp or normalize intermediate values before displaying them.

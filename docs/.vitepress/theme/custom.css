@@ -1,26 +1,26 @@
 :root {
   --vp-home-hero-name-color: var(--vp-c-text-1);
-  --vp-c-brand-1: #0FA0F0;
-  --vp-c-brand-2: #0B8CD6;
-  --vp-c-brand-3: #2AB6FF;
-  --vp-c-brand-soft: #E3F3FF;
+  --vp-c-brand-1: #0fa0f0;
+  --vp-c-brand-2: #0b8cd6;
+  --vp-c-brand-3: #2ab6ff;
+  --vp-c-brand-soft: #e3f3ff;
 }
 
 :root.dark {
-  --vp-c-brand-1: #6CCBFF;
-  --vp-c-brand-2: #4DBBFF;
-  --vp-c-brand-3: #26AEFF;
-  --vp-c-brand-soft: #0C2A3A;
+  --vp-c-brand-1: #6ccbff;
+  --vp-c-brand-2: #4dbbff;
+  --vp-c-brand-3: #26aeff;
+  --vp-c-brand-soft: #0c2a3a;
 }
 
 .VPNavBar.home {
-    .title {
-        display: none;
-    }
+  .title {
+    display: none;
+  }
 
-    .search {
-        padding-left: 0px;
-    }
+  .search {
+    padding-left: 0px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -35,7 +35,7 @@
 }
 
 .VPNavBar img.VPImage.logo {
-    height: 30px;
+  height: 30px;
 }
 
 .VPNavBar .github-stars {
@@ -43,10 +43,10 @@
 }
 
 .VPHomeHero .name.clip {
-    color: transparent;
-    -webkit-text-fill-color: transparent;
-    user-select: none;
-    -webkit-user-select: none;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .VPHomeHero .name::before {
@@ -54,9 +54,9 @@
   display: inline-block;
   width: 4em;
   height: 1.5em;
-  -webkit-mask: url('/logo.svg') no-repeat center / contain;
+  -webkit-mask: url("/logo.svg") no-repeat center / contain;
   background-color: var(--vp-c-text-1);
-  mask: url('/logo.svg') no-repeat center / contain;
+  mask: url("/logo.svg") no-repeat center / contain;
   vertical-align: middle;
   margin-bottom: 0.15em;
   margin-right: 0.6rem;
@@ -95,13 +95,13 @@
 }
 
 .badged-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
 
-    .VPBadge {
-        margin-top: 8px !important;
-    }
+  .VPBadge {
+    margin-top: 8px !important;
+  }
 }
 
 .VPBadge {
@@ -171,7 +171,7 @@
 
 .docblock .definition h3 .type {
   font-size: 14px;
-  color: var(--vp-c-text-3)
+  color: var(--vp-c-text-3);
 }
 
 .docblock .definition h3 .type a {
@@ -207,5 +207,5 @@
 }
 
 .system-list li img {
-    display: inline;
+  display: inline;
 }
