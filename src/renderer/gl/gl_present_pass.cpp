@@ -10,7 +10,7 @@
 #include "core/shader_library.hpp"
 #include "renderer/gl/gl_scene_buffer.hpp"
 
-#include "shaders/internal/headers/present_pass_vert.h"
+#include "shaders/internal/headers/screen_triangle_vert.h"
 #include "shaders/internal/headers/present_pass_frag.h"
 
 #include <vector>
@@ -19,7 +19,7 @@ namespace vglx {
 
 auto GLPresentPass::Initialize() -> std::expected<void, std::string> {
     auto sources = std::vector<ShaderInfo> {
-        {.type = ShaderType::kVertexShader, .source = _SHADER_present_pass_vert},
+        {.type = ShaderType::kVertexShader, .source = _SHADER_screen_triangle_vert},
         {.type = ShaderType::kFragmentShader, .source = _SHADER_present_pass_frag}
     };
 

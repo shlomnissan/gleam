@@ -16,7 +16,7 @@
 #include "shaders/internal/headers/equirect_to_cube_vert.h"
 #include "shaders/internal/headers/irradiance_cube_frag.h"
 #include "shaders/internal/headers/prefiltered_cube_frag.h"
-#include "shaders/internal/headers/fullscreen_triangle_vert.h"
+#include "shaders/internal/headers/screen_triangle_vert.h"
 #include "shaders/internal/headers/brdf_lut_frag.h"
 #include "utilities/logger.hpp"
 #include "utilities/assert.hpp"
@@ -164,7 +164,7 @@ auto GLEnvironment::Initialize() -> std::expected<void, std::string> {
     }
 
     prg_brdf_lut_ = std::make_unique<GLProgram>(std::vector<ShaderInfo>{
-        {.type = ShaderType::kVertexShader, .source = _SHADER_fullscreen_triangle_vert},
+        {.type = ShaderType::kVertexShader, .source = _SHADER_screen_triangle_vert},
         {.type = ShaderType::kFragmentShader, .source = _SHADER_brdf_lut_frag},
     });
 

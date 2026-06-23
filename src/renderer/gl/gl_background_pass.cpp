@@ -14,7 +14,7 @@
 #include "shaders/internal/headers/background_cube_vert.h"
 #include "shaders/internal/headers/background_equirect_frag.h"
 #include "shaders/internal/headers/background_frag.h"
-#include "shaders/internal/headers/background_vert.h"
+#include "shaders/internal/headers/screen_triangle_vert.h"
 #include "utilities/assert.hpp"
 #include "utilities/logger.hpp"
 
@@ -99,7 +99,7 @@ auto GLBackgroundPass::GenerateVAOs() -> std::expected<void, std::string> {
 
 auto GLBackgroundPass::InitializeBackground2D() -> std::expected<void, std::string> {
     background_2d_ = std::make_unique<GLProgram>(std::vector<ShaderInfo> {
-        {.type = ShaderType::kVertexShader, .source = _SHADER_background_vert},
+        {.type = ShaderType::kVertexShader, .source = _SHADER_screen_triangle_vert},
         {.type = ShaderType::kFragmentShader, .source = _SHADER_background_frag}
     });
 
