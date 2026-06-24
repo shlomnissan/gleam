@@ -43,14 +43,14 @@ void main() {
     vec3 output_color = 0.5 + 0.5 * cos(u_Time + uv.xyx + vec3(0,2,4));
 
     if (u_EnableTexture) {
-        output_color += texture(u_Channel0, v_TexCoord).rgb;
+        output_color += texture(u_Channel0, v_TexCoords).rgb;
     }
 
     #ifdef USE_FOG
         applyFog(output_color, v_ViewDepth);
     #endif
 
-    v_FragColor = vec4(output_color, u_Opacity);
+    o_FragColor = vec4(output_color, u_Opacity);
 })";
 
 }

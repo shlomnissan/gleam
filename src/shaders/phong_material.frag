@@ -152,7 +152,7 @@ void main() {
         vec3 normal = normalize(v_Normal);
 
         #ifdef USE_NORMAL_MAP
-            vec3 normal_tan = (texture(u_NormalMap, v_TexCoord).rgb * 2.0 - 1.0);
+            vec3 normal_tan = (texture(u_NormalMap, v_TexCoords).rgb * 2.0 - 1.0);
             normal_tan.xy *= u_NormalIntensity;
             normal = normalize(v_TBN * normal_tan);
         #endif
@@ -174,24 +174,24 @@ void main() {
     #endif
 
     #ifdef USE_ALBEDO_MAP
-        vec4 texture_sample = texture(u_AlbedoMap, v_TexCoord);
+        vec4 texture_sample = texture(u_AlbedoMap, v_TexCoords);
         diffuse_color *= texture_sample.rgb;
         opacity *= texture_sample.a;
     #endif
 
     #ifdef USE_ALPHA_MAP
-        vec4 alpha_sample = texture(u_AlphaMap, v_TexCoord);
+        vec4 alpha_sample = texture(u_AlphaMap, v_TexCoords);
         opacity *= alpha_sample.r;
     #endif
 
     float specular_factor = 1.0;
     #ifdef USE_SPECULAR_MAP
-        specular_factor = texture(u_SpecularMap, v_TexCoord).r;
+        specular_factor = texture(u_SpecularMap, v_TexCoords).r;
     #endif
 
     float ao = 1.0;
     #ifdef USE_AO_MAP
-        float ao_sample = texture(u_AOMap, v_TexCoord).r;
+        float ao_sample = texture(u_AOMap, v_TexCoords).r;
         ao = mix(1.0, ao_sample, u_AOIntensity);
     #endif
 
@@ -209,7 +209,7 @@ void main() {
 
     vec3 emissive = u_EmissiveColor;
     #ifdef USE_EMISSIVE_MAP
-        emissive *= texture(u_EmissiveMap, v_TexCoord).rgb;
+        emissive *= texture(u_EmissiveMap, v_TexCoords).rgb;
     #endif
 
     emissive *= u_EmissiveIntensity;
@@ -219,5 +219,5 @@ void main() {
         applyFog(output_color, v_ViewDepth);
     #endif
 
-    v_FragColor = vec4(output_color, opacity);
+    o_FragColor = vec4(output_color, opacity);
 }

@@ -1,6 +1,6 @@
 #version 410 core
 
-layout(location = 0) out vec2 v_FragColor;
+layout(location = 0) out vec2 o_FragColor;
 
 in vec2 v_TexCoords;
 
@@ -76,5 +76,5 @@ vec2 integrateBRDF(float n_dot_v, float roughness) {
 }
 
 void main() {
-    v_FragColor = integrateBRDF(v_TexCoords.x, v_TexCoords.y);
+    o_FragColor = integrateBRDF(v_TexCoords.x, v_TexCoords.y);
 }

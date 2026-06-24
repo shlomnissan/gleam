@@ -23,7 +23,7 @@ mat4 model_view = u_View * u_Model;
 mat3 normal_matrix = transpose(inverse(mat3(model_view)));
 
 v_Position = model_view * vec4(a_Position, 1.0);
-v_TexCoord = (u_TextureTransform * vec3(a_TexCoord, 1.0)).xy;
+v_TexCoords = (u_TextureTransform * vec3(a_TexCoord, 1.0)).xy;
 v_Normal = normalize(normal_matrix * a_Normal);
 v_ViewDir = -v_Position.xyz;
 v_ViewDepth = -v_Position.z;

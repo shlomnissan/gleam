@@ -22,13 +22,13 @@ void main() {
     #endif
 
     #ifdef USE_TEXTURE_MAP
-        output_color *= texture(u_TextureMap, v_TexCoord).rgb;
-        opacity *= texture(u_TextureMap, v_TexCoord).a;
+        output_color *= texture(u_TextureMap, v_TexCoords).rgb;
+        opacity *= texture(u_TextureMap, v_TexCoords).a;
     #endif
 
     #ifdef USE_FOG
         applyFog(output_color, v_ViewDepth);
     #endif
 
-    v_FragColor = vec4(output_color, opacity);
+    o_FragColor = vec4(output_color, opacity);
 }

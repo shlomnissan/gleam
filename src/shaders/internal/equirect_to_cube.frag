@@ -1,6 +1,6 @@
 #version 410 core
 
-layout(location = 0) out vec4 v_FragColor;
+layout(location = 0) out vec4 o_FragColor;
 
 in vec3 v_TexDir;
 
@@ -17,5 +17,5 @@ vec2 directionToEquirectUV(const in vec3 dir) {
 void main() {
     vec2 uv = directionToEquirectUV(normalize(v_TexDir));
 
-    v_FragColor = vec4(textureLod(u_EquirectTexture, uv, 0.0).rgb, 1.0);
+    o_FragColor = vec4(textureLod(u_EquirectTexture, uv, 0.0).rgb, 1.0);
 }

@@ -1,6 +1,6 @@
 #version 410 core
 
-layout (location = 0) out vec4 v_FragColor;
+layout (location = 0) out vec4 o_FragColor;
 
 in vec2 v_TexCoords;
 
@@ -36,5 +36,5 @@ void main() {
     color *= u_Exposure;
     color = toneMap(color);
     color = linearToSRGB(color);
-    v_FragColor = vec4(color, 1.0);
+    o_FragColor = vec4(color, 1.0);
 }

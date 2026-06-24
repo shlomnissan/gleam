@@ -68,7 +68,7 @@ constexpr auto fragment_shader = R"(
 uniform vec3 color;
 
 void main() {
-    v_FragColor = vec4(color, 1.0);
+    o_FragColor = vec4(color, 1.0);
 }
 )";
 ```
@@ -129,7 +129,7 @@ Inside `main` we include `vert_main_varyings.glsl` which defines varyings passed
 uniform vec3 color;
 
 void main() {
-    v_FragColor = vec4(color, 1.0);
+    o_FragColor = vec4(color, 1.0);
 }
 ```
 
@@ -193,7 +193,7 @@ Varyings are interpolated values produced by the vertex shader and consumed by t
 | Name              | Type    | Defined In                 | Description                     |
 | ----------------- | ------- | -------------------------- | ------------------------------- |
 | `v_Position`      | `vec4`  | `vert_main_varyings.glsl`  | View space position             |
-| `v_TexCoord`      | `vec2`  | `vert_main_varyings.glsl`  | Transformed UVs                 |
+| `v_TexCoords`     | `vec2`  | `vert_main_varyings.glsl`  | Transformed UVs                 |
 | `v_Normal`        | `vec3`  | `vert_main_varyings.glsl`  | View-space normal               |
 | `v_ViewDir`       | `vec3`  | `vert_main_varyings.glsl`  | View direction                  |
 | `v_ViewDepth`     | `float` | `vert_main_varyings.glsl`  | View space depth                |

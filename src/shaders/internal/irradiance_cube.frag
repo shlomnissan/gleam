@@ -1,6 +1,6 @@
 #version 410 core
 
-layout(location = 0) out vec4 v_FragColor;
+layout(location = 0) out vec4 o_FragColor;
 
 in vec3 v_TexDir;
 
@@ -34,5 +34,5 @@ void main() {
 
     irradiance = PI * irradiance / num_samples;
 
-    v_FragColor = vec4(irradiance, 1.0);
+    o_FragColor = vec4(irradiance, 1.0);
 }

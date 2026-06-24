@@ -14,7 +14,7 @@ used in both the vertex and fragment shaders.
 @uniform mat4 u_Projection - Projection transformation matrix
 @uniform mat4 u_View - View transformation matrix
 @out float v_ViewDepth - Depth of the vertex in view space
-@out vec2 v_TexCoord - Transformed texture coordinates for the fragment shader
+@out vec2 v_TexCoords - Transformed texture coordinates for the fragment shader
 @out vec3 v_Normal - Transformed normal vector in view space
 @out vec3 v_ViewDir - View vector from the vertex to the camera in view space; unnormalized
 @out vec4 v_Position - Vertex position in view space
@@ -40,7 +40,7 @@ uniform mat3 u_TextureTransform;
 uniform mat4 u_Model;
 
 out float v_ViewDepth;
-out vec2 v_TexCoord;
+out vec2 v_TexCoords;
 out vec3 v_Normal;
 out vec3 v_ViewDir;
 out vec4 v_Position;
