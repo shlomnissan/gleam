@@ -17,19 +17,13 @@
 
 ## Overview
 
-VGLX is a scene-oriented rendering engine for modern C++ focused on immediacy and control. It uses a familiar scene-graph built from objects, meshes, cameras, and lights with native performance and explicit GPU access. The engine is fully cross-platform and runs on Windows, macOS, and Linux.
+VGLX is a rendering engine for modern C++ focused on immediacy and control. It uses a familiar scene-graph built from objects, meshes, cameras, and lights with native performance and explicit GPU access. The engine is fully cross-platform and runs on Windows, macOS, and Linux.
 
 #### Documentation
 
 - Manual: https://www.vglx.org/manual/
 - API reference: https://www.vglx.org/reference/
 - Starter template: https://github.com/shlomnissan/vglx-starter
-
-## Community driven
-
-VGLX is developed in the open. Design decisions, trade-offs, and changes happen in public in the repository. The goal is not to chase trends or grow fast. It is to build a rendering engine that stays understandable as it evolves. Simplicity, clarity, and mechanical sympathy matter more than feature count.
-
-Community feedback shapes the engine. Questions, critiques, and experiments often lead to improvements in both code and documentation. If something feels unclear or overly complex, that signal matters. VGLX grows through shared understanding, not hidden roadmaps.
 
 ## Installation
 
@@ -121,7 +115,7 @@ auto main() -> int {
 
 ## Contributions
 
-Contributions are welcome at every level. Code, documentation, examples, bug reports, and design discussions all move the project forward. You do not need a large feature to contribute. Small, focused improvements often have the biggest impact.
+Contributions are welcome. Code, documentation, examples, bug reports, and design discussions all move the project forward.
 
 ## License
 ```
