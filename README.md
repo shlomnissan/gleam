@@ -40,7 +40,7 @@ python3 -m tools.installer.main
 
 The installer checks for CMake, detects your compiler, and asks for an installation prefix.
 
-## Hello VGLX (minimal example)
+## Minimal Example
 
 ```cpp
 #include <vglx/vglx.hpp>
@@ -113,10 +113,6 @@ auto main() -> int {
 }
 ```
 
-## Contributions
-
-Contributions are welcome. Code, documentation, examples, bug reports, and design discussions all move the project forward.
-
 ## License
 ```
  ___      ___ ________  ___          ___    ___
@@ -130,7 +126,7 @@ Contributions are welcome. Code, documentation, examples, bug reports, and desig
 
 The MIT License (MIT)
 
-Copyright (c) 2025-present Shlomi Nissan
+Copyright (c) 2024-present Shlomi Nissan
 https://www.vglx.org
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
