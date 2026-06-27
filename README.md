@@ -80,11 +80,6 @@ auto main() -> int {
         .far = 1000.0f
     });
 
-    window.OnResize([&camera, &renderer](const ResizeParameters& p) {
-        renderer.SetViewport(0, 0, p.framebuffer_width, p.framebuffer_height);
-        camera->Resize(p.window_width, p.window_height);
-    });
-
     auto scene = Scene::Create();
 
     scene->Add(OrbitControls::Create(camera.get(), {
@@ -112,6 +107,14 @@ auto main() -> int {
     return 0;
 }
 ```
+
+## Getting Help
+
+If you run into problems, please [open an issue on GitHub](https://github.com/shlomnissan/vglx/issues). If possible include:
+
+- Your OS and compiler version
+- CMake command you ran
+- Installer or compiler logs
 
 ## License
 ```
