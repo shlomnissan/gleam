@@ -122,7 +122,6 @@ set(PUBLIC_HEADERS
     "${PUBLIC_HEADERS_DIR}/lights/directional_light.hpp"
     "${PUBLIC_HEADERS_DIR}/lights/light.hpp"
     "${PUBLIC_HEADERS_DIR}/lights/point_light.hpp"
-    "${PUBLIC_HEADERS_DIR}/lights/shadow.hpp"
     "${PUBLIC_HEADERS_DIR}/lights/spot_light.hpp"
     "${PUBLIC_HEADERS_DIR}/materials/material.hpp"
     "${PUBLIC_HEADERS_DIR}/materials/pbr_material.hpp"
