@@ -97,6 +97,7 @@ SpotLight::SpotLight(const Parameters& params) :
     penumbra(params.penumbra),
     target(params.target),
     attenuation(params.attenuation),
+    cast_shadow(params.cast_shadow),
     impl_(std::make_unique<Impl>())
 {
     SetName("spot light");
@@ -128,6 +129,10 @@ auto SpotLight::OnUpdate(float delta) -> void {
     if (debug_mode_enabled_) {
         impl_->UpdateDebugMesh(this);
     }
+}
+
+[[nodiscard]] auto SpotLight::GetShadow() const -> const Shadow* {
+    return cast_shadow ? &shadow : nullptr;
 }
 
 SpotLight::~SpotLight() = default;

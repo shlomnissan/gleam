@@ -38,6 +38,7 @@ Renderer::Impl::Impl(const Renderer::Parameters& params)
     }),
     params_(params),
     render_lists_(std::make_unique<RenderLists>()),
+    shadow_map_(params.shadow_map),
     tone_mapping_(params.tone_mapping),
     exposure_(params.exposure)
 {
@@ -396,6 +397,17 @@ auto Renderer::Impl::ProcessLights(Camera* camera) -> void {
     if (lights_.HasLights()) lights_.Update();
 }
 
+auto Renderer::Impl::RenderShadowMaps(Scene* scene) -> void {
+    for (auto light : render_lists_->Lights()) {
+        auto shadow = light->GetShadow();
+        if (shadow == nullptr) {
+            continue;
+        }
+
+        // TODO: render shadow map
+    }
+}
+
 auto Renderer::Impl::Render(Scene* scene, Camera* camera, RenderTarget* target) -> void {
     if (scene->environment) {
         textures_.Bind(scene->environment, 0);
@@ -405,16 +417,21 @@ auto Renderer::Impl::Render(Scene* scene, Camera* camera, RenderTarget* target) 
         }
     }
 
+    scene->UpdateTransformHierarchy();
+    camera->UpdateViewMatrix();
+    render_lists_->ProcessScene(scene, camera);
+
+    if (shadow_map_ != ShadowMap::None) {
+        RenderShadowMaps(scene);
+    }
+
     const auto use_default_target = target == nullptr;
     use_default_target ? scene_buffer_.Begin() : framebuffers_.Begin(target);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    scene->UpdateTransformHierarchy();
-    camera->UpdateViewMatrix();
-
     camera_ubo_.Update(camera->projection_matrix, camera->view_matrix);
-    render_lists_->ProcessScene(scene, camera);
+
     ProcessLights(camera);
 
     RenderObjects(scene, camera);

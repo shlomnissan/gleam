@@ -87,7 +87,9 @@ private:
     size_t rendered_objects_counter_ {0};
     size_t rendered_objects_per_frame_ {0};
 
-    Renderer::ToneMapping tone_mapping_ {Renderer::ToneMapping::ACESFilmic};
+    Renderer::ShadowMap shadow_map_ {Renderer::ShadowMap::None};
+
+    Renderer::ToneMapping tone_mapping_ {Renderer::ToneMapping::None};
 
     GLEnvironmentMaps env_maps_ {};
 
@@ -100,6 +102,8 @@ private:
     auto RenderObjects(Scene* scene, Camera* camera) -> void;
 
     auto RenderObject(Renderable* renderable, Scene* scene, Camera* camera) -> void;
+
+    auto RenderShadowMaps(Scene* scene) -> void;
 
     auto SetUniforms(
         GLProgram* program,

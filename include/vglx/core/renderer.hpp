@@ -63,6 +63,14 @@ public:
         ACESFilmic ///< ACES filmic curve. Compresses highlights and preserves shadows.
     };
 
+    /**
+     * @brief Shadow mapping method applied to shadow-casting lights.
+     */
+    enum class ShadowMap {
+        None, ///< Shadows disabled.
+        Basic ///< Single-sample depth-mapped shadows with hard edges.
+    };
+
     /// @brief Parameters for constructing a @ref Renderer object.
     struct Parameters {
         int framebuffer_width {1280}; ///< Current framebuffer width in pixels.
@@ -71,6 +79,7 @@ public:
         Color clear_color {0x000000}; ///< Clear color used at the start of a frame.
         ToneMapping tone_mapping {ToneMapping::None}; ///< Tone mapping operator applied to the final frame.
         float exposure {1.0f}; ///< Exposure scale applied to HDR values before tone mapping.
+        ShadowMap shadow_map {ShadowMap::None}; ///< Shadow mapping method applied to the scene.
     };
 
     /**

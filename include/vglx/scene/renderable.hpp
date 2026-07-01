@@ -36,6 +36,12 @@ public:
     /// @brief When `true` this object participates in view frustum culling.
     bool frustum_culled {true};
 
+    /// @brief When `true` this object casts shadows onto shadow receivers.
+    bool cast_shadow {false};
+
+    /// @brief When `true` this object receives shadows from shadow casters.
+    bool receive_shadow {false};
+
     /**
      * @brief Returns the geometry used to draw this object.
      */

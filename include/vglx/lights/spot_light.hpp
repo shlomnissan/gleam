@@ -57,6 +57,7 @@ public:
         float penumbra; ///< Softness of the spotlight edge.
         Node* target; ///< Node the light is directed toward.
         Attenuation attenuation; ///< Attenuation parameters controlling distance-based falloff.
+        bool cast_shadow {false}; ///< Enables shadow casting for this light.
     };
 
     /// @brief Cone angle, in radians, of the spotlight.
@@ -70,6 +71,12 @@ public:
 
     /// @brief Attenuation parameters controlling distance-based falloff.
     Attenuation attenuation;
+
+    /// @brief When `true` this light casts shadows.
+    bool cast_shadow;
+
+    /// @brief Shadow configuration used when @ref cast_shadow is enabled.
+    Shadow shadow;
 
     /**
      * @brief Constructs a spotlight.
@@ -95,6 +102,8 @@ public:
     [[nodiscard]] auto GetType() const -> Light::Type override {
         return Light::Type::Spot;
     }
+
+    [[nodiscard]] auto GetShadow() const -> const Shadow* override;
 
     /**
      * @brief Returns the normalized direction vector of the light.
