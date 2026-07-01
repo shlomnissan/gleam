@@ -14,4 +14,5 @@
 #include "vglx/lights/ambient_light.hpp"
 #include "vglx/lights/directional_light.hpp"
 #include "vglx/lights/point_light.hpp"
+#include "vglx/lights/shadow.hpp"
 #include "vglx/lights/spot_light.hpp"
