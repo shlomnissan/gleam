@@ -51,7 +51,7 @@ auto RenderLists::ProcessNode(Node* node, const Frustum& frustum) -> void {
 
         if (!material->visible) return;
         if (!Renderable::CanRender(renderable)) return;
-        if (!Renderable::InFrustum(renderable, frustum)) return;
+        if (renderable->frustum_culled && !Renderable::InFrustum(renderable, frustum)) return;
 
         renderable->GetMaterial()->transparent
             ? transparent_.emplace_back(renderable)

@@ -38,8 +38,8 @@ class Scene;
  * bottom-up through the scene graph: children receive the event before their
  * parents, and any node can stop propagation by marking the event as handled.
  *
- * Nodes can opt out of automatic transform updates via @ref transform_auto_update
- * or disable visibility tests using @ref frustum_culled when needed.
+ * Nodes can opt out of automatic transform updates via
+ * @ref transform_auto_update when needed.
  *
  * @ingroup SceneGroup
  */
@@ -71,9 +71,6 @@ public:
 
     /// @brief When `true` the world transform is automatically updated each frame.
     bool transform_auto_update {true};
-
-     /// @brief When `true` this node participates in view frustum culling.
-    bool frustum_culled {true};
 
     /**
      * @brief Constructs a node.
