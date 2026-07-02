@@ -4,9 +4,11 @@
 # It makes a distinction between shaders and snippets. Snippets are used for
 # common code that is included across multiple shaders at runtime.
 
-file(GLOB_RECURSE SHADERS "**/*.vert" "**/*.frag" "**/*.glsl")
+file(GLOB_RECURSE SHADERS CONFIGURE_DEPENDS "**/*.vert" "**/*.frag" "**/*.glsl")
 
 foreach(SHADER IN LISTS SHADERS)
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${SHADER})
+
     get_filename_component(FILENAME ${SHADER} NAME)
     get_filename_component(DIRECTORY ${SHADER} DIRECTORY)
     get_filename_component(EXTENSION ${SHADER} EXT)
