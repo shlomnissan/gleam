@@ -36,12 +36,12 @@ class Node;
  * @ingroup LoadersGroup
  */
 struct CubeTexturePaths {
-    fs::path positive_x; ///< Right face (+X).
-    fs::path negative_x; ///< Left face (-X).
-    fs::path positive_y; ///< Top face (+Y).
-    fs::path negative_y; ///< Bottom face (-Y).
-    fs::path positive_z; ///< Front face (+Z).
-    fs::path negative_z; ///< Back face (-Z).
+    fs::path positive_x;
+    fs::path negative_x;
+    fs::path positive_y;
+    fs::path negative_y;
+    fs::path positive_z;
+    fs::path negative_z;
 };
 
 /**

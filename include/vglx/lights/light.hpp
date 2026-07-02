@@ -20,19 +20,31 @@ namespace vglx {
  * @brief Per-light shadow configuration.
  *
  * Plain, user-tunable data owned by a shadow-casting light and exposed as a
- * public member. Holds only the settings that cannot be derived from the light;
- * the depth framebuffer, texture, and light-space projection are owned by the
+ * public member. Holds only the settings that cannot be derived from the light.
+ * The depth framebuffer, texture, and light-space projection are owned by the
  * renderer, and the projection is derived from the light's own properties.
  *
  * @ingroup LightsGroup
  */
 struct Shadow {
-    /// @brief Constant depth bias applied during the shadow compare to reduce
-    /// self-shadowing artifacts.
+    /**
+     * @brief Constant depth bias applied to shadow compare.
+     */
     float bias {0.0f};
 
-    /// @brief Resolution of the square shadow map. Higher values sharpen shadow
-    /// edges at the cost of memory and fill rate. Powers of two are recommended.
+    /**
+     * @brief Near plane of the shadow camera.
+     */
+    float near {0.5f};
+
+    /**
+     * @brief Far plane of the shadow camera when the light is unbounded.
+     */
+    float far {500.0f};
+
+    /**
+     * @brief Resolution of the square shadow map.
+     */
     int map_size {1024};
 };
 
