@@ -29,7 +29,7 @@ PerspectiveCamera::PerspectiveCamera(const Parameters& params) : params_(params)
     projection_matrix = make_perspective_proj(params_);
 }
 
-auto PerspectiveCamera::Resize(int width, int height) -> void {
+auto PerspectiveCamera::OnResize(int width, int height) -> void {
     params_.aspect = static_cast<float>(width) / static_cast<float>(height);
     projection_matrix = make_perspective_proj(params_);
 }

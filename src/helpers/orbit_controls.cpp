@@ -7,10 +7,14 @@
 
 #include "vglx/helpers/orbit_controls.hpp"
 
+#include "vglx/math/matrix4.hpp"
 #include "vglx/math/spherical.hpp"
 #include "vglx/math/vector2.hpp"
 #include "vglx/math/vector3.hpp"
 
+#include "utilities/logger.hpp"
+
+#include <algorithm>
 #include <cmath>
 
 namespace vglx {
@@ -18,6 +22,11 @@ namespace vglx {
 namespace {
 
 constexpr float kThetaLimit = vglx::math::pi_over_2 - 0.001f;
+
+auto visible_world_height_at_distance(const Matrix4& projection, float distance) -> float {
+    const auto is_ortho = projection[3][3] == 1.0f;
+    return 2.0f * (is_ortho ? 1.0f : distance) / projection[1][1];
+}
 
 }
 
@@ -51,6 +60,15 @@ struct OrbitControls::Impl {
         using enum MouseEvent::Type;
         using enum MouseButton;
 
+        if (camera->ViewportHeight() <= 0) {
+            Logger::Log(
+                LogLevel::Error,
+                "OrbitControls requires a sized camera but Camera::Resize "
+                "was never called; ignoring mouse input"
+            );
+            return;
+        }
+
         const auto shift_mod = !!(event->mods & MouseMod::Shift);
 
         if (event->type == ButtonPressed && curr_button == MouseButton::None) {
@@ -64,15 +82,21 @@ struct OrbitControls::Impl {
 
         if (event->type == Moved) {
             curr_pos = event->position;
-            auto offset = curr_pos - prev_pos;
+            const auto offset =
+                (curr_pos - prev_pos) / static_cast<float>(camera->ViewportHeight());
 
             if (curr_button == Left && !shift_mod) {
-                spherical_delta.phi -= offset.x * params.sensitivity * params.orbit_speed;
-                spherical_delta.theta += offset.y * params.sensitivity * params.orbit_speed;
+                spherical_delta.phi -= offset.x * params.orbit_speed;
+                spherical_delta.theta += offset.y * params.orbit_speed;
             }
 
             if (curr_button == Right || (curr_button == Left && shift_mod)) {
-                const auto speed = params.pan_speed * spherical.radius * params.sensitivity;
+                const auto world_height = visible_world_height_at_distance(
+                    camera->projection_matrix,
+                    spherical.radius
+                );
+
+                const auto speed = params.pan_speed * world_height;
                 const auto right = camera->Right();
                 const auto up = camera->Up();
                 pan_delta -= (right * offset.x - up * offset.y) * speed;

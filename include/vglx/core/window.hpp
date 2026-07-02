@@ -194,8 +194,10 @@ public:
      *
      * The callback is executed whenever the client-area dimensions change,
      * including user drag-resizes and OS-driven scaling changes on high-DPI
-     * displays. The callback receives both logical window sizes and the
-     * framebuffer sizes in physical pixels.
+     * displays. It is also invoked once with the initial size on the first
+     * @ref PollEvents call, so size-dependent state can be fully initialized
+     * through this callback. The callback receives both logical window sizes
+     * and the framebuffer sizes in physical pixels.
      *
      * @param callback A function to invoke on resize with the new sizes.
      */

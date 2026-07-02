@@ -81,6 +81,9 @@ auto Window::Impl::Initialize() -> std::expected<void, std::string> {
     glfwGetFramebufferSize(window_, &framebuffer_width, &framebuffer_height);
     glfwGetWindowSize(window_, &window_width, &window_height);
 
+    // Report the initial size through the resize callback.
+    did_resize = true;
+
     glfwSetKeyCallback(window_, glfw_key_callback);
     glfwSetCursorPosCallback(window_, glfw_cursor_pos_callback);
     glfwSetMouseButtonCallback(window_, glfw_mouse_button_callback);

@@ -70,14 +70,6 @@ public:
     }
 
     /**
-     * @brief Updates the projection transform to match the new viewport size.
-     *
-     * @param width Viewport width in pixels.
-     * @param height Viewport height in pixels.
-     */
-    auto Resize(int width, int height) -> void override;
-
-    /**
      * @brief Configures perspective projection parameters.
      *
      * Updates the camera's vertical field of view, near plane, and far plane,
@@ -89,6 +81,15 @@ public:
      * @param far  Distance to the far clipping plane.
      */
     auto SetLens(float fov, float near, float far) -> void;
+
+protected:
+    /**
+     * @brief Updates the projection transform to match the new viewport size.
+     *
+     * @param width Viewport width in pixels.
+     * @param height Viewport height in pixels.
+     */
+    auto OnResize(int width, int height) -> void override;
 
 private:
     /// @cond INTERNAL

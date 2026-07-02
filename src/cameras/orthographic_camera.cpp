@@ -31,7 +31,7 @@ OrthographicCamera::OrthographicCamera(const Parameters& params) : params_(param
     projection_matrix = make_orthographic_proj(params_);
 }
 
-auto OrthographicCamera::Resize(int width, int height) -> void {
+auto OrthographicCamera::OnResize(int width, int height) -> void {
     const auto fw = static_cast<float>(width);
     const auto fh = static_cast<float>(height);
 

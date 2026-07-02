@@ -50,11 +50,10 @@ public:
         float radius {1.0f}; ///< Initial distance of the camera from its target.
         float pitch {0.0f}; ///< Initial pitch angle in radians.
         float yaw {0.0f}; ///< Initial yaw angle in radians.
-        float orbit_speed {3.0f}; ///< Orbit sensitivity (radians per full-height drag).
-        float pan_speed {0.5f}; ///< Pan sensitivity (relative to distance and viewport).
+        float orbit_speed {3.0f}; ///< Orbit sensitivity in radians per viewport-height drag.
+        float pan_speed {1.0f}; ///< Pan sensitivity. At 1 the target tracks the cursor exactly.
         float zoom_speed {1.0f}; ///< Scroll wheel zoom sensitivity multiplier.
         float damping_factor {0.3f}; ///< Set to 1 for instant response.
-        float sensitivity {1.0f / 720.0f}; ///< Pixel-to-motion scale (1 / reference window height).
     };
 
     /**

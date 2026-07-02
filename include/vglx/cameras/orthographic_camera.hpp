@@ -84,6 +84,7 @@ public:
         return std::make_unique<OrthographicCamera>(params);
     }
 
+protected:
     /**
      * @brief Updates the projection transform to match the new viewport size.
      *
@@ -92,7 +93,7 @@ public:
      * @param width Viewport width in pixels.
      * @param height Viewport height in pixels.
      */
-    auto Resize(int width, int height) -> void override;
+    auto OnResize(int width, int height) -> void override;
 
 private:
     /// @cond INTERNAL
