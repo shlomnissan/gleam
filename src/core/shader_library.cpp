@@ -23,6 +23,7 @@
 #include "shaders/headers/sprite_material_vert.h"
 #include "shaders/headers/unlit_material_frag.h"
 #include "shaders/headers/unlit_material_vert.h"
+#include "shaders/snippets/headers/frag_global_lights_glsl.h"
 #include "shaders/snippets/headers/frag_global_fog_glsl.h"
 #include "shaders/snippets/headers/frag_global_params_glsl.h"
 #include "shaders/snippets/headers/vert_global_params_glsl.h"
@@ -147,6 +148,7 @@ auto ShaderLibrary::InjectAttributes(
 
 auto ShaderLibrary::ResolveIncludes(std::string& source) const -> void {
     static const std::unordered_map<std::string, std::string> include_map = {
+        {"snippets/frag_global_lights.glsl", _SNIPPET_frag_global_lights},
         {"snippets/frag_global_fog.glsl", _SNIPPET_frag_global_fog},
         {"snippets/frag_global_params.glsl", _SNIPPET_frag_global_params},
         {"snippets/vert_global_params.glsl", _SNIPPET_vert_global_params},

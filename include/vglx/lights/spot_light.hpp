@@ -10,6 +10,7 @@
 #include "vglx_export.h"
 
 #include "vglx/lights/light.hpp"
+#include "vglx/math/utilities.hpp"
 
 #include <memory>
 
@@ -20,9 +21,9 @@ namespace vglx {
  * cone-shaped area of influence.
  *
  * A spotlight combines directional and point light behavior: intensity
- * diminishes with distance (via attenuation) and with the angle from the
- * central axis of the cone. This is commonly used to simulate focused light
- * sources such as flashlights or stage spotlights.
+ * follows physical inverse-square falloff with distance and diminishes with
+ * the angle from the central axis of the cone. This is commonly used to
+ * simulate focused light sources such as flashlights or stage spotlights.
  *
  * When the @ref SpotLight::Parameters::target "target" parameter is set to
  * `nullptr`, the light will point toward the world origin.
@@ -33,15 +34,11 @@ namespace vglx {
  * @code
  * my_scene->Add(vglx::SpotLight::Create({
  *   .color = 0xFFFFFF,
- *   .intensity = 1.0f,
+ *   .intensity = 25.0f,
  *   .angle = vglx::math::DegToRad(10.0f),
  *   .penumbra = 0.3f,
  *   .target = nullptr,
- *   .attenuation = {
- *     .base = 1.0f,
- *     .linear = 0.0f,
- *     .quadratic = 0.0f
- *   }
+ *   .range = 0.0f
  * }));
  * @endcode
  *
@@ -56,7 +53,7 @@ public:
         float angle; ///< Cone angle (in radians) for spotlight cutoff.
         float penumbra; ///< Softness of the spotlight edge.
         Node* target; ///< Node the light is directed toward.
-        Attenuation attenuation; ///< Attenuation parameters controlling distance-based falloff.
+        float range {0.0f}; ///< Maximum range of influence. 0 = unbounded.
         bool cast_shadow {false}; ///< Enables shadow casting for this light.
     };
 
@@ -69,8 +66,13 @@ public:
     /// @brief Node that the light is oriented toward.
     Node* target {nullptr};
 
-    /// @brief Attenuation parameters controlling distance-based falloff.
-    Attenuation attenuation;
+    /**
+     * @brief Maximum range of influence in world units.
+     *
+     * Falloff is smoothly windowed to reach zero at this distance.
+     * A value of 0 disables the cutoff, leaving pure inverse-square falloff.
+     */
+    float range {0.0f};
 
     /// @brief When `true` this light casts shadows.
     bool cast_shadow;
@@ -103,7 +105,31 @@ public:
         return Light::Type::Spot;
     }
 
+    /// @cond INTERNAL
     [[nodiscard]] auto GetShadow() const -> const Shadow* override;
+    /// @endcond
+
+    /**
+     * @brief Returns the light's luminous power in lumens.
+     *
+     * Uses the convention $\Phi = \pi \cdot I$, where $I$ is
+     * @ref Light::intensity "intensity" in candela, so power is independent
+     * of the cone @ref angle. This matches the three.js convention rather
+     * than the exact solid-angle integral.
+     */
+    [[nodiscard]] auto GetPower() const -> float {
+        return intensity * math::pi;
+    }
+
+    /**
+     * @brief Sets @ref Light::intensity "intensity" from luminous power
+     * in lumens.
+     *
+     * @param power Luminous power in lumens.
+     */
+    auto SetPower(float power) -> void {
+        intensity = power / math::pi;
+    }
 
     /**
      * @brief Returns the normalized direction vector of the light.

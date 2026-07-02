@@ -25,7 +25,7 @@ struct Scene : public vglx::Scene {
 
         Add(vglx::PointLight::Create({
             .color = 0xFFFFFF,
-            .intensity = 1.0f,
+            .intensity = 32.0f,
         }))->transform.Translate({2.0f, 2.5f, 4.0f});
     }
 

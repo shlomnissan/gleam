@@ -10,6 +10,7 @@
 #include "vglx_export.h"
 
 #include "vglx/lights/light.hpp"
+#include "vglx/math/utilities.hpp"
 
 #include <memory>
 
@@ -19,18 +20,14 @@ namespace vglx {
  * @brief Represents a light that emits from a single point in all directions.
  *
  * A point light simulates a localized light source such as a bare lightbulb.
- * Intensity falls off with distance according to the configured attenuation
- * parameters.
+ * Intensity follows physical inverse-square falloff, so @ref Light::intensity
+ * "intensity" represents the light's brightness at a distance of one unit.
  *
  * @code
  * my_scene->Add(vglx::PointLight::Create({
  *   .color = 0xFFFFFF,
- *   .intensity = 1.0f,
- *   .attenuation = {
- *     .base = 1.0f,
- *     .linear = 0.0f,
- *     .quadratic = 0.0f
- *   }
+ *   .intensity = 25.0f,
+ *   .range = 0.0f
  * }));
  * @endcode
  *
@@ -42,11 +39,16 @@ public:
     struct Parameters {
         Color color; ///< Light color.
         float intensity; ///< Light intensity multiplier.
-        Attenuation attenuation; ///< Light attenuation parameters.
+        float range {0.0f}; ///< Maximum range of influence. 0 = unbounded.
     };
 
-    /// @brief Attenuation parameters controlling distance-based falloff.
-    Attenuation attenuation;
+    /**
+     * @brief Maximum range of influence in world units.
+     *
+     * Falloff is smoothly windowed to reach zero at this distance.
+     * A value of 0 disables the cutoff, leaving pure inverse-square falloff.
+     */
+    float range {0.0f};
 
     /**
      * @brief Constructs a point light.
@@ -71,6 +73,30 @@ public:
      */
     [[nodiscard]] auto GetType() const -> Light::Type override {
         return Light::Type::Point;
+    }
+
+    /**
+     * @brief Returns the light's luminous power in lumens.
+     *
+     * Power is the total light emitted in all directions:
+     * $\Phi = 4\pi \cdot I$, where $I$ is @ref Light::intensity "intensity"
+     * in candela.
+     */
+    [[nodiscard]] auto GetPower() const -> float {
+        return intensity * 4.0f * math::pi;
+    }
+
+    /**
+     * @brief Sets @ref Light::intensity "intensity" from luminous power
+     * in lumens.
+     *
+     * Useful for specifying brightness in familiar lightbulb terms,
+     * e.g. `SetPower(800.0f)` approximates a 60W incandescent bulb.
+     *
+     * @param power Luminous power in lumens.
+     */
+    auto SetPower(float power) -> void {
+        intensity = power / (4.0f * math::pi);
     }
 
     /**

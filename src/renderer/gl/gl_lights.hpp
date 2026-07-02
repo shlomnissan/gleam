@@ -31,9 +31,7 @@ public:
         alignas(16) Vector3 direction {Vector3::Zero()};
         alignas(4) float cone_cos {0.0f};
         alignas(4) float penumbra_cos {0.0f};
-        alignas(4) float base {0.0f};
-        alignas(4) float linear {0.0f};
-        alignas(4) float quadratic {0.0f};
+        alignas(4) float range {0.0f};
     };
 
     struct alignas(16) UniformLights {

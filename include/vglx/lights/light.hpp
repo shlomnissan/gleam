@@ -57,28 +57,6 @@ public:
         Spot ///< Light emitting in a cone from a single point.
     };
 
-    /**
-     * @brief Defines how light intensity diminishes over distance.
-     *
-     * Used by point and spot lights to simulate physical light falloff.
-     * The attenuation model follows the classic convention:
-     *
-     * $$
-     * I = \frac{1.0}{a + b \cdot d + c \cdot d^2}
-     * $$
-     *
-     * where $a$, $b$, and $c$ correspond to base, linear, and quadratic
-     * components respectively, and $d$ is the distance from the light source.
-     */
-    struct Attenuation {
-        /// @brief Constant term unaffected by distance.
-        float base {1.0f};
-        /// @brief Linear fade with distance.
-        float linear {0.0f};
-        /// @brief Quadratic fade (inverse-square falloff).
-        float quadratic {0.0f};
-    };
-
     /// @brief Light color represented as @ref Color "RGB components".
     Color color {0xffffff};
 
@@ -105,9 +83,11 @@ public:
         return Node::Type::Light;
     }
 
+    /// @cond INTERNAL
     [[nodiscard]] virtual auto GetShadow() const -> const Shadow* {
         return nullptr;
     }
+    /// @endcond
 
     /**
      * @brief Enables or disables debug visualization mode.

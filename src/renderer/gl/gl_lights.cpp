@@ -54,9 +54,7 @@ auto GLLights::AddLight(Light* light, Camera* camera) -> void {
                 dst.direction = Vector3(dir.x, dir.y, dir.z);
                 dst.cone_cos = 0.0f;
                 dst.penumbra_cos = 0.0f;
-                dst.base = 0.0f;
-                dst.linear = 0.0f;
-                dst.quadratic = 0.0f;
+                dst.range = 0.0f;
             }
             break;
             case Point: {
@@ -68,9 +66,7 @@ auto GLLights::AddLight(Light* light, Camera* camera) -> void {
                 dst.direction = Vector3::Zero();
                 dst.cone_cos = 0.0f;
                 dst.penumbra_cos = 0.0f;
-                dst.base = src->attenuation.base;
-                dst.linear = src->attenuation.linear;
-                dst.quadratic = src->attenuation.quadratic;
+                dst.range = src->range;
             }
             break;
             case Spot: {
@@ -84,9 +80,7 @@ auto GLLights::AddLight(Light* light, Camera* camera) -> void {
                 dst.direction = Vector3(dir.x, dir.y, dir.z);
                 dst.cone_cos = math::Cos(src->angle);
                 dst.penumbra_cos = math::Cos(src->angle * (1 - src->penumbra));
-                dst.base = src->attenuation.base;
-                dst.linear = src->attenuation.linear;
-                dst.quadratic = src->attenuation.quadratic;
+                dst.range = src->range;
             }
             break;
         };

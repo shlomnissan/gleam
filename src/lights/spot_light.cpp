@@ -96,7 +96,7 @@ SpotLight::SpotLight(const Parameters& params) :
     angle(params.angle),
     penumbra(params.penumbra),
     target(params.target),
-    attenuation(params.attenuation),
+    range(params.range),
     cast_shadow(params.cast_shadow),
     impl_(std::make_unique<Impl>())
 {

@@ -55,7 +55,7 @@ struct PointLight::Impl {
 
 PointLight::PointLight(const Parameters& params)  :
     Light(params.color, params.intensity),
-    attenuation(params.attenuation),
+    range(params.range),
     impl_(std::make_unique<Impl>())
 {
     SetName("point light");

@@ -100,28 +100,7 @@ vec3 cookTorranceShading(
 
 #if NUM_LIGHTS > 0
 
-struct Light {
-    int Type; // 1 = directional, 2 = point, 3 = spot
-    vec3 Color;
-    vec3 Position;
-    vec3 Direction;
-    float ConeCos;
-    float PenumbraCos;
-    float Base;
-    float Linear;
-    float Quadratic;
-};
-
-layout(std140) uniform ub_Lights {
-    Light u_Lights[NUM_LIGHTS];
-};
-
-float attenuation(in float dist, in Light light) {
-    float denominator = light.Base +
-                        light.Linear * dist +
-                        light.Quadratic * (dist * dist);
-    return clamp(1.0 / max(denominator, 0.01), 0.0, 1.0);
-}
+#include "snippets/frag_global_lights.glsl"
 
 vec3 processLights(
     const in vec3 normal,

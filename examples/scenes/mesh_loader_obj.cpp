@@ -47,12 +47,12 @@ auto get_scene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
 
     sphere->Add(vglx::PointLight::Create({
         .color = 0xFFFFFF,
-        .intensity = 0.9f
+        .intensity = 128.0f
     }))->transform.Translate({2.0f, 6.0f, 10.0f});
 
     sphere->Add(vglx::PointLight::Create({
         .color = 0xFAA916,
-        .intensity = 1.0f
+        .intensity = 64.0f
     }))->transform.Translate({-2.0f, 6.0f, -4.0f});
 
     return scene;
