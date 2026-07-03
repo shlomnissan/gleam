@@ -54,7 +54,7 @@ public:
         float pitch {0.0f}; ///< Initial pitch angle in radians.
         float yaw {0.0f}; ///< Initial yaw angle in radians.
         Vector3 target {Vector3::Zero()}; ///< Initial point the camera orbits around.
-        float orbit_speed {3.0f}; ///< Orbit sensitivity in radians per viewport-height drag.
+        float orbit_speed {5.0f}; ///< Orbit sensitivity in radians per viewport-height drag.
         float pan_speed {1.0f}; ///< Pan sensitivity. At 1 the target tracks the cursor exactly.
         float zoom_speed {1.0f}; ///< Scroll wheel zoom sensitivity multiplier.
         float damping_factor {0.3f}; ///< Set to 1 for instant response.

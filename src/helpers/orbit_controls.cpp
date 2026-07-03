@@ -80,11 +80,8 @@ struct OrbitControls::Impl {
         using enum MouseButton;
 
         if (camera->ViewportHeight() <= 0) {
-            Logger::Log(
-                LogLevel::Error,
-                "OrbitControls requires a sized camera but Camera::Resize "
-                "was never called; ignoring mouse input"
-            );
+            // OrbitControls requires a sized camera but Camera::Resize
+            // was never called. Ignoring mouse input
             return;
         }
 
@@ -141,31 +138,26 @@ struct OrbitControls::Impl {
     }
 
     auto OnUpdate(float delta) {
-        spherical.phi += spherical_delta.phi;
-        spherical.theta += spherical_delta.theta;
-        spherical.radius *= zoom_scale;
-        target += pan_delta;
+        const auto t = damping_factor > 0.0f
+            ? std::pow(1.0f - damping_factor, delta * 60.0f)
+            : 0.0f;
+
+        const auto applied = 1.0f - t;
+        spherical.phi += spherical_delta.phi * applied;
+        spherical.theta += spherical_delta.theta * applied;
+        spherical.radius *= std::pow(zoom_scale, applied);
+        target += pan_delta * applied;
+
+        spherical_delta.phi *= t;
+        spherical_delta.theta *= t;
+        zoom_scale = std::pow(zoom_scale, t);
+        pan_delta *= t;
 
         spherical.theta = math::Clamp(spherical.theta, min_pitch, max_pitch);
         spherical.radius = math::Clamp(spherical.radius, min_distance, max_distance);
 
         camera->transform.SetPosition(target + spherical.ToVector3());
         camera->LookAt(target);
-
-        if (damping_factor > 0.0f) {
-            // Framerate-independent damping. The exponent normalizes
-            // to 60 fps so the damping_factor parameter keeps its
-            // original per-frame meaning at that reference rate.
-            const auto t = std::pow(1.0f - damping_factor, delta * 60.0f);
-            spherical_delta.phi *= t;
-            spherical_delta.theta *= t;
-            zoom_scale = math::Lerp(1.0f, zoom_scale, t);
-            pan_delta *= t;
-        } else {
-            spherical_delta = Spherical {0.0f, 0.0f, 0.0f};
-            zoom_scale = 1.0f;
-            pan_delta = Vector3::Zero();
-        }
     }
 };
 
