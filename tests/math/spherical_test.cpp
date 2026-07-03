@@ -94,6 +94,33 @@ TEST(Spherical, ToVector3EquatorZDirection) {
 
 #pragma endregion
 
+#pragma region FromVector3
+
+TEST(Spherical, FromVector3RoundTrip) {
+    constexpr auto s = vglx::Spherical {2.5f, vglx::math::pi_over_4, -0.5f};
+    const auto result = vglx::Spherical::FromVector3(s.ToVector3());
+
+    EXPECT_NEAR(result.radius, s.radius, 1e-4f);
+    EXPECT_NEAR(result.phi, s.phi, 1e-4f);
+    EXPECT_NEAR(result.theta, s.theta, 1e-4f);
+}
+
+TEST(Spherical, FromVector3EquatorZDirection) {
+    const auto result = vglx::Spherical::FromVector3({0.0f, 0.0f, 3.0f});
+
+    EXPECT_NEAR(result.radius, 3.0f, 1e-4f);
+    EXPECT_FLOAT_EQ(result.phi, 0.0f);
+    EXPECT_FLOAT_EQ(result.theta, 0.0f);
+}
+
+TEST(Spherical, FromVector3ZeroVector) {
+    const auto result = vglx::Spherical::FromVector3(vglx::Vector3::Zero());
+
+    EXPECT_EQ(result, vglx::Spherical {});
+}
+
+#pragma endregion
+
 #pragma region Lerp
 
 TEST(Spherical, Lerp) {

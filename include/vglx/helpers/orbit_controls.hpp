@@ -10,8 +10,11 @@
 #include "vglx_export.h"
 
 #include "vglx/cameras/camera.hpp"
+#include "vglx/math/utilities.hpp"
+#include "vglx/math/vector3.hpp"
 #include "vglx/scene/node.hpp"
 
+#include <limits>
 #include <memory>
 
 namespace vglx {
@@ -28,7 +31,7 @@ namespace vglx {
  *
  * The control scheme includes:
  * - Left mouse drag: orbit around the target
- * - Right mouse drag: pan in view space
+ * - Right mouse drag or Shift + left mouse drag: pan in view space
  * - Scroll wheel: zoom in and out
  *
  * @code
@@ -50,11 +53,19 @@ public:
         float radius {1.0f}; ///< Initial distance of the camera from its target.
         float pitch {0.0f}; ///< Initial pitch angle in radians.
         float yaw {0.0f}; ///< Initial yaw angle in radians.
+        Vector3 target {Vector3::Zero()}; ///< Initial point the camera orbits around.
         float orbit_speed {3.0f}; ///< Orbit sensitivity in radians per viewport-height drag.
         float pan_speed {1.0f}; ///< Pan sensitivity. At 1 the target tracks the cursor exactly.
         float zoom_speed {1.0f}; ///< Scroll wheel zoom sensitivity multiplier.
         float damping_factor {0.3f}; ///< Set to 1 for instant response.
+        float min_distance {0.1f}; ///< Minimum orbit distance from the target.
+        float max_distance {std::numeric_limits<float>::infinity()}; ///< Maximum orbit distance from the target.
+        float min_pitch {-math::pi_over_2}; ///< Minimum pitch angle in radians.
+        float max_pitch {math::pi_over_2}; ///< Maximum pitch angle in radians.
     };
+
+    /// @brief When false, all mouse input is ignored.
+    bool enabled {true};
 
     /**
      * @brief Constructs orbit controls.
@@ -89,11 +100,22 @@ public:
      */
     auto OnUpdate(float delta) -> void override;
 
+    /**
+     * @brief Sets the point the camera orbits around.
+     *
+     * The camera keeps its current position and re-derives its orbit distance
+     * and orientation toward the new target. Any in-flight damped motion is
+     * cancelled.
+     *
+     * @param target World space position to orbit around.
+     */
+    auto SetTarget(const Vector3& target) -> void;
+
     ~OrbitControls() override;
 
 private:
     /// @cond INTERNAL
-    class Impl;
+    struct Impl;
     std::unique_ptr<Impl> impl_;
     /// @endcond
 };

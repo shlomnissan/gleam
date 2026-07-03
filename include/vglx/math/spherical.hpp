@@ -49,6 +49,20 @@ struct Spherical {
         : radius(radius), phi(phi), theta(theta) {}
 
     /**
+     * @brief Creates a spherical coordinate from a @ref Vector3.
+     *
+     * This is the inverse of @ref ToVector3 using the same convention.
+     * A zero-length vector produces a default spherical coordinate.
+     *
+     * @param v Cartesian position to convert.
+     */
+    [[nodiscard]] static constexpr auto FromVector3(const Vector3& v) -> Spherical {
+        const auto radius = v.Length();
+        if (radius == 0.0f) return {};
+        return {radius, math::Atan2(v.x, v.z), math::Asin(v.y / radius)};
+    }
+
+    /**
      * @brief Converts this spherical coordinate to a @ref Vector3.
      *
      * In this convention, `phi` equals 0 along the +Z axis and increases toward +X.

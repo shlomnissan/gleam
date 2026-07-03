@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 
 namespace vglx {
 
@@ -48,12 +49,30 @@ struct OrbitControls::Impl {
     float damping_factor = 0.0f;
     float zoom_scale = 1.0f;
 
+    float min_distance = 0.1f;
+    float max_distance = std::numeric_limits<float>::infinity();
+    float min_pitch = -kThetaLimit;
+    float max_pitch = kThetaLimit;
+
     Impl(Camera* camera, const Parameters& params) :
       camera(camera),
       params(params) {
         spherical = Spherical {params.radius, params.yaw, params.pitch};
         spherical_delta = Spherical {0.0f, 0.0f, 0.0f};
+        target = params.target;
         damping_factor = std::clamp(params.damping_factor, 0.0f, 1.0f);
+        min_distance = std::max(params.min_distance, 0.001f);
+        max_distance = std::max(params.max_distance, min_distance);
+        min_pitch = std::clamp(params.min_pitch, -kThetaLimit, kThetaLimit);
+        max_pitch = std::clamp(params.max_pitch, min_pitch, kThetaLimit);
+    }
+
+    auto SetTarget(const Vector3& new_target) -> void {
+        target = new_target;
+        spherical = Spherical::FromVector3(camera->transform.position - target);
+        spherical_delta = Spherical {0.0f, 0.0f, 0.0f};
+        pan_delta = Vector3::Zero();
+        zoom_scale = 1.0f;
     }
 
     auto OnMouseEvent(MouseEvent* event) {
@@ -71,13 +90,21 @@ struct OrbitControls::Impl {
 
         const auto shift_mod = !!(event->mods & MouseMod::Shift);
 
-        if (event->type == ButtonPressed && curr_button == MouseButton::None) {
+        const auto uses_button = [](MouseButton button) {
+            return button == Left || button == Right;
+        };
+
+        if (event->type == ButtonPressed &&
+            curr_button == MouseButton::None &&
+            uses_button(event->button)) {
             curr_button = event->button;
             prev_pos = event->position;
+            event->handled = true;
         }
 
         if (event->type == ButtonReleased && curr_button == event->button) {
             curr_button = MouseButton::None;
+            event->handled = true;
         }
 
         if (event->type == Moved) {
@@ -88,6 +115,7 @@ struct OrbitControls::Impl {
             if (curr_button == Left && !shift_mod) {
                 spherical_delta.phi -= offset.x * params.orbit_speed;
                 spherical_delta.theta += offset.y * params.orbit_speed;
+                event->handled = true;
             }
 
             if (curr_button == Right || (curr_button == Left && shift_mod)) {
@@ -100,6 +128,7 @@ struct OrbitControls::Impl {
                 const auto right = camera->Right();
                 const auto up = camera->Up();
                 pan_delta -= (right * offset.x - up * offset.y) * speed;
+                event->handled = true;
             }
 
             prev_pos = curr_pos;
@@ -107,6 +136,7 @@ struct OrbitControls::Impl {
 
         if (event->type == Scrolled) {
             zoom_scale *= std::pow(0.95f, event->scroll.y * params.zoom_speed);
+            event->handled = true;
         }
     }
 
@@ -116,8 +146,8 @@ struct OrbitControls::Impl {
         spherical.radius *= zoom_scale;
         target += pan_delta;
 
-        spherical.theta = math::Clamp(spherical.theta, -kThetaLimit, kThetaLimit);
-        spherical.radius = std::max(0.1f, spherical.radius);
+        spherical.theta = math::Clamp(spherical.theta, min_pitch, max_pitch);
+        spherical.radius = math::Clamp(spherical.radius, min_distance, max_distance);
 
         camera->transform.SetPosition(target + spherical.ToVector3());
         camera->LookAt(target);
@@ -143,11 +173,21 @@ OrbitControls::OrbitControls(Camera* camera, const Parameters& params)
     : impl_(std::make_unique<Impl>(camera, params)) {}
 
 auto OrbitControls::OnMouseEvent(MouseEvent* event) -> void {
+    if (!enabled) {
+        // Drop any active drag so it doesn't resume with stale state
+        // when the controls are re-enabled.
+        impl_->curr_button = MouseButton::None;
+        return;
+    }
     impl_->OnMouseEvent(event);
 }
 
 auto OrbitControls::OnUpdate(float delta) -> void {
     impl_->OnUpdate(delta);
+}
+
+auto OrbitControls::SetTarget(const Vector3& target) -> void {
+    impl_->SetTarget(target);
 }
 
 OrbitControls::~OrbitControls() = default;
