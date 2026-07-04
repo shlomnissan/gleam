@@ -22,7 +22,7 @@ namespace vglx {
 
 class RenderLists {
 public:
-    auto ProcessScene(Scene* scene, Camera* camera) -> void;
+    auto ProcessScene(Scene* scene, Camera* camera, bool sort = true) -> void;
 
     [[nodiscard]] auto Opaque() const -> std::span<Renderable* const> {
         return opaque_;

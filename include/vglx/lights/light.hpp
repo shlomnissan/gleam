@@ -45,7 +45,7 @@ struct Shadow {
     /**
      * @brief Resolution of the square shadow map.
      */
-    int map_size {1024};
+    unsigned int map_size {1024};
 };
 
 /**

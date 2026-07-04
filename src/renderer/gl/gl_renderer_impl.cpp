@@ -38,6 +38,7 @@ Renderer::Impl::Impl(const Renderer::Parameters& params)
     }),
     params_(params),
     render_lists_(std::make_unique<RenderLists>()),
+    shadow_render_lists_(std::make_unique<RenderLists>()),
     shadow_map_(params.shadow_map),
     tone_mapping_(params.tone_mapping),
     exposure_(params.exposure)
@@ -398,14 +399,25 @@ auto Renderer::Impl::ProcessLights(Camera* camera) -> void {
 }
 
 auto Renderer::Impl::RenderShadowMaps(Scene* scene) -> void {
+    shadow_maps_.StartFrame();
     for (auto light : render_lists_->Lights()) {
         auto shadow = light->GetShadow();
         if (shadow == nullptr) {
             continue;
         }
 
-        // TODO: render shadow map
+        auto result = shadow_maps_.BindShadowMap(light);
+        if (!result.has_value()) {
+            Logger::Log(LogLevel::Error, "{}", result.error());
+            continue;
+        }
+
+        auto camera = result.value();
+        shadow_render_lists_->ProcessScene(scene, camera, false);
+
+        // TODO: render scene
     }
+    shadow_maps_.EndFrame();
 }
 
 auto Renderer::Impl::Render(Scene* scene, Camera* camera, RenderTarget* target) -> void {
@@ -419,6 +431,7 @@ auto Renderer::Impl::Render(Scene* scene, Camera* camera, RenderTarget* target) 
 
     scene->UpdateTransformHierarchy();
     camera->UpdateViewMatrix();
+
     render_lists_->ProcessScene(scene, camera);
 
     if (shadow_map_ != ShadowMap::None) {

@@ -14,7 +14,7 @@
 
 namespace vglx {
 
-auto RenderLists::ProcessScene(Scene* scene, Camera* camera) -> void {
+auto RenderLists::ProcessScene(Scene* scene, Camera* camera, bool sort) -> void {
     Reset();
 
     const auto frustum = camera->GetFrustum();
@@ -28,11 +28,10 @@ auto RenderLists::ProcessScene(Scene* scene, Camera* camera) -> void {
         return Dot(renderable->GetWorldPosition() - c, f);
     };
 
-    // Sort opaque renderables front-to-back to optimize depth buffer writes.
-    std::ranges::stable_sort(opaque_, std::ranges::less {}, compare);
-
-    // Sort transparent renderables back-to-front to ensure correct blending.
-    std::ranges::stable_sort(transparent_, std::ranges::greater {}, compare);
+    if (sort) {
+        std::ranges::stable_sort(opaque_, std::ranges::less {}, compare);
+        std::ranges::stable_sort(transparent_, std::ranges::greater {}, compare);
+    }
 }
 
 auto RenderLists::ProcessNode(Node* node, const Frustum& frustum) -> void {

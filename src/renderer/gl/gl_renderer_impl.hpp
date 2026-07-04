@@ -19,6 +19,7 @@
 #include "renderer/gl/gl_present_pass.hpp"
 #include "renderer/gl/gl_programs.hpp"
 #include "renderer/gl/gl_scene_buffer.hpp"
+#include "renderer/gl/gl_shadow_maps.hpp"
 #include "renderer/gl/gl_state.hpp"
 #include "renderer/gl/gl_textures.hpp"
 #include "renderer/gl/gl_vertex_buffers.hpp"
@@ -76,6 +77,7 @@ private:
     GLPresentPass present_pass_;
     GLPrograms programs_;
     GLSceneBuffer scene_buffer_;
+    GLShadowMaps shadow_maps_;
     GLState state_;
     GLTextures textures_;
     GLVertexBuffers vertex_buffers_;
@@ -83,6 +85,7 @@ private:
     Renderer::Parameters params_;
 
     std::unique_ptr<RenderLists> render_lists_;
+    std::unique_ptr<RenderLists> shadow_render_lists_;
 
     size_t rendered_objects_counter_ {0};
     size_t rendered_objects_per_frame_ {0};
