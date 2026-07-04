@@ -21,8 +21,60 @@ namespace vglx {
 
 namespace {
 
+constexpr float border[] = {1.0f, 1.0f, 1.0f, 1.0f};
+
 auto allocate_resources(GLShadowMap& shadow_map) -> std::expected<void, std::string> {
-    // TODO: implement
+    glGenFramebuffers(1, &shadow_map.buffer_id);
+    if (shadow_map.buffer_id == 0) {
+        return std::unexpected("Failed to generate shadow map framebuffer");
+    }
+
+    glGenTextures(1, &shadow_map.texture_id);
+    if (shadow_map.texture_id == 0) {
+        return std::unexpected("Failed to generate shadow map texture");
+    }
+
+    glBindTexture(GL_TEXTURE_2D, shadow_map.texture_id);
+    glTexImage2D(
+        GL_TEXTURE_2D,
+        0,
+        GL_DEPTH_COMPONENT24,
+        shadow_map.map_size,
+        shadow_map.map_size,
+        0,
+        GL_DEPTH_COMPONENT,
+        GL_FLOAT,
+        nullptr
+    );
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, shadow_map.buffer_id);
+    glFramebufferTexture2D(
+        GL_FRAMEBUFFER,
+        GL_DEPTH_ATTACHMENT,
+        GL_TEXTURE_2D,
+        shadow_map.texture_id,
+        0
+    );
+
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        return std::unexpected("Shadow map framebuffer is incomplete");
+    }
+
     return {};
 }
 
