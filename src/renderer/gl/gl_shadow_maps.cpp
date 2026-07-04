@@ -6,7 +6,10 @@
 */
 
 #include "vglx/cameras/camera.hpp"
+#include "vglx/cameras/perspective_camera.hpp"
 #include "vglx/lights/light.hpp"
+#include "vglx/lights/spot_light.hpp"
+#include "vglx/math/vector3.hpp"
 
 #include "renderer/gl/gl_shadow_maps.hpp"
 
@@ -31,12 +34,34 @@ auto deallocate_resources(GLShadowMap& shadow_map) {
     shadow_map.texture_id = 0;
 }
 
-auto update_camera(Light* light, Camera* camera) {
+auto update_camera(Light* light, Camera* camera) -> void {
+    if (light->GetType() == Light::Type::Spot) {
+        auto spot = static_cast<SpotLight*>(light);
+        auto far = spot->range > 0.0f ? spot->range : spot->shadow.far;
+        auto spot_camera = static_cast<PerspectiveCamera*>(camera);
 
+        spot_camera->SetLens(spot->angle * 2.0f, spot->shadow.near, far);
+
+        const auto target = spot->target != nullptr
+            ? spot->target->GetWorldPosition()
+            : Vector3::Zero();
+
+        spot_camera->transform.SetPosition(spot->GetWorldPosition());
+        spot_camera->LookAt(target);
+        spot_camera->UpdateViewMatrix();
+    }
 }
 
 auto create_camera(Light* light) -> std::unique_ptr<Camera> {
-    // TODO: implement
+    if (light->GetType() == Light::Type::Spot) {
+        auto spot = static_cast<SpotLight*>(light);
+        return PerspectiveCamera::Create({
+            .fov = spot->angle * 2.0f,
+            .aspect = 1.0f,
+            .near = spot->shadow.near,
+            .far = spot->range > 0.0f ? spot->range : spot->shadow.far
+        });
+    }
     return nullptr;
 }
 
@@ -62,12 +87,14 @@ auto GLShadowMaps::BindShadowMap(Light* light) -> std::expected<Camera*, std::st
     if (it == shadow_maps_.end()) {
         auto entry = GLShadowMap {};
         entry.camera = create_camera(light);
+        if (entry.camera == nullptr) {
+            return std::unexpected("Shadow mapping is not supported for this light type");
+        }
         it = shadow_maps_.emplace(shadow_maps_.end(), light, std::move(entry));
-    } else {
-        update_camera(light, it->second.camera.get());
     }
 
     auto& entry = it->second;
+    update_camera(light, entry.camera.get());
 
     if (entry.map_size != config->map_size || entry.buffer_id == 0) {
         entry.map_size = config->map_size;
