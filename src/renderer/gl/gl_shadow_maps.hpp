@@ -14,6 +14,7 @@
 
 namespace vglx {
 
+class GLProgram;
 class Light;
 class Camera;
 
@@ -39,7 +40,11 @@ public:
     GLShadowMaps(GLShadowMaps&&) = delete;
     auto operator=(GLShadowMaps&&) -> GLShadowMaps& = delete;
 
+    auto Initialize() -> std::expected<void, std::string>;
+
     auto StartFrame() -> void;
+
+    auto GetProgram(bool instanced) -> GLProgram*;
 
     [[nodiscard]] auto BindShadowMap(Light* light) -> std::expected<Camera*, std::string>;
 
@@ -49,6 +54,9 @@ public:
 
 private:
     std::vector<std::pair<Light*, GLShadowMap>> shadow_maps_ {};
+
+    std::unique_ptr<GLProgram> prg_shadow_map_;
+    std::unique_ptr<GLProgram> prg_instanced_shadow_map_;
 };
 
 }

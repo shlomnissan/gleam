@@ -70,6 +70,10 @@ auto Renderer::Impl::Initialize() -> std::expected<void, std::string> {
         return std::unexpected(result.error());
     }
 
+    if (auto result = shadow_maps_.Initialize(); !result.has_value()) {
+        return std::unexpected(result.error());
+    }
+
     state_.SetDepthFunction(Material::Depth::LessEqual);
     state_.SetSeamlessCubemapFiltering();
 

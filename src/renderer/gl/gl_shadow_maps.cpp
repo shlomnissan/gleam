@@ -11,7 +11,14 @@
 #include "vglx/lights/spot_light.hpp"
 #include "vglx/math/vector3.hpp"
 
+#include "renderer/gl/gl_program.hpp"
 #include "renderer/gl/gl_shadow_maps.hpp"
+
+#include "core/shader_library.hpp"
+
+#include "shaders/internal/headers/shadow_depth_vert.h"
+#include "shaders/internal/headers/shadow_depth_instanced_vert.h"
+#include "shaders/internal/headers/shadow_depth_frag.h"
 
 #include <algorithm>
 
@@ -119,10 +126,36 @@ auto create_camera(Light* light) -> std::unique_ptr<Camera> {
 
 }
 
+auto GLShadowMaps::Initialize() -> std::expected<void, std::string> {
+    prg_shadow_map_ = std::make_unique<GLProgram>(std::vector<ShaderInfo> {
+        {.type = ShaderType::kVertexShader, .source = _SHADER_shadow_depth_vert},
+        {.type = ShaderType::kFragmentShader, .source = _SHADER_shadow_depth_frag}
+    });
+
+    if (!prg_shadow_map_->IsValid()) {
+        return std::unexpected("Unable to create shadow map program");
+    }
+
+    prg_instanced_shadow_map_ = std::make_unique<GLProgram>(std::vector<ShaderInfo> {
+        {.type = ShaderType::kVertexShader, .source = _SHADER_shadow_depth_instanced_vert},
+        {.type = ShaderType::kFragmentShader, .source = _SHADER_shadow_depth_frag}
+    });
+
+    if (!prg_instanced_shadow_map_->IsValid()) {
+        return std::unexpected("Unable to create instanced shadow map program");
+    }
+
+    return {};
+}
+
 auto GLShadowMaps::StartFrame() -> void {
     for (auto& [_, shadow_map] : shadow_maps_) {
         shadow_map.touched = false;
     }
+}
+
+auto GLShadowMaps::GetProgram(bool instanced) -> GLProgram* {
+    return instanced ? prg_instanced_shadow_map_.get() : prg_shadow_map_.get();
 }
 
 auto GLShadowMaps::BindShadowMap(Light* light) -> std::expected<Camera*, std::string> {

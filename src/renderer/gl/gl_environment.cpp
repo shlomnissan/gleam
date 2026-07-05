@@ -12,14 +12,15 @@
 
 #include "core/shader_library.hpp"
 #include "renderer/gl/gl_program.hpp"
+#include "utilities/logger.hpp"
+#include "utilities/assert.hpp"
+
 #include "shaders/internal/headers/equirect_to_cube_frag.h"
 #include "shaders/internal/headers/equirect_to_cube_vert.h"
 #include "shaders/internal/headers/irradiance_cube_frag.h"
 #include "shaders/internal/headers/prefiltered_cube_frag.h"
 #include "shaders/internal/headers/screen_triangle_vert.h"
 #include "shaders/internal/headers/brdf_lut_frag.h"
-#include "utilities/logger.hpp"
-#include "utilities/assert.hpp"
 
 #include <algorithm>
 #include <array>
