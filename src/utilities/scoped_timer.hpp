@@ -23,8 +23,11 @@ public:
 
     using Clock = std::chrono::high_resolution_clock;
 
-    ScopedTimer(const std::string& label, Unit unit = Unit::Microseconds) :
-        label_(label), unit_(unit) {}
+    ScopedTimer(
+        const std::string& label,
+        Unit unit = Unit::Microseconds,
+        LogLevel level = LogLevel::Debug
+    ) : label_(label), unit_(unit), level_(level) {}
 
     auto Stop() {
         if (is_running_) {
@@ -33,11 +36,11 @@ public:
             const auto delta = end - start_;
             if (unit_ == Unit::Microseconds) {
                 const auto duration = std::chrono::duration_cast<std::chrono::microseconds>(delta);
-                Logger::Log(LogLevel::Debug, "{}: {} µs", label_, duration.count());
+                Logger::Log(level_, "{}: {} µs", label_, duration.count());
             }
             if (unit_ == Unit::Milliseconds) {
                 const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(delta);
-                Logger::Log(LogLevel::Debug, "{}: {} ms", label_, duration.count());
+                Logger::Log(level_, "{}: {} ms", label_, duration.count());
             }
         }
     }
@@ -49,6 +52,7 @@ public:
 private:
     std::string label_;
     Unit unit_;
+    LogLevel level_;
     Clock::time_point start_ {Clock::now()};
     bool is_running_ {true};
 };

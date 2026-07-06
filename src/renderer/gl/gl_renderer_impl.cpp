@@ -23,6 +23,7 @@
 #include "core/program_attributes.hpp"
 #include "core/render_lists.hpp"
 #include "utilities/logger.hpp"
+#include "utilities/scoped_timer.hpp"
 
 #include <glad/glad.h>
 
@@ -48,6 +49,14 @@ Renderer::Impl::Impl(const Renderer::Parameters& params)
 }
 
 auto Renderer::Impl::Initialize() -> std::expected<void, std::string> {
+#if !defined(NDEBUG)
+    const auto timer = ScopedTimer(
+        "Renderer initialization time",
+        ScopedTimer::Unit::Milliseconds,
+        LogLevel::Info
+    );
+#endif
+
     const auto& info = gl::driver_info();
     Logger::Log(LogLevel::Info, "Vendor: {}", info.vendor);
     Logger::Log(LogLevel::Info, "Renderer: {}", info.renderer);
