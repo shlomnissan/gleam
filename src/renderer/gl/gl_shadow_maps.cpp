@@ -30,67 +30,41 @@ namespace {
 
 constexpr float border[] = {1.0f, 1.0f, 1.0f, 1.0f};
 
-auto allocate_resources(GLShadowMap& shadow_map) -> std::expected<void, std::string> {
-    glGenFramebuffers(1, &shadow_map.buffer_id);
-    if (shadow_map.buffer_id == 0) {
-        return std::unexpected("Failed to generate shadow map framebuffer");
-    }
+auto allocate_texture_array(int count, unsigned int max_map_size) -> std::expected<GLuint, std::string> {
+    GLuint texture_id {0};
 
-    glGenTextures(1, &shadow_map.texture_id);
-    if (shadow_map.texture_id == 0) {
+    glGenTextures(1, &texture_id);
+    if (texture_id == 0) {
         return std::unexpected("Failed to generate shadow map texture");
     }
 
-    glBindTexture(GL_TEXTURE_2D, shadow_map.texture_id);
-    glTexImage2D(
-        GL_TEXTURE_2D,
+    glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
+    glTexImage3D(
+        GL_TEXTURE_2D_ARRAY,
         0,
         GL_DEPTH_COMPONENT24,
-        shadow_map.map_size,
-        shadow_map.map_size,
+        max_map_size,
+        max_map_size,
+        count,
         0,
         GL_DEPTH_COMPONENT,
         GL_FLOAT,
         nullptr
     );
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, border);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, shadow_map.buffer_id);
-    glFramebufferTexture2D(
-        GL_FRAMEBUFFER,
-        GL_DEPTH_ATTACHMENT,
-        GL_TEXTURE_2D,
-        shadow_map.texture_id,
-        0
-    );
-
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        return std::unexpected("Shadow map framebuffer is incomplete");
-    }
-
-    return {};
-}
-
-auto deallocate_resources(GLShadowMap& shadow_map) {
-    if (shadow_map.buffer_id != 0) glDeleteFramebuffers(1, &shadow_map.buffer_id);
-    if (shadow_map.texture_id != 0) glDeleteTextures(1, &shadow_map.texture_id);
-
-    shadow_map.buffer_id = 0;
-    shadow_map.texture_id = 0;
+    return texture_id;
 }
 
 auto update_camera(Light* light, Camera* camera) -> void {
@@ -145,17 +119,52 @@ auto GLShadowMaps::Initialize() -> std::expected<void, std::string> {
         return std::unexpected("Unable to create instanced shadow map program");
     }
 
+    glGenFramebuffers(1, &buffer_id_);
+    if (buffer_id_ == 0) {
+        return std::unexpected("Failed to generate shadow map framebuffer");
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, buffer_id_);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     return {};
 }
 
-auto GLShadowMaps::StartFrame() -> void {
+auto GLShadowMaps::StartFrame(int count, unsigned int max_map_size) -> std::expected<void, std::string> {
+    if (count != count_ || max_map_size != max_map_size_) {
+        if (texture_id_ != 0) {
+            glDeleteTextures(1, &texture_id_);
+            texture_id_ = 0;
+            count_ = 0;
+        }
+
+        auto result = allocate_texture_array(count, max_map_size);
+        if (!result.has_value()) {
+            return std::unexpected(result.error());
+        }
+
+        texture_id_ = result.value();
+        count_ = count;
+        max_map_size_ = max_map_size;
+    }
+
+    curr_idx_ = 0;
+
     for (auto& [_, shadow_map] : shadow_maps_) {
         shadow_map.touched = false;
     }
+
+    return {};
 }
 
 auto GLShadowMaps::GetProgram(bool instanced) -> GLProgram* {
     return instanced ? prg_instanced_shadow_map_.get() : prg_shadow_map_.get();
+}
+
+auto GLShadowMaps::GetTextureId() const -> unsigned int {
+    return texture_id_;
 }
 
 auto GLShadowMaps::BindShadowMap(Light* light) -> std::expected<Camera*, std::string> {
@@ -181,33 +190,36 @@ auto GLShadowMaps::BindShadowMap(Light* light) -> std::expected<Camera*, std::st
     auto& entry = it->second;
     update_camera(light, entry.camera.get());
 
-    if (entry.map_size != config->map_size || entry.buffer_id == 0) {
-        entry.map_size = config->map_size;
-        deallocate_resources(entry);
-        if (auto res = allocate_resources(entry); !res.has_value()) {
-            return std::unexpected(res.error());
-        }
-    }
+    glBindFramebuffer(GL_FRAMEBUFFER, buffer_id_);
+    glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, texture_id_, 0, curr_idx_);
 
     entry.touched = true;
+    entry.map_idx = curr_idx_++;
 
-    glBindFramebuffer(GL_FRAMEBUFFER, entry.buffer_id);
+#if !defined(NDEBUG)
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        return std::unexpected("Shadow map framebuffer is incomplete");
+    }
+#endif
+
     return entry.camera.get();
 }
 
 auto GLShadowMaps::EndFrame() -> void {
-    for (auto& [_, entry] : shadow_maps_) {
-        if (!entry.touched) deallocate_resources(entry);
-    }
-
     std::erase_if(shadow_maps_, [](const auto& entry) {
         return !entry.second.touched;
     });
 }
 
 GLShadowMaps::~GLShadowMaps() {
-    for (auto& [_, entry] : shadow_maps_) {
-        deallocate_resources(entry);
+    if (buffer_id_ != 0) {
+        glDeleteFramebuffers(1, &buffer_id_);
+        buffer_id_ = 0;
+    }
+
+    if (texture_id_ != 0) {
+        glDeleteTextures(1, &texture_id_);
+        texture_id_ = 0;
     }
 }
 

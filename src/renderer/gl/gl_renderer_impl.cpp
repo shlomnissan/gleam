@@ -412,13 +412,23 @@ auto Renderer::Impl::ProcessLights(Camera* camera) -> void {
 }
 
 auto Renderer::Impl::RenderShadowMaps(Scene* scene) -> void {
-    shadow_maps_.StartFrame();
-    for (auto light : render_lists_->Lights()) {
-        auto shadow = light->GetShadow();
-        if (shadow == nullptr) {
-            continue;
-        }
+    auto lights = std::vector<Light*> {};
+    auto max_map_size = 0u;
 
+    for (auto light : render_lists_->Lights()) {
+        if (light->GetShadow() == nullptr) continue;
+        lights.emplace_back(light);
+        max_map_size = std::max(max_map_size, light->GetShadow()->map_size);
+    }
+
+    auto result = shadow_maps_.StartFrame(static_cast<int>(lights.size()), max_map_size);
+    if (!result.has_value()) {
+        Logger::Log(LogLevel::Error, "{}", result.error());
+        return;
+    }
+
+    for (auto light : lights) {
+        auto shadow = light->GetShadow();
         auto result = shadow_maps_.BindShadowMap(light);
         if (!result.has_value()) {
             Logger::Log(LogLevel::Error, "{}", result.error());
@@ -426,10 +436,54 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene) -> void {
         }
 
         auto camera = result.value();
-        shadow_render_lists_->ProcessScene(scene, camera, false);
 
-        // TODO: render scene
+        state_.SetViewport(0, 0, shadow->map_size, shadow->map_size);
+        state_.SetDepthTest(true);
+        state_.SetDepthWrites(true);
+
+        glClear(GL_DEPTH_BUFFER_BIT);
+
+        shadow_render_lists_->ProcessScene(scene, camera, false);
+        camera_ubo_.Update(camera->projection_matrix, camera->view_matrix);
+
+        for (auto renderable : shadow_render_lists_->Opaque()) {
+            if (!renderable->cast_shadow) continue;
+
+            auto geometry = renderable->GetGeometry();
+            if (geometry->primitive != Geometry::PrimitiveType::Triangles) {
+                continue;
+            }
+
+            auto is_instanced = renderable->GetNodeType() == Node::Type::InstancedMesh;
+            auto program = shadow_maps_.GetProgram(is_instanced);
+            auto model = renderable->GetWorldTransform();
+
+            state_.SetBackfaceCulling(!renderable->GetMaterial()->two_sided);
+            state_.UseProgram(program->Id());
+
+            program->SetUniform(Uniform::Model, &model);
+            program->UpdateUniforms();
+
+            const auto index_size = geometry->IndexData().size();
+            const auto vertex_size = geometry->VertexCount();
+
+            vertex_buffers_.Bind(geometry);
+
+            if (is_instanced) {
+                const auto instanced = static_cast<InstancedMesh*>(renderable);
+                const auto count = instanced->Count();
+                vertex_buffers_.BindInstancedMesh(instanced);
+                index_size
+                    ? glDrawElementsInstanced(GL_TRIANGLES, index_size, GL_UNSIGNED_INT, nullptr, count)
+                    : glDrawArraysInstanced(GL_TRIANGLES, 0, vertex_size, count);
+            } else {
+                index_size
+                    ? glDrawElements(GL_TRIANGLES, index_size, GL_UNSIGNED_INT, nullptr)
+                    : glDrawArrays(GL_TRIANGLES, 0, vertex_size);
+            }
+        }
     }
+
     shadow_maps_.EndFrame();
 }
 

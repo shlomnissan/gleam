@@ -19,9 +19,7 @@ class Light;
 class Camera;
 
 struct GLShadowMap {
-    unsigned int buffer_id;
-    unsigned int texture_id;
-    unsigned int map_size;
+    unsigned int map_idx;
 
     std::unique_ptr<Camera> camera;
 
@@ -42,9 +40,11 @@ public:
 
     auto Initialize() -> std::expected<void, std::string>;
 
-    auto StartFrame() -> void;
-
     auto GetProgram(bool instanced) -> GLProgram*;
+
+    auto GetTextureId() const -> unsigned int;
+
+    [[nodiscard]] auto StartFrame(int count, unsigned int max_map_size) -> std::expected<void, std::string>;
 
     [[nodiscard]] auto BindShadowMap(Light* light) -> std::expected<Camera*, std::string>;
 
@@ -57,6 +57,13 @@ private:
 
     std::unique_ptr<GLProgram> prg_shadow_map_;
     std::unique_ptr<GLProgram> prg_instanced_shadow_map_;
+
+    unsigned int curr_idx_ {0};
+    unsigned int max_map_size_ {0u};
+    unsigned int texture_id_ {0};
+    unsigned int buffer_id_ {0};
+
+    int count_ {0};
 };
 
 }
