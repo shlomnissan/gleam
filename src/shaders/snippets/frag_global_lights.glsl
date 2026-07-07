@@ -21,6 +21,9 @@ struct Light {
     float ConeCos;
     float PenumbraCos;
     float Range;
+    int ShadowLayerIndex;
+    float ShadowBias;
+    mat4 ShadowTransform;
 };
 
 layout(std140) uniform ub_Lights {

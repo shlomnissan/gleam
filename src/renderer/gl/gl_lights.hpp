@@ -11,6 +11,7 @@
 
 #include "vglx/cameras/camera.hpp"
 #include "vglx/math/color.hpp"
+#include "vglx/math/matrix4.hpp"
 #include "vglx/math/vector3.hpp"
 
 #include "renderer/gl/gl_uniform_buffer.hpp"
@@ -25,13 +26,16 @@ public:
     static constexpr auto kMaxLights = 10;
 
     struct alignas(16) UniformLight {
-        alignas(4)  int type {0};
+        alignas(4) int type {0};
         alignas(16) Color color {0xFFFFFF};
         alignas(16) Vector3 position {Vector3::Zero()};
         alignas(16) Vector3 direction {Vector3::Zero()};
         alignas(4) float cone_cos {0.0f};
         alignas(4) float penumbra_cos {0.0f};
         alignas(4) float range {0.0f};
+        alignas(4) int shadow_layer_index {-1};
+        alignas(4) float shadow_bias {0.0f};
+        alignas(16) Matrix4 shadow_transform {Matrix4::Identity()};
     };
 
     struct alignas(16) UniformLights {
