@@ -90,9 +90,9 @@ auto main() -> int {
     auto scene = std::make_unique<Scene>();
 
     scene.get()->Add(vglx::OrbitControls::Create(camera.get(), {
-        .target = scene->mesh->transform.position,
         .radius = 4.0f,
-        .pitch = 0.25f
+        .pitch = 0.25f,
+        .target = scene->mesh->transform.position
     }));
 
     return run_example(scene.get(), camera.get(), {
