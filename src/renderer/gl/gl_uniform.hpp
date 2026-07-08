@@ -40,16 +40,19 @@ enum class Uniform {
     AlphaMap,
     AmbientLight,
     Anchor,
+    BrdfLut,
     Color,
     EmissiveColor,
     EmissiveIntensity,
     EmissiveMap,
+    EnvironmentIntensity,
     EnvironmentMap,
     FogColor,
     FogDensity,
     FogFar,
     FogNear,
     FogType,
+    IrradianceMap,
     MaterialColor,
     MaterialDiffuseColor,
     MaterialMetallic,
@@ -61,10 +64,13 @@ enum class Uniform {
     NormalIntensity,
     NormalMap,
     Opacity,
+    PrefilteredMap,
+    PrefilteredMaxLod,
     Reflectivity,
     Resolution,
     Rotation,
     RoughnessMap,
+    ShadowMaps,
     SpecularMap,
     TextureMap,
     TextureTransform,
@@ -79,16 +85,19 @@ constexpr auto get_uniform_loc(std::string_view str) {
     if (str == "u_AlphaMap") return static_cast<int>(AlphaMap);
     if (str == "u_AmbientLight") return static_cast<int>(AmbientLight);
     if (str == "u_Anchor") return static_cast<int>(Anchor);
+    if (str == "u_BrdfLut") return static_cast<int>(BrdfLut);
     if (str == "u_Color") return static_cast<int>(Color);
     if (str == "u_EmissiveColor") return static_cast<int>(EmissiveColor);
     if (str == "u_EmissiveIntensity") return static_cast<int>(EmissiveIntensity);
     if (str == "u_EmissiveMap") return static_cast<int>(EmissiveMap);
+    if (str == "u_EnvironmentIntensity") return static_cast<int>(EnvironmentIntensity);
     if (str == "u_EnvironmentMap") return static_cast<int>(EnvironmentMap);
     if (str == "u_Fog.Color") return static_cast<int>(FogColor);
     if (str == "u_Fog.Density") return static_cast<int>(FogDensity);
     if (str == "u_Fog.Far") return static_cast<int>(FogFar);
     if (str == "u_Fog.Near") return static_cast<int>(FogNear);
     if (str == "u_Fog.Type") return static_cast<int>(FogType);
+    if (str == "u_IrradianceMap") return static_cast<int>(IrradianceMap);
     if (str == "u_Material.Color") return static_cast<int>(MaterialColor);
     if (str == "u_Material.DiffuseColor") return static_cast<int>(MaterialDiffuseColor);
     if (str == "u_Material.Metallic") return static_cast<int>(MaterialMetallic);
@@ -100,10 +109,13 @@ constexpr auto get_uniform_loc(std::string_view str) {
     if (str == "u_NormalIntensity") return static_cast<int>(NormalIntensity);
     if (str == "u_NormalMap") return static_cast<int>(NormalMap);
     if (str == "u_Opacity") return static_cast<int>(Opacity);
+    if (str == "u_PrefilteredMap") return static_cast<int>(PrefilteredMap);
+    if (str == "u_PrefilteredMaxLod") return static_cast<int>(PrefilteredMaxLod);
     if (str == "u_Reflectivity") return static_cast<int>(Reflectivity);
     if (str == "u_Resolution") return static_cast<int>(Resolution);
     if (str == "u_Rotation") return static_cast<int>(Rotation);
     if (str == "u_RoughnessMap") return static_cast<int>(RoughnessMap);
+    if (str == "u_ShadowMaps") return static_cast<int>(ShadowMaps);
     if (str == "u_SpecularMap") return static_cast<int>(SpecularMap);
     if (str == "u_TextureMap") return static_cast<int>(TextureMap);
     if (str == "u_TextureTransform") return static_cast<int>(TextureTransform);

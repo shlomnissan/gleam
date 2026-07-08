@@ -277,13 +277,13 @@ auto Renderer::Impl::SetUniforms(
             const auto brdf_lut_unit = std::to_underlying(GLTextureMapType::BrdfLutMap);
             const auto prefiltered_max_lod = static_cast<float>(env_maps_.prefiltered_mips - 1);
 
-            program->SetUniform("u_IrradianceMap", &irradiance_unit);
-            program->SetUniform("u_PrefilteredMap", &prefiltered_unit);
-            program->SetUniform("u_BrdfLut", &brdf_lut_unit);
-            program->SetUniform("u_PrefilteredMaxLod", &prefiltered_max_lod);
+            program->SetUniform(Uniform::IrradianceMap, &irradiance_unit);
+            program->SetUniform(Uniform::PrefilteredMap, &prefiltered_unit);
+            program->SetUniform(Uniform::BrdfLut, &brdf_lut_unit);
+            program->SetUniform(Uniform::PrefilteredMaxLod, &prefiltered_max_lod);
 
             const auto env_intensity = scene->environment_intensity * m->environment_intensity;
-            program->SetUniform("u_EnvironmentIntensity", &env_intensity);
+            program->SetUniform(Uniform::EnvironmentIntensity, &env_intensity);
         }
 
         if (lights_.HasLights()) {
@@ -296,7 +296,7 @@ auto Renderer::Impl::SetUniforms(
                 auto tex_unit = std::to_underlying(GLTextureMapType::ShadowMap);
                 glActiveTexture(GL_TEXTURE0 + tex_unit);
                 glBindTexture(GL_TEXTURE_2D_ARRAY, shadow_maps_.GetTextureId());
-                program->SetUniform("u_ShadowMaps", &tex_unit);
+                program->SetUniform(Uniform::ShadowMaps, &tex_unit);
             }
         }
 
@@ -340,7 +340,7 @@ auto Renderer::Impl::SetUniforms(
                 auto tex_unit = std::to_underlying(GLTextureMapType::ShadowMap);
                 glActiveTexture(GL_TEXTURE0 + tex_unit);
                 glBindTexture(GL_TEXTURE_2D_ARRAY, shadow_maps_.GetTextureId());
-                program->SetUniform("u_ShadowMaps", &tex_unit);
+                program->SetUniform(Uniform::ShadowMaps, &tex_unit);
             }
         }
 
