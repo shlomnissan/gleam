@@ -56,11 +56,6 @@ struct Vector3 {
     constexpr Vector3(float x, float y, float z) : x(x), y(y), z(z) {}
 
     /**
-     * @brief Returns a unit vector pointing forward.
-     */
-    [[nodiscard]] static constexpr auto Forward() -> Vector3 { return {0.0f, 0.0f, 1.0f}; }
-
-    /**
      * @brief Returns a unit vector pointing right.
      */
     [[nodiscard]] static constexpr auto Right() -> Vector3 { return {1.0f, 0.0f, 0.0f}; }
@@ -69,6 +64,11 @@ struct Vector3 {
      * @brief Returns a unit vector pointing up.
      */
     [[nodiscard]] static constexpr auto Up() -> Vector3 { return {0.0f, 1.0f, 0.0f}; }
+
+    /**
+     * @brief Returns a unit vector pointing forward.
+     */
+    [[nodiscard]] static constexpr auto Forward() -> Vector3 { return {0.0f, 0.0f, 1.0f}; }
 
     /**
      * @brief Returns the zero vector.
