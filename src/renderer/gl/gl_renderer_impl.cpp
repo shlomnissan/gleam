@@ -405,20 +405,28 @@ auto Renderer::Impl::ProcessLights(Camera* camera) -> void {
     lights_.Reset();
 
     for(auto light : render_lists_->Lights()) {
-        lights_.AddLight(light, camera);
+        GLShadowMap* shadow_map {shadow_maps_.GetShadowMap(light)};
+        if (shadow_map != nullptr) {
+            lights_.AddLight(light, camera, &shadow_map->transform, shadow_map->map_idx);
+        } else {
+            lights_.AddLight(light, camera);
+        }
     }
 
     if (lights_.HasLights()) lights_.Update();
 }
 
-auto Renderer::Impl::RenderShadowMaps(Scene* scene) -> void {
+auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
     auto lights = std::vector<Light*> {};
     auto max_map_size = 0u;
 
     for (auto light : render_lists_->Lights()) {
-        if (light->GetShadow() == nullptr) continue;
+        auto shadow = light->GetShadow();
+        if (shadow == nullptr) {
+            continue;
+        }
         lights.emplace_back(light);
-        max_map_size = std::max(max_map_size, light->GetShadow()->map_size);
+        max_map_size = std::max(max_map_size, shadow->map_size);
     }
 
     auto result = shadow_maps_.StartFrame(static_cast<int>(lights.size()), max_map_size);
@@ -429,7 +437,7 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene) -> void {
 
     for (auto light : lights) {
         auto shadow = light->GetShadow();
-        auto result = shadow_maps_.BindShadowMap(light);
+        auto result = shadow_maps_.BindShadowMap(light, camera);
         if (!result.has_value()) {
             Logger::Log(LogLevel::Error, "{}", result.error());
             continue;
@@ -502,7 +510,7 @@ auto Renderer::Impl::Render(Scene* scene, Camera* camera, RenderTarget* target) 
     render_lists_->ProcessScene(scene, camera);
 
     if (shadow_map_ != ShadowMap::None) {
-        RenderShadowMaps(scene);
+        RenderShadowMaps(scene, camera);
     }
 
     const auto use_default_target = target == nullptr;

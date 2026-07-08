@@ -106,7 +106,7 @@ private:
 
     auto RenderObject(Renderable* renderable, Scene* scene, Camera* camera) -> void;
 
-    auto RenderShadowMaps(Scene* scene) -> void;
+    auto RenderShadowMaps(Scene* scene, Camera* camera) -> void;
 
     auto SetUniforms(
         GLProgram* program,

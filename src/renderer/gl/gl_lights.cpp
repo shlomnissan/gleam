@@ -16,7 +16,12 @@
 
 namespace vglx {
 
-auto GLLights::AddLight(Light* light, Camera* camera) -> void {
+auto GLLights::AddLight(
+    Light* light,
+    Camera* camera,
+    Matrix4* shadow_transform,
+    int shadow_layer_index
+) -> void {
     using enum Light::Type;
 
     if (idx_ >= kMaxLights) {
@@ -42,6 +47,14 @@ auto GLLights::AddLight(Light* light, Camera* camera) -> void {
         auto& dst = lights_.lights[idx_++];
         dst.type = static_cast<unsigned>(light->GetType());
         dst.color = light->color * light->intensity;
+
+        dst.shadow_layer_index = -1;
+        auto shadow_params = light->GetShadow();
+        if (shadow_params && shadow_transform && shadow_layer_index != -1) {
+            dst.shadow_bias = shadow_params->bias;
+            dst.shadow_layer_index = shadow_layer_index;
+            dst.shadow_transform = *shadow_transform;
+        }
 
         switch(light->GetType()) {
             case Ambient: /* noop */ break;

@@ -159,15 +159,7 @@ auto GLShadowMaps::StartFrame(int count, unsigned int max_map_size) -> std::expe
     return {};
 }
 
-auto GLShadowMaps::GetProgram(bool instanced) -> GLProgram* {
-    return instanced ? prg_instanced_shadow_map_.get() : prg_shadow_map_.get();
-}
-
-auto GLShadowMaps::GetTextureId() const -> unsigned int {
-    return texture_id_;
-}
-
-auto GLShadowMaps::BindShadowMap(Light* light) -> std::expected<Camera*, std::string> {
+auto GLShadowMaps::BindShadowMap(Light* light, Camera* camera) -> std::expected<Camera*, std::string> {
     auto config = light->GetShadow();
     if (config == nullptr) {
         return std::unexpected("Failed to read shadow config from light source");
@@ -196,6 +188,27 @@ auto GLShadowMaps::BindShadowMap(Light* light) -> std::expected<Camera*, std::st
     entry.touched = true;
     entry.map_idx = curr_idx_++;
 
+    // Maps view-space positions to shadow map coordinates: light clip space
+    // via the light's view-projection, then a [-1,1] → [0,1] remap whose XY
+    // is scaled by map_size / max_map_size_ so lookups address this light's
+    // sub-viewport region within the full-size layer.
+
+    const auto scale = 0.5f
+        * static_cast<float>(config->map_size)
+        / static_cast<float>(max_map_size_);
+
+    const auto remap = Matrix4 {
+        scale, 0.0f,  0.0f, scale,
+        0.0f,  scale, 0.0f, scale,
+        0.0f,  0.0f,  0.5f, 0.5f,
+        0.0f,  0.0f,  0.0f, 1.0f
+    };
+
+    entry.transform = remap
+        * entry.camera->projection_matrix
+        * entry.camera->view_matrix
+        * camera->GetWorldTransform();
+
 #if !defined(NDEBUG)
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
         return std::unexpected("Shadow map framebuffer is incomplete");
@@ -203,6 +216,27 @@ auto GLShadowMaps::BindShadowMap(Light* light) -> std::expected<Camera*, std::st
 #endif
 
     return entry.camera.get();
+}
+
+auto GLShadowMaps::GetShadowMap(Light* light) -> GLShadowMap* {
+    auto it = std::ranges::find_if(shadow_maps_,
+        [&light](Light* key) { return key == light; },
+        &std::pair<Light*, GLShadowMap>::first
+    );
+
+    if (it == shadow_maps_.end()) {
+        return nullptr;
+    }
+
+    return &it->second;
+}
+
+auto GLShadowMaps::GetProgram(bool instanced) -> GLProgram* {
+    return instanced ? prg_instanced_shadow_map_.get() : prg_shadow_map_.get();
+}
+
+auto GLShadowMaps::GetTextureId() const -> unsigned int {
+    return texture_id_;
 }
 
 auto GLShadowMaps::EndFrame() -> void {

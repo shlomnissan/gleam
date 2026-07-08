@@ -59,7 +59,12 @@ public:
     GLLights(GLLights&&) = delete;
     auto operator=(GLLights&&) -> GLLights& = delete;
 
-    auto AddLight(Light* light, Camera* camera) -> void;
+    auto AddLight(
+        Light* light,
+        Camera* camera,
+        Matrix4* shadow_transform = nullptr,
+        int shadow_layer_index = -1
+    ) -> void;
 
     auto HasLights() const -> bool;
 

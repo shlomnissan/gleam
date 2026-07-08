@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "vglx/math/matrix4.hpp"
+
 #include <expected>
 #include <memory>
 #include <string>
@@ -20,6 +22,8 @@ class Camera;
 
 struct GLShadowMap {
     unsigned int map_idx;
+
+    Matrix4 transform {Matrix4::Identity()};
 
     std::unique_ptr<Camera> camera;
 
@@ -40,13 +44,15 @@ public:
 
     auto Initialize() -> std::expected<void, std::string>;
 
-    auto GetProgram(bool instanced) -> GLProgram*;
-
-    auto GetTextureId() const -> unsigned int;
-
     [[nodiscard]] auto StartFrame(int count, unsigned int max_map_size) -> std::expected<void, std::string>;
 
-    [[nodiscard]] auto BindShadowMap(Light* light) -> std::expected<Camera*, std::string>;
+    [[nodiscard]] auto BindShadowMap(Light* light, Camera* camera) -> std::expected<Camera*, std::string>;
+
+    [[nodiscard]] auto GetShadowMap(Light* light) -> GLShadowMap*;
+
+    [[nodiscard]] auto GetProgram(bool instanced) -> GLProgram*;
+
+    [[nodiscard]] auto GetTextureId() const -> unsigned int;
 
     auto EndFrame() -> void;
 
