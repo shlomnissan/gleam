@@ -49,6 +49,8 @@ public:
     uint8_t point {0};
     uint8_t spot {0};
 
+    bool has_shadow_casters {false};
+
     GLLights() = default;
 
     // delete copy constructor and assignment operator

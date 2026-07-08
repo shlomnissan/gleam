@@ -20,7 +20,7 @@ namespace vglx {
 
 ProgramAttributes::ProgramAttributes(
     Renderable* renderable,
-    const LightsCounter& lights,
+    const LightInfo& lights,
     const Scene* scene
 ) {
     auto geometry = renderable->GetGeometry().get();
@@ -39,6 +39,7 @@ ProgramAttributes::ProgramAttributes(
         normal_map = m->normal_map != nullptr;
         roughness_map = m->roughness_map != nullptr;
         ibl = scene->environment != nullptr;
+        shadow_maps = lights.enable_shadow_maps;
     }
 
     if (type == Material::Type::PhongMaterial) {
@@ -51,6 +52,7 @@ ProgramAttributes::ProgramAttributes(
         environment_map = m->environment_map != nullptr;
         normal_map = m->normal_map != nullptr;
         specular_map = m->specular_map != nullptr;
+        shadow_maps = lights.enable_shadow_maps;
     }
 
     auto shader_material_id = 0;
@@ -108,6 +110,7 @@ ProgramAttributes::ProgramAttributes(
     key |= (ao_map ? 1ULL : 0ULL) << 32; // 1 bit
     key |= (environment_map ? 1ULL : 0ULL) << 33; // 1 bit
     key |= (ibl ? 1ULL : 0ULL) << 34; // 1 bit
+    key |= (shadow_maps ? 1ULL : 0ULL) << 35; // 1 bit
 
     if (type == Material::Type::ShaderMaterial) {
         math::HashCombine(key, shader_material_id);

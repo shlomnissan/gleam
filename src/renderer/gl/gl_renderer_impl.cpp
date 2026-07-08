@@ -127,7 +127,8 @@ auto Renderer::Impl::RenderObject(Renderable* renderable, Scene* scene, Camera* 
     auto attrs = ProgramAttributes {renderable, {
         .directional = lights_.directional,
         .point = lights_.point,
-        .spot = lights_.spot
+        .spot = lights_.spot,
+        .enable_shadow_maps = shadow_map_ != ShadowMap::None && lights_.has_shadow_casters,
     }, scene};
 
     auto program = programs_.GetProgram(attrs);
@@ -290,6 +291,13 @@ auto Renderer::Impl::SetUniforms(
             program->SetUniform(Uniform::MaterialColor, &m->color);
             program->SetUniform(Uniform::MaterialMetallic, &m->metallic);
             program->SetUniform(Uniform::MaterialRoughness, &m->roughness);
+
+            if (attrs->shadow_maps) {
+                auto tex_unit = std::to_underlying(GLTextureMapType::ShadowMap);
+                glActiveTexture(GL_TEXTURE0 + tex_unit);
+                glBindTexture(GL_TEXTURE_2D_ARRAY, shadow_maps_.GetTextureId());
+                program->SetUniform("u_ShadowMaps", &tex_unit);
+            }
         }
 
         program->SetUniform(Uniform::EmissiveColor, &m->emissive_color);
@@ -327,6 +335,13 @@ auto Renderer::Impl::SetUniforms(
             program->SetUniform(Uniform::MaterialDiffuseColor, &m->color);
             program->SetUniform(Uniform::MaterialSpecularColor, &m->specular_color);
             program->SetUniform(Uniform::MaterialShininess, &m->shininess);
+
+            if (attrs->shadow_maps) {
+                auto tex_unit = std::to_underlying(GLTextureMapType::ShadowMap);
+                glActiveTexture(GL_TEXTURE0 + tex_unit);
+                glBindTexture(GL_TEXTURE_2D_ARRAY, shadow_maps_.GetTextureId());
+                program->SetUniform("u_ShadowMaps", &tex_unit);
+            }
         }
 
         program->SetUniform(Uniform::EmissiveColor, &m->emissive_color);

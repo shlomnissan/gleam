@@ -51,6 +51,7 @@ auto GLLights::AddLight(
         dst.shadow_layer_index = -1;
         auto shadow_params = light->GetShadow();
         if (shadow_params && shadow_transform && shadow_layer_index != -1) {
+            has_shadow_casters = true;
             dst.shadow_bias = shadow_params->bias;
             dst.shadow_layer_index = shadow_layer_index;
             dst.shadow_transform = *shadow_transform;
@@ -114,6 +115,7 @@ auto GLLights::Reset() -> void {
     directional = 0;
     point = 0;
     spot = 0;
+    has_shadow_casters = false;
 }
 
 }

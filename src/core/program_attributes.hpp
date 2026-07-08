@@ -17,10 +17,11 @@
 namespace vglx {
 
 struct ProgramAttributes {
-    struct LightsCounter {
+    struct LightInfo {
         uint8_t directional {0};
         uint8_t point {0};
         uint8_t spot {0};
+        bool enable_shadow_maps {false};
     };
 
     std::size_t key {0};
@@ -53,10 +54,11 @@ struct ProgramAttributes {
     bool size_attenuation {false};
     bool specular_map {false};
     bool texture_map {false};
+    bool shadow_maps {false};
 
     ProgramAttributes(
         Renderable* renderable,
-        const LightsCounter& lights,
+        const LightInfo& lights,
         const Scene* scene
     );
 };

@@ -23,12 +23,15 @@ UniformType ToUniformType(GLenum type) {
         case GL_FLOAT_VEC3: return UniformType::Vector3;
         case GL_FLOAT_VEC4: return UniformType::Vector4;
         case GL_INT: return UniformType::Int;
+        case GL_INT_SAMPLER_2D:
         case GL_SAMPLER_2D:
         case GL_SAMPLER_2D_ARRAY:
+        case GL_SAMPLER_2D_ARRAY_SHADOW:
         case GL_SAMPLER_2D_SHADOW:
         case GL_SAMPLER_3D:
         case GL_SAMPLER_CUBE:
-        case GL_INT_SAMPLER_2D:
+        case GL_SAMPLER_CUBE_MAP_ARRAY:
+        case GL_SAMPLER_CUBE_MAP_ARRAY_SHADOW:
         case GL_UNSIGNED_INT_SAMPLER_2D:
             return UniformType::Sampler;
         default: return UniformType::Unsupported;

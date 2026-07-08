@@ -41,6 +41,10 @@ uniform sampler2D u_AOMap;
     uniform float u_EnvironmentIntensity;
 #endif
 
+#ifdef USE_SHADOW_MAPS
+    uniform sampler2DArrayShadow u_ShadowMaps;
+#endif
+
 const float PI = 3.14159265358979;
 
 float distributionGGX(float NoH, float alpha) {
