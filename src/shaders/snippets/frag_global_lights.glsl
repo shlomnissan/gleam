@@ -11,6 +11,13 @@ included inside an #if NUM_LIGHTS > 0 block, after NUM_LIGHTS is defined.
 - @param const in Light light - The light whose range controls the cutoff
 - @return float - Factor to multiply with the light's contribution
 
+@func float shadowFactor(const in Light light)
+- @desc Samples the light's shadow map with a hardware-filtered depth compare;
+  returns 1.0 when the fragment is lit, 0.0 when fully shadowed. Always 1.0
+  when the fragment does not receive shadows or the light does not cast them
+- @param const in Light light - The light whose shadow map is sampled
+- @return float - Factor to multiply with the light's contribution
+
 */
 
 struct Light {
@@ -43,3 +50,25 @@ float attenuation(const in float dist, const in Light light) {
     }
     return atten;
 }
+
+#ifdef USE_SHADOW_MAPS
+float shadowFactor(const in Light light) {
+    if (!u_ReceiveShadow || light.ShadowLayerIndex < 0) {
+        return 1.0;
+    }
+
+    vec4 coord = light.ShadowTransform * v_Position;
+    vec3 proj = coord.xyz / coord.w;
+    if (proj.z > 1.0) {
+        return 1.0;
+    }
+
+    float ref = proj.z - light.ShadowBias;
+
+    return texture(u_ShadowMaps, vec4(proj.xy, float(light.ShadowLayerIndex), ref));
+}
+#else
+float shadowFactor(const in Light light) {
+    return 1.0;
+}
+#endif

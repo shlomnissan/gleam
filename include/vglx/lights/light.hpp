@@ -28,7 +28,11 @@ namespace vglx {
  */
 struct Shadow {
     /**
-     * @brief Constant depth bias applied to shadow compare.
+     * @brief Constant depth bias applied to the shadow compare.
+     *
+     * Positive values push the compare toward the light, reducing
+     * self-shadowing artifacts. Overly large values cause shadows
+     * to visibly detach from their casters.
      */
     float bias {0.0f};
 

@@ -28,7 +28,8 @@ auto run_example(vglx::Scene* scene, vglx::Camera* camera, const ExampleSettings
         .sample_count = kSampleCount,
         .clear_color = settings.clear_color,
         .tone_mapping = settings.tone_mapping,
-        .exposure = settings.exposure
+        .exposure = settings.exposure,
+        .shadow_map = settings.shadow_map
     }};
 
     if (auto result = renderer.Initialize(); !result.has_value()) {

@@ -104,7 +104,7 @@ vec3 processLights(
             float angle_cos = dot(light_dir, light.Direction);
             if (angle_cos > light.ConeCos) {
                 vec3 spot_color = light.Color * smoothstep(light.ConeCos, light.PenumbraCos, angle_cos);
-                output_color += attenuation(dist, light) * phongShading(
+                output_color += shadowFactor(light) * attenuation(dist, light) * phongShading(
                     light_dir,
                     spot_color,
                     normal,

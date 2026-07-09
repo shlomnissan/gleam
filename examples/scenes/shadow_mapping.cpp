@@ -55,7 +55,7 @@ struct Scene : public vglx::Scene {
         spot->transform.Translate({8.0f, 10.0f, 5.0f});
         spot->cast_shadow = true;
         spot->target = mesh;
-        spot->shadow.map_size = 256;
+        spot->shadow.map_size = 1024;
         spot->shadow.bias = 0.002f;
         spot->shadow.far = 20.0f;
 
