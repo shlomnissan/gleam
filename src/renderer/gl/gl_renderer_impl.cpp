@@ -297,6 +297,7 @@ auto Renderer::Impl::SetUniforms(
                 glActiveTexture(GL_TEXTURE0 + tex_unit);
                 glBindTexture(GL_TEXTURE_2D_ARRAY, shadow_maps_.GetTextureId());
                 program->SetUniform(Uniform::ShadowMaps, &tex_unit);
+                program->SetUniform(Uniform::ReceiveShadow, &renderable->receive_shadow);
             }
         }
 
@@ -341,6 +342,7 @@ auto Renderer::Impl::SetUniforms(
                 glActiveTexture(GL_TEXTURE0 + tex_unit);
                 glBindTexture(GL_TEXTURE_2D_ARRAY, shadow_maps_.GetTextureId());
                 program->SetUniform(Uniform::ShadowMaps, &tex_unit);
+                program->SetUniform(Uniform::ReceiveShadow, &renderable->receive_shadow);
             }
         }
 

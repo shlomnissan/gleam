@@ -37,10 +37,6 @@ uniform sampler2D u_NormalMap;
 uniform sampler2D u_SpecularMap;
 uniform sampler2D u_EmissiveMap;
 
-#ifdef USE_SHADOW_MAPS
-    uniform sampler2DArrayShadow u_ShadowMaps;
-#endif
-
 vec3 phongShading(
     const in vec3 light_dir,
     const in vec3 light_color,

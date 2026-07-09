@@ -26,6 +26,11 @@ struct Light {
     mat4 ShadowTransform;
 };
 
+#ifdef USE_SHADOW_MAPS
+    uniform sampler2DArrayShadow u_ShadowMaps;
+    uniform bool u_ReceiveShadow;
+#endif
+
 layout(std140) uniform ub_Lights {
     Light u_Lights[NUM_LIGHTS];
 };
