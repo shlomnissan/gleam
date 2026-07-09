@@ -29,7 +29,7 @@ namespace vglx {
  *
  * @code
  * auto scene = vglx::Scene::Create();
- * scene->fog = vglx::Fog::CreateExponential(0x444444, 0.3f);
+ * scene->fog = vglx::Fog::CreateExponential({.color = 0x444444, .density = 0.3f});
  *
  * scene->Add(vglx::Mesh::Create(
  *   vglx::BoxGeometry::Create(),

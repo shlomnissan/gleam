@@ -24,10 +24,17 @@ namespace vglx {
  *
  * @code
  * // Adds linear fog to scene
- * my_scene->fog = Fog::CreateLinear(0x444444, 2.0f, 6.0f);
+ * my_scene->fog = Fog::CreateLinear({
+ *   .color = 0x444444,
+ *   .near = 2.0f,
+ *   .far = 6.0f
+ * });
  *
  * // Adds exponential fog to scene
- * my_scene->fog = Fog::CreateExponential(0x444444, 0.3f);
+ * my_scene->fog = Fog::CreateExponential({
+ *   .color = 0x444444,
+ *   .density = 0.3f
+ * });
  * @endcode
  *
  * @ingroup SceneGroup
@@ -43,6 +50,23 @@ struct Fog {
     enum class Type {
         Linear, ///< Depth-based fog using a near and far distance range.
         Exponential, ///< Density-based fog using a continuous falloff curve.
+    };
+
+    /**
+     * @brief Parameters for constructing a linear @ref Fog object.
+     */
+    struct LinearParameters {
+        Color color = 0xFFFFFF; ///< Fog color.
+        float near = 1.0f; ///< Distance at which fog begins to appear.
+        float far = 1000.0f; ///< Distance at which fog reaches full intensity.
+    };
+
+    /**
+     * @brief Parameters for constructing an exponential @ref Fog object.
+     */
+    struct ExponentialParameters {
+        Color color = 0xFFFFFF; ///< Fog color.
+        float density = 0.00025f; ///< Exponential density factor (higher values produce thicker fog).
     };
 
     Type type; ///< Fog attenuation model.
@@ -67,14 +91,12 @@ struct Fog {
      * direction, typically using a factor similar to
      * $f(d) = \\mathrm{clamp}((d - near) / (far - near), 0, 1)$.
      *
-     * @param color Fog color.
-     * @param near Distance at which fog begins to appear.
-     * @param far Distance at which fog reaches full intensity.
+     * @param params @ref Fog::LinearParameters "Initialization parameters".
      */
-    [[nodiscard]] static auto CreateLinear(const Color& color, float near, float far) -> Fog {
-        auto out = Fog {Type::Linear, color};
-        out.near = near;
-        out.far = far;
+    [[nodiscard]] static auto CreateLinear(const LinearParameters& params) -> Fog {
+        auto out = Fog {Type::Linear, params.color};
+        out.near = params.near;
+        out.far = params.far;
         return out;
     }
 
@@ -85,12 +107,11 @@ struct Fog {
      * typically with a factor like $f(d) = e^{-\\mathrm{density} \\cdot d}$ or
      * a related variant, which produces a smooth atmospheric falloff.
      *
-     * @param color Fog color.
-     * @param density Exponential density factor (higher values produce thicker fog).
+     * @param params @ref Fog::ExponentialParameters "Initialization parameters".
      */
-    [[nodiscard]] static auto CreateExponential(const Color& color, float density) -> Fog {
-        auto out = Fog {Type::Exponential, color};
-        out.density = density;
+    [[nodiscard]] static auto CreateExponential(const ExponentialParameters& params) -> Fog {
+        auto out = Fog {Type::Exponential, params.color};
+        out.density = params.density;
         return out;
     }
 

@@ -13,7 +13,7 @@ struct Scene : public vglx::Scene {
     vglx::Mesh* mesh {nullptr};
 
     Scene() {
-        fog = vglx::Fog::CreateExponential(vglx::Color {0x222244}, 0.2f);
+        fog = vglx::Fog::CreateExponential({.color = 0x222244, .density = 0.2f});
         AddGeometry();
         AddLights();
     }
@@ -90,7 +90,7 @@ auto main() -> int {
     auto scene = std::make_unique<Scene>();
 
     scene.get()->Add(vglx::OrbitControls::Create(camera.get(), {
-        .radius = 4.0f,
+        .radius = 3.5f,
         .pitch = 0.25f,
         .target = scene->mesh->transform.position
     }));
