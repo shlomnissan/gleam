@@ -69,9 +69,9 @@ TEST(Euler, GetMatrixBasic) {
     constexpr auto e = vglx::Euler {0.5f, 0.2f, 0.3f};
     constexpr auto m = e.GetMatrix();
 
-    constexpr auto rotation_x = Rotate(e.pitch, vglx::Vector3::Right());
-    constexpr auto rotation_y = Rotate(e.yaw, vglx::Vector3::Up());
-    constexpr auto rotation_z = Rotate(e.roll, vglx::Vector3::Forward());
+    constexpr auto rotation_x = Rotate(e.pitch, vglx::Vector3::X());
+    constexpr auto rotation_y = Rotate(e.yaw, vglx::Vector3::Y());
+    constexpr auto rotation_z = Rotate(e.roll, vglx::Vector3::Z());
 
     constexpr auto expected = rotation_z * rotation_x * rotation_y;
     EXPECT_MAT4_NEAR(m, expected, 1e-4);

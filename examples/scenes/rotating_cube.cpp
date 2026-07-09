@@ -30,8 +30,8 @@ struct Scene : public vglx::Scene {
     }
 
     auto OnUpdate(float dt) -> void override {
-        mesh->transform.Rotate(vglx::Vector3::Right(), dt);
-        mesh->transform.Rotate(vglx::Vector3::Up(), dt);
+        mesh->transform.Rotate(vglx::Vector3::X(), dt);
+        mesh->transform.Rotate(vglx::Vector3::Y(), dt);
     }
 };
 

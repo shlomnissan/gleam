@@ -54,14 +54,14 @@ struct Vector2 {
     constexpr Vector2(float x, float y) : x(x), y(y) {}
 
     /**
-     * @brief Returns a unit vector pointing to the right.
+     * @brief Returns the unit vector along the X axis.
      */
-    [[nodiscard]] static constexpr auto Right() -> Vector2 { return {1.0f, 0.0f}; }
+    [[nodiscard]] static constexpr auto X() -> Vector2 { return {1.0f, 0.0f}; }
 
     /**
-     * @brief Returns a unit vector pointing up.
+     * @brief Returns the unit vector along the Y axis.
      */
-    [[nodiscard]] static constexpr auto Up() -> Vector2 { return {0.0f, 1.0f}; }
+    [[nodiscard]] static constexpr auto Y() -> Vector2 { return {0.0f, 1.0f}; }
 
     /**
      * @brief Returns the zero vector.

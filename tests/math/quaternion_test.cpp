@@ -94,7 +94,7 @@ TEST(Quaternion, IdentityReturnsZeroVectorAndScalarOne) {
 #pragma region From Axis Angle
 
 TEST(Quaternion, FromAxisAngleBasic) {
-    constexpr auto q = vglx::Quaternion::FromAxisAngle(vglx::Vector3::Up(), vglx::math::pi_over_2);
+    constexpr auto q = vglx::Quaternion::FromAxisAngle(vglx::Vector3::Y(), vglx::math::pi_over_2);
 
     const auto s = vglx::math::Sin(vglx::math::pi_over_4);
     const auto c = vglx::math::Cos(vglx::math::pi_over_4);
@@ -110,7 +110,7 @@ TEST(Quaternion, FromAxisAngleBasic) {
 
 TEST(Quaternion, FromAxisAngleNormalizesAxis) {
     constexpr auto a = vglx::Quaternion::FromAxisAngle(vglx::Vector3 {0.0f, 5.0f, 0.0f}, 1.0f);
-    constexpr auto b = vglx::Quaternion::FromAxisAngle(vglx::Vector3::Up(), 1.0f);
+    constexpr auto b = vglx::Quaternion::FromAxisAngle(vglx::Vector3::Y(), 1.0f);
 
     EXPECT_NEAR(a.x, b.x, 1e-4);
     EXPECT_NEAR(a.y, b.y, 1e-4);
@@ -152,8 +152,8 @@ TEST(Quaternion, IdentityGetMatrixIsIdentity) {
 #pragma region Multiplication
 
 TEST(Quaternion, CompositionMatchesMatrixProduct) {
-    constexpr auto a = vglx::Quaternion::FromAxisAngle(vglx::Vector3::Up(), 0.7f);
-    constexpr auto b = vglx::Quaternion::FromAxisAngle(vglx::Vector3::Right(), 1.1f);
+    constexpr auto a = vglx::Quaternion::FromAxisAngle(vglx::Vector3::Y(), 0.7f);
+    constexpr auto b = vglx::Quaternion::FromAxisAngle(vglx::Vector3::X(), 1.1f);
 
     constexpr auto product = a * b;
 
@@ -163,7 +163,7 @@ TEST(Quaternion, CompositionMatchesMatrixProduct) {
 }
 
 TEST(Quaternion, IdentityIsMultiplicativeIdentity) {
-    constexpr auto q = vglx::Quaternion::FromAxisAngle(vglx::Vector3::Forward(), 0.9f);
+    constexpr auto q = vglx::Quaternion::FromAxisAngle(vglx::Vector3::Z(), 0.9f);
     constexpr auto r = q * vglx::Quaternion::Identity();
 
     EXPECT_NEAR(r.x, q.x, 1e-4);
@@ -299,8 +299,8 @@ TEST(Quaternion, DotProduct) {
 #pragma region Slerp
 
 TEST(Quaternion, SlerpAtZeroReturnsStart) {
-    constexpr auto a = vglx::Quaternion::FromAxisAngle(vglx::Vector3::Up(), 0.0f);
-    constexpr auto b = vglx::Quaternion::FromAxisAngle(vglx::Vector3::Up(), vglx::math::pi_over_2);
+    constexpr auto a = vglx::Quaternion::FromAxisAngle(vglx::Vector3::Y(), 0.0f);
+    constexpr auto b = vglx::Quaternion::FromAxisAngle(vglx::Vector3::Y(), vglx::math::pi_over_2);
     constexpr auto r = Slerp(a, b, 0.0f);
 
     EXPECT_NEAR(r.y, a.y, 1e-4);
@@ -310,8 +310,8 @@ TEST(Quaternion, SlerpAtZeroReturnsStart) {
 }
 
 TEST(Quaternion, SlerpAtOneReturnsEnd) {
-    constexpr auto a = vglx::Quaternion::FromAxisAngle(vglx::Vector3::Up(), 0.0f);
-    constexpr auto b = vglx::Quaternion::FromAxisAngle(vglx::Vector3::Up(), vglx::math::pi_over_2);
+    constexpr auto a = vglx::Quaternion::FromAxisAngle(vglx::Vector3::Y(), 0.0f);
+    constexpr auto b = vglx::Quaternion::FromAxisAngle(vglx::Vector3::Y(), vglx::math::pi_over_2);
     constexpr auto r = Slerp(a, b, 1.0f);
 
     EXPECT_NEAR(r.y, b.y, 1e-4);
@@ -322,10 +322,10 @@ TEST(Quaternion, SlerpAtOneReturnsEnd) {
 
 TEST(Quaternion, SlerpMidpointIsHalfRotation) {
     constexpr auto a = vglx::Quaternion::Identity();
-    constexpr auto b = vglx::Quaternion::FromAxisAngle(vglx::Vector3::Up(), vglx::math::pi_over_2);
+    constexpr auto b = vglx::Quaternion::FromAxisAngle(vglx::Vector3::Y(), vglx::math::pi_over_2);
 
     constexpr auto mid = Slerp(a, b, 0.5f);
-    constexpr auto expected = vglx::Quaternion::FromAxisAngle(vglx::Vector3::Up(), vglx::math::pi_over_4);
+    constexpr auto expected = vglx::Quaternion::FromAxisAngle(vglx::Vector3::Y(), vglx::math::pi_over_4);
 
     EXPECT_NEAR(mid.y, expected.y, 1e-4);
     EXPECT_NEAR(mid.w, expected.w, 1e-4);

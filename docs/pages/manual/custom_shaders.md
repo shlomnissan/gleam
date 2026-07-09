@@ -35,8 +35,8 @@ struct MyScene : public vglx::Scene {
 
     auto OnUpdate(float delta) -> void override {
         const auto rotation_speed = vglx::math::pi_over_2;
-        mesh->transform.Rotate(vglx::Vector3::Right(), rotation_speed * delta);
-        mesh->transform.Rotate(vglx::Vector3::Up(), rotation_speed * delta);
+        mesh->transform.Rotate(vglx::Vector3::X(), rotation_speed * delta);
+        mesh->transform.Rotate(vglx::Vector3::Y(), rotation_speed * delta);
     }
 };
 ```

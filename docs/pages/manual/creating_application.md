@@ -242,8 +242,8 @@ To keep things simple we’ll animate the scene by rotating the cube around the 
 ```cpp
 auto OnUpdate(float delta) -> void override {
     const auto rotation_speed = math::pi_over_2;
-    mesh->transform.Rotate(Vector3::Right(), rotation_speed * delta);
-    mesh->transform.Rotate(Vector3::Up(), rotation_speed * delta);
+    mesh->transform.Rotate(Vector3::X(), rotation_speed * delta);
+    mesh->transform.Rotate(Vector3::Y(), rotation_speed * delta);
 }
 ```
 
@@ -292,8 +292,8 @@ struct MyScene : public Scene {
 
     auto OnUpdate(float delta) -> void override {
         const auto rotation_speed = math::pi_over_2;
-        mesh->transform.Rotate(Vector3::Right(), rotation_speed * delta);
-        mesh->transform.Rotate(Vector3::Up(), rotation_speed * delta);
+        mesh->transform.Rotate(Vector3::X(), rotation_speed * delta);
+        mesh->transform.Rotate(Vector3::Y(), rotation_speed * delta);
     }
 };
 

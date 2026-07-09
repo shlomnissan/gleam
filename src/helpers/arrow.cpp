@@ -39,7 +39,7 @@ Arrow::Arrow(const Parameters& params) {
     Add(Mesh::Create(line_geometry(params.length - kConeHeight), material));
 
     cone->transform.Translate({0.0f, 0.0f, params.length - kConeHeight / 2.0f});
-    cone->transform.Rotate(Vector3::Right(), math::pi_over_2);
+    cone->transform.Rotate(Vector3::X(), math::pi_over_2);
 
     SetOrigin(params.origin);
     SetDirection(params.direction);

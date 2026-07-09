@@ -39,7 +39,7 @@ struct Scene : public vglx::Scene {
         ));
 
         plane->receive_shadow = true;
-        plane->transform.Rotate(vglx::Vector3::Right(), -vglx::math::pi_over_2);
+        plane->transform.Rotate(vglx::Vector3::X(), -vglx::math::pi_over_2);
     }
 
     auto AddLights() -> void {
@@ -68,9 +68,9 @@ struct Scene : public vglx::Scene {
     }
 
     auto OnUpdate(float dt) -> void override {
-        mesh->transform.Rotate(vglx::Vector3::Right(), 0.25f * dt);
-        mesh->transform.Rotate(vglx::Vector3::Up(), 0.5f * dt);
-        mesh->transform.Rotate(vglx::Vector3::Forward(), 1.0f * dt);
+        mesh->transform.Rotate(vglx::Vector3::X(), 0.25f * dt);
+        mesh->transform.Rotate(vglx::Vector3::Y(), 0.5f * dt);
+        mesh->transform.Rotate(vglx::Vector3::Z(), 1.0f * dt);
     }
 };
 

@@ -59,6 +59,26 @@ struct Vector4 {
     constexpr Vector4(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
 
     /**
+     * @brief Returns the unit vector along the X axis.
+     */
+    [[nodiscard]] static constexpr auto X() -> Vector4 { return {1.0f, 0.0f, 0.0f, 0.0f}; }
+
+    /**
+     * @brief Returns the unit vector along the Y axis.
+     */
+    [[nodiscard]] static constexpr auto Y() -> Vector4 { return {0.0f, 1.0f, 0.0f, 0.0f}; }
+
+    /**
+     * @brief Returns the unit vector along the Z axis.
+     */
+    [[nodiscard]] static constexpr auto Z() -> Vector4 { return {0.0f, 0.0f, 1.0f, 0.0f}; }
+
+    /**
+     * @brief Returns the unit vector along the W axis.
+     */
+    [[nodiscard]] static constexpr auto W() -> Vector4 { return {0.0f, 0.0f, 0.0f, 1.0f}; }
+
+    /**
      * @brief Returns the zero vector.
      */
     [[nodiscard]] static constexpr auto Zero() -> Vector4 { return {0.0f}; }

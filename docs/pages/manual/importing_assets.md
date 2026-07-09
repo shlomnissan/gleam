@@ -48,8 +48,8 @@ struct MyScene : public vglx::Scene {
     auto OnUpdate(float delta) -> void override {
         if (mesh != nullptr) {
             const auto rotation_speed = vglx::math::pi_over_2;
-            mesh->transform.Rotate(vglx::Vector3::Right(), rotation_speed * delta);
-            mesh->transform.Rotate(vglx::Vector3::Up(), rotation_speed * delta);
+            mesh->transform.Rotate(vglx::Vector3::X(), rotation_speed * delta);
+            mesh->transform.Rotate(vglx::Vector3::Y(), rotation_speed * delta);
         }
     }
 };
@@ -101,7 +101,7 @@ struct MyScene : public vglx::Scene {
         }
 
         // Transfer ownership of the loaded node to the scene graph.
-        Add(std::move(root.value()))->transform.Rotate(vglx::Vector3::Up(), vglx::math::DegToRad(90.0f));
+        Add(std::move(root.value()))->transform.Rotate(vglx::Vector3::Y(), vglx::math::DegToRad(90.0f));
     }
 };
 ```

@@ -85,7 +85,7 @@ TEST(Transform3, SetRotationFromEuler) {
 }
 
 TEST(Transform3, SetRotationFromQuaternion) {
-    constexpr auto q = vglx::Quaternion::FromAxisAngle(vglx::Vector3::Up(), vglx::math::pi_over_2);
+    constexpr auto q = vglx::Quaternion::FromAxisAngle(vglx::Vector3::Y(), vglx::math::pi_over_2);
 
     auto t1 = vglx::Transform3 {};
     t1.SetRotation(q);
@@ -95,7 +95,7 @@ TEST(Transform3, SetRotationFromQuaternion) {
 
     constexpr auto t2 = []() {
         auto t = vglx::Transform3 {};
-        t.SetRotation(vglx::Quaternion::FromAxisAngle(vglx::Vector3::Up(), vglx::math::pi_over_2));
+        t.SetRotation(vglx::Quaternion::FromAxisAngle(vglx::Vector3::Y(), vglx::math::pi_over_2));
         return t;
     }();
 
@@ -199,8 +199,8 @@ TEST(Transform3, Scale) {
 
 TEST(Transform3, RotateX) {
     auto t = vglx::Transform3 {};
-    t.Rotate(vglx::Vector3::Right(), vglx::math::pi_over_2);
-    t.Rotate(vglx::Vector3::Right(), 0.1f);
+    t.Rotate(vglx::Vector3::X(), vglx::math::pi_over_2);
+    t.Rotate(vglx::Vector3::X(), 0.1f);
 
     constexpr auto c = vglx::math::Cos(vglx::math::pi_over_2 + 0.1f);
     constexpr auto s = vglx::math::Sin(vglx::math::pi_over_2 + 0.1f);
@@ -214,8 +214,8 @@ TEST(Transform3, RotateX) {
 
     constexpr auto m = []() {
         auto t = vglx::Transform3 {};
-        t.Rotate(vglx::Vector3::Right(), vglx::math::pi_over_2);
-        t.Rotate(vglx::Vector3::Right(), 0.1f);
+        t.Rotate(vglx::Vector3::X(), vglx::math::pi_over_2);
+        t.Rotate(vglx::Vector3::X(), 0.1f);
         return t.Get();
     }();
 
@@ -227,8 +227,8 @@ TEST(Transform3, RotateX) {
 
 TEST(Transform3, RotateY) {
     auto t = vglx::Transform3 {};
-    t.Rotate(vglx::Vector3::Up(), vglx::math::pi_over_2);
-    t.Rotate(vglx::Vector3::Up(), 0.1f);
+    t.Rotate(vglx::Vector3::Y(), vglx::math::pi_over_2);
+    t.Rotate(vglx::Vector3::Y(), 0.1f);
 
     constexpr auto c = vglx::math::Cos(vglx::math::pi_over_2 + 0.1f);
     constexpr auto s = vglx::math::Sin(vglx::math::pi_over_2 + 0.1f);
@@ -242,8 +242,8 @@ TEST(Transform3, RotateY) {
 
     constexpr auto m = []() {
         auto t = vglx::Transform3 {};
-        t.Rotate(vglx::Vector3::Up(), vglx::math::pi_over_2);
-        t.Rotate(vglx::Vector3::Up(), 0.1f);
+        t.Rotate(vglx::Vector3::Y(), vglx::math::pi_over_2);
+        t.Rotate(vglx::Vector3::Y(), 0.1f);
         return t.Get();
     }();
 
@@ -255,8 +255,8 @@ TEST(Transform3, RotateY) {
 
 TEST(Transform3, RotateZ) {
     auto t = vglx::Transform3 {};
-    t.Rotate(vglx::Vector3::Forward(), vglx::math::pi_over_2);
-    t.Rotate(vglx::Vector3::Forward(), 0.1f);
+    t.Rotate(vglx::Vector3::Z(), vglx::math::pi_over_2);
+    t.Rotate(vglx::Vector3::Z(), 0.1f);
 
     constexpr auto c = vglx::math::Cos(vglx::math::pi_over_2 + 0.1f);
     constexpr auto s = vglx::math::Sin(vglx::math::pi_over_2 + 0.1f);
@@ -270,8 +270,8 @@ TEST(Transform3, RotateZ) {
 
     constexpr auto m = []() {
         auto t = vglx::Transform3 {};
-        t.Rotate(vglx::Vector3::Forward(), vglx::math::pi_over_2);
-        t.Rotate(vglx::Vector3::Forward(), 0.1f);
+        t.Rotate(vglx::Vector3::Z(), vglx::math::pi_over_2);
+        t.Rotate(vglx::Vector3::Z(), 0.1f);
         return t.Get();
     }();
 
@@ -309,7 +309,7 @@ TEST(Transform3, RotateArbitraryAxis) {
 TEST(Transform3, TranslateBeforeRotation) {
     auto t = vglx::Transform3 {};
     t.Translate({0.0f, 0.0f, 1.0f});
-    t.Rotate(vglx::Vector3::Up(), vglx::math::pi_over_2);
+    t.Rotate(vglx::Vector3::Y(), vglx::math::pi_over_2);
 
     EXPECT_MAT4_NEAR(t.Get(), {
          0.0f, 0.0f, 1.0f, 0.0f,
@@ -321,7 +321,7 @@ TEST(Transform3, TranslateBeforeRotation) {
     constexpr auto m = []() {
         auto t = vglx::Transform3 {};
         t.Translate({0.0f, 0.0f, 1.0f});
-        t.Rotate(vglx::Vector3::Up(), vglx::math::pi_over_2);
+        t.Rotate(vglx::Vector3::Y(), vglx::math::pi_over_2);
         return t.Get();
     }();
 
@@ -341,7 +341,7 @@ TEST(Transform3, TranslateBeforeRotation) {
 
 TEST(Transform3, TranslateAfterRotation) {
     auto t = vglx::Transform3 {};
-    t.Rotate(vglx::Vector3::Up(), vglx::math::pi_over_2);
+    t.Rotate(vglx::Vector3::Y(), vglx::math::pi_over_2);
     t.Translate({0.0f, 0.0f, 1.0f});
 
     EXPECT_MAT4_NEAR(t.Get(), {
@@ -353,7 +353,7 @@ TEST(Transform3, TranslateAfterRotation) {
 
     constexpr auto m = []() {
         auto t = vglx::Transform3 {};
-        t.Rotate(vglx::Vector3::Up(), vglx::math::pi_over_2);
+        t.Rotate(vglx::Vector3::Y(), vglx::math::pi_over_2);
         t.Translate({0.0f, 0.0f, 1.0f});
         return t.Get();
     }();

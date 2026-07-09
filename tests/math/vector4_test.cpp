@@ -43,6 +43,38 @@ TEST(Vector4, ConstructorParameterized) {
 
 #pragma region Unit vectors
 
+TEST(Vector4, UnitVectorAlongX) {
+    constexpr auto v = vglx::Vector4::X();
+
+    EXPECT_VEC4_EQ(v, {1.0f, 0.0f, 0.0f, 0.0f});
+
+    static_assert(v == vglx::Vector4 {1.0f, 0.0f, 0.0f, 0.0f});
+}
+
+TEST(Vector4, UnitVectorAlongY) {
+    constexpr auto v = vglx::Vector4::Y();
+
+    EXPECT_VEC4_EQ(v, {0.0f, 1.0f, 0.0f, 0.0f});
+
+    static_assert(v == vglx::Vector4 {0.0f, 1.0f, 0.0f, 0.0f});
+}
+
+TEST(Vector4, UnitVectorAlongZ) {
+    constexpr auto v = vglx::Vector4::Z();
+
+    EXPECT_VEC4_EQ(v, {0.0f, 0.0f, 1.0f, 0.0f});
+
+    static_assert(v == vglx::Vector4 {0.0f, 0.0f, 1.0f, 0.0f});
+}
+
+TEST(Vector4, UnitVectorAlongW) {
+    constexpr auto v = vglx::Vector4::W();
+
+    EXPECT_VEC4_EQ(v, {0.0f, 0.0f, 0.0f, 1.0f});
+
+    static_assert(v == vglx::Vector4 {0.0f, 0.0f, 0.0f, 1.0f});
+}
+
 TEST(Vector4, ZeroVector) {
     constexpr auto v = vglx::Vector4::Zero();
 

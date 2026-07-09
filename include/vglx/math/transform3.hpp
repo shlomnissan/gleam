@@ -109,7 +109,7 @@ public:
         if (forward == Vector3::Zero()) {
             // The position and target are the same,
             // so we can't determine a forward vector.
-            forward = Vector3::Forward();
+            forward = Vector3::Z();
         }
 
         auto right = Cross(world_up, forward);
