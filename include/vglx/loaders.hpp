@@ -30,11 +30,6 @@ class Texture2D;
 class CubeTexture;
 class Node;
 
-/**
- * @brief Six face image paths for a cube texture.
- *
- * @ingroup LoadersGroup
- */
 struct CubeTexturePaths {
     fs::path positive_x;
     fs::path negative_x;

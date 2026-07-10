@@ -1,4 +1,7 @@
 :root {
+  --vp-font-family-base: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --vp-font-family-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --vp-code-font-size: 0.81em;
   --vp-home-hero-name-color: var(--vp-c-text-1);
   --vp-c-brand-1: #0fa0f0;
   --vp-c-brand-2: #0b8cd6;
@@ -11,8 +14,28 @@
   --vp-c-brand-2: #4dbbff;
   --vp-c-brand-3: #26aeff;
   --vp-c-brand-soft: #0c2a3a;
+
+  --vp-c-text-1: #ffffff;
+  --vp-c-text-2: #a3a3a3;
+  --vp-c-text-3: #808080;
+
+  --vp-c-divider: #383838;
+  --vp-c-gutter: #383838;
 }
 
+.VPHome .VPButton.medium,
+.VPHome .VPButton.big {
+  border-radius: 6px;
+}
+
+.VPHome .VPFeature .icon {
+  width: auto;
+  height: auto;
+  justify-content: flex-start;
+  border-radius: 0;
+  background-color: transparent;
+  color: var(--vp-c-brand-3);
+}
 .VPNavBar.home {
   .title {
     display: none;
@@ -74,23 +97,29 @@
   .name {
     color: var(--vp-c-text-1);
     font-weight: 800;
-    font-size: 3.8rem;
+    font-size: 3.3rem;
 
     @media (max-width: 960px) {
-      font-size: 3.5rem;
+      font-size: 3rem;
     }
 
     @media (max-width: 640px) {
-      font-size: 2.8rem;
+      font-size: 2.4rem;
     }
   }
 }
 
 .main {
   .tagline {
+    padding-top: 24px;
+
     @media (max-width: 640px) {
       font-size: 1rem;
     }
+  }
+
+  .actions {
+    padding-top: 32px;
   }
 }
 

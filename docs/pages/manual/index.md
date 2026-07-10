@@ -1,6 +1,6 @@
 # Introduction
 
-[VGLX](https://github.com/shlomnissan/vglx) is a scene-oriented rendering engine for modern C++ with a simple philosophy: building things in 3D should feel good again. The engine aims to bring back the sense of immediacy that early rendering APIs once had while still giving full access to the power of today’s GPUs. It is fully cross-platform and runs on Windows, macOS and Linux with identical behavior.
+VGLX is a scene-oriented rendering engine for modern C++ with a simple philosophy: building things in 3D should feel good again. The engine aims to bring back the sense of immediacy that early rendering APIs once had while still giving full access to the power of today’s GPUs. It is fully cross-platform and runs on Windows, macOS and Linux with identical behavior.
 
 The name originally stood for Cross-Platform Vulkan Graphics Library, but practicality won the early battles so the backend today is OpenGL. Vulkan support is planned for 2026. In the meantime OpenGL lets the engine grow without drowning in ceremony.
 
