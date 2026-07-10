@@ -122,6 +122,50 @@ TEST(Quaternion, FromAxisAngleNormalizesAxis) {
 
 #pragma endregion
 
+#pragma region From Euler
+
+TEST(Quaternion, FromEulerMatchesEulerMatrix) {
+    constexpr auto euler = vglx::Euler {0.4f, -1.1f, 2.3f};
+    constexpr auto q = vglx::Quaternion::FromEuler(euler);
+
+    EXPECT_MAT4_NEAR(q.GetMatrix(), euler.GetMatrix(), 1e-4);
+}
+
+TEST(Quaternion, FromEulerSingleAxisMatchesAxisAngle) {
+    constexpr auto pitch = vglx::Quaternion::FromEuler({0.7f, 0.0f, 0.0f});
+    constexpr auto yaw = vglx::Quaternion::FromEuler({0.0f, 0.7f, 0.0f});
+    constexpr auto roll = vglx::Quaternion::FromEuler({0.0f, 0.0f, 0.7f});
+
+    EXPECT_MAT4_NEAR(
+        pitch.GetMatrix(),
+        vglx::Quaternion::FromAxisAngle(vglx::Vector3::X(), 0.7f).GetMatrix(),
+        1e-4
+    );
+
+    EXPECT_MAT4_NEAR(
+        yaw.GetMatrix(),
+        vglx::Quaternion::FromAxisAngle(vglx::Vector3::Y(), 0.7f).GetMatrix(),
+        1e-4
+    );
+
+    EXPECT_MAT4_NEAR(
+        roll.GetMatrix(),
+        vglx::Quaternion::FromAxisAngle(vglx::Vector3::Z(), 0.7f).GetMatrix(),
+        1e-4
+    );
+}
+
+TEST(Quaternion, FromEulerIdentityForZeroAngles) {
+    constexpr auto q = vglx::Quaternion::FromEuler({});
+
+    EXPECT_NEAR(q.x, 0.0f, 1e-6);
+    EXPECT_NEAR(q.y, 0.0f, 1e-6);
+    EXPECT_NEAR(q.z, 0.0f, 1e-6);
+    EXPECT_NEAR(q.w, 1.0f, 1e-6);
+}
+
+#pragma endregion
+
 #pragma region Get Matrix
 
 TEST(Quaternion, GetMatrixMatchesAxisAngleRotation) {

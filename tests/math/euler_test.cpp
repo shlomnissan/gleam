@@ -73,7 +73,7 @@ TEST(Euler, GetMatrixBasic) {
     constexpr auto rotation_y = Rotate(e.yaw, vglx::Vector3::Y());
     constexpr auto rotation_z = Rotate(e.roll, vglx::Vector3::Z());
 
-    constexpr auto expected = rotation_z * rotation_x * rotation_y;
+    constexpr auto expected = rotation_y * rotation_x * rotation_z;
     EXPECT_MAT4_NEAR(m, expected, 1e-4);
 
     static_assert(ApproxEqual(m[0].x, expected[0].x));

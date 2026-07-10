@@ -11,6 +11,7 @@
 
 struct Scene : public vglx::Scene {
     vglx::Mesh* mesh {nullptr};
+    vglx::Euler rotation {};
 
     Scene() {
         fog = vglx::Fog::CreateExponential({.color = 0x222244, .density = 0.2f});
@@ -56,7 +57,7 @@ struct Scene : public vglx::Scene {
         spot->cast_shadow = true;
         spot->target = mesh;
         spot->shadow.map_size = 1024;
-        spot->shadow.bias = 0.002f;
+        spot->shadow.bias = 0.0002f;
         spot->shadow.far = 20.0f;
 
         auto directional = Add(vglx::DirectionalLight::Create({
@@ -68,9 +69,10 @@ struct Scene : public vglx::Scene {
     }
 
     auto OnUpdate(float dt) -> void override {
-        mesh->transform.Rotate(vglx::Vector3::X(), 0.25f * dt);
-        mesh->transform.Rotate(vglx::Vector3::Y(), 0.5f * dt);
-        mesh->transform.Rotate(vglx::Vector3::Z(), 1.0f * dt);
+        rotation.pitch += 0.25f * dt;
+        rotation.yaw += 0.5f * dt;
+        rotation.roll += 1.0f * dt;
+        mesh->transform.SetRotation(rotation);
     }
 };
 

@@ -124,19 +124,19 @@ TEST(Transform3, MultipleTransformations) {
     const auto sin_r = vglx::math::Sin(rotation.roll);
 
     EXPECT_MAT4_NEAR(t.Get(), {
-        scale.x * (cos_r * cos_y - sin_r * sin_p * sin_y),
-        scale.y * (-sin_r * cos_p),
-        scale.z * (cos_r * sin_y + sin_r * sin_p * cos_y),
+        scale.x * (cos_y * cos_r + sin_y * sin_p * sin_r),
+        scale.y * (sin_y * sin_p * cos_r - cos_y * sin_r),
+        scale.z * (sin_y * cos_p),
         position.x,
 
-        scale.x * (sin_r * cos_y + cos_r * sin_p * sin_y),
-        scale.y * (cos_r * cos_p),
-        scale.z * (sin_r * sin_y - cos_r * sin_p * cos_y),
+        scale.x * (cos_p * sin_r),
+        scale.y * (cos_p * cos_r),
+        scale.z * (-sin_p),
         position.y,
 
-        scale.x * (-cos_p * sin_y),
-        scale.y * sin_p,
-        scale.z * (cos_p * cos_y),
+        scale.x * (cos_y * sin_p * sin_r - sin_y * cos_r),
+        scale.y * (sin_y * sin_r + cos_y * sin_p * cos_r),
+        scale.z * (cos_y * cos_p),
         position.z,
 
         0.0f, 0.0f, 0.0f, 1.0f

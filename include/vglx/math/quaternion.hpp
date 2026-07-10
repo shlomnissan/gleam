@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "vglx/math/euler.hpp"
 #include "vglx/math/matrix4.hpp"
 #include "vglx/math/vector3.hpp"
 #include "vglx/math/utilities.hpp"
@@ -15,6 +16,7 @@ namespace vglx {
 
 struct Quaternion;
 auto constexpr Dot(const Quaternion& a, const Quaternion& b) -> float;
+constexpr auto operator*(const Quaternion& a, const Quaternion& b) -> Quaternion;
 
 /**
  * @brief Represents a rotation as a unit quaternion.
@@ -111,6 +113,21 @@ struct Quaternion {
         const auto s = math::Sin(half);
         const auto n = vglx::Normalize(axis);
         return {n.x * s, n.y * s, n.z * s, math::Cos(half)};
+    }
+
+    /**
+     * @brief Builds a quaternion from Euler angles.
+     *
+     * Produces the same rotation as @ref Euler::GetMatrix, using the same
+     * intrinsic YXZ order: yaw around Y is applied first, then pitch around
+     * the rotated X-axis, then roll around the rotated Z-axis.
+     *
+     * @param euler Input @ref Euler angles in radians.
+     */
+    [[nodiscard]] static constexpr auto FromEuler(const Euler& euler) -> Quaternion {
+        return FromAxisAngle(Vector3::Y(), euler.yaw)
+             * FromAxisAngle(Vector3::X(), euler.pitch)
+             * FromAxisAngle(Vector3::Z(), euler.roll);
     }
 
     /**

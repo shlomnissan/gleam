@@ -183,7 +183,7 @@ public:
      * @param rotation New Euler rotation.
      */
     constexpr auto SetRotation(const Euler& rotation) -> void {
-        SetRotation(Quaternion {rotation.GetMatrix()});
+        SetRotation(Quaternion::FromEuler(rotation));
     }
 
     /**

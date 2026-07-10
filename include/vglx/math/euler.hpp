@@ -16,9 +16,9 @@ namespace vglx {
  * @brief Represents 3D Euler angles with pitch, yaw, and roll components.
  *
  * Euler stores orientation using intrinsic Tait–Bryan angles in YXZ order:
- * yaw is a rotation around the Y-axis, pitch is a rotation around the X-axis,
- * and roll is a rotation around the Z-axis. All angles are specified in
- * radians.
+ * yaw around the Y-axis is applied first, then pitch around the rotated
+ * X-axis, then roll around the rotated Z-axis (equivalent to the three.js
+ * Euler order "YXZ"). All angles are specified in radians.
  *
  * Instances can be constructed from individual angles or extracted from a
  * transformation matrix, and converted back to a @ref Matrix4 for use in
@@ -55,20 +55,20 @@ public:
      *
      * Extracts pitch, yaw, and roll from the given matrix using the YXZ
      * rotation order. When cos(pitch) is close to zero (gimbal lock),
-     * yaw is set to zero and roll is computed using an alternate path.
+     * roll is set to zero and yaw is computed using an alternate path.
      *
      * @param m Input transformation matrix.
      */
     explicit constexpr Euler(const Matrix4& m) {
-        pitch = math::Asin(m[1].z);
+        pitch = math::Asin(-m[2].y);
         if (math::Cos(pitch) > 1e-6) {
-            yaw = math::Atan2(-m[0].z, m[2].z);
-            roll = math::Atan2(-m[1].x, m[1].y);
+            yaw = math::Atan2(m[2].x, m[2].z);
+            roll = math::Atan2(m[0].y, m[1].y);
         } else {
-            // If cos(pitch) is close to zero, we have a gimble lock
+            // If cos(pitch) is close to zero, we have a gimbal lock
             // and only one of the angles can be determined
-            yaw = 0.0f;
-            roll = math::Atan2(m[0].y, m[0].x);
+            yaw = math::Atan2(-m[0].z, m[0].x);
+            roll = 0.0f;
         }
     }
 
@@ -86,9 +86,9 @@ public:
         const auto sin_r = math::Sin(roll);
 
         return Matrix4 {
-            cos_r * cos_y - sin_r * sin_p * sin_y, -sin_r * cos_p, cos_r * sin_y + sin_r * sin_p * cos_y, 0.0f,
-            sin_r * cos_y + cos_r * sin_p * sin_y, cos_r * cos_p, sin_r * sin_y - cos_r * sin_p * cos_y, 0.0f,
-            -cos_p * sin_y, sin_p, cos_p * cos_y, 0.0f,
+            cos_y * cos_r + sin_y * sin_p * sin_r, sin_y * sin_p * cos_r - cos_y * sin_r, sin_y * cos_p, 0.0f,
+            cos_p * sin_r, cos_p * cos_r, -sin_p, 0.0f,
+            cos_y * sin_p * sin_r - sin_y * cos_r, sin_y * sin_r + cos_y * sin_p * cos_r, cos_y * cos_p, 0.0f,
             0.0f, 0.0f, 0.0f, 1.0f
         };
     }
