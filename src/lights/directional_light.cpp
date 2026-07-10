@@ -88,6 +88,7 @@ struct DirectionalLight::Impl {
 DirectionalLight::DirectionalLight(const Parameters& params) :
     Light(params.color, params.intensity),
     target(params.target),
+    cast_shadow(params.cast_shadow),
     impl_(std::make_unique<Impl>())
 {
     SetName("directional light");
@@ -119,6 +120,10 @@ auto DirectionalLight::OnUpdate(float delta) -> void {
     if (debug_mode_enabled_) {
         impl_->UpdateDebugMesh(this);
     }
+}
+
+auto DirectionalLight::GetShadow() const -> const Shadow* {
+    return cast_shadow ? &shadow : nullptr;
 }
 
 DirectionalLight::~DirectionalLight() = default;

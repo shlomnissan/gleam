@@ -75,7 +75,7 @@ vec3 processLights(
         Light light = u_Lights[i];
 
         if (light.Type == 1 /* directional light */) {
-            output_color += phongShading(
+            output_color += shadowFactor(light) * phongShading(
                 light.Direction,
                 light.Color,
                 normal,

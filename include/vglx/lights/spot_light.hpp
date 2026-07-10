@@ -75,10 +75,10 @@ public:
     float range {0.0f};
 
     /// @brief When `true` this light casts shadows.
-    bool cast_shadow;
+    bool cast_shadow {false};
 
     /// @brief Shadow configuration used when @ref cast_shadow is enabled.
-    Shadow shadow;
+    Shadow shadow {};
 
     /**
      * @brief Constructs a spotlight.

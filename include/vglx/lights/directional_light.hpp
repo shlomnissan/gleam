@@ -47,10 +47,17 @@ public:
         Color color; ///< Light color.
         float intensity; ///< Light intensity multiplier.
         Node* target; ///< Node the light is directed toward.
+        bool cast_shadow {false}; ///< Enables shadow casting for this light.
     };
 
     /// @brief Node that the light is oriented toward.
     Node* target {nullptr};
+
+    /// @brief When `true` this light casts shadows.
+    bool cast_shadow {false};
+
+    /// @brief Shadow configuration used when @ref cast_shadow is enabled.
+    Shadow shadow {};
 
     /**
      * @brief Constructs a directional light.
@@ -76,6 +83,10 @@ public:
     auto GetType() const -> Light::Type override {
         return Light::Type::Directional;
     }
+
+    /// @cond INTERNAL
+    [[nodiscard]] auto GetShadow() const -> const Shadow* override;
+    /// @endcond
 
     /**
      * @brief Returns the normalized direction vector of the light.

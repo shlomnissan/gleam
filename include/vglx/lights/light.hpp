@@ -42,9 +42,17 @@ struct Shadow {
     float near {0.5f};
 
     /**
-     * @brief Far plane of the shadow camera when the light is unbounded.
+     * @brief Far plane of the shadow camera.
+     *
+     * Spot lights with a positive range use the range instead. Directional
+     * lights always use this value.
      */
     float far {500.0f};
+
+    /**
+     * @brief Half-width of the directional shadow camera's orthographic box.
+     */
+    float extent {15.0f};
 
     /**
      * @brief Resolution of the square shadow map.

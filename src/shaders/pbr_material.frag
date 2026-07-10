@@ -114,7 +114,7 @@ vec3 processLights(
         Light light = u_Lights[i];
 
         if (light.Type == 1 /* directional light */) {
-            output_color += cookTorranceShading(
+            output_color += shadowFactor(light) * cookTorranceShading(
                 light.Direction,
                 light.Color,
                 normal,

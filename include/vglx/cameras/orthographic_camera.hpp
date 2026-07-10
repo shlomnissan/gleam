@@ -84,6 +84,17 @@ public:
         return std::make_unique<OrthographicCamera>(params);
     }
 
+    /**
+     * @brief Configures orthographic projection parameters.
+     *
+     * Replaces the camera's clipping planes and rebuilds the projection
+     * transform accordingly.
+     *
+     * @param params @ref OrthographicCamera::Parameters "Projection parameters"
+     * defining the new clipping planes.
+     */
+    auto SetLens(const Parameters& params) -> void;
+
 protected:
     /**
      * @brief Updates the projection transform to match the new viewport size.

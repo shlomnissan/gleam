@@ -6,7 +6,9 @@
 */
 
 #include "vglx/cameras/camera.hpp"
+#include "vglx/cameras/orthographic_camera.hpp"
 #include "vglx/cameras/perspective_camera.hpp"
+#include "vglx/lights/directional_light.hpp"
 #include "vglx/lights/light.hpp"
 #include "vglx/lights/spot_light.hpp"
 #include "vglx/math/vector3.hpp"
@@ -83,6 +85,29 @@ auto update_camera(Light* light, Camera* camera) -> void {
         spot_camera->LookAt(target);
         spot_camera->UpdateViewMatrix();
     }
+
+    if (light->GetType() == Light::Type::Directional) {
+        auto directional = static_cast<DirectionalLight*>(light);
+        auto dir_camera = static_cast<OrthographicCamera*>(camera);
+        auto& shadow = directional->shadow;
+
+        dir_camera->SetLens({
+            .left = -shadow.extent,
+            .right = shadow.extent,
+            .top = shadow.extent,
+            .bottom = -shadow.extent,
+            .near = shadow.near,
+            .far = shadow.far
+        });
+
+        const auto target = directional->target != nullptr
+            ? directional->target->GetWorldPosition()
+            : Vector3::Zero();
+
+        dir_camera->transform.SetPosition(directional->GetWorldPosition());
+        dir_camera->LookAt(target);
+        dir_camera->UpdateViewMatrix();
+    }
 }
 
 auto create_camera(Light* light) -> std::unique_ptr<Camera> {
@@ -95,6 +120,19 @@ auto create_camera(Light* light) -> std::unique_ptr<Camera> {
             .far = spot->range > 0.0f ? spot->range : spot->shadow.far
         });
     }
+
+    if (light->GetType() == Light::Type::Directional) {
+        auto& shadow = static_cast<DirectionalLight*>(light)->shadow;
+        return OrthographicCamera::Create({
+            .left = -shadow.extent,
+            .right = shadow.extent,
+            .top = shadow.extent,
+            .bottom = -shadow.extent,
+            .near = shadow.near,
+            .far = shadow.far
+        });
+    }
+
     return nullptr;
 }
 
