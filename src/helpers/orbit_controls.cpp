@@ -80,8 +80,11 @@ struct OrbitControls::Impl {
         using enum MouseButton;
 
         if (event->window_size.y <= 0.0f) {
-            // Cursor motion can't be normalized without a valid window
-            // size. Ignoring malformed mouse input
+            Logger::LogOnce(
+                LogLevel::Warning,
+                "Cursor motion can't be normalized without a valid window "
+                "size. Ignoring malformed mouse input"
+            );
             return;
         }
 

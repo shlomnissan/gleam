@@ -50,6 +50,31 @@ TEST(Logger, LogDebug) {
 
 #pragma endregion
 
+#pragma region Log once
+
+TEST(Logger, LogOnceSuppressesRepeatedMessages) {
+    testing::internal::CaptureStdout();
+    vglx::Logger::LogOnce(vglx::LogLevel::Info, "log once repeated");
+    vglx::Logger::LogOnce(vglx::LogLevel::Info, "log once repeated");
+    auto output = testing::internal::GetCapturedStdout();
+
+    const auto first = output.find("log once repeated");
+    EXPECT_NE(first, std::string::npos);
+    EXPECT_EQ(output.find("log once repeated", first + 1), std::string::npos);
+}
+
+TEST(Logger, LogOnceEmitsDistinctMessages) {
+    testing::internal::CaptureStdout();
+    vglx::Logger::LogOnce(vglx::LogLevel::Info, "log once resource {}", "a"s);
+    vglx::Logger::LogOnce(vglx::LogLevel::Info, "log once resource {}", "b"s);
+    auto output = testing::internal::GetCapturedStdout();
+
+    EXPECT_THAT(output, ::testing::HasSubstr("log once resource a"));
+    EXPECT_THAT(output, ::testing::HasSubstr("log once resource b"));
+}
+
+#pragma endregion
+
 #pragma region String formatting
 
 TEST(Logger, StringFormatting) {

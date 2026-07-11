@@ -9,20 +9,14 @@
 
 #include "vglx/core/identity.hpp"
 #include "vglx/utilities/logging.hpp"
-#include "vglx/utilities/timer.hpp"
 
-#include <atomic>
-#include <filesystem>
 #include <format>
-#include <iostream>
-#include <mutex>
 #include <source_location>
 #include <string>
+#include <string_view>
 #include <utility>
 
 namespace vglx {
-
-namespace fs = std::filesystem;
 
 class Logger {
 public:
@@ -36,10 +30,6 @@ public:
         ) {
             if (std::to_underlying(level) > std::to_underlying(GetLevel())) return;
 
-            const auto lock = std::scoped_lock(mutex_);
-
-            auto stream = level == LogLevel::Error ? &std::cerr : &std::cout;
-            const auto& path = fs::path{loc.file_name()};
             // std::format needs a compile-time string; std::vformat allows
             // runtime strings using format args.
             const auto message = std::vformat(
@@ -47,14 +37,7 @@ public:
                 std::make_format_args(static_cast<const Args&>(args)...)
             );
 
-            *stream << std::format(
-                "[{}]{}: {} -> {}:{}\n",
-                Timer::GetTimestamp(),
-                GetLogLevelString(level),
-                message,
-                path.filename().string(),
-                loc.line()
-            );
+            Emit(level, message, loc);
         }
 
         Log(
@@ -65,18 +48,58 @@ public:
     };
 
     template <typename... Args>
+    struct LogOnce {
+        LogOnce(
+            LogLevel level,
+            std::string_view format_str,
+            Args&&... args,
+            const std::source_location& loc = std::source_location::current()
+        ) {
+            if (std::to_underlying(level) > std::to_underlying(GetLevel())) return;
+
+            const auto message = std::vformat(
+                format_str,
+                std::make_format_args(static_cast<const Args&>(args)...)
+            );
+
+            EmitOnce(level, message, loc);
+        }
+
+        LogOnce(
+            std::string_view format_str,
+            Args&&... args,
+            const std::source_location& loc = std::source_location::current()
+        ) : LogOnce(LogLevel::Debug, format_str, std::forward<Args>(args)..., loc) {}
+    };
+
+    template <typename... Args>
     Log(LogLevel level, std::string_view message, Args&&...) -> Log<Args...>;
 
     template <typename... Args>
     Log(std::string_view message, Args&&...) -> Log<Args...>;
+
+    template <typename... Args>
+    LogOnce(LogLevel level, std::string_view message, Args&&...) -> LogOnce<Args...>;
+
+    template <typename... Args>
+    LogOnce(std::string_view message, Args&&...) -> LogOnce<Args...>;
 
     static auto GetLevel() -> LogLevel;
 
     static void SetLevel(LogLevel level);
 
 private:
-    static std::mutex mutex_;
-    static std::atomic<LogLevel> runtime_level_;
+    static void Emit(
+        LogLevel level,
+        std::string_view message,
+        const std::source_location& loc
+    );
+
+    static void EmitOnce(
+        LogLevel level,
+        const std::string& message,
+        const std::source_location& loc
+    );
 };
 
 }

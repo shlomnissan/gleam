@@ -8,6 +8,14 @@
 #include "utilities/logger.hpp"
 
 #include "vglx/utilities/logging.hpp"
+#include "vglx/utilities/timer.hpp"
+
+#include <atomic>
+#include <filesystem>
+#include <iostream>
+#include <mutex>
+#include <string>
+#include <unordered_set>
 
 #ifndef VGLX_LOG_LEVEL
     #define VGLX_LOG_LEVEL 3
@@ -31,15 +39,54 @@ constexpr LogLevel kDefaultLogLevel =
 
 namespace fs = std::filesystem;
 
-std::atomic<LogLevel> Logger::runtime_level_{kDefaultLogLevel};
-std::mutex Logger::mutex_ {};
+namespace {
+
+std::atomic<LogLevel> runtime_level {kDefaultLogLevel};
+std::mutex logger_mutex {};
+
+}
+
+void Logger::Emit(
+    LogLevel level,
+    std::string_view message,
+    const std::source_location& loc
+) {
+    const auto lock = std::scoped_lock(logger_mutex);
+
+    auto stream = level == LogLevel::Error ? &std::cerr : &std::cout;
+    const auto path = fs::path {loc.file_name()};
+
+    *stream << std::format(
+        "[{}]{}: {} -> {}:{}\n",
+        Timer::GetTimestamp(),
+        GetLogLevelString(level),
+        message,
+        path.filename().string(),
+        loc.line()
+    );
+}
+
+void Logger::EmitOnce(
+    LogLevel level,
+    const std::string& message,
+    const std::source_location& loc
+) {
+    static auto seen_messages = std::unordered_set<std::string>{};
+
+    {
+        const auto lock = std::scoped_lock(logger_mutex);
+        if (!seen_messages.insert(message).second) return;
+    }
+
+    Emit(level, message, loc);
+}
 
 auto Logger::GetLevel() -> LogLevel {
-    return runtime_level_.load(std::memory_order_relaxed);
+    return runtime_level.load(std::memory_order_relaxed);
 }
 
 void Logger::SetLevel(LogLevel level) {
-    runtime_level_.store(level, std::memory_order_relaxed);
+    runtime_level.store(level, std::memory_order_relaxed);
 }
 
 void SetLogLevel(LogLevel level) {
