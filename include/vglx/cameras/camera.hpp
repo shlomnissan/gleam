@@ -44,27 +44,15 @@ public:
     /**
      * @brief Updates the camera to reflect the current viewport size.
      *
-     * Caches the viewport dimensions, then calls @ref OnResize so the derived
-     * camera can rebuild its @ref projection_matrix.
+     * Calls @ref OnResize so the derived camera can rebuild its
+     * @ref projection_matrix.
      *
      * @param width  Viewport width in pixels.
      * @param height Viewport height in pixels.
      */
     auto Resize(int width, int height) -> void {
-        viewport_width_ = width;
-        viewport_height_ = height;
         OnResize(width, height);
     }
-
-    /**
-     * @brief Viewport width in pixels, or 0 before the first @ref Resize call.
-     */
-    [[nodiscard]] auto ViewportWidth() const -> int { return viewport_width_; }
-
-    /**
-     * @brief Viewport height in pixels, or 0 before the first @ref Resize call.
-     */
-    [[nodiscard]] auto ViewportHeight() const -> int { return viewport_height_; }
 
     /**
      * @brief Identifies this node as @ref Node::Type "Node::Type::Camera".
@@ -123,12 +111,6 @@ protected:
      * @param height Viewport height in pixels.
      */
     virtual auto OnResize(int width, int height) -> void = 0;
-
-private:
-    /// @cond INTERNAL
-    int viewport_width_ = 0;
-    int viewport_height_ = 0;
-    /// @endcond
 };
 
 }

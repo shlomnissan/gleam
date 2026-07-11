@@ -197,6 +197,10 @@ auto glfw_cursor_pos_callback(GLFWwindow* window, double x, double y) -> void {
     event->mods = glfw_mouse_mod_map(glfw_mouse_mods);
     event->position = {static_cast<float>(x), static_cast<float>(y)};
     event->scroll = {0.0f, 0.0f};
+    event->window_size = {
+        static_cast<float>(instance->window_width),
+        static_cast<float>(instance->window_height)
+    };
 
     EventDispatcher::Get().Dispatch("mouse_event", std::move(event));
 }
@@ -217,6 +221,10 @@ auto glfw_mouse_button_callback(GLFWwindow* window, int button, int action, int 
         static_cast<float>(instance->mouse_pos_y)
     };
     event->scroll = {0.0f, 0.0f};
+    event->window_size = {
+        static_cast<float>(instance->window_width),
+        static_cast<float>(instance->window_height)
+    };
 
     if (action == GLFW_PRESS) {
         EventDispatcher::Get().Dispatch("mouse_event", std::move(event));
@@ -244,6 +252,10 @@ auto glfw_scroll_callback(GLFWwindow* window, double x, double y) -> void {
         static_cast<float>(instance->mouse_pos_y)
     };
     event->scroll = {static_cast<float>(x), static_cast<float>(y)};
+    event->window_size = {
+        static_cast<float>(instance->window_width),
+        static_cast<float>(instance->window_height)
+    };
 
     EventDispatcher::Get().Dispatch("mouse_event", std::move(event));
 }

@@ -79,9 +79,9 @@ struct OrbitControls::Impl {
         using enum MouseEvent::Type;
         using enum MouseButton;
 
-        if (camera->ViewportHeight() <= 0) {
-            // OrbitControls requires a sized camera but Camera::Resize
-            // was never called. Ignoring mouse input
+        if (event->window_size.y <= 0.0f) {
+            // Cursor motion can't be normalized without a valid window
+            // size. Ignoring malformed mouse input
             return;
         }
 
@@ -106,8 +106,7 @@ struct OrbitControls::Impl {
 
         if (event->type == Moved) {
             curr_pos = event->position;
-            const auto offset =
-                (curr_pos - prev_pos) / static_cast<float>(camera->ViewportHeight());
+            const auto offset = (curr_pos - prev_pos) / event->window_size.y;
 
             if (curr_button == Left && !shift_mod) {
                 spherical_delta.phi -= offset.x * params.orbit_speed;

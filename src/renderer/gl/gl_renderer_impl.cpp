@@ -37,7 +37,8 @@ Renderer::Impl::Impl(const Renderer::Parameters& params)
         params.framebuffer_height,
         params.sample_count,
     }),
-    params_(params),
+    viewport_width_(params.framebuffer_width),
+    viewport_height_(params.framebuffer_height),
     render_lists_(std::make_unique<RenderLists>()),
     shadow_render_lists_(std::make_unique<RenderLists>()),
     shadow_map_(params.shadow_map),
@@ -189,14 +190,10 @@ auto Renderer::Impl::SetUniforms(
 ) -> void {
     auto material = renderable->GetMaterial().get();
     auto model = renderable->GetWorldTransform();
-    auto resolution = Vector2(
-        static_cast<float>(params_.framebuffer_width),
-        static_cast<float>(params_.framebuffer_height)
-    );
 
     program->SetUniform(Uniform::Model, &model);
     program->SetUniform(Uniform::Opacity, &material->opacity);
-    program->SetUniform(Uniform::Resolution, &resolution);
+    program->SetUniform(Uniform::Resolution, &resolution_);
 
     static const auto kIdentity = Matrix3::Identity();
     program->SetUniform(Uniform::TextureTransform, &kIdentity);
@@ -513,6 +510,10 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
 }
 
 auto Renderer::Impl::Render(Scene* scene, Camera* camera, RenderTarget* target) -> void {
+    resolution_ = target != nullptr
+        ? Vector2 { static_cast<float>(target->width), static_cast<float>(target->height) }
+        : Vector2 { static_cast<float>(viewport_width_), static_cast<float>(viewport_height_) };
+
     if (scene->environment) {
         textures_.Bind(scene->environment, 0);
         auto env_maps = environment_.GetOrProcess(scene->environment);
@@ -553,6 +554,8 @@ auto Renderer::Impl::Render(Scene* scene, Camera* camera, RenderTarget* target) 
 }
 
 auto Renderer::Impl::SetViewport(int x, int y, int width, int height) -> void {
+    viewport_width_ = width;
+    viewport_height_ = height;
     state_.SetViewport(x, y, width, height);
     scene_buffer_.ResizeViewport(width, height);
 }

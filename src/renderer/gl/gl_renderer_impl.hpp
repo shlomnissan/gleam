@@ -8,6 +8,7 @@
 #pragma once
 
 #include "vglx/core/renderer.hpp"
+#include "vglx/math/vector2.hpp"
 #include "vglx/scene/renderable.hpp"
 
 #include "renderer/gl/gl_background_pass.hpp"
@@ -82,7 +83,10 @@ private:
     GLTextures textures_;
     GLVertexBuffers vertex_buffers_;
 
-    Renderer::Parameters params_;
+    Vector2 resolution_ {0.0f, 0.0f};
+
+    int viewport_width_ {0};
+    int viewport_height_ {0};
 
     std::unique_ptr<RenderLists> render_lists_;
     std::unique_ptr<RenderLists> shadow_render_lists_;

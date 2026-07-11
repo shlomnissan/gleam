@@ -67,7 +67,7 @@ struct VGLX_EXPORT MouseEvent : public Event {
      * The coordinate origin is always the top-left corner of the window:
      * X increases to the right and Y increases downward.
      */
-    Vector2 position;
+    Vector2 position {0.0f, 0.0f};
 
     /**
      * @brief Scroll delta since the last scroll event.
@@ -75,7 +75,15 @@ struct VGLX_EXPORT MouseEvent : public Event {
      * The delta is expressed in abstract scroll units normalized such that
      * positive Y values represent upward scrolling.
      */
-    Vector2 scroll;
+    Vector2 scroll {0.0f, 0.0f};
+
+    /**
+     * @brief Size of the window's client area in window coordinates.
+     *
+     * Shares the coordinate space of @ref MouseEvent::position "position",
+     * so it can be used to normalize cursor positions or drag deltas.
+     */
+    Vector2 window_size {0.0f, 0.0f};
 
     /// @brief The interaction @ref MouseEvent::Type "type" for this event.
     MouseEvent::Type type;
