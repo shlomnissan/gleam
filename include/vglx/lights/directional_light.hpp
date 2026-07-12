@@ -44,9 +44,9 @@ class VGLX_EXPORT DirectionalLight : public Light {
 public:
     /// @brief Parameters for constructing a @ref DirectionalLight object.
     struct Parameters {
-        Color color; ///< Light color.
-        float intensity; ///< Light intensity multiplier.
-        Node* target; ///< Node the light is directed toward.
+        Color color {0xFFFFFF}; ///< Light color.
+        float intensity {1.0f}; ///< Light intensity multiplier.
+        Node* target {nullptr}; ///< Node the light is directed toward.
         bool cast_shadow {false}; ///< Enables shadow casting for this light.
     };
 
@@ -66,6 +66,13 @@ public:
      * for constructing the light.
      */
     explicit DirectionalLight(const Parameters& params);
+
+    /**
+     * @brief Creates an instance of @ref DirectionalLight with default parameters.
+     */
+    [[nodiscard]] static auto Create() -> std::unique_ptr<DirectionalLight> {
+        return std::make_unique<DirectionalLight>(Parameters {});
+    }
 
     /**
      * @brief Creates an instance of @ref DirectionalLight.

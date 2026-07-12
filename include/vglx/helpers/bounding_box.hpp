@@ -27,33 +27,39 @@ namespace vglx {
  *
  * @code
  * auto geometry = vglx::SphereGeometry::Create();
- * my_scene->Add(vglx::BoundingBox::Create(
- *   geometry->BoundingBox(),
- *   0xFFFFFF
- * ));
+ * my_scene->Add(vglx::BoundingBox::Create({
+ *   .box = geometry->BoundingBox(),
+ *   .color = 0xFFFFFF
+ * }));
  * @endcode
  *
  * @ingroup HelpersGroup
  */
 class VGLX_EXPORT BoundingBox : public Node {
 public:
+    /// @brief Parameters for constructing a @ref BoundingBox object.
+    struct Parameters {
+        Box3 box; ///< Axis-aligned bounds to visualize.
+        Color color {0xFFFFFF}; ///< Line color used for rendering the box.
+    };
+
     /**
      * @brief Constructs a bounding box debug node.
      *
-     * @param box Axis-aligned bounds to visualize.
-     * @param color Line color used for rendering the box.
+     * @param params @ref BoundingBox::Parameters "Initialization parameters"
+     * for constructing the bounding box.
      */
-    BoundingBox(const Box3& box, const Color& color);
+    explicit BoundingBox(const Parameters& params);
 
     /**
      * @brief Creates an instance of @ref BoundingBox.
      *
-     * @param box Axis-aligned bounds to visualize.
-     * @param color Line color used for rendering the box.
+     * @param params @ref BoundingBox::Parameters "Initialization parameters"
+     * for constructing the bounding box.
      */
     [[nodiscard]] static auto
-    Create(const Box3& box, const Color& color) -> std::unique_ptr<BoundingBox> {
-        return std::make_unique<BoundingBox>(box, color);
+    Create(const Parameters& params) -> std::unique_ptr<BoundingBox> {
+        return std::make_unique<BoundingBox>(params);
     }
 };
 

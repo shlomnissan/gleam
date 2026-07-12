@@ -26,7 +26,11 @@ namespace vglx {
  * alpha channel.
  *
  * @code
- * auto material = vglx::SpriteMaterial::Create(texture, 0xFFFFFF);
+ * auto material = vglx::SpriteMaterial::Create({
+ *   .color = 0xFFFFFF,
+ *   .texture_map = texture
+ * });
+ *
  * my_scene->Add(vglx::Sprite::Create(material));
  * @endcode
  *
@@ -34,6 +38,15 @@ namespace vglx {
  */
 class VGLX_EXPORT SpriteMaterial : public Material {
 public:
+    /**
+     * @brief Parameters for constructing a @ref SpriteMaterial object.
+     */
+    struct Parameters {
+        Color color {0xFFFFFF}; ///< Base tint color applied to the texture.
+        std::shared_ptr<Texture> texture_map {nullptr}; ///< Sprite texture sampled for color and alpha.
+        bool size_attenuation {true}; ///< Attenuate sprite size by distance in perspective.
+    };
+
     /// @brief Base tint color applied multiplicatively to the sprite texture.
     Color color;
 
@@ -44,32 +57,34 @@ public:
     bool size_attenuation {true};
 
     /**
-     * @brief Constructs a sprite material.
+     * @brief Constructs a sprite material from the given parameters.
      *
      * Transparency is enabled by default and uses the alpha channel of the
      * provided texture.
      *
-     * @param texture_map Sprite texture to sample for color and alpha.
-     * @param color Base tint color applied to the texture.
+     * @param params @ref SpriteMaterial::Parameters "Initialization parameters".
      */
-    SpriteMaterial(
-        std::shared_ptr<Texture> texture_map,
-        const Color& color = 0xFFFFFF
-    ) : color(color), texture_map(std::move(texture_map)) {
+    explicit SpriteMaterial(const Parameters& params)
+      : color(params.color),
+        texture_map(params.texture_map),
+        size_attenuation(params.size_attenuation) {
         transparent = true;
+    }
+
+    /**
+     * @brief Creates a shared instance of @ref SpriteMaterial with default parameters.
+     */
+    [[nodiscard]] static auto Create() -> std::shared_ptr<SpriteMaterial> {
+        return std::make_shared<SpriteMaterial>(Parameters {});
     }
 
     /**
      * @brief Creates a shared instance of @ref SpriteMaterial.
      *
-     * @param texture_map Sprite texture to sample for color and alpha.
-     * @param color Base tint color applied to the texture.
+     * @param params @ref SpriteMaterial::Parameters "Initialization parameters".
      */
-    [[nodiscard]] static auto Create(
-        std::shared_ptr<Texture> texture_map,
-        const Color& color = 0xFFFFFF
-    ) -> std::shared_ptr<SpriteMaterial> {
-        return std::make_shared<SpriteMaterial>(std::move(texture_map), color);
+    [[nodiscard]] static auto Create(const Parameters& params) -> std::shared_ptr<SpriteMaterial> {
+        return std::make_shared<SpriteMaterial>(params);
     }
 
     /**

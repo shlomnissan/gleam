@@ -36,8 +36,8 @@ class AmbientLight : public Light {
 public:
     /// @brief Parameters for constructing an @ref AmbientLight object.
     struct Parameters {
-        Color color; ///< Light color.
-        float intensity; ///< Light intensity multiplier.
+        Color color {0xFFFFFF}; ///< Light color.
+        float intensity {1.0f}; ///< Light intensity multiplier.
     };
 
     /**
@@ -48,6 +48,13 @@ public:
      */
     explicit AmbientLight(const Parameters& params) : Light(params.color, params.intensity) {
         SetName("ambient light");
+    }
+
+    /**
+     * @brief Creates an instance of @ref AmbientLight with default parameters.
+     */
+    [[nodiscard]] static auto Create() -> std::unique_ptr<AmbientLight> {
+        return std::make_unique<AmbientLight>(Parameters {});
     }
 
     /**

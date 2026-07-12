@@ -31,7 +31,7 @@ namespace vglx {
  * MyNode::MyNode() {
  *   auto texture = LoadTexture("assets/sprite.png");
  *   if (texture.has_value()) {
- *     auto material = vglx::SpriteMaterial::Create(texture.value());
+ *     auto material = vglx::SpriteMaterial::Create({.texture_map = texture.value()});
  *     Add(vglx::Sprite::Create(material))->transform.SetScale(0.5f);
  *   } else {
  *     std::println(stderr, "{}", texture.error());
@@ -69,7 +69,7 @@ public:
      *
      * @param material Material used to render the sprite.
      */
-    Sprite(std::shared_ptr<SpriteMaterial> material);
+    explicit Sprite(std::shared_ptr<SpriteMaterial> material);
 
     /**
      * @brief Creates an instance of @ref Sprite.

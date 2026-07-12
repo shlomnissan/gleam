@@ -37,8 +37,8 @@ class VGLX_EXPORT PointLight : public Light {
 public:
     /// @brief Parameters for constructing a @ref PointLight object.
     struct Parameters {
-        Color color; ///< Light color.
-        float intensity; ///< Light intensity multiplier.
+        Color color {0xFFFFFF}; ///< Light color.
+        float intensity {1.0f}; ///< Light intensity multiplier.
         float range {0.0f}; ///< Maximum range of influence. 0 = unbounded.
     };
 
@@ -56,7 +56,14 @@ public:
      * @param params @ref PointLight::Parameters "Initialization parameters"
      * for constructing the light.
      */
-    PointLight(const Parameters& params);
+    explicit PointLight(const Parameters& params);
+
+    /**
+     * @brief Creates an instance of @ref PointLight with default parameters.
+     */
+    [[nodiscard]] static auto Create() -> std::unique_ptr<PointLight> {
+        return std::make_unique<PointLight>(Parameters {});
+    }
 
     /**
      * @brief Creates an instance of @ref PointLight.

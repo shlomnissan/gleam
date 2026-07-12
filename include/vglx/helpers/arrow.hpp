@@ -41,10 +41,10 @@ class VGLX_EXPORT Arrow : public Node {
 public:
     /// @brief Parameters used to construct an @ref Arrow object.
     struct Parameters {
-        Vector3 direction; ///< Direction vector of the arrow.
-        Vector3 origin; ///< World-space origin of the arrow.
-        Color color; ///< Arrow color.
-        float length; ///< Length of the arrow in world units.
+        Vector3 direction {0.0f, 0.0f, 1.0f}; ///< Direction vector of the arrow.
+        Vector3 origin {Vector3::Zero()}; ///< World-space origin of the arrow.
+        Color color {0xFFFFFF}; ///< Arrow color.
+        float length {1.0f}; ///< Length of the arrow in world units.
     };
 
     /**
@@ -54,6 +54,13 @@ public:
      * for constructing the arrow.
      */
     explicit Arrow(const Parameters& params);
+
+    /**
+     * @brief Creates an instance of @ref Arrow with default parameters.
+     */
+    [[nodiscard]] static auto Create() -> std::unique_ptr<Arrow> {
+        return std::make_unique<Arrow>(Parameters {});
+    }
 
     /**
      * @brief Creates an instance of @ref Arrow.

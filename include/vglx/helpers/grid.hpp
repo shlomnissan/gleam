@@ -40,9 +40,9 @@ public:
      * @brief Parameters for constructing a @ref Grid object.
      */
     struct Parameters {
-        Color color; ///< Line color used for rendering.
-        float size; ///< Half-width of the grid in world units.
-        unsigned int divisions; ///< Number of grid subdivisions along each axis.
+        Color color {0x333333}; ///< Line color used for rendering.
+        float size {4.0f}; ///< Half-width of the grid in world units.
+        unsigned int divisions {16}; ///< Number of grid subdivisions along each axis.
     };
 
     /**
@@ -52,6 +52,13 @@ public:
      * for constructing the grid.
      */
     explicit Grid(const Parameters& params);
+
+    /**
+     * @brief Creates an instance of @ref Grid with default parameters.
+     */
+    [[nodiscard]] static auto Create() -> std::unique_ptr<Grid> {
+        return std::make_unique<Grid>(Parameters {});
+    }
 
     /**
      * @brief Creates an instance of @ref Grid.

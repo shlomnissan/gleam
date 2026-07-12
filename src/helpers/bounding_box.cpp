@@ -47,8 +47,8 @@ auto create_geometry(const Box3& box) {
 
 }
 
-BoundingBox::BoundingBox(const Box3& box, const Color& color) {
-    Add(Mesh::Create(create_geometry(box), UnlitMaterial::Create({.color = color})));
+BoundingBox::BoundingBox(const Parameters& params) {
+    Add(Mesh::Create(create_geometry(params.box), UnlitMaterial::Create({.color = params.color})));
 }
 
 }

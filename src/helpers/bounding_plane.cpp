@@ -60,12 +60,12 @@ auto create_solid_mesh(const Color& color) {
 
 }
 
-BoundingPlane::BoundingPlane(const Plane& plane, float size, const Color& color) {
-    Add(create_wireframe_mesh(color));
-    Add(create_solid_mesh(color));
-    transform.SetScale({size * 0.5f, size * 0.5f, size});
-    LookAt(plane.normal);
-    transform.Translate({0.0f, 0.0f, -plane.distance});
+BoundingPlane::BoundingPlane(const Parameters& params) {
+    Add(create_wireframe_mesh(params.color));
+    Add(create_solid_mesh(params.color));
+    transform.SetScale({params.size * 0.5f, params.size * 0.5f, params.size});
+    LookAt(params.plane.normal);
+    transform.Translate({0.0f, 0.0f, -params.plane.distance});
 }
 
 }

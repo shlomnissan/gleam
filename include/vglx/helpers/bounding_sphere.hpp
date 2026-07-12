@@ -27,33 +27,39 @@ namespace vglx {
  *
  * @code
  * auto geometry = vglx::BoxGeometry::Create();
- * my_scene->Add(vglx::BoundingSphere::Create(
- *   geometry->BoundingSphere(),
- *   0xFF0000
- * ));
+ * my_scene->Add(vglx::BoundingSphere::Create({
+ *   .sphere = geometry->BoundingSphere(),
+ *   .color = 0xFF0000
+ * }));
  * @endcode
  *
  * @ingroup HelpersGroup
  */
 class VGLX_EXPORT BoundingSphere : public Node {
 public:
+    /// @brief Parameters for constructing a @ref BoundingSphere object.
+    struct Parameters {
+        Sphere sphere; ///< Spherical bounds to visualize.
+        Color color {0xFFFFFF}; ///< Line color used for rendering the wireframe sphere.
+    };
+
     /**
      * @brief Constructs a bounding-sphere debug node.
      *
-     * @param sphere Spherical bounds to visualize.
-     * @param color Line color used for rendering the wireframe sphere.
+     * @param params @ref BoundingSphere::Parameters "Initialization parameters"
+     * for constructing the bounding sphere.
      */
-    BoundingSphere(const Sphere& sphere, const Color& color);
+    explicit BoundingSphere(const Parameters& params);
 
     /**
      * @brief Creates an instance of @ref BoundingSphere.
      *
-     * @param sphere Spherical bounds to visualize.
-     * @param color Line color used for rendering.
+     * @param params @ref BoundingSphere::Parameters "Initialization parameters"
+     * for constructing the bounding sphere.
      */
     [[nodiscard]] static auto
-    Create(const Sphere& sphere, const Color& color) -> std::unique_ptr<BoundingSphere> {
-        return std::make_unique<BoundingSphere>(sphere, color);
+    Create(const Parameters& params) -> std::unique_ptr<BoundingSphere> {
+        return std::make_unique<BoundingSphere>(params);
     }
 };
 

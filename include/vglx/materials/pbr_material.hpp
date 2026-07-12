@@ -45,21 +45,21 @@ public:
      * @brief Parameters for constructing a @ref PBRMaterial object.
      */
     struct Parameters {
-        Color color = 0xFFFFFF; ///< Base surface color.
-        Color emissive_color = 0x000000; ///< Emissive color independent of lighting.
-        float ao_intensity = 1.0f; ///< AO contribution strength.
-        float emissive_intensity = 1.0f; ///< Emissive multiplier.
-        float environment_intensity = 1.0f; ///< Environment lighting multiplier.
-        float metallic = 0.0f; ///< Metallic factor.
-        float normal_intensity = 1.0f; ///< Normal map strength.
-        float roughness = 1.0f; ///< Roughness factor.
-        std::shared_ptr<Texture> alpha_map = nullptr; ///< Per-pixel opacity map.
-        std::shared_ptr<Texture> ao_map = nullptr; ///< Ambient occlusion map (R channel).
-        std::shared_ptr<Texture> albedo_map = nullptr; ///< Base color map.
-        std::shared_ptr<Texture> emissive_map = nullptr; ///< Emissive color map.
-        std::shared_ptr<Texture> metallic_map = nullptr; ///< Metallic map (B channel).
-        std::shared_ptr<Texture> normal_map = nullptr; ///< Surface normal map.
-        std::shared_ptr<Texture> roughness_map = nullptr; ///< Roughness map (G channel).
+        Color color {0xFFFFFF}; ///< Base surface color.
+        Color emissive_color {0x000000}; ///< Emissive color independent of lighting.
+        float ao_intensity {1.0f}; ///< AO contribution strength.
+        float emissive_intensity {1.0f}; ///< Emissive multiplier.
+        float environment_intensity {1.0f}; ///< Environment lighting multiplier.
+        float metallic {0.0f}; ///< Metallic factor.
+        float normal_intensity {1.0f}; ///< Normal map strength.
+        float roughness {1.0f}; ///< Roughness factor.
+        std::shared_ptr<Texture> alpha_map {nullptr}; ///< Per-pixel opacity map.
+        std::shared_ptr<Texture> ao_map {nullptr}; ///< Ambient occlusion map (R channel).
+        std::shared_ptr<Texture> albedo_map {nullptr}; ///< Base color map.
+        std::shared_ptr<Texture> emissive_map {nullptr}; ///< Emissive color map.
+        std::shared_ptr<Texture> metallic_map {nullptr}; ///< Metallic map (B channel).
+        std::shared_ptr<Texture> normal_map {nullptr}; ///< Surface normal map.
+        std::shared_ptr<Texture> roughness_map {nullptr}; ///< Roughness map (G channel).
     };
 
     /// @brief Base surface color; for metals this acts as the specular tint.

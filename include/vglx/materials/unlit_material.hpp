@@ -42,9 +42,9 @@ public:
      * @brief Parameters for constructing an @ref UnlitMaterial object.
      */
     struct Parameters {
-        Color color = 0xFFFFFF; ///< Base surface color.
-        std::shared_ptr<Texture> texture_map = nullptr; ///< Surface color texture.
-        std::shared_ptr<Texture> alpha_map = nullptr; ///< Per-pixel opacity map.
+        Color color {0xFFFFFF}; ///< Base surface color.
+        std::shared_ptr<Texture> texture_map {nullptr}; ///< Surface color texture.
+        std::shared_ptr<Texture> alpha_map {nullptr}; ///< Per-pixel opacity map.
     };
 
     /// @brief Base color applied to the surface.

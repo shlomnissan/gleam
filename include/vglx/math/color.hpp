@@ -71,7 +71,7 @@ public:
      *
      * @param color Span containing red, green, and blue components.
      */
-    constexpr Color(std::span<float> color) : r(color[0]), g(color[1]), b(color[2]) {}
+    explicit constexpr Color(std::span<float> color) : r(color[0]), g(color[1]), b(color[2]) {}
 
     /**
      * @brief Accesses a channel by index.

@@ -76,10 +76,10 @@ public:
 
     /// @brief Parameters for constructing a Window object.
     struct Parameters {
-        std::string title; ///< Window title.
-        int width; ///< Client-area width in pixels.
-        int height; ///< Client-area height in pixels.
-        bool vsync; ///< Enable or disable vertical sync.
+        std::string title {""}; ///< Window title.
+        int width {1280}; ///< Client-area width in pixels.
+        int height {720}; ///< Client-area height in pixels.
+        bool vsync {true}; ///< Enable or disable vertical sync.
     };
 
     /**

@@ -10,6 +10,7 @@
 #include "vglx_export.h"
 
 #include "vglx/cameras/camera.hpp"
+#include "vglx/math/utilities.hpp"
 
 #include <memory>
 
@@ -44,10 +45,10 @@ class VGLX_EXPORT PerspectiveCamera : public Camera {
 public:
     /// @brief Parameters for constructing a @ref PerspectiveCamera object.
     struct Parameters {
-        float fov; ///< Vertical field of view in radians.
-        float aspect; ///< Aspect ratio.
-        float near; ///< Distance to the near clipping plane.
-        float far; ///< Distance to the far clipping plane.
+        float fov {math::DegToRad(60.0f)}; ///< Vertical field of view in radians.
+        float aspect {1.0f}; ///< Aspect ratio.
+        float near {0.1f}; ///< Distance to the near clipping plane.
+        float far {1000.0f}; ///< Distance to the far clipping plane.
     };
 
     /**
@@ -57,6 +58,13 @@ public:
      * for constructing the camera.
      */
     explicit PerspectiveCamera(const Parameters& params);
+
+    /**
+     * @brief Creates an instance of @ref PerspectiveCamera with default parameters.
+     */
+    [[nodiscard]] static auto Create() -> std::unique_ptr<PerspectiveCamera> {
+        return std::make_unique<PerspectiveCamera>(Parameters {});
+    }
 
     /**
      * @brief Creates an instance of @ref PerspectiveCamera.

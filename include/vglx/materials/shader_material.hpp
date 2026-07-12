@@ -19,6 +19,7 @@
 #include "vglx/textures/texture.hpp"
 
 #include <memory>
+#include <utility>
 #include <string>
 #include <unordered_map>
 #include <variant>
@@ -110,8 +111,8 @@ public:
      * @param params @ref ShaderMaterial::Parameters "Initialization parameters"
      * defining the shader sources and initial uniform values.
      */
-    [[nodiscard]] static auto Create(const Parameters& params) -> std::shared_ptr<ShaderMaterial> {
-        return std::make_shared<ShaderMaterial>(params);
+    [[nodiscard]] static auto Create(Parameters params) -> std::shared_ptr<ShaderMaterial> {
+        return std::make_shared<ShaderMaterial>(std::move(params));
     }
 
     /**

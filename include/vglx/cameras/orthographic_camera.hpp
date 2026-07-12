@@ -46,12 +46,12 @@ class VGLX_EXPORT OrthographicCamera : public Camera {
 public:
     /// @brief Parameters for constructing an @ref OrthographicCamera object.
     struct Parameters {
-        float left; ///< Left clipping plane.
-        float right; ///< Right clipping plane.
-        float top; ///< Top clipping plane.
-        float bottom; ///< Bottom clipping plane.
-        float near; ///< Near clipping plane.
-        float far; ///< Far clipping plane.
+        float left {-1.0f}; ///< Left clipping plane.
+        float right {1.0f}; ///< Right clipping plane.
+        float top {1.0f}; ///< Top clipping plane.
+        float bottom {-1.0f}; ///< Bottom clipping plane.
+        float near {0.1f}; ///< Near clipping plane.
+        float far {1000.0f}; ///< Far clipping plane.
     };
 
     /**
@@ -73,6 +73,13 @@ public:
      * for constructing the camera.
      */
     explicit OrthographicCamera(const Parameters& params);
+
+    /**
+     * @brief Creates an instance of @ref OrthographicCamera with default parameters.
+     */
+    [[nodiscard]] static auto Create() -> std::unique_ptr<OrthographicCamera> {
+        return std::make_unique<OrthographicCamera>(Parameters {});
+    }
 
     /**
      * @brief Creates an instance of @ref OrthographicCamera.

@@ -27,33 +27,41 @@ namespace vglx {
  * a simple wireframe in the color provided.
  *
  * @code
- * auto plane = vglx::Plane {vglx::Vector3::Z(), 0.0f};
- * my_scene->Add(vglx::BoundingPlane::Create(plane, 2.0f, 0xFF0000));
+ * my_scene->Add(vglx::BoundingPlane::Create({
+ *   .plane = vglx::Plane {vglx::Vector3::Z(), 0.0f},
+ *   .size = 2.0f,
+ *   .color = 0xFF0000
+ * }));
  * @endcode
  *
  * @ingroup HelpersGroup
  */
 class VGLX_EXPORT BoundingPlane : public Node {
 public:
+    /// @brief Parameters for constructing a @ref BoundingPlane object.
+    struct Parameters {
+        Plane plane; ///< Infinite geometric plane to visualize.
+        float size {1.0f}; ///< Extent of the rendered square patch, measured from center to edge.
+        Color color {0xFFFFFF}; ///< Line color used to draw the patch.
+    };
+
     /**
      * @brief Constructs a bounding plane debug node.
      *
-     * @param plane Infinite geometric plane to visualize.
-     * @param size Extent of the rendered square patch, measured from center to edge.
-     * @param color Line color used to draw the patch.
+     * @param params @ref BoundingPlane::Parameters "Initialization parameters"
+     * for constructing the bounding plane.
      */
-    BoundingPlane(const Plane& plane, float size, const Color& color);
+    explicit BoundingPlane(const Parameters& params);
 
     /**
      * @brief Creates an instance of @ref BoundingPlane.
      *
-     * @param plane Infinite geometric plane to visualize.
-     * @param size Extent of the rendered square patch.
-     * @param color Line color used to draw the patch.
+     * @param params @ref BoundingPlane::Parameters "Initialization parameters"
+     * for constructing the bounding plane.
      */
     [[nodiscard]] static auto
-    Create(const Plane& plane, float size, const Color& color) -> std::unique_ptr<BoundingPlane> {
-        return std::make_unique<BoundingPlane>(plane, size, color);
+    Create(const Parameters& params) -> std::unique_ptr<BoundingPlane> {
+        return std::make_unique<BoundingPlane>(params);
     }
 };
 

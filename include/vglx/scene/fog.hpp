@@ -56,25 +56,25 @@ struct Fog {
      * @brief Parameters for constructing a linear @ref Fog object.
      */
     struct LinearParameters {
-        Color color = 0xFFFFFF; ///< Fog color.
-        float near = 1.0f; ///< Distance at which fog begins to appear.
-        float far = 1000.0f; ///< Distance at which fog reaches full intensity.
+        Color color {0xFFFFFF}; ///< Fog color.
+        float near {1.0f}; ///< Distance at which fog begins to appear.
+        float far {1000.0f}; ///< Distance at which fog reaches full intensity.
     };
 
     /**
      * @brief Parameters for constructing an exponential @ref Fog object.
      */
     struct ExponentialParameters {
-        Color color = 0xFFFFFF; ///< Fog color.
-        float density = 0.00025f; ///< Exponential density factor (higher values produce thicker fog).
+        Color color {0xFFFFFF}; ///< Fog color.
+        float density {0.00025f}; ///< Exponential density factor (higher values produce thicker fog).
     };
 
     Type type; ///< Fog attenuation model.
     Color color; ///< Fog color applied at full intensity.
 
-    float near; ///< Start distance for linear fog (used when type is Linear).
-    float far; ///< End distance for linear fog (used when type is Linear).
-    float density; ///< Density factor for exponential fog (used when type is Exponential).
+    float near {1.0f}; ///< Start distance for linear fog (used when type is Linear).
+    float far {1000.0f}; ///< End distance for linear fog (used when type is Linear).
+    float density {0.00025f}; ///< Density factor for exponential fog (used when type is Exponential).
 
     /**
      * @brief Constructs a fog object.

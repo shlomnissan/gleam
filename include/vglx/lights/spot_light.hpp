@@ -48,11 +48,11 @@ class VGLX_EXPORT SpotLight : public Light {
 public:
     /// @brief Parameters for constructing a @ref SpotLight object.
     struct Parameters {
-        Color color; ///< Light color.
-        float intensity; ///< Light intensity multiplier.
-        float angle; ///< Cone angle (in radians) for spotlight cutoff.
-        float penumbra; ///< Softness of the spotlight edge.
-        Node* target; ///< Node the light is directed toward.
+        Color color {0xFFFFFF}; ///< Light color.
+        float intensity {1.0f}; ///< Light intensity multiplier.
+        float angle {math::pi / 3.0f}; ///< Cone angle (in radians) for spotlight cutoff.
+        float penumbra {0.0f}; ///< Softness of the spotlight edge.
+        Node* target {nullptr}; ///< Node the light is directed toward.
         float range {0.0f}; ///< Maximum range of influence. 0 = unbounded.
         bool cast_shadow {false}; ///< Enables shadow casting for this light.
     };
@@ -87,6 +87,13 @@ public:
      * for constructing the light.
      */
     explicit SpotLight(const Parameters& params);
+
+    /**
+     * @brief Creates an instance of @ref SpotLight with default parameters.
+     */
+    [[nodiscard]] static auto Create() -> std::unique_ptr<SpotLight> {
+        return std::make_unique<SpotLight>(Parameters {});
+    }
 
     /**
      * @brief Creates an instance of @ref SpotLight.

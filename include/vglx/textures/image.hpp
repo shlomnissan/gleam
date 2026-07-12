@@ -61,7 +61,7 @@ struct Image {
      * @param params @ref Image::Parameters "Initialization parameters"
      * for constructing the image.
      */
-    Image(Parameters params)
+    explicit Image(Parameters params)
         : data(std::move(params.data)),
           width(params.width),
           height(params.height) {}
@@ -80,7 +80,7 @@ struct Image {
      * @param params @ref Image::Parameters "Initialization parameters"
      * for constructing the image.
      */
-    static auto Create(Parameters params) -> std::shared_ptr<Image> {
+    [[nodiscard]] static auto Create(Parameters params) -> std::shared_ptr<Image> {
         return std::make_shared<Image>(std::move(params));
     }
 

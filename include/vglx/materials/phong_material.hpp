@@ -45,21 +45,21 @@ public:
      * @brief Parameters for constructing a @ref PhongMaterial object.
      */
     struct Parameters {
-        Color color = 0xFFFFFF; ///< Diffuse base color.
-        Color specular_color = 0x111111; ///< Specular highlight tint.
-        Color emissive_color = 0x000000; ///< Emissive color independent of lighting.
-        float ao_intensity = 1.0f; ///< AO contribution strength.
-        float shininess = 32.0f; ///< Specular highlight glossiness.
-        float emissive_intensity = 1.0f; ///< Emissive multiplier.
-        float normal_intensity = 1.0f; ///< Normal map strength.
-        float reflectivity = 1.0f; ///< Environment reflection strength.
-        std::shared_ptr<Texture> albedo_map = nullptr; ///< Diffuse color map.
-        std::shared_ptr<Texture> alpha_map = nullptr; ///< Per-pixel opacity map.
-        std::shared_ptr<Texture> ao_map = nullptr; ///< Ambient occlusion map (R channel).
-        std::shared_ptr<Texture> emissive_map = nullptr; ///< Emissive color map.
-        std::shared_ptr<CubeTexture> environment_map = nullptr; ///< Environment reflection cube map.
-        std::shared_ptr<Texture> normal_map = nullptr; ///< Surface normal map.
-        std::shared_ptr<Texture> specular_map = nullptr; ///< Specular intensity map.
+        Color color {0xFFFFFF}; ///< Diffuse base color.
+        Color specular_color {0x111111}; ///< Specular highlight tint.
+        Color emissive_color {0x000000}; ///< Emissive color independent of lighting.
+        float ao_intensity {1.0f}; ///< AO contribution strength.
+        float shininess {32.0f}; ///< Specular highlight glossiness.
+        float emissive_intensity {1.0f}; ///< Emissive multiplier.
+        float normal_intensity {1.0f}; ///< Normal map strength.
+        float reflectivity {1.0f}; ///< Environment reflection strength.
+        std::shared_ptr<Texture> albedo_map {nullptr}; ///< Diffuse color map.
+        std::shared_ptr<Texture> alpha_map {nullptr}; ///< Per-pixel opacity map.
+        std::shared_ptr<Texture> ao_map {nullptr}; ///< Ambient occlusion map (R channel).
+        std::shared_ptr<Texture> emissive_map {nullptr}; ///< Emissive color map.
+        std::shared_ptr<CubeTexture> environment_map {nullptr}; ///< Environment reflection cube map.
+        std::shared_ptr<Texture> normal_map {nullptr}; ///< Surface normal map.
+        std::shared_ptr<Texture> specular_map {nullptr}; ///< Specular intensity map.
     };
 
     /// @brief Base surface color used for diffuse reflection.
