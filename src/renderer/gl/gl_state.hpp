@@ -14,9 +14,16 @@
 
 namespace vglx {
 
+enum class CullFace {
+    Back,
+    Front
+};
+
 class GLState {
 public:
     auto SetBackfaceCulling(bool enabled) -> void;
+
+    auto SetCullFace(CullFace face) -> void;
 
     auto SetBlending(Material::Blending blending) -> void;
 
@@ -51,9 +58,11 @@ private:
 
     bool curr_backface_culling_ {false};
 
-    bool curr_depth_mask_ {false};
+    bool curr_depth_mask_ {true};
 
-    unsigned int curr_program_ = 0;
+    CullFace curr_cull_face_ {CullFace::Back};
+
+    unsigned int curr_program_ {0};
 
     auto Enable(int token) -> void;
 

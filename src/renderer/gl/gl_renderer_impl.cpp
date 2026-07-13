@@ -480,7 +480,14 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
             auto program = shadow_maps_.GetProgram(is_instanced);
             auto model = renderable->GetWorldTransform();
 
-            state_.SetBackfaceCulling(!renderable->GetMaterial()->two_sided);
+            auto two_sided = renderable->GetMaterial()->two_sided;
+            if (!two_sided) {
+                state_.SetBackfaceCulling(true);
+                state_.SetCullFace(CullFace::Front);
+            } else {
+                state_.SetBackfaceCulling(false);
+            }
+
             state_.UseProgram(program->Id());
 
             program->SetUniform(Uniform::Model, &model);

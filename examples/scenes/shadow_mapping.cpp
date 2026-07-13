@@ -57,7 +57,6 @@ struct Scene : public vglx::Scene {
         spot->cast_shadow = true;
         spot->target = mesh;
         spot->shadow.map_size = 1024;
-        spot->shadow.bias = 0.0002f;
         spot->shadow.far = 20.0f;
 
         auto directional = Add(vglx::DirectionalLight::Create({
@@ -68,7 +67,6 @@ struct Scene : public vglx::Scene {
         directional->transform.Translate({3.0f, 12.0f, 17.0f});
         directional->cast_shadow = true;
         directional->shadow.map_size = 1024;
-        directional->shadow.bias = 0.0002f;
         directional->shadow.extent = 2.0f;
     }
 
