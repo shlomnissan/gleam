@@ -34,7 +34,7 @@ auto create_wireframe_mesh(const Color& color) {
 
     auto wireframe_geometry = WireframeGeometry::Create(geometry.get());
     auto wireframe_material = UnlitMaterial::Create({.color = color});
-    wireframe_material->two_sided = true;
+    wireframe_material->side = Material::Side::TwoSided;
 
     return Mesh::Create(wireframe_geometry, wireframe_material);
 }

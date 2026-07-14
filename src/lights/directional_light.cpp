@@ -45,7 +45,7 @@ struct DirectionalLight::Impl {
         using enum Geometry::PrimitiveType;
 
         material = UnlitMaterial::Create();
-        material->two_sided = true;
+        material->side = Material::Side::TwoSided;
         material->color = self->color;
         material->fog = false;
 

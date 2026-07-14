@@ -136,7 +136,7 @@ void main() {
             normal = normalize(v_TBN * normal_tan);
         #endif
 
-        #ifdef USE_TWO_SIDED
+        #ifdef USE_FLIP_NORMALS
             normal *= gl_FrontFacing ? 1.0 : -1.0;
         #endif
     #endif

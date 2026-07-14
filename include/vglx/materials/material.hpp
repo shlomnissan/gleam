@@ -51,6 +51,15 @@ public:
     };
 
     /**
+     * @brief Enumerates which side of each polygon is rendered.
+     */
+    enum class Side {
+        Front, ///< Renders front faces only (default).
+        Back, ///< Renders back faces only.
+        TwoSided ///< Renders both front and back faces.
+    };
+
+    /**
      * @brief Enumerates depth comparison functions used for depth testing.
      */
     enum class Depth {
@@ -80,9 +89,6 @@ public:
     /// @brief Enables scene fog for this material.
     bool fog {true};
 
-    /// @brief Enables rendering both front and back faces of polygons.
-    bool two_sided {false};
-
     /// @brief Enables depth testing.
     bool depth_test {true};
 
@@ -97,6 +103,9 @@ public:
 
     /// @brief Controls whether this material is visible when rendering.
     bool visible {true};
+
+    /// @brief @ref Side of each polygon rendered by this material.
+    Side side {Side::Front};
 
     /// @brief @ref Blending mode used when rendering this material.
     Blending blending {Blending::Normal};

@@ -114,7 +114,7 @@ auto ShaderLibrary::InjectAttributes(
     if (attrs.fog) features += "#define USE_FOG\n";
     if (attrs.ibl) features += "#define USE_IBL\n";
     if (attrs.instancing) features += "#define USE_INSTANCING\n";
-    if (attrs.two_sided) features += "#define USE_TWO_SIDED\n";
+    if (attrs.flip_normals) features += "#define USE_FLIP_NORMALS\n";
     if (attrs.vertex_color) features += "#define USE_VERTEX_COLOR\n";
     if (attrs.shadow_maps) features += "#define USE_SHADOW_MAPS\n";
 

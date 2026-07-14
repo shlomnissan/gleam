@@ -30,7 +30,7 @@ auto get_scene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
         vglx::PhongMaterial::Create({.color = 0x000011})
     ));
 
-    sphere->GetMaterial()->two_sided = true;
+    sphere->GetMaterial()->side = vglx::Material::Side::TwoSided;
 
     auto result = vglx::LoadMesh(ASSETS_DIR "/lps_head/lps_head.obj");
     if (!result.has_value()) {

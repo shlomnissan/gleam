@@ -81,7 +81,7 @@ ProgramAttributes::ProgramAttributes(
     fog = material->fog && scene->fog.has_value();
     instancing = renderable->GetNodeType() == Node::Type::InstancedMesh;
     num_lights = lights.directional + lights.point + lights.spot;
-    two_sided = material->two_sided;
+    flip_normals = material->side != Material::Side::Front;
     vertex_color = geometry->HasAttribute(Geometry::VertexAttributeType::Color);
     tangent = geometry->HasAttribute(Geometry::VertexAttributeType::Tangent);
 
@@ -98,7 +98,7 @@ ProgramAttributes::ProgramAttributes(
     key |= (alpha_map ? 1ULL : 0ULL) << 20; // 1 bit
     key |= (normal_map ? 1ULL : 0ULL) << 21; // 1 bit
     key |= (emissive_map ? 1ULL : 0ULL) << 22; // 1 bit
-    key |= (two_sided ? 1ULL : 0ULL) << 23; // 1 bit
+    key |= (flip_normals ? 1ULL : 0ULL) << 23; // 1 bit
     key |= (instancing ? 1ULL : 0ULL) << 24; // 1 bit
     key |= (vertex_color ? 1ULL : 0ULL) << 25; // 1 bit
     key |= (tangent ? 1ULL : 0ULL) << 26; // 1 bit

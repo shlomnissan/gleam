@@ -22,7 +22,7 @@ struct PointLight::Impl {
 
     auto CreateDebugMesh(PointLight* self) -> void {
         material = UnlitMaterial::Create();
-        material->two_sided = true;
+        material->side = Material::Side::TwoSided;
         material->color = self->color;
         material->wireframe = true;
         material->fog = false;

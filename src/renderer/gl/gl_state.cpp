@@ -16,12 +16,11 @@
 namespace vglx {
 
 auto GLState::ProcessMaterial(const Material* material) -> void {
-    SetBackfaceCulling(!material->two_sided);
     SetBlending(!material->transparent ? Material::Blending::None : material->blending);
-    SetCullFace(CullFace::Back);
     SetDepthFunction(material->depth);
     SetDepthTest(material->depth_test);
     SetPolygonOffset(material->polygon_offset_factor, material->polygon_offset_units);
+    SetSide(material->side);
 }
 
 auto GLState::Enable(int token) -> void {
@@ -42,14 +41,18 @@ auto GLState::SetViewport(int x, int y, int width, int height) const -> void {
     glViewport(x, y, width, height);
 }
 
-auto GLState::SetBackfaceCulling(bool enabled) -> void {
-    enabled ? Enable(GL_CULL_FACE) : Disable(GL_CULL_FACE);
-}
+auto GLState::SetSide(Material::Side side) -> void {
+    if (side == Material::Side::TwoSided) {
+        Disable(GL_CULL_FACE);
+        return;
+    }
 
-auto GLState::SetCullFace(CullFace face) -> void {
-    if (curr_cull_face_ != face) {
-        glCullFace(face == CullFace::Front ? GL_FRONT : GL_BACK);
-        curr_cull_face_ = face;
+    Enable(GL_CULL_FACE);
+
+    const auto cull_front = side == Material::Side::Back;
+    if (curr_cull_front_ != cull_front) {
+        glCullFace(cull_front ? GL_FRONT : GL_BACK);
+        curr_cull_front_ = cull_front;
     }
 }
 
@@ -129,8 +132,7 @@ auto GLState::SetClearColor(const Color& color) -> void {
 }
 
 auto GLState::Reset() -> void {
-    SetBackfaceCulling(false);
-    SetCullFace(CullFace::Back);
+    SetSide(Material::Side::TwoSided);
     SetDepthTest(false);
     SetPolygonOffset(0.0f, 0.0f);
     SetBlending(Material::Blending::None);

@@ -104,7 +104,7 @@ auto Renderer::Impl::RenderObjects(Scene* scene, Camera* camera) -> void {
         // outward-wound faces would otherwise be culled.
         state_.SetDepthTest(true);
         state_.SetDepthFunction(Material::Depth::LessEqual);
-        state_.SetBackfaceCulling(false);
+        state_.SetSide(Material::Side::TwoSided);
         state_.SetBlending(Material::Blending::None);
         textures_.Bind(scene->background, 0);
         background_pass_.Render(scene->background);
@@ -480,12 +480,11 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
             auto program = shadow_maps_.GetProgram(is_instanced);
             auto model = renderable->GetWorldTransform();
 
-            auto two_sided = renderable->GetMaterial()->two_sided;
-            if (!two_sided) {
-                state_.SetBackfaceCulling(true);
-                state_.SetCullFace(CullFace::Front);
-            } else {
-                state_.SetBackfaceCulling(false);
+            using enum Material::Side;
+            switch (renderable->GetMaterial()->side) {
+                case Front: state_.SetSide(Back); break;
+                case Back: state_.SetSide(Front); break;
+                case TwoSided: state_.SetSide(TwoSided); break;
             }
 
             state_.UseProgram(program->Id());

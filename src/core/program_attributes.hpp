@@ -40,7 +40,7 @@ struct ProgramAttributes {
     bool ibl {false};
     bool instancing {false};
     bool tangent {false};
-    bool two_sided {false};
+    bool flip_normals {false};
     bool vertex_color {false};
 
     bool albedo_map {false};
