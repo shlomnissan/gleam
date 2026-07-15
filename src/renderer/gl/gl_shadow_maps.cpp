@@ -111,29 +111,13 @@ auto update_camera(Light* light, Camera* camera) -> void {
 }
 
 auto create_camera(Light* light) -> std::unique_ptr<Camera> {
-    if (light->GetType() == Light::Type::Spot) {
-        auto spot = static_cast<SpotLight*>(light);
-        return PerspectiveCamera::Create({
-            .fov = spot->angle * 2.0f,
-            .aspect = 1.0f,
-            .near = spot->shadow.near,
-            .far = spot->range > 0.0f ? spot->range : spot->shadow.far
-        });
+    switch(light->GetType()) {
+        case Light::Type::Spot:
+            return PerspectiveCamera::Create();
+        case Light::Type::Directional:
+            return OrthographicCamera::Create();
+        default: return nullptr;
     }
-
-    if (light->GetType() == Light::Type::Directional) {
-        auto& shadow = static_cast<DirectionalLight*>(light)->shadow;
-        return OrthographicCamera::Create({
-            .left = -shadow.extent,
-            .right = shadow.extent,
-            .top = shadow.extent,
-            .bottom = -shadow.extent,
-            .near = shadow.near,
-            .far = shadow.far
-        });
-    }
-
-    return nullptr;
 }
 
 }

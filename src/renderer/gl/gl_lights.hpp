@@ -35,6 +35,8 @@ public:
         alignas(4) float range {0.0f};
         alignas(4) int shadow_layer_index {-1};
         alignas(4) float shadow_bias {0.0f};
+        alignas(4) float shadow_near {0.0f};
+        alignas(4) float shadow_far {0.0f};
         alignas(16) Matrix4 shadow_transform {Matrix4::Identity()};
     };
 

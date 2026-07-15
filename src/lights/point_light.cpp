@@ -56,6 +56,7 @@ struct PointLight::Impl {
 PointLight::PointLight(const Parameters& params)  :
     Light(params.color, params.intensity),
     range(params.range),
+    cast_shadow(params.cast_shadow),
     impl_(std::make_unique<Impl>())
 {
     SetName("point light");
@@ -74,6 +75,10 @@ auto PointLight::OnUpdate(float delta) -> void {
     if (debug_mode_enabled_) {
         impl_->UpdateDebugMesh(this);
     }
+}
+
+auto PointLight::GetShadow() const -> const Shadow* {
+    return cast_shadow ? &shadow : nullptr;
 }
 
 PointLight::~PointLight() = default;

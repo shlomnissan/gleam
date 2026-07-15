@@ -50,9 +50,13 @@ auto GLLights::AddLight(
 
         dst.shadow_layer_index = -1;
         auto shadow_params = light->GetShadow();
-        if (shadow_params && shadow_transform && shadow_layer_index != -1) {
+        auto cast_shadow = shadow_params && shadow_transform && shadow_layer_index != -1;
+
+        if (cast_shadow) {
             has_shadow_casters = true;
             dst.shadow_bias = shadow_params->bias;
+            dst.shadow_near = shadow_params->near;
+            dst.shadow_far = shadow_params->far;
             dst.shadow_layer_index = shadow_layer_index;
             dst.shadow_transform = *shadow_transform;
         }
@@ -81,6 +85,11 @@ auto GLLights::AddLight(
                 dst.cone_cos = 0.0f;
                 dst.penumbra_cos = 0.0f;
                 dst.range = src->range;
+
+                if (cast_shadow) {
+                    // Must match the face-camera far in gl_shadow_maps.cpp
+                    dst.shadow_far = src->range > 0.0f ? src->range : shadow_params->far;
+                }
             }
             break;
             case Spot: {

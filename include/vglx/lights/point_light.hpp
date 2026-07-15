@@ -40,6 +40,7 @@ public:
         Color color {0xFFFFFF}; ///< Light color.
         float intensity {1.0f}; ///< Light intensity multiplier.
         float range {0.0f}; ///< Maximum range of influence. 0 = unbounded.
+        bool cast_shadow {false}; ///< Enables shadow casting for this light.
     };
 
     /**
@@ -49,6 +50,12 @@ public:
      * A value of 0 disables the cutoff, leaving pure inverse-square falloff.
      */
     float range {0.0f};
+
+    /// @brief When `true` this light casts shadows.
+    bool cast_shadow {false};
+
+    /// @brief Shadow configuration used when @ref cast_shadow is enabled.
+    Shadow shadow {};
 
     /**
      * @brief Constructs a point light.
@@ -81,6 +88,10 @@ public:
     [[nodiscard]] auto GetType() const -> Light::Type override {
         return Light::Type::Point;
     }
+
+    /// @cond INTERNAL
+    [[nodiscard]] auto GetShadow() const -> const Shadow* override;
+    /// @endcond
 
     /**
      * @brief Returns the light's luminous power in lumens.
