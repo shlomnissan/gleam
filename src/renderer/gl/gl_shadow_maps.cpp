@@ -32,7 +32,7 @@ namespace {
 
 constexpr float border[] = {1.0f, 1.0f, 1.0f, 1.0f};
 
-auto allocate_texture_array(int count, unsigned int max_map_size) -> std::expected<GLuint, std::string> {
+auto allocate_texture_2d_array(int count, unsigned int max_map_size) -> std::expected<GLuint, std::string> {
     GLuint texture_id {0};
 
     glGenTextures(1, &texture_id);
@@ -154,25 +154,29 @@ auto GLShadowMaps::Initialize() -> std::expected<void, std::string> {
     return {};
 }
 
-auto GLShadowMaps::StartFrame(int count, unsigned int max_map_size) -> std::expected<void, std::string> {
-    if (count != count_ || max_map_size != max_map_size_) {
-        if (texture_id_ != 0) {
-            glDeleteTextures(1, &texture_id_);
-            texture_id_ = 0;
-            count_ = 0;
+auto GLShadowMaps::StartFrame(
+    unsigned int count_2d,
+    unsigned int max_map_size_2d
+) -> std::expected<void, std::string> {
+    if (count_2d != state_2d_.count || max_map_size_2d != state_2d_.max_map_size) {
+        if (state_2d_.texture_id != 0) {
+            glDeleteTextures(1, &state_2d_.texture_id);
+            state_2d_.texture_id = 0;
+            state_2d_.count = 0;
         }
 
-        auto result = allocate_texture_array(count, max_map_size);
+        auto result = allocate_texture_2d_array(count_2d, max_map_size_2d);
         if (!result.has_value()) {
             return std::unexpected(result.error());
         }
 
-        texture_id_ = result.value();
-        count_ = count;
-        max_map_size_ = max_map_size;
+        state_2d_.texture_id = result.value();
+        state_2d_.count = count_2d;
+        state_2d_.max_map_size = max_map_size_2d;
     }
 
-    curr_idx_ = 0;
+    state_2d_.curr_layer_id = 0;
+    state_cube_.curr_layer_id = 0;
 
     for (auto& [_, shadow_map] : shadow_maps_) {
         shadow_map.touched = false;
@@ -205,10 +209,16 @@ auto GLShadowMaps::BindShadowMap(Light* light, Camera* camera) -> std::expected<
     update_camera(light, entry.camera.get());
 
     glBindFramebuffer(GL_FRAMEBUFFER, buffer_id_);
-    glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, texture_id_, 0, curr_idx_);
+    glFramebufferTextureLayer(
+        GL_FRAMEBUFFER,
+        GL_DEPTH_ATTACHMENT,
+        state_2d_.texture_id,
+        0,
+        state_2d_.curr_layer_id
+    );
 
     entry.touched = true;
-    entry.map_idx = curr_idx_++;
+    entry.map_idx = state_2d_.curr_layer_id++;
 
     // Maps view-space positions to shadow map coordinates: light clip space
     // via the light's view-projection, then a [-1,1] → [0,1] remap whose XY
@@ -217,7 +227,7 @@ auto GLShadowMaps::BindShadowMap(Light* light, Camera* camera) -> std::expected<
 
     const auto scale = 0.5f
         * static_cast<float>(config->map_size)
-        / static_cast<float>(max_map_size_);
+        / static_cast<float>(state_2d_.max_map_size);
 
     const auto remap = Matrix4 {
         scale, 0.0f,  0.0f, scale,
@@ -257,10 +267,6 @@ auto GLShadowMaps::GetProgram(bool instanced) -> GLProgram* {
     return instanced ? prg_instanced_shadow_map_.get() : prg_shadow_map_.get();
 }
 
-auto GLShadowMaps::GetTextureId() const -> unsigned int {
-    return texture_id_;
-}
-
 auto GLShadowMaps::EndFrame() -> void {
     std::erase_if(shadow_maps_, [](const auto& entry) {
         return !entry.second.touched;
@@ -273,9 +279,14 @@ GLShadowMaps::~GLShadowMaps() {
         buffer_id_ = 0;
     }
 
-    if (texture_id_ != 0) {
-        glDeleteTextures(1, &texture_id_);
-        texture_id_ = 0;
+    if (state_2d_.texture_id != 0) {
+        glDeleteTextures(1, &state_2d_.texture_id);
+        state_2d_.texture_id = 0;
+    }
+
+    if (state_cube_.texture_id != 0) {
+        glDeleteTextures(1, &state_cube_.texture_id);
+        state_cube_.texture_id = 0;
     }
 }
 

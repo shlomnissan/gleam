@@ -44,7 +44,10 @@ public:
 
     auto Initialize() -> std::expected<void, std::string>;
 
-    [[nodiscard]] auto StartFrame(int count, unsigned int max_map_size) -> std::expected<void, std::string>;
+    [[nodiscard]] auto StartFrame(
+        unsigned int count_2d,
+        unsigned int max_map_size_2d
+    ) -> std::expected<void, std::string>;
 
     [[nodiscard]] auto BindShadowMap(Light* light, Camera* camera) -> std::expected<Camera*, std::string>;
 
@@ -52,24 +55,35 @@ public:
 
     [[nodiscard]] auto GetProgram(bool instanced) -> GLProgram*;
 
-    [[nodiscard]] auto GetTextureId() const -> unsigned int;
+    [[nodiscard]] auto GetTexture2D() const -> unsigned int {
+        return state_2d_.texture_id;
+    }
+
+    [[nodiscard]] auto GetTextureCube() const -> unsigned int {
+        return state_cube_.texture_id;
+    }
 
     auto EndFrame() -> void;
 
     ~GLShadowMaps();
 
 private:
+    struct InternalShadowMapState {
+        unsigned int curr_layer_id {0u};
+        unsigned int max_map_size {0u};
+        unsigned int texture_id {0u};
+        unsigned int count {0u};
+    };
+
     std::vector<std::pair<Light*, GLShadowMap>> shadow_maps_ {};
 
     std::unique_ptr<GLProgram> prg_shadow_map_;
     std::unique_ptr<GLProgram> prg_instanced_shadow_map_;
 
-    unsigned int curr_idx_ {0};
-    unsigned int max_map_size_ {0u};
-    unsigned int texture_id_ {0};
-    unsigned int buffer_id_ {0};
+    InternalShadowMapState state_2d_ {};
+    InternalShadowMapState state_cube_ {};
 
-    int count_ {0};
+    unsigned int buffer_id_ {0};
 };
 
 }
