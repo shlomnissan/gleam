@@ -432,7 +432,11 @@ auto Renderer::Impl::ProcessLights(Camera* camera) -> void {
 
 auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
     auto lights = std::vector<Light*> {};
-    auto max_map_size = 0u;
+
+    auto count_2d = 0u;
+    auto count_cube = 0u;
+    auto max_map_size_2d = 0u;
+    auto max_map_size_cube = 0u;
 
     for (auto light : render_lists_->Lights()) {
         auto shadow = light->GetShadow();
@@ -440,10 +444,22 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
             continue;
         }
         lights.emplace_back(light);
-        max_map_size = std::max(max_map_size, shadow->map_size);
+        if (light->GetType() == Light::Type::Point) {
+            count_cube++;
+            max_map_size_cube = std::max(max_map_size_cube, shadow->map_size);
+        } else {
+            count_2d++;
+            max_map_size_2d = std::max(max_map_size_2d, shadow->map_size);
+        }
     }
 
-    auto result = shadow_maps_.StartFrame(static_cast<int>(lights.size()), max_map_size);
+    auto result = shadow_maps_.StartFrame(
+        count_2d,
+        max_map_size_2d,
+        count_cube,
+        max_map_size_cube
+    );
+
     if (!result.has_value()) {
         Logger::Log(LogLevel::Error, "{}", result.error());
         return;

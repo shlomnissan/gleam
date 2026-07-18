@@ -46,7 +46,9 @@ public:
 
     [[nodiscard]] auto StartFrame(
         unsigned int count_2d,
-        unsigned int max_map_size_2d
+        unsigned int max_map_size_2d,
+        unsigned int count_cube,
+        unsigned int max_map_size_cube
     ) -> std::expected<void, std::string>;
 
     [[nodiscard]] auto BindShadowMap(Light* light, Camera* camera) -> std::expected<Camera*, std::string>;

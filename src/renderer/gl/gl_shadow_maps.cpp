@@ -32,7 +32,7 @@ namespace {
 
 constexpr float border[] = {1.0f, 1.0f, 1.0f, 1.0f};
 
-auto allocate_texture_2d_array(int count, unsigned int max_map_size) -> std::expected<GLuint, std::string> {
+auto allocate_texture(unsigned int count, unsigned int max_map_size, GLenum type) -> std::expected<GLuint, std::string> {
     GLuint texture_id {0};
 
     glGenTextures(1, &texture_id);
@@ -40,31 +40,35 @@ auto allocate_texture_2d_array(int count, unsigned int max_map_size) -> std::exp
         return std::unexpected("Failed to generate shadow map texture");
     }
 
-    glBindTexture(GL_TEXTURE_2D_ARRAY, texture_id);
+    auto sides = type == GL_TEXTURE_CUBE_MAP_ARRAY ? 6 : 1;
+
+    glBindTexture(type, texture_id);
     glTexImage3D(
-        GL_TEXTURE_2D_ARRAY,
+        type,
         0,
         GL_DEPTH_COMPONENT24,
         max_map_size,
         max_map_size,
-        count,
+        count * sides,
         0,
         GL_DEPTH_COMPONENT,
         GL_FLOAT,
         nullptr
     );
 
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(type, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(type, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, border);
+    if (type == GL_TEXTURE_2D_ARRAY) {
+        glTexParameteri(type, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+        glTexParameteri(type, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+        glTexParameterfv(type, GL_TEXTURE_BORDER_COLOR, border);
+    }
 
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+    glTexParameteri(type, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+    glTexParameteri(type, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
-    glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+    glBindTexture(type, 0);
 
     return texture_id;
 }
@@ -156,7 +160,9 @@ auto GLShadowMaps::Initialize() -> std::expected<void, std::string> {
 
 auto GLShadowMaps::StartFrame(
     unsigned int count_2d,
-    unsigned int max_map_size_2d
+    unsigned int max_map_size_2d,
+    unsigned int count_cube,
+    unsigned int max_map_size_cube
 ) -> std::expected<void, std::string> {
     if (count_2d != state_2d_.count || max_map_size_2d != state_2d_.max_map_size) {
         if (state_2d_.texture_id != 0) {
@@ -165,14 +171,25 @@ auto GLShadowMaps::StartFrame(
             state_2d_.count = 0;
         }
 
-        auto result = allocate_texture_2d_array(count_2d, max_map_size_2d);
-        if (!result.has_value()) {
-            return std::unexpected(result.error());
-        }
-
+        auto result = allocate_texture(count_2d, max_map_size_2d, GL_TEXTURE_2D_ARRAY);
+        if (!result.has_value()) return std::unexpected(result.error());
         state_2d_.texture_id = result.value();
         state_2d_.count = count_2d;
         state_2d_.max_map_size = max_map_size_2d;
+    }
+
+    if (count_cube != state_cube_.count || max_map_size_cube != state_cube_.max_map_size) {
+        if (state_cube_.texture_id != 0) {
+            glDeleteTextures(1, &state_cube_.texture_id);
+            state_cube_.texture_id = 0;
+            state_cube_.count = 0;
+        }
+
+        auto result = allocate_texture(count_cube, max_map_size_cube, GL_TEXTURE_CUBE_MAP_ARRAY);
+        if (!result.has_value()) return std::unexpected(result.error());
+        state_cube_.texture_id = result.value();
+        state_cube_.count = count_cube;
+        state_cube_.max_map_size = max_map_size_cube;
     }
 
     state_2d_.curr_layer_id = 0;
