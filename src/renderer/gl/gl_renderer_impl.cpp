@@ -465,24 +465,15 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
         return;
     }
 
-    for (auto light : lights) {
-        auto shadow = light->GetShadow();
-        auto result = shadow_maps_.BindShadowMap(light, camera);
-        if (!result.has_value()) {
-            Logger::Log(LogLevel::Error, "{}", result.error());
-            continue;
-        }
-
-        auto camera = result.value();
-
-        state_.SetViewport(0, 0, shadow->map_size, shadow->map_size);
+    const auto render_depth_pass = [&](Camera* shadow_camera, unsigned int map_size) {
+        state_.SetViewport(0, 0, map_size, map_size);
         state_.SetDepthTest(true);
         state_.SetDepthWrites(true);
 
         glClear(GL_DEPTH_BUFFER_BIT);
 
-        shadow_render_lists_->ProcessScene(scene, camera, false);
-        camera_ubo_.Update(camera->projection_matrix, camera->view_matrix);
+        shadow_render_lists_->ProcessScene(scene, shadow_camera, false);
+        camera_ubo_.Update(shadow_camera->projection_matrix, shadow_camera->view_matrix);
 
         for (auto renderable : shadow_render_lists_->Opaque()) {
             if (!renderable->cast_shadow) continue;
@@ -525,6 +516,26 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
                     ? glDrawElements(GL_TRIANGLES, index_size, GL_UNSIGNED_INT, nullptr)
                     : glDrawArrays(GL_TRIANGLES, 0, vertex_size);
             }
+        }
+    };
+
+    for (auto light : lights) {
+        if (light->GetType() == Light::Type::Point) {
+            for (auto i = 0u; i < 6u; ++i) {
+                auto result = shadow_maps_.BindShadowMap(light, camera, i);
+                if (!result.has_value()) {
+                    Logger::Log(LogLevel::Error, "{}", result.error());
+                    break;
+                }
+                render_depth_pass(result.value(), max_map_size_cube);
+            }
+        } else {
+            auto result = shadow_maps_.BindShadowMap(light, camera);
+            if (!result.has_value()) {
+                Logger::Log(LogLevel::Error, "{}", result.error());
+                continue;
+            }
+            render_depth_pass(result.value(), light->GetShadow()->map_size);
         }
     }
 
