@@ -10,6 +10,7 @@
 #include "vglx/cameras/perspective_camera.hpp"
 #include "vglx/lights/directional_light.hpp"
 #include "vglx/lights/light.hpp"
+#include "vglx/lights/point_light.hpp"
 #include "vglx/lights/spot_light.hpp"
 #include "vglx/math/vector3.hpp"
 
@@ -74,6 +75,16 @@ auto allocate_texture(unsigned int count, unsigned int max_map_size, GLenum type
 }
 
 auto update_camera(Light* light, Camera* camera) -> void {
+    if (light->GetType() == Light::Type::Point) {
+        auto point = static_cast<PointLight*>(light);
+        auto far = point->range > 0.0f ? point->range : point->shadow.far;
+        auto point_camera = static_cast<PerspectiveCamera*>(camera);
+
+        point_camera->SetLens(math::DegToRad(90.0f), point->shadow.near, far);
+
+        point_camera->transform.SetPosition(point->GetWorldPosition());
+    }
+
     if (light->GetType() == Light::Type::Spot) {
         auto spot = static_cast<SpotLight*>(light);
         auto far = spot->range > 0.0f ? spot->range : spot->shadow.far;
@@ -116,12 +127,31 @@ auto update_camera(Light* light, Camera* camera) -> void {
 
 auto create_camera(Light* light) -> std::unique_ptr<Camera> {
     switch(light->GetType()) {
+        case Light::Type::Point:
         case Light::Type::Spot:
             return PerspectiveCamera::Create();
         case Light::Type::Directional:
             return OrthographicCamera::Create();
         default: return nullptr;
     }
+}
+
+auto set_camera_face(PerspectiveCamera* camera, unsigned int face) -> void {
+    auto direction = Vector3::Zero();
+    auto up = Vector3::Zero();
+
+    switch (face) {
+        case 0: direction = { 1.0f,  0.0f,  0.0f}; up = {0.0f, -1.0f,  0.0f}; break;
+        case 1: direction = {-1.0f,  0.0f,  0.0f}; up = {0.0f, -1.0f,  0.0f}; break;
+        case 2: direction = { 0.0f,  1.0f,  0.0f}; up = {0.0f,  0.0f,  1.0f}; break;
+        case 3: direction = { 0.0f, -1.0f,  0.0f}; up = {0.0f,  0.0f, -1.0f}; break;
+        case 4: direction = { 0.0f,  0.0f,  1.0f}; up = {0.0f, -1.0f,  0.0f}; break;
+        case 5: direction = { 0.0f,  0.0f, -1.0f}; up = {0.0f, -1.0f,  0.0f}; break;
+    }
+
+    camera->up = up;
+    camera->LookAt(camera->GetWorldPosition() + direction);
+    camera->UpdateViewMatrix();
 }
 
 }
@@ -202,7 +232,7 @@ auto GLShadowMaps::StartFrame(
     return {};
 }
 
-auto GLShadowMaps::BindShadowMap(Light* light, Camera* camera) -> std::expected<Camera*, std::string> {
+auto GLShadowMaps::BindShadowMap(Light* light, Camera* camera, unsigned int face) -> std::expected<Camera*, std::string> {
     auto config = light->GetShadow();
     if (config == nullptr) {
         return std::unexpected("Failed to read shadow config from light source");
@@ -223,40 +253,61 @@ auto GLShadowMaps::BindShadowMap(Light* light, Camera* camera) -> std::expected<
     }
 
     auto& entry = it->second;
-    update_camera(light, entry.camera.get());
 
     glBindFramebuffer(GL_FRAMEBUFFER, buffer_id_);
-    glFramebufferTextureLayer(
-        GL_FRAMEBUFFER,
-        GL_DEPTH_ATTACHMENT,
-        state_2d_.texture_id,
-        0,
-        state_2d_.curr_layer_id
-    );
 
-    entry.touched = true;
-    entry.map_idx = state_2d_.curr_layer_id++;
+    if (light->GetType() == Light::Type::Point) {
+        if (!entry.touched) {
+            entry.touched = true;
+            entry.map_idx = state_cube_.curr_layer_id++;
+            update_camera(light, entry.camera.get());
+        }
 
-    // Maps view-space positions to shadow map coordinates: light clip space
-    // via the light's view-projection, then a [-1,1] → [0,1] remap whose XY
-    // is scaled by map_size / max_map_size_ so lookups address this light's
-    // sub-viewport region within the full-size layer.
+        set_camera_face(static_cast<PerspectiveCamera*>(entry.camera.get()), face);
 
-    const auto scale = 0.5f
-        * static_cast<float>(config->map_size)
-        / static_cast<float>(state_2d_.max_map_size);
+        glFramebufferTextureLayer(
+            GL_FRAMEBUFFER,
+            GL_DEPTH_ATTACHMENT,
+            state_cube_.texture_id,
+            0,
+            entry.map_idx * 6 + face
+        );
+    } else {
+        entry.touched = true;
+        entry.map_idx = state_2d_.curr_layer_id++;
+        update_camera(light, entry.camera.get());
 
-    const auto remap = Matrix4 {
-        scale, 0.0f,  0.0f, scale,
-        0.0f,  scale, 0.0f, scale,
-        0.0f,  0.0f,  0.5f, 0.5f,
-        0.0f,  0.0f,  0.0f, 1.0f
-    };
+        glFramebufferTextureLayer(
+            GL_FRAMEBUFFER,
+            GL_DEPTH_ATTACHMENT,
+            state_2d_.texture_id,
+            0,
+            entry.map_idx
+        );
 
-    entry.transform = remap
-        * entry.camera->projection_matrix
-        * entry.camera->view_matrix
-        * camera->GetWorldTransform();
+        // Maps view-space positions to shadow map coordinates: light clip space
+        // via the light's view-projection, then a [-1,1] → [0,1] remap whose XY
+        // is scaled by map_size / max_map_size_ so lookups address this light's
+        // sub-viewport region within the full-size layer. Point lights skip
+        // this: cube lookups are direction-based and have no sub-viewport,
+        // so the receiver reconstructs depth from ShadowNear/ShadowFar instead.
+
+        const auto scale = 0.5f
+            * static_cast<float>(config->map_size)
+            / static_cast<float>(state_2d_.max_map_size);
+
+        const auto remap = Matrix4 {
+            scale, 0.0f,  0.0f, scale,
+            0.0f,  scale, 0.0f, scale,
+            0.0f,  0.0f,  0.5f, 0.5f,
+            0.0f,  0.0f,  0.0f, 1.0f
+        };
+
+        entry.transform = remap
+            * entry.camera->projection_matrix
+            * entry.camera->view_matrix
+            * camera->GetWorldTransform();
+    }
 
 #if !defined(NDEBUG)
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {

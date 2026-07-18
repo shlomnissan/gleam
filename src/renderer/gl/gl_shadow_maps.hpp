@@ -51,7 +51,11 @@ public:
         unsigned int max_map_size_cube
     ) -> std::expected<void, std::string>;
 
-    [[nodiscard]] auto BindShadowMap(Light* light, Camera* camera) -> std::expected<Camera*, std::string>;
+    [[nodiscard]] auto BindShadowMap(
+        Light* light,
+        Camera* camera,
+        unsigned int face = 0
+    ) -> std::expected<Camera*, std::string>;
 
     [[nodiscard]] auto GetShadowMap(Light* light) -> GLShadowMap*;
 
