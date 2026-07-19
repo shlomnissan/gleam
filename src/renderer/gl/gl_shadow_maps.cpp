@@ -201,10 +201,13 @@ auto GLShadowMaps::StartFrame(
             state_2d_.count = 0;
         }
 
-        auto result = allocate_texture(count_2d, max_map_size_2d, GL_TEXTURE_2D_ARRAY);
-        if (!result.has_value()) return std::unexpected(result.error());
-        state_2d_.texture_id = result.value();
-        state_2d_.count = count_2d;
+        if (count_2d > 0) {
+            auto result = allocate_texture(count_2d, max_map_size_2d, GL_TEXTURE_2D_ARRAY);
+            if (!result.has_value()) return std::unexpected(result.error());
+            state_2d_.texture_id = result.value();
+            state_2d_.count = count_2d;
+        }
+
         state_2d_.max_map_size = max_map_size_2d;
     }
 
@@ -215,10 +218,13 @@ auto GLShadowMaps::StartFrame(
             state_cube_.count = 0;
         }
 
-        auto result = allocate_texture(count_cube, max_map_size_cube, GL_TEXTURE_CUBE_MAP_ARRAY);
-        if (!result.has_value()) return std::unexpected(result.error());
-        state_cube_.texture_id = result.value();
-        state_cube_.count = count_cube;
+        if (count_cube > 0) {
+            auto result = allocate_texture(count_cube, max_map_size_cube, GL_TEXTURE_CUBE_MAP_ARRAY);
+            if (!result.has_value()) return std::unexpected(result.error());
+            state_cube_.texture_id = result.value();
+            state_cube_.count = count_cube;
+        }
+
         state_cube_.max_map_size = max_map_size_cube;
     }
 

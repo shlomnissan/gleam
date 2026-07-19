@@ -40,6 +40,7 @@ ProgramAttributes::ProgramAttributes(
         roughness_map = m->roughness_map != nullptr;
         ibl = scene->environment != nullptr;
         shadow_maps = lights.enable_shadow_maps;
+        point_shadow_maps = lights.enable_point_shadow_maps;
     }
 
     if (type == Material::Type::PhongMaterial) {
@@ -53,6 +54,7 @@ ProgramAttributes::ProgramAttributes(
         normal_map = m->normal_map != nullptr;
         specular_map = m->specular_map != nullptr;
         shadow_maps = lights.enable_shadow_maps;
+        point_shadow_maps = lights.enable_point_shadow_maps;
     }
 
     auto shader_material_id = 0;
@@ -111,6 +113,7 @@ ProgramAttributes::ProgramAttributes(
     key |= (environment_map ? 1ULL : 0ULL) << 33; // 1 bit
     key |= (ibl ? 1ULL : 0ULL) << 34; // 1 bit
     key |= (shadow_maps ? 1ULL : 0ULL) << 35; // 1 bit
+    key |= (point_shadow_maps ? 1ULL : 0ULL) << 36; // 1 bit
 
     if (type == Material::Type::ShaderMaterial) {
         math::HashCombine(key, shader_material_id);

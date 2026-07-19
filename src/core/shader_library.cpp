@@ -117,6 +117,7 @@ auto ShaderLibrary::InjectAttributes(
     if (attrs.flip_normals) features += "#define USE_FLIP_NORMALS\n";
     if (attrs.vertex_color) features += "#define USE_VERTEX_COLOR\n";
     if (attrs.shadow_maps) features += "#define USE_SHADOW_MAPS\n";
+    if (attrs.point_shadow_maps) features += "#define USE_POINT_SHADOW_MAPS\n";
 
     if (attrs.albedo_map) features += "#define USE_ALBEDO_MAP\n";
     if (attrs.alpha_map) features += "#define USE_ALPHA_MAP\n";

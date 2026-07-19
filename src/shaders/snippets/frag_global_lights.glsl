@@ -36,7 +36,7 @@ struct Light {
 };
 
 #ifdef USE_SHADOW_MAPS
-    uniform sampler2DArrayShadow u_ShadowMaps;
+    uniform sampler2DArrayShadow u_ShadowMaps2D;
     uniform bool u_ReceiveShadow;
 #endif
 
@@ -67,7 +67,7 @@ float shadowFactor(const in Light light) {
 
     float ref = proj.z - light.ShadowBias;
 
-    return texture(u_ShadowMaps, vec4(proj.xy, float(light.ShadowLayerIndex), ref));
+    return texture(u_ShadowMaps2D, vec4(proj.xy, float(light.ShadowLayerIndex), ref));
 }
 #else
 float shadowFactor(const in Light light) {

@@ -22,6 +22,7 @@ struct ProgramAttributes {
         uint8_t point {0};
         uint8_t spot {0};
         bool enable_shadow_maps {false};
+        bool enable_point_shadow_maps {false};
     };
 
     std::size_t key {0};
@@ -55,6 +56,7 @@ struct ProgramAttributes {
     bool specular_map {false};
     bool texture_map {false};
     bool shadow_maps {false};
+    bool point_shadow_maps {false};
 
     ProgramAttributes(
         Renderable* renderable,

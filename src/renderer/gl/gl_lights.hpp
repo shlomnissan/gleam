@@ -53,6 +53,8 @@ public:
 
     bool has_shadow_casters {false};
 
+    bool has_point_shadow_casters {false};
+
     GLLights() = default;
 
     // delete copy constructor and assignment operator

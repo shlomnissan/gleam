@@ -32,7 +32,7 @@ enum class GLTextureMapType {
     IrradianceMap = 10,
     PrefilteredMap = 11,
     BrdfLutMap = 12,
-    ShadowMap = 13,
+    ShadowMap2D = 13,
     Reserved
 };
 

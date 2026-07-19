@@ -87,7 +87,7 @@ auto GLLights::AddLight(
                 dst.range = src->range;
 
                 if (cast_shadow) {
-                    // Must match the face-camera far in gl_shadow_maps.cpp
+                    has_point_shadow_casters = true;
                     dst.shadow_far = src->range > 0.0f ? src->range : shadow_params->far;
                 }
             }
@@ -125,6 +125,7 @@ auto GLLights::Reset() -> void {
     point = 0;
     spot = 0;
     has_shadow_casters = false;
+    has_point_shadow_casters = false;
 }
 
 }

@@ -71,7 +71,7 @@ enum class Uniform {
     Resolution,
     Rotation,
     RoughnessMap,
-    ShadowMaps,
+    ShadowMaps2D,
     SpecularMap,
     TextureMap,
     TextureTransform,
@@ -117,7 +117,7 @@ constexpr auto get_uniform_loc(std::string_view str) {
     if (str == "u_Resolution") return static_cast<int>(Resolution);
     if (str == "u_Rotation") return static_cast<int>(Rotation);
     if (str == "u_RoughnessMap") return static_cast<int>(RoughnessMap);
-    if (str == "u_ShadowMaps") return static_cast<int>(ShadowMaps);
+    if (str == "u_ShadowMaps2D") return static_cast<int>(ShadowMaps2D);
     if (str == "u_SpecularMap") return static_cast<int>(SpecularMap);
     if (str == "u_TextureMap") return static_cast<int>(TextureMap);
     if (str == "u_TextureTransform") return static_cast<int>(TextureTransform);
