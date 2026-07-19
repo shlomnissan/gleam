@@ -47,8 +47,8 @@ public:
     [[nodiscard]] auto StartFrame(
         unsigned int count_2d,
         unsigned int max_map_size_2d,
-        unsigned int count_cube,
-        unsigned int max_map_size_cube
+        unsigned int count_point,
+        unsigned int max_map_size_point
     ) -> std::expected<void, std::string>;
 
     [[nodiscard]] auto BindShadowMap(
@@ -65,8 +65,8 @@ public:
         return state_2d_.texture_id;
     }
 
-    [[nodiscard]] auto GetTextureCube() const -> unsigned int {
-        return state_cube_.texture_id;
+    [[nodiscard]] auto GetPointTexture() const -> unsigned int {
+        return state_point_.texture_id;
     }
 
     auto EndFrame() -> void;
@@ -87,7 +87,7 @@ private:
     std::unique_ptr<GLProgram> prg_instanced_shadow_map_;
 
     InternalShadowMapState state_2d_ {};
-    InternalShadowMapState state_cube_ {};
+    InternalShadowMapState state_point_ {};
 
     unsigned int buffer_id_ {0};
 };

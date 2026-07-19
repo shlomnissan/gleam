@@ -33,6 +33,7 @@ enum class GLTextureMapType {
     PrefilteredMap = 11,
     BrdfLutMap = 12,
     ShadowMap2D = 13,
+    PointShadowMap = 14,
     Reserved
 };
 

@@ -191,8 +191,8 @@ auto GLShadowMaps::Initialize() -> std::expected<void, std::string> {
 auto GLShadowMaps::StartFrame(
     unsigned int count_2d,
     unsigned int max_map_size_2d,
-    unsigned int count_cube,
-    unsigned int max_map_size_cube
+    unsigned int count_point,
+    unsigned int max_map_size_point
 ) -> std::expected<void, std::string> {
     if (count_2d != state_2d_.count || max_map_size_2d != state_2d_.max_map_size) {
         if (state_2d_.texture_id != 0) {
@@ -211,25 +211,25 @@ auto GLShadowMaps::StartFrame(
         state_2d_.max_map_size = max_map_size_2d;
     }
 
-    if (count_cube != state_cube_.count || max_map_size_cube != state_cube_.max_map_size) {
-        if (state_cube_.texture_id != 0) {
-            glDeleteTextures(1, &state_cube_.texture_id);
-            state_cube_.texture_id = 0;
-            state_cube_.count = 0;
+    if (count_point != state_point_.count || max_map_size_point != state_point_.max_map_size) {
+        if (state_point_.texture_id != 0) {
+            glDeleteTextures(1, &state_point_.texture_id);
+            state_point_.texture_id = 0;
+            state_point_.count = 0;
         }
 
-        if (count_cube > 0) {
-            auto result = allocate_texture(count_cube, max_map_size_cube, GL_TEXTURE_CUBE_MAP_ARRAY);
+        if (count_point > 0) {
+            auto result = allocate_texture(count_point, max_map_size_point, GL_TEXTURE_CUBE_MAP_ARRAY);
             if (!result.has_value()) return std::unexpected(result.error());
-            state_cube_.texture_id = result.value();
-            state_cube_.count = count_cube;
+            state_point_.texture_id = result.value();
+            state_point_.count = count_point;
         }
 
-        state_cube_.max_map_size = max_map_size_cube;
+        state_point_.max_map_size = max_map_size_point;
     }
 
     state_2d_.curr_layer_id = 0;
-    state_cube_.curr_layer_id = 0;
+    state_point_.curr_layer_id = 0;
 
     for (auto& [_, shadow_map] : shadow_maps_) {
         shadow_map.touched = false;
@@ -265,7 +265,7 @@ auto GLShadowMaps::BindShadowMap(Light* light, Camera* camera, unsigned int face
     if (light->GetType() == Light::Type::Point) {
         if (!entry.touched) {
             entry.touched = true;
-            entry.map_idx = state_cube_.curr_layer_id++;
+            entry.map_idx = state_point_.curr_layer_id++;
             update_camera(light, entry.camera.get());
         }
 
@@ -274,7 +274,7 @@ auto GLShadowMaps::BindShadowMap(Light* light, Camera* camera, unsigned int face
         glFramebufferTextureLayer(
             GL_FRAMEBUFFER,
             GL_DEPTH_ATTACHMENT,
-            state_cube_.texture_id,
+            state_point_.texture_id,
             0,
             entry.map_idx * 6 + face
         );
@@ -358,9 +358,9 @@ GLShadowMaps::~GLShadowMaps() {
         state_2d_.texture_id = 0;
     }
 
-    if (state_cube_.texture_id != 0) {
-        glDeleteTextures(1, &state_cube_.texture_id);
-        state_cube_.texture_id = 0;
+    if (state_point_.texture_id != 0) {
+        glDeleteTextures(1, &state_point_.texture_id);
+        state_point_.texture_id = 0;
     }
 }
 

@@ -64,6 +64,7 @@ enum class Uniform {
     NormalIntensity,
     NormalMap,
     Opacity,
+    PointShadowMaps,
     PrefilteredMap,
     PrefilteredMaxLod,
     ReceiveShadow,
@@ -110,6 +111,7 @@ constexpr auto get_uniform_loc(std::string_view str) {
     if (str == "u_NormalIntensity") return static_cast<int>(NormalIntensity);
     if (str == "u_NormalMap") return static_cast<int>(NormalMap);
     if (str == "u_Opacity") return static_cast<int>(Opacity);
+    if (str == "u_PointShadowMaps") return static_cast<int>(PointShadowMaps);
     if (str == "u_PrefilteredMap") return static_cast<int>(PrefilteredMap);
     if (str == "u_PrefilteredMaxLod") return static_cast<int>(PrefilteredMaxLod);
     if (str == "u_Reflectivity") return static_cast<int>(Reflectivity);

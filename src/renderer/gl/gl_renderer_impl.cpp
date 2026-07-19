@@ -296,6 +296,13 @@ auto Renderer::Impl::SetUniforms(
                 glBindTexture(GL_TEXTURE_2D_ARRAY, shadow_maps_.GetTexture2D());
                 program->SetUniform(Uniform::ShadowMaps2D, &tex_unit);
                 program->SetUniform(Uniform::ReceiveShadow, &renderable->receive_shadow);
+
+                if (attrs->point_shadow_maps) {
+                    auto point_tex_unit = std::to_underlying(GLTextureMapType::PointShadowMap);
+                    glActiveTexture(GL_TEXTURE0 + point_tex_unit);
+                    glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, shadow_maps_.GetPointTexture());
+                    program->SetUniform(Uniform::PointShadowMaps, &point_tex_unit);
+                }
             }
         }
 
@@ -341,6 +348,13 @@ auto Renderer::Impl::SetUniforms(
                 glBindTexture(GL_TEXTURE_2D_ARRAY, shadow_maps_.GetTexture2D());
                 program->SetUniform(Uniform::ShadowMaps2D, &tex_unit);
                 program->SetUniform(Uniform::ReceiveShadow, &renderable->receive_shadow);
+
+                if (attrs->point_shadow_maps) {
+                    auto point_tex_unit = std::to_underlying(GLTextureMapType::PointShadowMap);
+                    glActiveTexture(GL_TEXTURE0 + point_tex_unit);
+                    glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, shadow_maps_.GetPointTexture());
+                    program->SetUniform(Uniform::PointShadowMaps, &point_tex_unit);
+                }
             }
         }
 
@@ -435,9 +449,9 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
     auto lights = std::vector<Light*> {};
 
     auto count_2d = 0u;
-    auto count_cube = 0u;
+    auto count_point = 0u;
     auto max_map_size_2d = 0u;
-    auto max_map_size_cube = 0u;
+    auto max_map_size_point = 0u;
 
     for (auto light : render_lists_->Lights()) {
         auto shadow = light->GetShadow();
@@ -446,8 +460,8 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
         }
         lights.emplace_back(light);
         if (light->GetType() == Light::Type::Point) {
-            count_cube++;
-            max_map_size_cube = std::max(max_map_size_cube, shadow->map_size);
+            count_point++;
+            max_map_size_point = std::max(max_map_size_point, shadow->map_size);
         } else {
             count_2d++;
             max_map_size_2d = std::max(max_map_size_2d, shadow->map_size);
@@ -457,8 +471,8 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
     auto result = shadow_maps_.StartFrame(
         count_2d,
         max_map_size_2d,
-        count_cube,
-        max_map_size_cube
+        count_point,
+        max_map_size_point
     );
 
     if (!result.has_value()) {
@@ -528,7 +542,7 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
                     Logger::Log(LogLevel::Error, "{}", result.error());
                     break;
                 }
-                render_depth_pass(result.value(), max_map_size_cube);
+                render_depth_pass(result.value(), max_map_size_point);
             }
         } else {
             auto result = shadow_maps_.BindShadowMap(light, camera);
