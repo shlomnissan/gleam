@@ -128,7 +128,7 @@ vec3 processLights(
         if (light.Type == 2 /* point light */) {
             vec3 light_dir = normalize(light.Position - v_Position.xyz);
             float dist = length(light.Position - v_Position.xyz);
-            output_color += attenuation(dist, light) * cookTorranceShading(
+            output_color += shadowFactor(light) * attenuation(dist, light) * cookTorranceShading(
                 light_dir,
                 light.Color,
                 normal,

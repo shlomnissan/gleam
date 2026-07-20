@@ -40,6 +40,10 @@ struct Light {
     uniform bool u_ReceiveShadow;
 #endif
 
+#ifdef USE_POINT_SHADOW_MAPS
+    uniform samplerCubeArrayShadow u_PointShadowMaps;
+#endif
+
 layout(std140) uniform ub_Lights {
     Light u_Lights[NUM_LIGHTS];
 };
@@ -58,6 +62,25 @@ float shadowFactor(const in Light light) {
     if (!u_ReceiveShadow || light.ShadowLayerIndex < 0) {
         return 1.0;
     }
+
+    #ifdef USE_POINT_SHADOW_MAPS
+    if (light.Type == 2 /* point light */) {
+        vec3 dir = v_Position.xyz - light.Position;
+        dir = transpose(mat3(u_View)) * dir;
+
+        float axis = max(abs(dir.x), max(abs(dir.y), abs(dir.z)));
+        if (axis >= light.ShadowFar) {
+            return 1.0;
+        }
+
+        float ndc = (light.ShadowFar + light.ShadowNear) / (light.ShadowFar - light.ShadowNear)
+            - (2.0 * light.ShadowFar * light.ShadowNear) / ((light.ShadowFar - light.ShadowNear) * axis);
+
+        float ref = (ndc * 0.5 + 0.5) - light.ShadowBias;
+
+        return texture(u_PointShadowMaps, vec4(dir, float(light.ShadowLayerIndex)), ref);
+    }
+    #endif
 
     vec4 coord = light.ShadowTransform * v_Position;
     vec3 proj = coord.xyz / coord.w;
