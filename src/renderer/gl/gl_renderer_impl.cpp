@@ -447,17 +447,26 @@ auto Renderer::Impl::ProcessLights(Camera* camera) -> void {
 
 auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
     auto lights = std::vector<Light*> {};
-
     auto count_2d = 0u;
     auto count_point = 0u;
     auto max_map_size_2d = 0u;
     auto max_map_size_point = 0u;
 
+    auto slots = 0;
     for (auto light : render_lists_->Lights()) {
+        if (light->GetType() == Light::Type::Ambient) {
+            continue;
+        }
+
+        if (++slots > GLLights::kMaxLights) {
+            break;
+        }
+
         auto shadow = light->GetShadow();
         if (shadow == nullptr) {
             continue;
         }
+
         lights.emplace_back(light);
         if (light->GetType() == Light::Type::Point) {
             count_point++;
@@ -477,6 +486,7 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
 
     if (!result.has_value()) {
         Logger::Log(LogLevel::Error, "{}", result.error());
+        shadow_maps_.EndFrame();
         return;
     }
 

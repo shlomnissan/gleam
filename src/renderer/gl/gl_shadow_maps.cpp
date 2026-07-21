@@ -194,6 +194,13 @@ auto GLShadowMaps::StartFrame(
     unsigned int count_point,
     unsigned int max_map_size_point
 ) -> std::expected<void, std::string> {
+    state_2d_.curr_layer_id = 0;
+    state_point_.curr_layer_id = 0;
+
+    for (auto& [_, shadow_map] : shadow_maps_) {
+        shadow_map.touched = false;
+    }
+
     if (count_2d != state_2d_.count || max_map_size_2d != state_2d_.max_map_size) {
         if (state_2d_.texture_id != 0) {
             glDeleteTextures(1, &state_2d_.texture_id);
@@ -226,13 +233,6 @@ auto GLShadowMaps::StartFrame(
         }
 
         state_point_.max_map_size = max_map_size_point;
-    }
-
-    state_2d_.curr_layer_id = 0;
-    state_point_.curr_layer_id = 0;
-
-    for (auto& [_, shadow_map] : shadow_maps_) {
-        shadow_map.touched = false;
     }
 
     return {};
@@ -317,6 +317,7 @@ auto GLShadowMaps::BindShadowMap(Light* light, Camera* camera, unsigned int face
 
 #if !defined(NDEBUG)
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        entry.touched = false;
         return std::unexpected("Shadow map framebuffer is incomplete");
     }
 #endif
