@@ -44,6 +44,10 @@ auto Renderer::SetExposure(float exposure) -> void {
     impl_->SetExposure(exposure);
 }
 
+auto Renderer::SetShadowMap(ShadowMap shadow_map) -> void {
+    impl_->SetShadowMap(shadow_map);
+}
+
 auto Renderer:: CreateTextureFromRenderTarget(RenderTarget* target) -> std::shared_ptr<Texture2D> {
     return impl_->CreateTextureFromRenderTarget(target);
 }

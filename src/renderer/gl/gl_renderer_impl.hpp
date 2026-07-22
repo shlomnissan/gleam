@@ -53,6 +53,8 @@ public:
 
     auto SetExposure(float exposure) -> void;
 
+    auto SetShadowMap(ShadowMap shadow_map) -> void;
+
     auto CreateTextureFromRenderTarget(RenderTarget* target) -> std::shared_ptr<Texture2D>;
 
     [[nodiscard]] auto RenderedObjectsPerFrame() const {

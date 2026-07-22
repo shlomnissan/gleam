@@ -354,15 +354,21 @@ GLShadowMaps::~GLShadowMaps() {
         buffer_id_ = 0;
     }
 
+    Clear();
+}
+
+auto GLShadowMaps::Clear() -> void {
     if (state_2d_.texture_id != 0) {
         glDeleteTextures(1, &state_2d_.texture_id);
-        state_2d_.texture_id = 0;
     }
 
     if (state_point_.texture_id != 0) {
         glDeleteTextures(1, &state_point_.texture_id);
-        state_point_.texture_id = 0;
     }
+
+    state_2d_ = {};
+    state_point_ = {};
+    shadow_maps_.clear();
 }
 
 }

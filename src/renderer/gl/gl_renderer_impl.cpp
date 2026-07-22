@@ -631,6 +631,17 @@ auto Renderer::Impl::SetExposure(float exposure) -> void {
     exposure_ = exposure;
 }
 
+auto Renderer::Impl::SetShadowMap(ShadowMap shadow_map) -> void {
+    if (shadow_map == shadow_map_) {
+        return;
+    }
+
+    shadow_map_ = shadow_map;
+    if (shadow_map_ == ShadowMap::None) {
+        shadow_maps_.Clear();
+    }
+}
+
 auto Renderer::Impl::CreateTextureFromRenderTarget(RenderTarget* target) -> std::shared_ptr<Texture2D> {
     const auto tex_id = framebuffers_.GetColorAttachment(target);
     if (tex_id == 0) {

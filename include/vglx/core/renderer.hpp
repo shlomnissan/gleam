@@ -191,6 +191,17 @@ public:
     auto SetExposure(float exposure) -> void;
 
     /**
+     * @brief Sets the shadow mapping method for subsequent frames.
+     *
+     * Switching methods may compile new shader variants on the next frame.
+     * Selecting @ref ShadowMap::None "ShadowMap::None" releases all shadow
+     * map resources. Switching back re-creates them on demand.
+     *
+     * @param shadow_map @ref ShadowMap "Shadow mapping method" to apply.
+     */
+    auto SetShadowMap(ShadowMap shadow_map) -> void;
+
+    /**
      * @brief Returns the number of renderable objects drawn in the last frame.
      *
      * Intended for statistics overlays and debugging.

@@ -71,6 +71,8 @@ public:
 
     auto EndFrame() -> void;
 
+    auto Clear() -> void;
+
     ~GLShadowMaps();
 
 private:
