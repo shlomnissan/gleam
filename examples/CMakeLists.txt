@@ -1,6 +1,12 @@
+option(VGLX_EXAMPLES_ENABLE_UI "Enable the stats UI overlay in examples" ON)
+
 add_library(example_runner STATIC example_runner.cpp example_runner.hpp)
 
 target_include_directories(example_runner PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+
+if (VGLX_EXAMPLES_ENABLE_UI)
+    target_compile_definitions(example_runner PRIVATE VGLX_EXAMPLES_ENABLE_UI)
+endif()
 
 target_link_libraries(example_runner PUBLIC vglx)
 

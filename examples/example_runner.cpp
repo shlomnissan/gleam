@@ -48,10 +48,26 @@ auto run_example(vglx::Scene* scene, vglx::Camera* camera, const ExampleSettings
 
     auto timer = vglx::FrameTimer {true};
 
+    #ifdef VGLX_EXAMPLES_ENABLE_UI
+        auto stats = vglx::Stats {};
+    #endif
+
     while(!window.ShouldClose()) {
         window.PollEvents();
         scene->Advance(timer.Tick());
+
+    #ifdef VGLX_EXAMPLES_ENABLE_UI
+        stats.BeforeRender();
         renderer.Render(scene, camera);
+        stats.AfterRender(renderer.RenderedObjectsPerFrame());
+
+        window.BeginUIFrame();
+        stats.Draw();
+        window.EndUIFrame();
+    #else
+        renderer.Render(scene, camera);
+    #endif
+
         window.SwapBuffers();
     }
 

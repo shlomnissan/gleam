@@ -17,8 +17,8 @@
 
 namespace vglx {
 
-static const float kContainerWidth {250.0f};
-static const float kContainerHeight {215.0f};
+static const float kContainerWidth {180.0f};
+static const float kContainerHeight {107.0f};
 
 struct Stats::Impl {
     DataSeries<float, 150> fps_series;
@@ -76,37 +76,25 @@ auto Stats::Draw() const -> void {
 
     ImGui::SetNextWindowSize({kContainerWidth, kContainerHeight});
     ImGui::SetNextWindowPos({window_width - kContainerWidth - 10.0f, 10.0f});
+    ImGui::SetNextWindowBgAlpha(0.8f);
     ImGui::Begin("Stats", nullptr,
         ImGuiWindowFlags_NoResize |
-        ImGuiWindowFlags_NoMove
+        ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoTitleBar |
+        ImGuiWindowFlags_NoInputs
     );
 
-    // frames per second
-    ImGui::PushStyleColor(ImGuiCol_PlotHistogram, {0.68f, 0.07f, 0.35f, 1.0f});
+    ImGui::Text("Frame time: %.0fms", impl_->frame_time_series.LastValue());
+    ImGui::Text("Object count: %.0f", impl_->rendered_objects_series.LastValue());
     ImGui::Text("FPS: %.0f", impl_->fps_series.LastValue());
+
+    ImGui::PushStyleColor(ImGuiCol_FrameBg, {0.106f, 0.106f, 0.122f, 1.0f});
+    ImGui::PushStyleColor(ImGuiCol_PlotHistogram, {0.149f, 0.682f, 1.0f, 1.0f});
     ImGui::PlotHistogram(
         "##FPS",
-        impl_->fps_series.Buffer(), 150, 0, nullptr, 0.0f, 120.0f, {235, 40}
+        impl_->fps_series.Buffer(), 150, 0, nullptr, 0.0f, 120.0f, {165, 40}
     );
-    ImGui::PopStyleColor();
-
-    // frame time
-    ImGui::PushStyleColor(ImGuiCol_PlotHistogram, {0.40f, 0.70f, 0.20f, 1.0f});
-    ImGui::Text("Frame Time: %.0fms", impl_->frame_time_series.LastValue());
-    ImGui::PlotHistogram(
-        "##Frame Time",
-        impl_->frame_time_series.Buffer(), 150, 0, nullptr, 0.0f, 10.0f, {235, 40}
-    );
-    ImGui::PopStyleColor();
-
-    // rendered objects
-    ImGui::PushStyleColor(ImGuiCol_PlotHistogram, {0.20f, 0.40f, 0.70f, 1.0f});
-    ImGui::Text("Rendered objects: %.0f", impl_->rendered_objects_series.LastValue());
-    ImGui::PlotHistogram(
-        "##Rendered Objects",
-        impl_->rendered_objects_series.Buffer(), 150, 0, nullptr, 0.0f, 1000.0f, {235, 40}
-    );
-    ImGui::PopStyleColor();
+    ImGui::PopStyleColor(2);
 
     ImGui::End();
 #endif
