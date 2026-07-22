@@ -17,8 +17,9 @@
 
 namespace vglx {
 
-static const float kContainerWidth {180.0f};
-static const float kContainerHeight {107.0f};
+static const float kContainerWidth {115.0f};
+static const float kContainerHeight {40.0f};
+static const float kContainerMargin {5.0f};
 
 struct Stats::Impl {
     DataSeries<float, 150> fps_series;
@@ -74,29 +75,39 @@ auto Stats::Draw() const -> void {
 #ifdef VGLX_USE_IMGUI
     const auto window_width = ImGui::GetIO().DisplaySize.x;
 
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, {0.0f, 0.0f});
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
     ImGui::SetNextWindowSize({kContainerWidth, kContainerHeight});
-    ImGui::SetNextWindowPos({window_width - kContainerWidth - 10.0f, 10.0f});
-    ImGui::SetNextWindowBgAlpha(0.8f);
+    ImGui::SetNextWindowPos({
+        window_width - kContainerWidth - kContainerMargin,
+        kContainerMargin
+    });
+
     ImGui::Begin("Stats", nullptr,
         ImGuiWindowFlags_NoResize |
         ImGuiWindowFlags_NoMove |
         ImGuiWindowFlags_NoTitleBar |
-        ImGuiWindowFlags_NoInputs
+        ImGuiWindowFlags_NoInputs |
+        ImGuiWindowFlags_NoBackground
     );
-
-    ImGui::Text("Frame time: %.0fms", impl_->frame_time_series.LastValue());
-    ImGui::Text("Object count: %.0f", impl_->rendered_objects_series.LastValue());
-    ImGui::Text("FPS: %.0f", impl_->fps_series.LastValue());
 
     ImGui::PushStyleColor(ImGuiCol_FrameBg, {0.106f, 0.106f, 0.122f, 1.0f});
     ImGui::PushStyleColor(ImGuiCol_PlotHistogram, {0.149f, 0.682f, 1.0f, 1.0f});
+
     ImGui::PlotHistogram(
         "##FPS",
-        impl_->fps_series.Buffer(), 150, 0, nullptr, 0.0f, 120.0f, {165, 40}
+        impl_->fps_series.Buffer(), 150, 0, nullptr, 0.0f, 120.0f,
+        {kContainerWidth, kContainerHeight}
     );
+
     ImGui::PopStyleColor(2);
 
+    auto offset = kContainerHeight - ImGui::GetTextLineHeight() - 3.0f;
+    ImGui::SetCursorPos({5.0f, offset});
+    ImGui::Text("FPS: %.0f", impl_->fps_series.LastValue());
+
     ImGui::End();
+    ImGui::PopStyleVar(2);
 #endif
 }
 
