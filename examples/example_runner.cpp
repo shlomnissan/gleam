@@ -9,7 +9,7 @@
 
 #include <print>
 
-auto run_example(vglx::Scene* scene, vglx::Camera* camera, const ExampleSettings& settings) -> int {
+auto run_example(ExampleScene* scene, vglx::Camera* camera, const ExampleSettings& settings) -> int {
     auto window = vglx::Window {{
         .title = settings.window_title,
         .width = kWindowWidth,
@@ -63,6 +63,7 @@ auto run_example(vglx::Scene* scene, vglx::Camera* camera, const ExampleSettings
 
         window.BeginUIFrame();
         stats.Draw();
+        scene->OnDrawUI();
         window.EndUIFrame();
     #else
         renderer.Render(scene, camera);

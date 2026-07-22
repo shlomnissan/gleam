@@ -9,7 +9,7 @@
 
 #include "example_runner.hpp"
 
-struct Scene : public vglx::Scene {
+struct Scene : public ExampleScene {
     vglx::Mesh* mesh {nullptr};
 
     Scene() {

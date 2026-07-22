@@ -23,8 +23,8 @@ auto get_camera() {
     return camera;
 }
 
-auto get_scene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
-    auto scene = vglx::Scene::Create();
+auto get_scene() -> std::expected<std::unique_ptr<ExampleScene>, std::string> {
+    auto scene = ExampleScene::Create();
 
     auto result_background = vglx::LoadHDRTexture(ASSETS_DIR "/hdri/qwantani_dusk_2_puresky_4k.hdr");
     if (!result_background.has_value()) {

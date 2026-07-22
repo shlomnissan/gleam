@@ -23,8 +23,8 @@ auto get_camera() {
     return camera;
 }
 
-auto get_scene() -> std::expected<std::unique_ptr<vglx::Scene>, std::string> {
-    auto scene = vglx::Scene::Create();
+auto get_scene() -> std::expected<std::unique_ptr<ExampleScene>, std::string> {
+    auto scene = ExampleScene::Create();
     auto sphere = scene->Add(vglx::Mesh::Create(
         vglx::SphereGeometry::Create({.radius = 5.0f}),
         vglx::PhongMaterial::Create({.color = 0x000011})
