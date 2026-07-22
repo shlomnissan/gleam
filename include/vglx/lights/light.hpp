@@ -55,6 +55,14 @@ struct Shadow {
     float extent {15.0f};
 
     /**
+     * @brief Penumbra width in shadow map texels.
+     *
+     * Values between 1 and 2 stay smooth; larger values trade quality for
+     * width. Only used when @ref Renderer::ShadowMap::PCF is selected.
+     */
+    float radius {1.0f};
+
+    /**
      * @brief Resolution of the square shadow map.
      */
     unsigned int map_size {1024};

@@ -55,6 +55,7 @@ auto GLLights::AddLight(
         if (cast_shadow) {
             has_shadow_casters = true;
             dst.shadow_bias = shadow_params->bias;
+            dst.shadow_radius = shadow_params->radius;
             dst.shadow_near = shadow_params->near;
             dst.shadow_far = shadow_params->far;
             dst.shadow_layer_index = shadow_layer_index;

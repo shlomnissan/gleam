@@ -40,6 +40,7 @@ ProgramAttributes::ProgramAttributes(
         roughness_map = m->roughness_map != nullptr;
         ibl = scene->environment != nullptr;
         shadow_maps = lights.enable_shadow_maps;
+        pcf_shadows = lights.enable_pcf_shadows;
         point_shadow_maps = lights.enable_point_shadow_maps;
     }
 
@@ -54,6 +55,7 @@ ProgramAttributes::ProgramAttributes(
         normal_map = m->normal_map != nullptr;
         specular_map = m->specular_map != nullptr;
         shadow_maps = lights.enable_shadow_maps;
+        pcf_shadows = lights.enable_pcf_shadows;
         point_shadow_maps = lights.enable_point_shadow_maps;
     }
 
@@ -114,6 +116,7 @@ ProgramAttributes::ProgramAttributes(
     key |= (ibl ? 1ULL : 0ULL) << 34; // 1 bit
     key |= (shadow_maps ? 1ULL : 0ULL) << 35; // 1 bit
     key |= (point_shadow_maps ? 1ULL : 0ULL) << 36; // 1 bit
+    key |= (pcf_shadows ? 1ULL : 0ULL) << 37; // 1 bit
 
     if (type == Material::Type::ShaderMaterial) {
         math::HashCombine(key, shader_material_id);

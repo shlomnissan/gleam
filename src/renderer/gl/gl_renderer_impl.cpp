@@ -130,7 +130,8 @@ auto Renderer::Impl::RenderObject(Renderable* renderable, Scene* scene, Camera* 
         .point = lights_.point,
         .spot = lights_.spot,
         .enable_shadow_maps = shadow_map_ != ShadowMap::None && lights_.has_shadow_casters,
-        .enable_point_shadow_maps = shadow_map_ != ShadowMap::None && lights_.has_point_shadow_casters,
+        .enable_pcf_shadows = shadow_map_ == ShadowMap::PCF && lights_.has_shadow_casters,
+        .enable_point_shadow_maps = shadow_map_ != ShadowMap::None && lights_.has_point_shadow_casters
     }, scene};
 
     auto program = programs_.GetProgram(attrs);

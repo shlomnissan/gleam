@@ -30,6 +30,7 @@ struct Light {
     float Range;
     int ShadowLayerIndex;
     float ShadowBias;
+    float ShadowRadius;
     float ShadowNear;
     float ShadowFar;
     mat4 ShadowTransform;

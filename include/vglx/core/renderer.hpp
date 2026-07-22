@@ -68,7 +68,8 @@ public:
      */
     enum class ShadowMap {
         None, ///< Shadows disabled.
-        Basic ///< Single-sample depth-mapped shadows with hard edges.
+        Basic, ///< Single-sample depth-mapped shadows with hard edges.
+        PCF ///< Percentage-closer filtered (PCF) shadows with soft edges.
     };
 
     /// @brief Parameters for constructing a @ref Renderer object.
