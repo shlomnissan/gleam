@@ -112,6 +112,6 @@ auto main() -> int {
     return run_example(scene.get(), camera.get(), {
         .window_title = "Shadow Mapping",
         .clear_color = 0x222244,
-        .shadow_map = vglx::Renderer::ShadowMap::Basic
+        .shadow_map = vglx::Renderer::ShadowMap::PCF
     });
 }

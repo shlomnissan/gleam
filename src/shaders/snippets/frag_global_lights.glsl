@@ -79,6 +79,10 @@ float shadowFactor(const in Light light) {
 
         float ref = (ndc * 0.5 + 0.5) - light.ShadowBias;
 
+        #ifdef USE_PCF_SHADOWS
+            return 1.0;
+        #endif
+
         return texture(u_PointShadowMaps, vec4(dir, float(light.ShadowLayerIndex)), ref);
     }
     #endif
@@ -90,6 +94,18 @@ float shadowFactor(const in Light light) {
     }
 
     float ref = proj.z - light.ShadowBias;
+
+    #ifdef USE_PCF_SHADOWS
+        float texel_step = light.ShadowRadius / float(textureSize(u_ShadowMaps2D, 0).x);
+        float sum = 0.0;
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                vec2 coords = proj.xy + vec2(i, j) * texel_step;
+                sum += texture(u_ShadowMaps2D, vec4(coords, float(light.ShadowLayerIndex), ref));
+            }
+        }
+        return sum / 9.0;
+    #endif
 
     return texture(u_ShadowMaps2D, vec4(proj.xy, float(light.ShadowLayerIndex), ref));
 }
