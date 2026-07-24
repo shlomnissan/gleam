@@ -31,6 +31,7 @@ public:
      * @brief Enumerates all supported material types.
      */
     enum class Type {
+        DepthMaterial, ///< Renders depth only; used internally for shadow map passes.
         PBRMaterial, ///< Implements physically-based rendering with the metallic workflow.
         PhongMaterial, ///< Implements the Blinn–Phong lighting model.
         ShaderMaterial, ///< Uses a custom shader program for rendering.
@@ -138,6 +139,8 @@ public:
      */
     [[nodiscard]] inline static auto TypeToString(Type type) -> std::string {
         switch(type) {
+            case Material::Type::DepthMaterial:
+                return "depth_material";
             case Material::Type::PBRMaterial:
                 return "pbr_material";
             case Material::Type::PhongMaterial:
@@ -149,7 +152,7 @@ public:
             case Material::Type::UnlitMaterial:
                 return "unlit_material";
             default:
-                return "unkonwn";
+                return "unknown";
         }
     }
 

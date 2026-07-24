@@ -12,6 +12,7 @@
  * @brief Classes defining material properties for meshes.
  */
 
+#include "vglx/materials/depth_material.hpp"
 #include "vglx/materials/pbr_material.hpp"
 #include "vglx/materials/phong_material.hpp"
 #include "vglx/materials/shader_material.hpp"
