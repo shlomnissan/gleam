@@ -75,8 +75,9 @@ public:
     /**
      * @brief Value in the range $[0.0, 1.0]$ indicating how transparent the material is.
      *
-     * For opacity to have an effect, @ref Material::transparent "transparency"
-     * must be enabled.
+     * Blends the material with the framebuffer when @ref Material::transparent
+     * "transparency" is enabled, and contributes to the alpha value tested
+     * against @ref alpha_test. Has no effect when both are disabled.
      */
     float opacity {1.0f};
 
@@ -85,6 +86,16 @@ public:
 
     /// @brief Polygon offset units used to mitigate z-fighting.
     float polygon_offset_units {0.0f};
+
+    /**
+     * @brief Alpha threshold below which fragments are discarded.
+     *
+     * Fragments whose final alpha (@ref opacity combined with texture alpha)
+     * falls below this value are not rendered. Use for cutout surfaces such
+     * as foliage. Unlike @ref transparent, discarded fragments write no depth
+     * and require no sorting. A value of 0 disables the test.
+     */
+    float alpha_test {0.0f};
 
     /// @brief Enables scene fog for this material.
     bool fog {true};

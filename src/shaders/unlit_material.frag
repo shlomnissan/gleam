@@ -32,6 +32,10 @@ void main() {
         opacity *= alpha_sample.r;
     #endif
 
+    #ifdef USE_ALPHA_TEST
+        if (opacity < u_AlphaTest) discard;
+    #endif
+
     #ifdef USE_FOG
         applyFog(output_color, v_ViewDepth);
     #endif

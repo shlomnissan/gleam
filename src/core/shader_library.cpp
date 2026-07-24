@@ -110,6 +110,7 @@ auto ShaderLibrary::InjectAttributes(
     auto features = std::string {};
 
     if (attrs.color) features += "#define USE_COLOR\n";
+    if (attrs.alpha_test) features += "#define USE_ALPHA_TEST\n";
     if (attrs.flat_shaded) features += "#define USE_FLAT_SHADED\n";
     if (attrs.fog) features += "#define USE_FOG\n";
     if (attrs.ibl) features += "#define USE_IBL\n";

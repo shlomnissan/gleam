@@ -195,6 +195,10 @@ auto Renderer::Impl::SetUniforms(
 
     program->SetUniform(Uniform::Model, &model);
     program->SetUniform(Uniform::Opacity, &material->opacity);
+
+    if (attrs->alpha_test) {
+        program->SetUniform(Uniform::AlphaTest, &material->alpha_test);
+    }
     program->SetUniform(Uniform::Resolution, &resolution_);
 
     static const auto kIdentity = Matrix3::Identity();

@@ -205,6 +205,10 @@ void main() {
         opacity *= alpha_sample.r;
     #endif
 
+    #ifdef USE_ALPHA_TEST
+        if (opacity < u_AlphaTest) discard;
+    #endif
+
     float metallic = u_Material.Metallic;
     #ifdef USE_METALLIC_MAP
         metallic *= texture(u_MetallicMap, v_TexCoords).b;

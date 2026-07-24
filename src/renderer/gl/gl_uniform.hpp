@@ -38,6 +38,7 @@ enum class Uniform {
     AOMap,
     AlbedoMap,
     AlphaMap,
+    AlphaTest,
     AmbientLight,
     Anchor,
     BrdfLut,
@@ -85,6 +86,7 @@ constexpr auto get_uniform_loc(std::string_view str) {
     if (str == "u_AOMap") return static_cast<int>(AOMap);
     if (str == "u_AlbedoMap") return static_cast<int>(AlbedoMap);
     if (str == "u_AlphaMap") return static_cast<int>(AlphaMap);
+    if (str == "u_AlphaTest") return static_cast<int>(AlphaTest);
     if (str == "u_AmbientLight") return static_cast<int>(AmbientLight);
     if (str == "u_Anchor") return static_cast<int>(Anchor);
     if (str == "u_BrdfLut") return static_cast<int>(BrdfLut);

@@ -11,6 +11,7 @@ output color, varyings, and uniforms accessible within the fragment shader.
 @varying vec4 v_Position - Fragment position in view space
 @uniform vec3 u_Color - Base color of the fragment
 @uniform float u_Opacity - Fragment opacity
+@uniform float u_AlphaTest - Alpha cutoff below which fragments are discarded (USE_ALPHA_TEST)
 @uniform mat4 u_Projection - Projection transformation matrix (ub_Camera)
 @uniform mat4 u_View - View transformation matrix (ub_Camera)
 
@@ -34,6 +35,10 @@ in vec4 v_Position;
 
 uniform float u_Opacity;
 uniform vec3 u_Color;
+
+#ifdef USE_ALPHA_TEST
+    uniform float u_AlphaTest;
+#endif
 
 layout(std140) uniform ub_Camera {
     mat4 u_Projection;

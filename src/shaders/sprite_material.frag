@@ -26,6 +26,10 @@ void main() {
         opacity *= texture(u_TextureMap, v_TexCoords).a;
     #endif
 
+    #ifdef USE_ALPHA_TEST
+        if (opacity < u_AlphaTest) discard;
+    #endif
+
     #ifdef USE_FOG
         applyFog(output_color, v_ViewDepth);
     #endif

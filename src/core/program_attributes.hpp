@@ -36,6 +36,7 @@ struct ProgramAttributes {
 
     uint8_t num_lights {0};
 
+    bool alpha_test {false};
     bool color {false};
     bool flat_shaded {false};
     bool fog {false};

@@ -81,6 +81,7 @@ ProgramAttributes::ProgramAttributes(
         alpha_map = m->alpha_map != nullptr;
     }
 
+    alpha_test = material->alpha_test > 0.0f;
     flat_shaded = material->flat_shaded;
     fog = material->fog && scene->fog.has_value();
     instancing = renderable->GetNodeType() == Node::Type::InstancedMesh;
@@ -117,6 +118,7 @@ ProgramAttributes::ProgramAttributes(
     key |= (shadow_maps ? 1ULL : 0ULL) << 35; // 1 bit
     key |= (point_shadow_maps ? 1ULL : 0ULL) << 36; // 1 bit
     key |= (pcf_shadows ? 1ULL : 0ULL) << 37; // 1 bit
+    key |= (alpha_test ? 1ULL : 0ULL) << 38; // 1 bit
 
     if (type == Material::Type::ShaderMaterial) {
         math::HashCombine(key, shader_material_id);

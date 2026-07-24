@@ -163,6 +163,10 @@ void main() {
         opacity *= alpha_sample.r;
     #endif
 
+    #ifdef USE_ALPHA_TEST
+        if (opacity < u_AlphaTest) discard;
+    #endif
+
     float specular_factor = 1.0;
     #ifdef USE_SPECULAR_MAP
         specular_factor = texture(u_SpecularMap, v_TexCoords).r;
