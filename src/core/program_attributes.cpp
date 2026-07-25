@@ -7,6 +7,7 @@
 
 #include "core/program_attributes.hpp"
 
+#include "vglx/materials/depth_material.hpp"
 #include "vglx/materials/pbr_material.hpp"
 #include "vglx/materials/phong_material.hpp"
 #include "vglx/materials/shader_material.hpp"
@@ -21,12 +22,21 @@ namespace vglx {
 ProgramAttributes::ProgramAttributes(
     Renderable* renderable,
     const LightInfo& lights,
-    const Scene* scene
+    const Scene* scene,
+    const Material* material_override
 ) {
     auto geometry = renderable->GetGeometry().get();
-    auto material = renderable->GetMaterial().get();
+    const auto material = material_override != nullptr
+        ? material_override
+        : renderable->GetMaterial().get();
 
     type = material->GetType();
+
+    if (type == Material::Type::DepthMaterial) {
+        auto m = static_cast<const DepthMaterial*>(material);
+        albedo_map = m->albedo_map != nullptr;
+        alpha_map = m->alpha_map != nullptr;
+    }
 
     if (type == Material::Type::PBRMaterial) {
         auto m = static_cast<const PBRMaterial*>(material);

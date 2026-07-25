@@ -15,6 +15,8 @@
 
 #include "utilities/logger.hpp"
 
+#include "shaders/headers/depth_material_frag.h"
+#include "shaders/headers/depth_material_vert.h"
 #include "shaders/headers/pbr_material_frag.h"
 #include "shaders/headers/pbr_material_vert.h"
 #include "shaders/headers/phong_material_frag.h"
@@ -34,6 +36,16 @@
 namespace vglx {
 
 auto ShaderLibrary::GetShaderSource(const ProgramAttributes& attrs) const -> std::vector<ShaderInfo> {
+    if (attrs.type == Material::Type::DepthMaterial) {
+        return {{
+            ShaderType::kVertexShader,
+            ProcessShader(attrs, _SHADER_depth_material_vert)
+        }, {
+            ShaderType::kFragmentShader,
+            ProcessShader(attrs, _SHADER_depth_material_frag)
+        }};
+    }
+
     if (attrs.type == Material::Type::PBRMaterial) {
         return {{
             ShaderType::kVertexShader,

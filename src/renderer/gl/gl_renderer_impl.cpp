@@ -41,12 +41,15 @@ Renderer::Impl::Impl(const Renderer::Parameters& params)
     viewport_height_(params.framebuffer_height),
     render_lists_(std::make_unique<RenderLists>()),
     shadow_render_lists_(std::make_unique<RenderLists>()),
+    depth_material_(DepthMaterial::Create()),
     shadow_map_(params.shadow_map),
     tone_mapping_(params.tone_mapping),
     exposure_(params.exposure)
 {
     state_.SetViewport(0, 0, params.framebuffer_width, params.framebuffer_height);
     state_.SetClearColor(params.clear_color);
+
+    depth_material_->fog = false;
 }
 
 auto Renderer::Impl::Initialize() -> std::expected<void, std::string> {
@@ -450,6 +453,37 @@ auto Renderer::Impl::ProcessLights(Camera* camera) -> void {
     if (lights_.HasLights()) lights_.Update();
 }
 
+static auto configure_depth_material(Material* source, DepthMaterial* destination) -> void {
+    destination->opacity = source->opacity;
+    destination->alpha_test = source->alpha_test;
+    destination->albedo_map = nullptr;
+    destination->alpha_map = nullptr;
+
+    if (source->alpha_test <= 0.0f) return;
+
+    switch (source->GetType()) {
+        case Material::Type::PBRMaterial: {
+            auto m = static_cast<PBRMaterial*>(source);
+            destination->albedo_map = m->albedo_map;
+            destination->alpha_map = m->alpha_map;
+        }
+        break;
+        case Material::Type::PhongMaterial: {
+            auto m = static_cast<PhongMaterial*>(source);
+            destination->albedo_map = m->albedo_map;
+            destination->alpha_map = m->alpha_map;
+        }
+        break;
+        case Material::Type::UnlitMaterial: {
+            auto m = static_cast<UnlitMaterial*>(source);
+            destination->albedo_map = m->texture_map;
+            destination->alpha_map = m->alpha_map;
+        }
+        break;
+        default: break;
+    }
+}
+
 auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
     auto lights = std::vector<Light*> {};
     auto count_2d = 0u;
@@ -513,12 +547,23 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
                 continue;
             }
 
+            auto material = renderable->GetMaterial().get();
+            configure_depth_material(material, depth_material_.get());
+
+            auto attrs = ProgramAttributes {
+                renderable, {}, scene, depth_material_.get()
+            };
+
+            auto program = programs_.GetProgram(attrs);
+            if (!program->IsValid()) {
+                continue;
+            }
+
             auto is_instanced = renderable->GetNodeType() == Node::Type::InstancedMesh;
-            auto program = shadow_maps_.GetProgram(is_instanced);
             auto model = renderable->GetWorldTransform();
 
             using enum Material::Side;
-            switch (renderable->GetMaterial()->side) {
+            switch (material->side) {
                 case Front: state_.SetSide(Back); break;
                 case Back: state_.SetSide(Front); break;
                 case TwoSided: state_.SetSide(TwoSided); break;
@@ -527,6 +572,44 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
             state_.UseProgram(program->Id());
 
             program->SetUniform(Uniform::Model, &model);
+
+            if (attrs.alpha_test) {
+                program->SetUniform(Uniform::Opacity, &depth_material_->opacity);
+                program->SetUniform(Uniform::AlphaTest, &depth_material_->alpha_test);
+
+                static const auto kIdentity = Matrix3::Identity();
+                program->SetUniform(Uniform::TextureTransform, &kIdentity);
+
+                const auto bind_alpha_texture = [&](
+                    GLTextureMapType type,
+                    Uniform uniform,
+                    const std::shared_ptr<Texture>& tex
+                ) {
+                    textures_.Bind(tex, std::to_underlying(type));
+                    program->SetUniform(uniform, &type);
+                    if (tex->GetType() == Texture::Type::Texture2D) {
+                        const auto& transform = static_cast<Texture2D*>(tex.get())->transform.Get();
+                        program->SetUniform(Uniform::TextureTransform, &transform);
+                    }
+                };
+
+                if (attrs.albedo_map) {
+                    bind_alpha_texture(
+                        GLTextureMapType::AlbedoMap,
+                        Uniform::AlbedoMap,
+                        depth_material_->albedo_map
+                    );
+                }
+
+                if (attrs.alpha_map) {
+                    bind_alpha_texture(
+                        GLTextureMapType::AlphaMap,
+                        Uniform::AlphaMap,
+                        depth_material_->alpha_map
+                    );
+                }
+            }
+
             program->UpdateUniforms();
 
             const auto index_size = geometry->IndexData().size();

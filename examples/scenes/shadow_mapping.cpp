@@ -54,30 +54,20 @@ struct Scene : public ExampleScene {
         }));
 
         spot->transform.Translate({8.0f, 10.0f, 5.0f});
-        spot->cast_shadow = false;
+        spot->cast_shadow = true;
         spot->target = mesh;
         spot->shadow.map_size = 1024;
         spot->shadow.far = 20.0f;
 
-        // auto directional = Add(vglx::DirectionalLight::Create({
-        //     .color = 0x8888ff,
-        //     .intensity = 3.0f
-        // }));
-
-        // directional->transform.Translate({3.0f, 12.0f, 17.0f});
-        // directional->cast_shadow = true;
-        // directional->shadow.map_size = 1024;
-        // directional->shadow.extent = 2.0f;
-
-        auto point = Add(vglx::PointLight::Create({
+        auto directional = Add(vglx::DirectionalLight::Create({
             .color = 0x8888ff,
-            .intensity = 20.0f
+            .intensity = 3.0f
         }));
 
-        point->transform.Translate({1.0f, 3.0f, 1.0f});
-        point->cast_shadow = true;
-        point->shadow.map_size = 1024;
-        point->range = 15.0f;
+        directional->transform.Translate({3.0f, 12.0f, 17.0f});
+        directional->cast_shadow = true;
+        directional->shadow.map_size = 1024;
+        directional->shadow.extent = 2.0f;
     }
 
     auto OnUpdate(float dt) -> void override {

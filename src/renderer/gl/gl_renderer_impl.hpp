@@ -8,6 +8,7 @@
 #pragma once
 
 #include "vglx/core/renderer.hpp"
+#include "vglx/materials/depth_material.hpp"
 #include "vglx/math/vector2.hpp"
 #include "vglx/scene/renderable.hpp"
 
@@ -92,6 +93,8 @@ private:
 
     std::unique_ptr<RenderLists> render_lists_;
     std::unique_ptr<RenderLists> shadow_render_lists_;
+
+    std::shared_ptr<DepthMaterial> depth_material_;
 
     size_t rendered_objects_counter_ {0};
     size_t rendered_objects_per_frame_ {0};

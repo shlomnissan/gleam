@@ -16,7 +16,6 @@
 
 namespace vglx {
 
-class GLProgram;
 class Light;
 class Camera;
 
@@ -59,8 +58,6 @@ public:
 
     [[nodiscard]] auto GetShadowMap(Light* light) -> GLShadowMap*;
 
-    [[nodiscard]] auto GetProgram(bool instanced) -> GLProgram*;
-
     [[nodiscard]] auto GetTexture2D() const -> unsigned int {
         return state_2d_.texture_id;
     }
@@ -84,9 +81,6 @@ private:
     };
 
     std::vector<std::pair<Light*, GLShadowMap>> shadow_maps_ {};
-
-    std::unique_ptr<GLProgram> prg_shadow_map_;
-    std::unique_ptr<GLProgram> prg_instanced_shadow_map_;
 
     InternalShadowMapState state_2d_ {};
     InternalShadowMapState state_point_ {};

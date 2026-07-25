@@ -44,8 +44,9 @@ struct Shadow {
     /**
      * @brief Far plane of the shadow camera.
      *
-     * Spot lights with a positive range use the range instead. Directional
-     * lights always use this value.
+     * Directional lights always use this value. Point lights and spot lights with
+     * a positive range use the range instead.
+     *
      */
     float far {500.0f};
 
@@ -57,8 +58,8 @@ struct Shadow {
     /**
      * @brief Penumbra width in shadow map texels.
      *
-     * Values between 1 and 2 stay smooth; larger values trade quality for
-     * width. Only used when @ref Renderer::ShadowMap::PCF is selected.
+     * Values in the range $[1, 2]$ stay smooth. Larger values trade quality for
+     * width. Only used when @ref Renderer::ShadowMap "PCF" is selected.
      */
     float radius {1.0f};
 
