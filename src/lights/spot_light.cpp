@@ -131,7 +131,7 @@ auto SpotLight::OnUpdate(float delta) -> void {
     }
 }
 
-auto SpotLight::GetShadow() const -> const Shadow* {
+auto SpotLight::GetShadow() -> Shadow* {
     return cast_shadow ? &shadow : nullptr;
 }
 

@@ -633,6 +633,12 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
     };
 
     for (auto light : lights) {
+        auto config = light->GetShadow();
+        if (config == nullptr) {
+            Logger::Log(LogLevel::Error, "Failed to read shadow config from light source");
+            continue;
+        }
+
         if (light->GetType() == Light::Type::Point) {
             for (auto i = 0u; i < 6u; ++i) {
                 auto result = shadow_maps_.BindShadowMap(light, camera, i);
@@ -640,6 +646,12 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
                     Logger::Log(LogLevel::Error, "{}", result.error());
                     break;
                 }
+
+                auto needs_update = config->auto_update || config->needs_update;
+                if (!needs_update) {
+                    break;
+                }
+
                 render_depth_pass(result.value(), max_map_size_point);
             }
         } else {
@@ -648,8 +660,14 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
                 Logger::Log(LogLevel::Error, "{}", result.error());
                 continue;
             }
-            render_depth_pass(result.value(), light->GetShadow()->map_size);
+
+            auto needs_update = config->auto_update || config->needs_update;
+            if (needs_update) {
+                render_depth_pass(result.value(), config->map_size);
+            }
         }
+
+        config->needs_update = false;
     }
 
     shadow_maps_.EndFrame();

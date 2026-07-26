@@ -20,7 +20,9 @@ class Light;
 class Camera;
 
 struct GLShadowMap {
-    unsigned int map_idx;
+    int map_idx {-1};
+
+    unsigned int generation {0};
 
     Matrix4 transform {Matrix4::Identity()};
 
@@ -75,6 +77,7 @@ public:
 private:
     struct InternalShadowMapState {
         unsigned int curr_layer_id {0u};
+        unsigned int generation {0u};
         unsigned int max_map_size {0u};
         unsigned int texture_id {0u};
         unsigned int count {0u};

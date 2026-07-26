@@ -113,7 +113,7 @@ public:
     }
 
     /// @cond INTERNAL
-    [[nodiscard]] auto GetShadow() const -> const Shadow* override;
+    [[nodiscard]] auto GetShadow() -> Shadow* override;
     /// @endcond
 
     /**

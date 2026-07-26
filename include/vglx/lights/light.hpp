@@ -67,6 +67,20 @@ struct Shadow {
      * @brief Resolution of the square shadow map.
      */
     unsigned int map_size {1024};
+
+    /**
+     * @brief Re-renders the shadow map every frame.
+     *
+     * Disable for lights whose casters are static to skip their shadow
+     * passes. The light and its casters must not move while disabled.
+     */
+    bool auto_update {true};
+
+    /**
+     * @brief Requests a one-time shadow map refresh when @ref auto_update
+     * is disabled. Cleared by the renderer after the next render.
+     */
+    bool needs_update {false};
 };
 
 /**
@@ -117,7 +131,7 @@ public:
     }
 
     /// @cond INTERNAL
-    [[nodiscard]] virtual auto GetShadow() const -> const Shadow* {
+    [[nodiscard]] virtual auto GetShadow() -> Shadow* {
         return nullptr;
     }
     /// @endcond

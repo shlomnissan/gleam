@@ -77,7 +77,7 @@ auto PointLight::OnUpdate(float delta) -> void {
     }
 }
 
-auto PointLight::GetShadow() const -> const Shadow* {
+auto PointLight::GetShadow() -> Shadow* {
     return cast_shadow ? &shadow : nullptr;
 }
 

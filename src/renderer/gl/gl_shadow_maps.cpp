@@ -177,6 +177,8 @@ auto GLShadowMaps::StartFrame(
     }
 
     if (count_2d != state_2d_.count || max_map_size_2d != state_2d_.max_map_size) {
+        state_2d_.generation++;
+
         if (state_2d_.texture_id != 0) {
             glDeleteTextures(1, &state_2d_.texture_id);
             state_2d_.texture_id = 0;
@@ -194,6 +196,8 @@ auto GLShadowMaps::StartFrame(
     }
 
     if (count_point != state_point_.count || max_map_size_point != state_point_.max_map_size) {
+        state_point_.generation++;
+
         if (state_point_.texture_id != 0) {
             glDeleteTextures(1, &state_point_.texture_id);
             state_point_.texture_id = 0;
@@ -239,8 +243,16 @@ auto GLShadowMaps::BindShadowMap(Light* light, Camera* camera, unsigned int face
 
     if (light->GetType() == Light::Type::Point) {
         if (!entry.touched) {
+            auto force_update = entry.map_idx != state_point_.curr_layer_id ||
+                entry.generation != state_point_.generation;
+
+            if (force_update) {
+                config->needs_update = true;
+            }
+
             entry.touched = true;
             entry.map_idx = state_point_.curr_layer_id++;
+            entry.generation = state_point_.generation;
             update_camera(light, entry.camera.get());
         }
 
@@ -254,8 +266,16 @@ auto GLShadowMaps::BindShadowMap(Light* light, Camera* camera, unsigned int face
             entry.map_idx * 6 + face
         );
     } else {
+        auto force_update = entry.map_idx != state_2d_.curr_layer_id ||
+            entry.generation != state_2d_.generation;
+
+        if (force_update) {
+            config->needs_update = true;
+        }
+
         entry.touched = true;
         entry.map_idx = state_2d_.curr_layer_id++;
+        entry.generation = state_2d_.generation;
         update_camera(light, entry.camera.get());
 
         glFramebufferTextureLayer(

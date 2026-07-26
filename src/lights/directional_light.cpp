@@ -122,7 +122,7 @@ auto DirectionalLight::OnUpdate(float delta) -> void {
     }
 }
 
-auto DirectionalLight::GetShadow() const -> const Shadow* {
+auto DirectionalLight::GetShadow() -> Shadow* {
     return cast_shadow ? &shadow : nullptr;
 }
 
