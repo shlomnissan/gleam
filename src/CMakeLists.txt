@@ -90,7 +90,6 @@ set(SOURCE_CODE
     "textures/dynamic_texture_2d.cpp"
     "utilities/assert.hpp"
     "utilities/data_series.hpp"
-    "utilities/file.hpp"
     "utilities/logger.cpp"
     "utilities/logger.hpp"
     "utilities/scoped_timer.hpp"
