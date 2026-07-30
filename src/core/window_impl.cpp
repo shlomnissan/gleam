@@ -162,9 +162,9 @@ Window::Impl::~Impl() {
 namespace {
 
 auto glfw_get_error() -> std::string {
-    static const char* error_description;
-    glfwGetError(&error_description);
-    return error_description;
+    auto error = static_cast<const char*>(nullptr);
+    glfwGetError(&error);
+    return error != nullptr ? error : "unknown error";
 }
 
 auto glfw_key_callback(GLFWwindow*, int key, int scancode, int action, int mods) -> void {
