@@ -1,18 +1,10 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg id="Layer_2" data-name="Layer 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 69 77.93">
-  <defs>
-    <style>
-      .cls-1 {
-        fill: #3c3c44;
-      }
-    </style>
-  </defs>
-  <g id="Layer_1-2" data-name="Layer 1">
-    <g>
-      <polygon class="cls-1" points="52.6 49.88 52.6 32 36.76 41.1 36.76 58.98 52.6 49.88"/>
-      <polygon class="cls-1" points="16.83 68.9 32.37 77.93 32.37 41.02 16.83 32.1 16.83 68.9"/>
-      <polygon class="cls-1" points="34.72 19.08 18.82 28.2 34.63 37.28 50.53 28.15 34.72 19.08"/>
-      <path class="cls-1" d="M34.5,0L0,19.98v39.75l12.44,6.83v-15.68c-.01-.11-.02-.22-.02-.34v-23.67l22.19-12.74,22.18,12.74v25.47l-20.09,11.54v14.04l32.3-18.95V19.65L34.5,0Z"/>
-    </g>
-  </g>
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M100 0H0V100H100V0Z" fill="black"/>
+<mask id="mask0_3_16" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100">
+<path d="M100 0H0V100H100V0Z" fill="white"/>
+</mask>
+<g mask="url(#mask0_3_16)">
+<path d="M113.32 -1.94C152.61 -1.94 187.33 7.34 208.23 21.52C189.73 15.58 167.4 12.1 143.36 12.1C79.49 12.1 27.71 36.61 27.71 66.85C27.71 78.48 35.38 89.27 48.45 98.14C17.8 88.29 -2.33 71.66 -2.33 52.81C-2.33 22.57 49.45 -1.94 113.32 -1.94Z" fill="white"/>
+<path d="M82.54 29.45H96.65L78.57 88.27H57.76L43.92 43.23C43.92 43.23 45 41.87 49.14 38.86C53.28 35.84 55.5 34.79 55.5 34.79L62.52 57.31C64.37 63.31 64.99 65.51 67.99 76.71H68.34C71.43 65.25 71.69 64.28 73.81 57.31L82.54 29.44V29.45Z" fill="white"/>
+</g>
 </svg>
