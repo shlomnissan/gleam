@@ -14,4 +14,5 @@
 
 
 #include "vglx/geometries/geometry.hpp"
+#include "vglx/geometries/buffer_attribute.hpp"
 #include "vglx/geometries/wireframe_geometry.hpp"
