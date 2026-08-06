@@ -61,4 +61,8 @@ auto BufferAttribute::ElementCount() const -> uint32_t {
     return static_cast<uint32_t>(data_.size()) / get_components_from_format(format_);
 }
 
+BufferAttribute::~BufferAttribute() {
+    Dispose();
+}
+
 }

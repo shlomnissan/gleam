@@ -77,6 +77,8 @@ public:
 
     [[nodiscard]] auto GetVersion() const -> uint32_t { return version_; }
 
+    virtual ~BufferAttribute();
+
 private:
     std::string name_ {};
     std::vector<float> data_;
