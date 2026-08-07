@@ -29,12 +29,12 @@ auto get_components_from_format(BufferAttribute::Format format) -> uint32_t {
 }
 
 BufferAttribute::BufferAttribute(const Params& params, std::vector<float> data)
-    : name_ {params.name},
-      data_ {std::move(data)},
-      format_ {params.format},
-      rate_ {params.rate}
+    : name {params.name},
+      format {params.format},
+      rate {params.rate},
+      data_ {std::move(data)}
 {
-    if (name_.empty()) {
+    if (name.empty()) {
         Logger::Log(LogLevel::Error, "Buffer attribute initialization missing a name");
     }
 
@@ -54,11 +54,11 @@ auto BufferAttribute::SetData(std::vector<float> data) -> void {
 }
 
 auto BufferAttribute::Components() const -> uint32_t {
-    return get_components_from_format(format_);
+    return get_components_from_format(format);
 }
 
 auto BufferAttribute::ElementCount() const -> uint32_t {
-    return static_cast<uint32_t>(data_.size()) / get_components_from_format(format_);
+    return static_cast<uint32_t>(data_.size()) / get_components_from_format(format);
 }
 
 BufferAttribute::~BufferAttribute() {

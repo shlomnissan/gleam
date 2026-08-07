@@ -48,11 +48,11 @@ auto create_bounding_sphere(const std::vector<float>& positions, const Vector3& 
 }
 
 auto Geometry2::AddAttribute(std::shared_ptr<BufferAttribute> attribute) -> void {
-    auto error = [name = attribute->GetName()](std::string_view message) {
+    auto error = [name = attribute->name](std::string_view message) {
         Logger::Log(LogLevel::Error, "Failed to add attribute {}. {}", name, message);
     };
 
-    if (attribute->GetRate() == BufferAttribute::Rate::Instance) {
+    if (attribute->rate == BufferAttribute::Rate::Instance) {
         error("Instanced attributes should be added to InstancedMesh objects");
         return;
     }
@@ -62,7 +62,7 @@ auto Geometry2::AddAttribute(std::shared_ptr<BufferAttribute> attribute) -> void
         return;
     }
 
-    if (Attribute(attribute->GetName()) != nullptr) {
+    if (Attribute(attribute->name) != nullptr) {
         error("An attribute with this name already exist");
         return;
     }
@@ -87,7 +87,7 @@ auto Geometry2::SetIndices(std::vector<uint32_t> index_data) -> void {
 }
 
 auto Geometry2::Attribute(std::string_view name) const -> std::shared_ptr<BufferAttribute> {
-    auto it = std::ranges::find(attributes_, name, &BufferAttribute::GetName);
+    auto it = std::ranges::find(attributes_, name, &BufferAttribute::name);
     return it != attributes_.end() ? *it : nullptr;
 }
 

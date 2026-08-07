@@ -26,6 +26,22 @@ auto create_attribute(BufferAttribute::Format format, std::vector<float> data) {
 
 }
 
+#pragma region Construction
+
+TEST(BufferAttribute, ConstructorSetsNameFormatAndRate) {
+    const auto attribute = BufferAttribute::Create({
+        .name = "a_Test",
+        .format = BufferAttribute::Format::Float32x3,
+        .rate = BufferAttribute::Rate::Instance
+    }, {1.0f, 2.0f, 3.0f});
+
+    EXPECT_EQ(attribute->name, "a_Test");
+    EXPECT_EQ(attribute->format, BufferAttribute::Format::Float32x3);
+    EXPECT_EQ(attribute->rate, BufferAttribute::Rate::Instance);
+}
+
+#pragma endregion
+
 #pragma region Formats
 
 TEST(BufferAttribute, ComponentsPerFormat) {

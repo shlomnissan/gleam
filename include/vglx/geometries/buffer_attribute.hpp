@@ -49,9 +49,14 @@ public:
         Rate rate {Rate::Vertex};
     };
 
+    const std::string name;
+
+    const Format format {Format::Float32x1};
+
+    const Rate rate {Rate::Vertex};
+
     BufferAttribute(const Params& params, std::vector<float> data);
 
-    // delete copy constructor and assignment operator
     BufferAttribute(const BufferAttribute&) = delete;
     auto operator=(const BufferAttribute&) -> BufferAttribute& = delete;
 
@@ -65,28 +70,18 @@ public:
 
     [[nodiscard]] auto ElementCount() const -> uint32_t;
 
-    [[nodiscard]] auto IsValid() const -> bool { return !name_.empty() && !data_.empty(); }
+    [[nodiscard]] auto IsValid() const -> bool { return !name.empty() && !data_.empty(); }
 
     [[nodiscard]] auto GetData() const -> const std::vector<float>& { return data_; }
-
-    [[nodiscard]] auto GetFormat() const -> Format { return format_; }
-
-    [[nodiscard]] auto GetName() const -> const std::string& { return name_; }
-
-    [[nodiscard]] auto GetRate() const -> Rate { return rate_; }
 
     [[nodiscard]] auto GetVersion() const -> uint32_t { return version_; }
 
     virtual ~BufferAttribute();
 
 private:
-    std::string name_ {};
     std::vector<float> data_;
 
     uint32_t version_ {0};
-
-    Format format_ {Format::Float32x1};
-    Rate rate_ {Rate::Vertex};
 };
 
 }
