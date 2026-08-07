@@ -153,7 +153,7 @@ auto Renderer::Impl::RenderObject(Renderable* renderable, Scene* scene, Camera* 
 
     SetUniforms(program, &attrs, renderable, camera, scene);
 
-    state_.UseProgram(program->Id());
+    state_.UseProgram(program->ProgramId());
     program->UpdateUniforms();
 
     auto primitive = GL_TRIANGLES;
@@ -569,7 +569,7 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
                 case TwoSided: state_.SetSide(TwoSided); break;
             }
 
-            state_.UseProgram(program->Id());
+            state_.UseProgram(program->ProgramId());
 
             program->SetUniform(Uniform::Model, &model);
 

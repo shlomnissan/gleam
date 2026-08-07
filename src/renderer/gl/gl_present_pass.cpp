@@ -41,7 +41,7 @@ auto GLPresentPass::Present(
     Renderer::ToneMapping tone_mapping,
     float exposure
 ) const -> void {
-    glUseProgram(program_->Id());
+    glUseProgram(program_->ProgramId());
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, scene_buffer.GetResolvedColorTexture());

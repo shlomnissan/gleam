@@ -161,20 +161,20 @@ auto GLBackgroundPass::Render(const std::shared_ptr<Texture>& background) const 
 
     if (background->GetType() == Texture::Type::Texture2D) {
         if (background->mapping == Texture::Mapping::UV) {
-            glUseProgram(background_2d_->Id());
+            glUseProgram(background_2d_->ProgramId());
             glBindVertexArray(vao_[0]);
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
 
         if (background->mapping == Texture::Mapping::Equirectangular) {
-            glUseProgram(background_equirect_->Id());
+            glUseProgram(background_equirect_->ProgramId());
             glBindVertexArray(vao_[1]);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
     }
 
     if (background->GetType() == Texture::Type::CubeTexture) {
-        glUseProgram(background_cube_->Id());
+        glUseProgram(background_cube_->ProgramId());
         glBindVertexArray(vao_[1]);
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }

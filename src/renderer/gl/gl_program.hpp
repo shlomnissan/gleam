@@ -10,6 +10,7 @@
 #include "renderer/gl/gl_uniform.hpp"
 
 #include <array>
+#include <cstdint>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -29,6 +30,11 @@ constexpr auto uniforms_len = static_cast<int>(Uniform::KnownUniformsLength);
 
 class GLProgram {
 public:
+    struct VertexAttributeLocation {
+        std::string name {};
+        GLint location {0};
+    };
+
     explicit GLProgram(const std::vector<ShaderInfo>& shaders);
 
     GLProgram(const GLProgram&) = delete;
@@ -36,11 +42,15 @@ public:
     GLProgram& operator=(const GLProgram&) = delete;
     GLProgram& operator=(GLProgram&&) = delete;
 
+    [[nodiscard]] auto GetVertexAttributeLocations() const -> const std::vector<VertexAttributeLocation>& {
+        return vertex_attribute_locations_;
+    }
+
+    [[nodiscard]] auto ProgramId() const { return program_id_; }
+
     auto UpdateUniforms() -> void;
 
-    auto IsValid() const { return !has_errors_ && program_ > 0; }
-
-    auto Id() const { return program_; }
+    auto IsValid() const { return !has_errors_ && program_id_ > 0; }
 
     auto SetUniform(const std::string& name, const void* v) -> void;
 
@@ -55,7 +65,9 @@ private:
 
     std::array<std::unique_ptr<GLUniform>, uniforms_len> uniforms_ {nullptr};
 
-    GLuint program_ {0};
+    std::vector<VertexAttributeLocation> vertex_attribute_locations_ {};
+
+    GLuint program_id_ {0};
 
     bool has_errors_ {false};
 

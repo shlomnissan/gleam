@@ -30,10 +30,44 @@ const auto VertexAttributesMap = std::unordered_map<std::string, Geometry::Verte
     {"a_InstanceTransform", Geometry::VertexAttributeType::InstanceTransform},
 };
 
+auto get_vertex_attribute_locations(GLuint program) -> std::vector<GLProgram::VertexAttributeLocation> {
+    auto count = GLint {0};
+    glGetProgramiv(program, GL_ACTIVE_ATTRIBUTES, &count);
+
+    auto max_length = GLint {0};
+    glGetProgramiv(program, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &max_length);
+
+    auto curr_name = std::string {};
+    curr_name.resize(max_length);
+
+    auto out = std::vector<GLProgram::VertexAttributeLocation> {};
+
+    for (auto i = 0; i < count; ++i) {
+        auto length = GLsizei {0};
+
+        [[maybe_unused]] auto size = GLint {};
+        [[maybe_unused]] auto type = GLenum {};
+
+        glGetActiveAttrib(program, static_cast<GLuint>(i), curr_name.size(), &length, &size, &type, curr_name.data());
+
+        GLint location = glGetAttribLocation(program, curr_name.data());
+        if (location < 0) {
+            continue;
+        }
+
+        out.push_back({
+            .name = std::string {curr_name.data(), static_cast<size_t>(length)},
+            .location = location
+        });
+    }
+
+    return out;
+};
+
 }
 
 GLProgram::GLProgram(const std::vector<ShaderInfo>& shaders) {
-    program_ = glCreateProgram();
+    program_id_ = glCreateProgram();
 
     auto compilation_error = false;
     for (const auto& shader_info : shaders) {
@@ -48,7 +82,7 @@ GLProgram::GLProgram(const std::vector<ShaderInfo>& shaders) {
             break;
         }
 
-        glAttachShader(program_, shader_id);
+        glAttachShader(program_id_, shader_id);
         glDeleteShader(shader_id);
     }
 
@@ -59,11 +93,13 @@ GLProgram::GLProgram(const std::vector<ShaderInfo>& shaders) {
 
     BindVertexAttributeLocations();
 
-    glLinkProgram(program_);
+    glLinkProgram(program_id_);
     if (!CheckProgramLinkStatus()) {
         has_errors_ = true;
         return;
     }
+
+    vertex_attribute_locations_ = get_vertex_attribute_locations(program_id_);
 
     ProcessUniforms();
     ProcessUniformBlocks();
@@ -105,7 +141,7 @@ auto GLProgram::SetUniform(Uniform uniform, const Color* color) -> void {
 auto GLProgram::BindVertexAttributeLocations() const -> void {
     for (auto& [attr_name, attr_type] : VertexAttributesMap) {
         glBindAttribLocation(
-            program_,
+            program_id_,
             static_cast<int>(attr_type),
             attr_name.data()
         );
@@ -113,15 +149,15 @@ auto GLProgram::BindVertexAttributeLocations() const -> void {
 }
 
 auto GLProgram::GetUniformLoc(std::string_view name) const -> int {
-    return glGetUniformLocation(program_, name.data());
+    return glGetUniformLocation(program_id_, name.data());
 }
 
 auto GLProgram::ProcessUniforms() -> void {
     auto n_active_uniforms = GLint {0};
-    glGetProgramiv(program_, GL_ACTIVE_UNIFORMS, &n_active_uniforms);
+    glGetProgramiv(program_id_, GL_ACTIVE_UNIFORMS, &n_active_uniforms);
 
     auto max_name_length = GLsizei {0};
-    glGetProgramiv(program_, GL_ACTIVE_UNIFORM_MAX_LENGTH, &max_name_length);
+    glGetProgramiv(program_id_, GL_ACTIVE_UNIFORM_MAX_LENGTH, &max_name_length);
     auto buffer = std::string {"", static_cast<size_t>(max_name_length)};
 
     for (auto i = 0; i < n_active_uniforms; ++i) {
@@ -129,7 +165,7 @@ auto GLProgram::ProcessUniforms() -> void {
         auto size_unused = GLint {};
         auto type = GLenum {};
         glGetActiveUniform(
-            program_, i,
+            program_id_, i,
             max_name_length,
             &length,
             &size_unused,
@@ -149,22 +185,22 @@ auto GLProgram::ProcessUniforms() -> void {
 
 auto GLProgram::ProcessUniformBlocks() -> void {
     auto n_active_uniforms = GLint {0};
-    glGetProgramiv(program_, GL_ACTIVE_UNIFORM_BLOCKS, &n_active_uniforms);
+    glGetProgramiv(program_id_, GL_ACTIVE_UNIFORM_BLOCKS, &n_active_uniforms);
 
     GLint max_name_length = 0;
-    glGetProgramiv(program_, GL_ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH, &max_name_length);
+    glGetProgramiv(program_id_, GL_ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH, &max_name_length);
     auto buffer = std::string {"", static_cast<size_t>(max_name_length)};
 
     for (GLint i = 0; i < n_active_uniforms; ++i) {
         auto length = GLsizei {};
-        glGetActiveUniformBlockName(program_, i, max_name_length, &length, buffer.data());
+        glGetActiveUniformBlockName(program_id_, i, max_name_length, &length, buffer.data());
         auto name = std::string(buffer.data(), length);
         auto idx = get_uniform_block_loc(name);
         if (idx == -1) {
             Logger::Log(LogLevel::Error, "Unknown uniform block {}", name);
             continue;
         }
-        glUniformBlockBinding(program_, i, idx);
+        glUniformBlockBinding(program_id_, i, idx);
     }
 }
 
@@ -183,12 +219,12 @@ auto GLProgram::CheckShaderCompileStatus(GLuint shader_id) const -> bool {
 
 auto GLProgram::CheckProgramLinkStatus() const -> bool {
     auto success = 0;
-    glGetProgramiv(program_, GL_LINK_STATUS, &success);
+    glGetProgramiv(program_id_, GL_LINK_STATUS, &success);
     if (success == GL_FALSE) {
         auto length = 0;
-        glGetProgramiv(program_, GL_INFO_LOG_LENGTH, &length);
+        glGetProgramiv(program_id_, GL_INFO_LOG_LENGTH, &length);
         auto buffer = std::string {"", static_cast<size_t>(length)};
-        glGetProgramInfoLog(program_, length, nullptr, buffer.data());
+        glGetProgramInfoLog(program_id_, length, nullptr, buffer.data());
         Logger::Log(LogLevel::Error, "Shader program link error {}", buffer);
     }
     return success;
@@ -206,7 +242,7 @@ auto GLProgram::GetShaderType(ShaderType type) const -> GLuint {
 }
 
 GLProgram::~GLProgram() {
-    if (program_ > 0) glDeleteProgram(program_);
+    if (program_id_ > 0) glDeleteProgram(program_id_);
 }
 
 }

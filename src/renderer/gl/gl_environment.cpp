@@ -198,7 +198,7 @@ auto GLEnvironment::GenerateBrdfLut() -> void {
         "BRDF LUT framebuffer is incomplete"
     );
 
-    glUseProgram(prg_brdf_lut_->Id());
+    glUseProgram(prg_brdf_lut_->ProgramId());
     glViewport(0, 0, kLutSize, kLutSize);
     glBindVertexArray(vao_);
     glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -307,7 +307,7 @@ auto GLEnvironment::GetOrProcess(const std::shared_ptr<Texture>& source) -> std:
 
 auto GLEnvironment::RenderToCubeFaces(GLProgram* program, GLuint dst, int size, int mip) -> void {
     glBindFramebuffer(GL_FRAMEBUFFER, fbo_);
-    glUseProgram(program->Id());
+    glUseProgram(program->ProgramId());
     glViewport(0, 0, size, size);
 
     for (auto i = 0; i < 6; ++i) {
