@@ -82,6 +82,8 @@ set(SOURCE_CODE
     "renderer/gl/gl_uniform_buffer.hpp"
     "renderer/gl/gl_vertex_buffers.cpp"
     "renderer/gl/gl_vertex_buffers.hpp"
+    "renderer/gl/gl_buffers.cpp"
+    "renderer/gl/gl_buffers.hpp"
     "scene/instanced_mesh.cpp"
     "scene/instanced_mesh_impl.hpp"
     "scene/mesh.cpp"

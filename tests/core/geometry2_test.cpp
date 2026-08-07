@@ -51,7 +51,7 @@ TEST(Geometry2, AddAttribute) {
 
     geometry->AddAttribute(positions);
 
-    EXPECT_EQ(geometry->Attribute(BufferAttribute::kPosition), positions);
+    EXPECT_EQ(geometry->GetAttribute(BufferAttribute::kPosition), positions);
     EXPECT_EQ(geometry->VertexCount(), 3);
     EXPECT_EQ(geometry->GetLayoutVersion(), 1);
 }
@@ -66,8 +66,8 @@ TEST(Geometry2, AddMultipleAttributesWithMatchingCounts) {
         0.5f, 1.0f
     }));
 
-    EXPECT_NE(geometry->Attribute(BufferAttribute::kPosition), nullptr);
-    EXPECT_NE(geometry->Attribute(BufferAttribute::kTexCoord), nullptr);
+    EXPECT_NE(geometry->GetAttribute(BufferAttribute::kPosition), nullptr);
+    EXPECT_NE(geometry->GetAttribute(BufferAttribute::kTexCoord), nullptr);
     EXPECT_EQ(geometry->VertexCount(), 3);
     EXPECT_EQ(geometry->GetLayoutVersion(), 2);
 }
@@ -79,7 +79,7 @@ TEST(Geometry2, RejectsAttributeWithDuplicateName) {
     geometry->AddAttribute(first_attribute);
     geometry->AddAttribute(create_positions(kTrianglePositions));
 
-    EXPECT_EQ(geometry->Attribute(BufferAttribute::kPosition), first_attribute);
+    EXPECT_EQ(geometry->GetAttribute(BufferAttribute::kPosition), first_attribute);
     EXPECT_EQ(geometry->GetLayoutVersion(), 1);
 }
 
@@ -92,7 +92,7 @@ TEST(Geometry2, RejectsAttributeWithInstanceRate) {
         .rate = BufferAttribute::Rate::Instance
     }, {1.0f, 0.0f, 0.0f}));
 
-    EXPECT_EQ(geometry->Attribute(BufferAttribute::kInstanceColor), nullptr);
+    EXPECT_EQ(geometry->GetAttribute(BufferAttribute::kInstanceColor), nullptr);
     EXPECT_EQ(geometry->GetLayoutVersion(), 0);
 }
 
@@ -101,7 +101,7 @@ TEST(Geometry2, RejectsInvalidAttribute) {
 
     geometry->AddAttribute(create_positions({}));
 
-    EXPECT_EQ(geometry->Attribute(BufferAttribute::kPosition), nullptr);
+    EXPECT_EQ(geometry->GetAttribute(BufferAttribute::kPosition), nullptr);
     EXPECT_EQ(geometry->GetLayoutVersion(), 0);
 }
 
@@ -118,7 +118,7 @@ TEST(Geometry2, RejectsAttributeWithElementCountMismatch) {
         0.0f, 1.0f
     }));
 
-    EXPECT_EQ(geometry->Attribute(BufferAttribute::kTexCoord), nullptr);
+    EXPECT_EQ(geometry->GetAttribute(BufferAttribute::kTexCoord), nullptr);
     EXPECT_EQ(geometry->GetLayoutVersion(), 1);
 }
 

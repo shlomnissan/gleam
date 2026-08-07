@@ -44,7 +44,9 @@ public:
 
     auto SetIndices(std::vector<uint32_t> index_data) -> void;
 
-    [[nodiscard]] auto Attribute(std::string_view name) const -> std::shared_ptr<BufferAttribute>;
+    [[nodiscard]] auto GetAttributes() const -> const std::vector<std::shared_ptr<BufferAttribute>>& { return attributes_; }
+
+    [[nodiscard]] auto GetAttribute(std::string_view name) const -> std::shared_ptr<BufferAttribute>;
 
     [[nodiscard]] auto BoundingBox() -> Box3;
 

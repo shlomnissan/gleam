@@ -62,7 +62,7 @@ auto Geometry2::AddAttribute(std::shared_ptr<BufferAttribute> attribute) -> void
         return;
     }
 
-    if (Attribute(attribute->name) != nullptr) {
+    if (GetAttribute(attribute->name) != nullptr) {
         error("An attribute with this name already exist");
         return;
     }
@@ -86,7 +86,7 @@ auto Geometry2::SetIndices(std::vector<uint32_t> index_data) -> void {
     index_version_++;
 }
 
-auto Geometry2::Attribute(std::string_view name) const -> std::shared_ptr<BufferAttribute> {
+auto Geometry2::GetAttribute(std::string_view name) const -> std::shared_ptr<BufferAttribute> {
     auto it = std::ranges::find(attributes_, name, &BufferAttribute::name);
     return it != attributes_.end() ? *it : nullptr;
 }
@@ -96,7 +96,7 @@ auto Geometry2::VertexCount() const -> uint32_t {
 }
 
 auto Geometry2::BoundingBox() -> Box3 {
-    auto position_attribute = Attribute(BufferAttribute::kPosition);
+    auto position_attribute = GetAttribute(BufferAttribute::kPosition);
     if (position_attribute == nullptr || position_attribute->GetData().empty()) {
         Logger::Log(LogLevel::Error, "Failed to generate bounding box. Missing vertex position buffer");
         return {};
@@ -115,7 +115,7 @@ auto Geometry2::BoundingBox() -> Box3 {
 }
 
 auto Geometry2::BoundingSphere() -> Sphere {
-    auto position_attribute = Attribute(BufferAttribute::kPosition);
+    auto position_attribute = GetAttribute(BufferAttribute::kPosition);
     if (position_attribute == nullptr || position_attribute->GetData().empty()) {
         Logger::Log(LogLevel::Error, "Failed to generate bounding sphere. Missing vertex position buffer");
         return {};
