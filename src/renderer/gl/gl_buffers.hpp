@@ -39,7 +39,7 @@ private:
 
     std::shared_ptr<bool> alive_ { std::make_shared<bool>(true) };
 
-    std::unordered_map<std::string, Entry> cache_;
+    std::unordered_map<std::string, Entry> cache_ {};
 
     auto RegisterEviction(Disposable& disposable, const std::string& uuid) -> void;
 };
