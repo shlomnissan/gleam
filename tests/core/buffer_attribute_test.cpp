@@ -97,6 +97,46 @@ TEST(BufferAttribute, SetDataRejectsNonDivisibleSize) {
     EXPECT_EQ(attribute->GetVersion(), 0);
 }
 
+TEST(BufferAttribute, WriteReplacesRangeAndBumpsVersion) {
+    auto attribute = create_attribute(BufferAttribute::Format::Float32x3, {
+        1.0f, 2.0f, 3.0f,
+        4.0f, 5.0f, 6.0f
+    });
+
+    const auto values = std::vector<float> {7.0f, 8.0f, 9.0f};
+    attribute->Write(3, values);
+
+    EXPECT_FLOAT_EQ(attribute->GetData()[0], 1.0f);
+    EXPECT_FLOAT_EQ(attribute->GetData()[2], 3.0f);
+    EXPECT_FLOAT_EQ(attribute->GetData()[3], 7.0f);
+    EXPECT_FLOAT_EQ(attribute->GetData()[5], 9.0f);
+    EXPECT_EQ(attribute->GetVersion(), 1);
+}
+
+TEST(BufferAttribute, WriteRejectsOutOfBoundsRange) {
+    auto attribute = create_attribute(BufferAttribute::Format::Float32x3, {
+        1.0f, 2.0f, 3.0f
+    });
+
+    // 3 values at offset 1 exceed a data size of 3
+    const auto values = std::vector<float> {7.0f, 8.0f, 9.0f};
+    attribute->Write(1, values);
+
+    EXPECT_FLOAT_EQ(attribute->GetData()[1], 2.0f);
+    EXPECT_EQ(attribute->GetVersion(), 0);
+}
+
+TEST(BufferAttribute, WriteWithEmptyValuesIsNoOp) {
+    auto attribute = create_attribute(BufferAttribute::Format::Float32x3, {
+        1.0f, 2.0f, 3.0f
+    });
+
+    attribute->Write(0, {});
+
+    EXPECT_FLOAT_EQ(attribute->GetData()[0], 1.0f);
+    EXPECT_EQ(attribute->GetVersion(), 0);
+}
+
 #pragma endregion
 
 #pragma region Validity

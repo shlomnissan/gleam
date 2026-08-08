@@ -10,6 +10,8 @@
 #include "utilities/assert.hpp"
 #include "utilities/logger.hpp"
 
+#include <algorithm>
+
 namespace vglx {
 
 namespace {
@@ -50,6 +52,18 @@ auto BufferAttribute::SetData(std::vector<float> data) -> void {
     }
 
     data_ = std::move(data);
+    version_++;
+}
+
+auto BufferAttribute::Write(std::size_t offset, std::span<const float> values) -> void {
+    if (values.empty()) return;
+
+    if (offset + values.size() > data_.size()) {
+        Logger::Log(LogLevel::Error, "Buffer attribute skipped write. Range exceeds data size");
+        return;
+    }
+
+    std::ranges::copy(values, data_.begin() + offset);
     version_++;
 }
 

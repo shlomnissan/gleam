@@ -12,8 +12,10 @@
 #include "vglx/core/disposable.hpp"
 #include "vglx/core/identity.hpp"
 
+#include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -65,6 +67,8 @@ public:
     }
 
     auto SetData(std::vector<float> data) -> void;
+
+    auto Write(std::size_t offset, std::span<const float> values) -> void;
 
     [[nodiscard]] auto Components() const -> uint32_t;
 
