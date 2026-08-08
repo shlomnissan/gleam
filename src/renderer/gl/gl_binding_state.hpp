@@ -8,6 +8,7 @@
 #pragma once
 
 #include "vglx/geometries/geometry2.hpp"
+#include "vglx/scene/instanced_mesh2.hpp"
 
 #include "renderer/gl/gl_buffers.hpp"
 #include "renderer/gl/gl_program.hpp"
@@ -30,6 +31,8 @@ public:
 
     [[nodiscard]] auto Bind(Geometry2& geometry2, const GLProgram& program) -> GLuint;
 
+    [[nodiscard]] auto Bind(InstancedMesh2& instanced_mesh, const GLProgram& program) -> GLuint;
+
     auto Reset() { current_vao_ = 0; }
 
     ~GLBindingState();
@@ -37,6 +40,7 @@ public:
 private:
     struct Entry {
         uint32_t layout_version;
+        uint32_t instance_layout_version;
         uint32_t index_version;
         GLuint program_id;
         GLuint vao;

@@ -14,6 +14,11 @@ auto GLBindingState::Bind(Geometry2& geometry2, const GLProgram& program) -> GLu
     return 0;
 }
 
+auto GLBindingState::Bind(InstancedMesh2& instanced_mesh, const GLProgram& program) -> GLuint {
+    // TODO: implement
+    return 0;
+}
+
 GLBindingState::~GLBindingState() {
     // TODO: implement
 }
