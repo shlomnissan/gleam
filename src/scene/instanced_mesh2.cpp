@@ -112,7 +112,7 @@ auto InstancedMesh2::TransformAt(std::size_t idx) const -> Matrix4 {
     auto attribute = GetInstanceAttribute(BufferAttribute::kInstanceTransform);
     if (attribute == nullptr) {
         Logger::Log(LogLevel::Error, "Failed to read transform. Missing transform buffer attribute");
-        return {};
+        return Matrix4::Identity();
     }
     return get_transform_at(idx, attribute);
 }
