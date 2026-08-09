@@ -12,15 +12,13 @@
 #include <utility>
 #include <vector>
 
-using vglx::BufferAttribute;
-
 namespace {
 
-auto create_attribute(BufferAttribute::Format format, std::vector<float> data) {
-    return BufferAttribute::Create({
+auto create_attribute(vglx::BufferAttribute::Format format, std::vector<float> data) {
+    return vglx::BufferAttribute::Create({
         .name = "a_Test",
         .format = format,
-        .rate = BufferAttribute::Rate::Vertex
+        .rate = vglx::BufferAttribute::Rate::Vertex
     }, std::move(data));
 }
 
@@ -29,15 +27,15 @@ auto create_attribute(BufferAttribute::Format format, std::vector<float> data) {
 #pragma region Construction
 
 TEST(BufferAttribute, ConstructorSetsNameFormatAndRate) {
-    const auto attribute = BufferAttribute::Create({
+    const auto attribute = vglx::BufferAttribute::Create({
         .name = "a_Test",
-        .format = BufferAttribute::Format::Float32x3,
-        .rate = BufferAttribute::Rate::Instance
+        .format = vglx::BufferAttribute::Format::Float32x3,
+        .rate = vglx::BufferAttribute::Rate::Instance
     }, {1.0f, 2.0f, 3.0f});
 
     EXPECT_EQ(attribute->name, "a_Test");
-    EXPECT_EQ(attribute->format, BufferAttribute::Format::Float32x3);
-    EXPECT_EQ(attribute->rate, BufferAttribute::Rate::Instance);
+    EXPECT_EQ(attribute->format, vglx::BufferAttribute::Format::Float32x3);
+    EXPECT_EQ(attribute->rate, vglx::BufferAttribute::Rate::Instance);
 }
 
 #pragma endregion
@@ -45,7 +43,7 @@ TEST(BufferAttribute, ConstructorSetsNameFormatAndRate) {
 #pragma region Formats
 
 TEST(BufferAttribute, ComponentsPerFormat) {
-    using enum BufferAttribute::Format;
+    using enum vglx::BufferAttribute::Format;
 
     EXPECT_EQ(create_attribute(Float32x1, {0.0f})->Components(), 1);
     EXPECT_EQ(create_attribute(Float32x2, std::vector<float>(2))->Components(), 2);
@@ -55,7 +53,7 @@ TEST(BufferAttribute, ComponentsPerFormat) {
 }
 
 TEST(BufferAttribute, ElementCount) {
-    using enum BufferAttribute::Format;
+    using enum vglx::BufferAttribute::Format;
 
     EXPECT_EQ(create_attribute(Float32x3, std::vector<float>(6))->ElementCount(), 2);
     EXPECT_EQ(create_attribute(Float32x2, std::vector<float>(6))->ElementCount(), 3);
@@ -67,7 +65,7 @@ TEST(BufferAttribute, ElementCount) {
 #pragma region Data
 
 TEST(BufferAttribute, SetDataReplacesDataAndBumpsVersion) {
-    auto attribute = create_attribute(BufferAttribute::Format::Float32x3, {
+    auto attribute = create_attribute(vglx::BufferAttribute::Format::Float32x3, {
         1.0f, 2.0f, 3.0f
     });
 
@@ -85,7 +83,7 @@ TEST(BufferAttribute, SetDataReplacesDataAndBumpsVersion) {
 }
 
 TEST(BufferAttribute, SetDataRejectsNonDivisibleSize) {
-    auto attribute = create_attribute(BufferAttribute::Format::Float32x3, {
+    auto attribute = create_attribute(vglx::BufferAttribute::Format::Float32x3, {
         1.0f, 2.0f, 3.0f
     });
 
@@ -98,7 +96,7 @@ TEST(BufferAttribute, SetDataRejectsNonDivisibleSize) {
 }
 
 TEST(BufferAttribute, WriteReplacesRangeAndBumpsVersion) {
-    auto attribute = create_attribute(BufferAttribute::Format::Float32x3, {
+    auto attribute = create_attribute(vglx::BufferAttribute::Format::Float32x3, {
         1.0f, 2.0f, 3.0f,
         4.0f, 5.0f, 6.0f
     });
@@ -114,7 +112,7 @@ TEST(BufferAttribute, WriteReplacesRangeAndBumpsVersion) {
 }
 
 TEST(BufferAttribute, WriteRejectsOutOfBoundsRange) {
-    auto attribute = create_attribute(BufferAttribute::Format::Float32x3, {
+    auto attribute = create_attribute(vglx::BufferAttribute::Format::Float32x3, {
         1.0f, 2.0f, 3.0f
     });
 
@@ -127,7 +125,7 @@ TEST(BufferAttribute, WriteRejectsOutOfBoundsRange) {
 }
 
 TEST(BufferAttribute, WriteWithEmptyValuesIsNoOp) {
-    auto attribute = create_attribute(BufferAttribute::Format::Float32x3, {
+    auto attribute = create_attribute(vglx::BufferAttribute::Format::Float32x3, {
         1.0f, 2.0f, 3.0f
     });
 
@@ -142,23 +140,23 @@ TEST(BufferAttribute, WriteWithEmptyValuesIsNoOp) {
 #pragma region Validity
 
 TEST(BufferAttribute, IsValidRequiresName) {
-    const auto attribute = BufferAttribute::Create({
+    const auto attribute = vglx::BufferAttribute::Create({
         .name = "",
-        .format = BufferAttribute::Format::Float32x3,
-        .rate = BufferAttribute::Rate::Vertex
+        .format = vglx::BufferAttribute::Format::Float32x3,
+        .rate = vglx::BufferAttribute::Rate::Vertex
     }, {1.0f, 2.0f, 3.0f});
 
     EXPECT_FALSE(attribute->IsValid());
 }
 
 TEST(BufferAttribute, IsValidRequiresData) {
-    const auto attribute = create_attribute(BufferAttribute::Format::Float32x3, {});
+    const auto attribute = create_attribute(vglx::BufferAttribute::Format::Float32x3, {});
 
     EXPECT_FALSE(attribute->IsValid());
 }
 
 TEST(BufferAttribute, IsValidWithNameAndData) {
-    const auto attribute = create_attribute(BufferAttribute::Format::Float32x3, {
+    const auto attribute = create_attribute(vglx::BufferAttribute::Format::Float32x3, {
         1.0f, 2.0f, 3.0f
     });
 
@@ -170,7 +168,7 @@ TEST(BufferAttribute, IsValidWithNameAndData) {
 #pragma region Disposal
 
 TEST(BufferAttribute, DisposeFiresCallbackOnce) {
-    auto attribute = create_attribute(BufferAttribute::Format::Float32x1, {1.0f});
+    auto attribute = create_attribute(vglx::BufferAttribute::Format::Float32x1, {1.0f});
     auto calls = 0;
 
     attribute->OnDispose([&calls](vglx::Disposable*) { calls++; });
@@ -184,7 +182,7 @@ TEST(BufferAttribute, DisposeFiresOnDestruction) {
     auto calls = 0;
 
     {
-        auto attribute = create_attribute(BufferAttribute::Format::Float32x1, {1.0f});
+        auto attribute = create_attribute(vglx::BufferAttribute::Format::Float32x1, {1.0f});
         attribute->OnDispose([&calls](vglx::Disposable*) { calls++; });
     }
 

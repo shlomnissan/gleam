@@ -14,9 +14,6 @@
 #include <utility>
 #include <vector>
 
-using vglx::BufferAttribute;
-using vglx::Geometry2;
-
 namespace {
 
 const auto kTrianglePositions = std::vector<float> {
@@ -26,18 +23,18 @@ const auto kTrianglePositions = std::vector<float> {
 };
 
 auto create_positions(std::vector<float> data) {
-    return BufferAttribute::Create({
-        .name = BufferAttribute::kPosition,
-        .format = BufferAttribute::Format::Float32x3,
-        .rate = BufferAttribute::Rate::Vertex
+    return vglx::BufferAttribute::Create({
+        .name = vglx::BufferAttribute::kPosition,
+        .format = vglx::BufferAttribute::Format::Float32x3,
+        .rate = vglx::BufferAttribute::Rate::Vertex
     }, std::move(data));
 }
 
 auto create_tex_coords(std::vector<float> data) {
-    return BufferAttribute::Create({
-        .name = BufferAttribute::kTexCoord,
-        .format = BufferAttribute::Format::Float32x2,
-        .rate = BufferAttribute::Rate::Vertex
+    return vglx::BufferAttribute::Create({
+        .name = vglx::BufferAttribute::kTexCoord,
+        .format = vglx::BufferAttribute::Format::Float32x2,
+        .rate = vglx::BufferAttribute::Rate::Vertex
     }, std::move(data));
 }
 
@@ -46,18 +43,18 @@ auto create_tex_coords(std::vector<float> data) {
 #pragma region Attributes
 
 TEST(Geometry2, AddAttribute) {
-    auto geometry = Geometry2::Create();
+    auto geometry = vglx::Geometry2::Create();
     auto positions = create_positions(kTrianglePositions);
 
     geometry->AddAttribute(positions);
 
-    EXPECT_EQ(geometry->GetAttribute(BufferAttribute::kPosition), positions);
+    EXPECT_EQ(geometry->GetAttribute(vglx::BufferAttribute::kPosition), positions);
     EXPECT_EQ(geometry->VertexCount(), 3);
     EXPECT_EQ(geometry->GetLayoutVersion(), 1);
 }
 
 TEST(Geometry2, AddMultipleAttributesWithMatchingCounts) {
-    auto geometry = Geometry2::Create();
+    auto geometry = vglx::Geometry2::Create();
 
     geometry->AddAttribute(create_positions(kTrianglePositions));
     geometry->AddAttribute(create_tex_coords({
@@ -66,47 +63,47 @@ TEST(Geometry2, AddMultipleAttributesWithMatchingCounts) {
         0.5f, 1.0f
     }));
 
-    EXPECT_NE(geometry->GetAttribute(BufferAttribute::kPosition), nullptr);
-    EXPECT_NE(geometry->GetAttribute(BufferAttribute::kTexCoord), nullptr);
+    EXPECT_NE(geometry->GetAttribute(vglx::BufferAttribute::kPosition), nullptr);
+    EXPECT_NE(geometry->GetAttribute(vglx::BufferAttribute::kTexCoord), nullptr);
     EXPECT_EQ(geometry->VertexCount(), 3);
     EXPECT_EQ(geometry->GetLayoutVersion(), 2);
 }
 
 TEST(Geometry2, RejectsAttributeWithDuplicateName) {
-    auto geometry = Geometry2::Create();
+    auto geometry = vglx::Geometry2::Create();
     auto first_attribute = create_positions(kTrianglePositions);
 
     geometry->AddAttribute(first_attribute);
     geometry->AddAttribute(create_positions(kTrianglePositions));
 
-    EXPECT_EQ(geometry->GetAttribute(BufferAttribute::kPosition), first_attribute);
+    EXPECT_EQ(geometry->GetAttribute(vglx::BufferAttribute::kPosition), first_attribute);
     EXPECT_EQ(geometry->GetLayoutVersion(), 1);
 }
 
 TEST(Geometry2, RejectsAttributeWithInstanceRate) {
-    auto geometry = Geometry2::Create();
+    auto geometry = vglx::Geometry2::Create();
 
-    geometry->AddAttribute(BufferAttribute::Create({
-        .name = BufferAttribute::kInstanceColor,
-        .format = BufferAttribute::Format::Float32x3,
-        .rate = BufferAttribute::Rate::Instance
+    geometry->AddAttribute(vglx::BufferAttribute::Create({
+        .name = vglx::BufferAttribute::kInstanceColor,
+        .format = vglx::BufferAttribute::Format::Float32x3,
+        .rate = vglx::BufferAttribute::Rate::Instance
     }, {1.0f, 0.0f, 0.0f}));
 
-    EXPECT_EQ(geometry->GetAttribute(BufferAttribute::kInstanceColor), nullptr);
+    EXPECT_EQ(geometry->GetAttribute(vglx::BufferAttribute::kInstanceColor), nullptr);
     EXPECT_EQ(geometry->GetLayoutVersion(), 0);
 }
 
 TEST(Geometry2, RejectsInvalidAttribute) {
-    auto geometry = Geometry2::Create();
+    auto geometry = vglx::Geometry2::Create();
 
     geometry->AddAttribute(create_positions({}));
 
-    EXPECT_EQ(geometry->GetAttribute(BufferAttribute::kPosition), nullptr);
+    EXPECT_EQ(geometry->GetAttribute(vglx::BufferAttribute::kPosition), nullptr);
     EXPECT_EQ(geometry->GetLayoutVersion(), 0);
 }
 
 TEST(Geometry2, RejectsAttributeWithElementCountMismatch) {
-    auto geometry = Geometry2::Create();
+    auto geometry = vglx::Geometry2::Create();
 
     geometry->AddAttribute(create_positions(kTrianglePositions));
 
@@ -118,7 +115,7 @@ TEST(Geometry2, RejectsAttributeWithElementCountMismatch) {
         0.0f, 1.0f
     }));
 
-    EXPECT_EQ(geometry->GetAttribute(BufferAttribute::kTexCoord), nullptr);
+    EXPECT_EQ(geometry->GetAttribute(vglx::BufferAttribute::kTexCoord), nullptr);
     EXPECT_EQ(geometry->GetLayoutVersion(), 1);
 }
 
@@ -127,7 +124,7 @@ TEST(Geometry2, RejectsAttributeWithElementCountMismatch) {
 #pragma region Indices
 
 TEST(Geometry2, SetIndices) {
-    auto geometry = Geometry2::Create();
+    auto geometry = vglx::Geometry2::Create();
 
     geometry->SetIndices({0, 1, 2, 2, 3, 0});
 
@@ -137,7 +134,7 @@ TEST(Geometry2, SetIndices) {
 }
 
 TEST(Geometry2, SetIndicesWithEmptyList) {
-    auto geometry = Geometry2::Create();
+    auto geometry = vglx::Geometry2::Create();
 
     geometry->SetIndices({0, 1, 2});
     geometry->SetIndices({});
@@ -152,7 +149,7 @@ TEST(Geometry2, SetIndicesWithEmptyList) {
 #pragma region Bounding Volumes
 
 TEST(Geometry2, BoundingBox) {
-    auto geometry = Geometry2::Create();
+    auto geometry = vglx::Geometry2::Create();
     geometry->AddAttribute(create_positions(kTrianglePositions));
 
     const auto box = geometry->BoundingBox();
@@ -162,7 +159,7 @@ TEST(Geometry2, BoundingBox) {
 }
 
 TEST(Geometry2, BoundingSphere) {
-    auto geometry = Geometry2::Create();
+    auto geometry = vglx::Geometry2::Create();
     geometry->AddAttribute(create_positions({
         -1.0f, 0.0f, 0.0f,
          1.0f, 0.0f, 0.0f,
@@ -176,7 +173,7 @@ TEST(Geometry2, BoundingSphere) {
 }
 
 TEST(Geometry2, BoundingBoxWithoutPositionAttribute) {
-    auto geometry = Geometry2::Create();
+    auto geometry = vglx::Geometry2::Create();
 
     const auto box = geometry->BoundingBox();
     const auto default_box = vglx::Box3 {};
@@ -186,7 +183,7 @@ TEST(Geometry2, BoundingBoxWithoutPositionAttribute) {
 }
 
 TEST(Geometry2, BoundingSphereWithoutPositionAttribute) {
-    auto geometry = Geometry2::Create();
+    auto geometry = vglx::Geometry2::Create();
 
     const auto sphere = geometry->BoundingSphere();
 
@@ -194,7 +191,7 @@ TEST(Geometry2, BoundingSphereWithoutPositionAttribute) {
 }
 
 TEST(Geometry2, BoundingBoxInvalidatedWhenPositionDataChanges) {
-    auto geometry = Geometry2::Create();
+    auto geometry = vglx::Geometry2::Create();
     auto positions = create_positions(kTrianglePositions);
     geometry->AddAttribute(positions);
 
@@ -213,7 +210,7 @@ TEST(Geometry2, BoundingBoxInvalidatedWhenPositionDataChanges) {
 }
 
 TEST(Geometry2, BoundingSphereInvalidatedWhenPositionDataChanges) {
-    auto geometry = Geometry2::Create();
+    auto geometry = vglx::Geometry2::Create();
     auto positions = create_positions({
         -1.0f, 0.0f, 0.0f,
          1.0f, 0.0f, 0.0f,
@@ -239,7 +236,7 @@ TEST(Geometry2, BoundingSphereInvalidatedWhenPositionDataChanges) {
 #pragma region Disposal
 
 TEST(Geometry2, DisposeFiresCallbackOnce) {
-    auto geometry = Geometry2::Create();
+    auto geometry = vglx::Geometry2::Create();
     auto calls = 0;
 
     geometry->OnDispose([&calls](vglx::Disposable*) { calls++; });
@@ -253,7 +250,7 @@ TEST(Geometry2, DisposeFiresOnDestruction) {
     auto calls = 0;
 
     {
-        auto geometry = Geometry2::Create();
+        auto geometry = vglx::Geometry2::Create();
         geometry->OnDispose([&calls](vglx::Disposable*) { calls++; });
     }
 

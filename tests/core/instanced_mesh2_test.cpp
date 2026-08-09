@@ -15,10 +15,6 @@
 
 #include <vector>
 
-using vglx::BufferAttribute;
-using vglx::InstancedMesh2;
-using vglx::Matrix4;
-
 namespace {
 
 auto create_mesh(std::size_t count) {
@@ -27,11 +23,11 @@ auto create_mesh(std::size_t count) {
         .type = vglx::Geometry::VertexAttributeType::Position,
         .item_size = 3
     });
-    return InstancedMesh2::Create(geometry, vglx::UnlitMaterial::Create(), count);
+    return vglx::InstancedMesh2::Create(geometry, vglx::UnlitMaterial::Create(), count);
 }
 
 auto create_translation(float x, float y, float z) {
-    return Matrix4 {
+    return vglx::Matrix4 {
         1.0f, 0.0f, 0.0f, x,
         0.0f, 1.0f, 0.0f, y,
         0.0f, 0.0f, 1.0f, z,
@@ -48,7 +44,7 @@ TEST(InstancedMesh2, ConstructorInitializesIdentityTransformsAndWhiteColors) {
 
     EXPECT_EQ(mesh->GetCount(), 2);
     EXPECT_EQ(mesh->GetInstanceAttributes().size(), 2);
-    EXPECT_MAT4_EQ(mesh->TransformAt(1), Matrix4::Identity());
+    EXPECT_MAT4_EQ(mesh->TransformAt(1), vglx::Matrix4::Identity());
     EXPECT_FLOAT_EQ(mesh->ColorAt(1).r, 1.0f);
     EXPECT_FLOAT_EQ(mesh->ColorAt(1).g, 1.0f);
     EXPECT_FLOAT_EQ(mesh->ColorAt(1).b, 1.0f);
@@ -65,8 +61,8 @@ TEST(InstancedMesh2, SetTransformAtRoundTripsAndBumpsVersion) {
     mesh->SetTransformAt(1, transform);
 
     EXPECT_MAT4_EQ(mesh->TransformAt(1), transform);
-    EXPECT_MAT4_EQ(mesh->TransformAt(0), Matrix4::Identity());
-    EXPECT_EQ(mesh->GetInstanceAttribute(BufferAttribute::kInstanceTransform)->GetVersion(), 1);
+    EXPECT_MAT4_EQ(mesh->TransformAt(0), vglx::Matrix4::Identity());
+    EXPECT_EQ(mesh->GetInstanceAttribute(vglx::BufferAttribute::kInstanceTransform)->GetVersion(), 1);
 }
 
 TEST(InstancedMesh2, SetColorAtRoundTripsAndBumpsVersion) {
@@ -78,7 +74,7 @@ TEST(InstancedMesh2, SetColorAtRoundTripsAndBumpsVersion) {
     EXPECT_FLOAT_EQ(mesh->ColorAt(0).g, 0.4f);
     EXPECT_FLOAT_EQ(mesh->ColorAt(0).b, 0.6f);
     EXPECT_FLOAT_EQ(mesh->ColorAt(1).r, 1.0f);
-    EXPECT_EQ(mesh->GetInstanceAttribute(BufferAttribute::kInstanceColor)->GetVersion(), 1);
+    EXPECT_EQ(mesh->GetInstanceAttribute(vglx::BufferAttribute::kInstanceColor)->GetVersion(), 1);
 }
 
 #pragma endregion
@@ -87,10 +83,10 @@ TEST(InstancedMesh2, SetColorAtRoundTripsAndBumpsVersion) {
 
 TEST(InstancedMesh2, AddInstanceAttribute) {
     auto mesh = create_mesh(2);
-    auto attribute = BufferAttribute::Create({
+    auto attribute = vglx::BufferAttribute::Create({
         .name = "a_Custom",
-        .format = BufferAttribute::Format::Float32x1,
-        .rate = BufferAttribute::Rate::Instance
+        .format = vglx::BufferAttribute::Format::Float32x1,
+        .rate = vglx::BufferAttribute::Rate::Instance
     }, {0.0f, 1.0f});
 
     mesh->AddInstanceAttribute(attribute);
@@ -102,10 +98,10 @@ TEST(InstancedMesh2, AddInstanceAttribute) {
 TEST(InstancedMesh2, RejectsAttributeWithVertexRate) {
     auto mesh = create_mesh(2);
 
-    mesh->AddInstanceAttribute(BufferAttribute::Create({
+    mesh->AddInstanceAttribute(vglx::BufferAttribute::Create({
         .name = "a_Custom",
-        .format = BufferAttribute::Format::Float32x1,
-        .rate = BufferAttribute::Rate::Vertex
+        .format = vglx::BufferAttribute::Format::Float32x1,
+        .rate = vglx::BufferAttribute::Rate::Vertex
     }, {0.0f, 1.0f}));
 
     EXPECT_EQ(mesh->GetInstanceAttribute("a_Custom"), nullptr);
@@ -115,10 +111,10 @@ TEST(InstancedMesh2, RejectsAttributeWithVertexRate) {
 TEST(InstancedMesh2, RejectsAttributeWithDuplicateName) {
     auto mesh = create_mesh(2);
 
-    mesh->AddInstanceAttribute(BufferAttribute::Create({
-        .name = BufferAttribute::kInstanceColor,
-        .format = BufferAttribute::Format::Float32x3,
-        .rate = BufferAttribute::Rate::Instance
+    mesh->AddInstanceAttribute(vglx::BufferAttribute::Create({
+        .name = vglx::BufferAttribute::kInstanceColor,
+        .format = vglx::BufferAttribute::Format::Float32x3,
+        .rate = vglx::BufferAttribute::Rate::Instance
     }, std::vector<float>(6, 0.0f)));
 
     EXPECT_EQ(mesh->GetLayoutVersion(), 0);
@@ -128,10 +124,10 @@ TEST(InstancedMesh2, RejectsAttributeWithElementCountMismatch) {
     auto mesh = create_mesh(2);
 
     // 3 elements for 2 instances
-    mesh->AddInstanceAttribute(BufferAttribute::Create({
+    mesh->AddInstanceAttribute(vglx::BufferAttribute::Create({
         .name = "a_Custom",
-        .format = BufferAttribute::Format::Float32x1,
-        .rate = BufferAttribute::Rate::Instance
+        .format = vglx::BufferAttribute::Format::Float32x1,
+        .rate = vglx::BufferAttribute::Rate::Instance
     }, {0.0f, 1.0f, 2.0f}));
 
     EXPECT_EQ(mesh->GetInstanceAttribute("a_Custom"), nullptr);
