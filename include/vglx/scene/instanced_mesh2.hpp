@@ -10,13 +10,18 @@
 #include "vglx_export.h"
 
 #include "vglx/geometries/buffer_attribute.hpp"
+#include "vglx/math/box3.hpp"
 #include "vglx/math/color.hpp"
 #include "vglx/math/matrix4.hpp"
+#include "vglx/math/sphere.hpp"
 #include "vglx/scene/mesh.hpp"
 
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <optional>
+#include <string_view>
+#include <utility>
 #include <vector>
 
 namespace vglx {
@@ -45,6 +50,8 @@ public:
 
     [[nodiscard]] auto GetInstanceAttributes() const -> const std::vector<std::shared_ptr<BufferAttribute>>& { return attributes_; }
 
+    [[nodiscard]] auto GetInstanceAttribute(std::string_view name) const -> std::shared_ptr<BufferAttribute>;
+
     [[nodiscard]] auto GetCount() const -> size_t { return count_; }
 
     [[nodiscard]] auto GetLayoutVersion() const -> uint32_t { return layout_version_; }
@@ -67,6 +74,10 @@ private:
     size_t count_;
 
     uint32_t layout_version_ {0};
+
+    std::optional<std::pair<Box3, uint32_t>> bounding_box_ {};
+
+    std::optional<std::pair<Sphere, uint32_t>> bounding_sphere_ {};
 };
 
 }

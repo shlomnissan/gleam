@@ -48,9 +48,16 @@ auto create_bounding_sphere(const std::vector<float>& positions, const Vector3& 
 }
 
 auto Geometry2::AddAttribute(std::shared_ptr<BufferAttribute> attribute) -> void {
+    if (attribute == nullptr) return;
+
     auto error = [name = attribute->name](std::string_view message) {
         Logger::Log(LogLevel::Error, "Failed to add attribute {}. {}", name, message);
     };
+
+    if (attribute->Disposed()) {
+        error("The attribute is marked as disposed");
+        return;
+    }
 
     if (attribute->rate == BufferAttribute::Rate::Instance) {
         error("Instanced attributes should be added to InstancedMesh objects");
