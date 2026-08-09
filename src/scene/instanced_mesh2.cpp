@@ -122,12 +122,12 @@ auto InstancedMesh2::ColorAt(std::size_t idx) const -> Color {
     auto attribute = GetInstanceAttribute(BufferAttribute::kInstanceColor);
     if (attribute == nullptr) {
         Logger::Log(LogLevel::Error, "Failed to read color. Missing color buffer attribute");
-        return {};
+        return {1.0f, 1.0f, 1.0f};
     }
     auto& data = attribute->GetData();
     if (idx * 3 + 3 > data.size()) {
         Logger::Log(LogLevel::Error, "Failed to read color. Range exceeds data size");
-        return {};
+        return {1.0f, 1.0f, 1.0f};
     }
 
     return Color { data[idx * 3 + 0], data[idx * 3 + 1], data[idx * 3 + 2] };
