@@ -55,7 +55,7 @@ auto Geometry2::AddAttribute(std::shared_ptr<BufferAttribute> attribute) -> void
     };
 
     if (attribute->Disposed()) {
-        error("The attribute is marked as disposed");
+        error("Attribute is marked as disposed");
         return;
     }
 
@@ -100,6 +100,10 @@ auto Geometry2::GetAttribute(std::string_view name) const -> std::shared_ptr<Buf
 
 auto Geometry2::VertexCount() const -> uint32_t {
     return attributes_.empty() ? 0 : attributes_.front()->ElementCount();
+}
+
+auto Geometry2::HasPositions() const -> bool {
+    return GetAttribute(BufferAttribute::kPosition) != nullptr;
 }
 
 auto Geometry2::BoundingBox() -> Box3 {

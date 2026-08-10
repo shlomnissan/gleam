@@ -13,6 +13,7 @@
 #include "renderer/gl/gl_buffers.hpp"
 #include "renderer/gl/gl_program.hpp"
 
+#include <memory>
 #include <unordered_map>
 #include <vector>
 
@@ -29,7 +30,7 @@ public:
     auto operator=(const GLBindingState&) -> GLBindingState& = delete;
     auto operator=(GLBindingState&&) -> GLBindingState& = delete;
 
-    [[nodiscard]] auto Bind(Geometry2& geometry2, const GLProgram& program) -> GLuint;
+    [[nodiscard]] auto Bind(Geometry2& geometry, const GLProgram& program) -> GLuint;
 
     [[nodiscard]] auto Bind(InstancedMesh2& instanced_mesh, const GLProgram& program) -> GLuint;
 

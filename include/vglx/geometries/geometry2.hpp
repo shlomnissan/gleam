@@ -54,6 +54,8 @@ public:
 
     [[nodiscard]] auto VertexCount() const -> uint32_t;
 
+    [[nodiscard]] auto HasPositions() const -> bool;
+
     [[nodiscard]] auto GetIndexData() const -> const std::vector<uint32_t>& { return index_data_; }
 
     [[nodiscard]] auto GetLayoutVersion() const -> uint32_t { return layout_version_; }
