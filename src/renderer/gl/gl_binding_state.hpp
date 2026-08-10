@@ -40,10 +40,8 @@ public:
 
 private:
     struct Entry {
-        uint32_t layout_version;
-        uint32_t instance_layout_version;
-        uint32_t index_version;
         GLuint program_id;
+        GLuint ebo;
         GLuint vao;
     };
 

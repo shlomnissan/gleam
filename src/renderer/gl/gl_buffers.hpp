@@ -28,9 +28,9 @@ public:
     auto operator=(const GLBuffers&) -> GLBuffers& = delete;
     auto operator=(GLBuffers&&) -> GLBuffers& = delete;
 
-    [[nodiscard]] auto GetVertexBuffer(BufferAttribute& attribute) -> GLuint;
+    auto GetVertexBuffer(BufferAttribute& attribute) -> GLuint;
 
-    [[nodiscard]] auto GetIndexBuffer(Geometry2& geometry) -> GLuint;
+    auto GetIndexBuffer(Geometry2& geometry) -> GLuint;
 
     ~GLBuffers();
 

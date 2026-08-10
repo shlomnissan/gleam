@@ -11,6 +11,7 @@
 
 #include "utilities/logger.hpp"
 
+#include <algorithm>
 #include <string>
 
 #include <glad/glad.h>
@@ -27,53 +28,42 @@ struct AttributeWithLocation {
 }
 
 auto GLBindingState::Bind(Geometry2& geometry, const GLProgram& program) -> GLuint {
-    auto error = [&geometry](std::string_view message) {
-        auto name = geometry.Name().empty() ? geometry.UUID() : geometry.Name();
-        Logger::Log(LogLevel::Error, "Failed to bind geometry {}. {}", name, message);
-    };
-
     if (geometry.Disposed()) {
-        error("Geometry is marked as disposed");
+        auto name = geometry.Name().empty() ? geometry.UUID() : geometry.Name();
+        Logger::Log(LogLevel::Error, "Failed to bind geometry {}. Geometry marked as disposed", name);
         return 0;
     }
 
-    // TODO: check cache
-
-    if (!geometry.HasPositions()) {
-        error("Geometry doesn't contain vertex positions");
-        return 0;
-    }
-
-    if (!program.IsValid()) {
-        error("Program is invalid");
-        return 0;
-    }
-
-    auto program_attributes = program.GetVertexAttributeLocations();
-    if (program_attributes.empty()) {
-        error("Program doesn't have any active vertex attributes");
-        return 0;
-    }
-
-    auto attributes = std::vector<AttributeWithLocation> {};
-
-    auto missing_attributes = std::string {};
-    for (const auto& a : program_attributes) {
-        auto attribute = geometry.GetAttribute(a.name);
-        if (attribute == nullptr) {
-            missing_attributes.append(a.name + ", ");
-            continue;
+    Entry* entry {nullptr};
+    if (auto it = cache_.find(geometry.UUID()); it != cache_.end()) {
+        auto& entries = it->second;
+        for (auto& e : entries) {
+            if (e.program_id == program.ProgramId()) {
+                entry = &e;
+                break;
+            }
         }
-        attributes.emplace_back(a.location, attribute);
     }
 
-    if (!missing_attributes.empty()) {
-        missing_attributes.resize(missing_attributes.size() - 2);
-        error("Missing program attributes " + missing_attributes);
-        return 0;
+    if (entry != nullptr) {
+        if (entry->vao != current_vao_) {
+            glBindVertexArray(entry->vao);
+            current_vao_ = entry->vao;
+        }
+        for (const auto& attribute : geometry.GetAttributes()) {
+            buffers_.GetVertexBuffer(*attribute);
+        }
+
+        auto ebo = buffers_.GetIndexBuffer(geometry);
+        if (ebo != entry->ebo) {
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+            entry->ebo = ebo;
+        }
+
+        return entry->vao;
     }
 
-    // TODO: bind logic
+    // TODO: implement creation
 
     return 0;
 }
