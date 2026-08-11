@@ -58,14 +58,14 @@ private:
         const std::string& key,
         Geometry2& geometry,
         const GLProgram& program,
-        InstancedMesh2* mesh = nullptr
+        InstancedMesh2* instanced_mesh = nullptr
     ) -> Entry*;
 
     auto CreateEntry(
         const std::string& key,
         Geometry2& geometry,
         const GLProgram& program,
-        InstancedMesh2* mesh = nullptr
+        InstancedMesh2* instanced_mesh = nullptr
     ) -> std::expected<Entry, std::string>;
 };
 
