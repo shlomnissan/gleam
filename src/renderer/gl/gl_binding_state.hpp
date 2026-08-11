@@ -13,6 +13,7 @@
 #include "renderer/gl/gl_buffers.hpp"
 #include "renderer/gl/gl_program.hpp"
 
+#include <expected>
 #include <memory>
 #include <unordered_map>
 #include <vector>
@@ -52,6 +53,20 @@ private:
     GLBuffers& buffers_;
 
     GLuint current_vao_ {0};
+
+    auto GetEntry(
+        const std::string& key,
+        Geometry2& geometry,
+        const GLProgram& program,
+        InstancedMesh2* mesh = nullptr
+    ) -> Entry*;
+
+    auto CreateEntry(
+        const std::string& key,
+        Geometry2& geometry,
+        const GLProgram& program,
+        InstancedMesh2* mesh = nullptr
+    ) -> std::expected<Entry, std::string>;
 };
 
 }
