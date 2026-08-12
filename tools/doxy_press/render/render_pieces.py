@@ -6,6 +6,7 @@ from ..model import (
     Type,
     TypedefDoc,
     VarDoc,
+    VarGroupDoc,
 )
 from ..resolver import Resolver
 from ..strings import (
@@ -21,7 +22,8 @@ def _t_clean(s: str):
     s = re.sub(r'\boverride\b', '', s)
     s = re.sub(r'\s*=\s*0\b', '', s)
     s = tighten_template_spaces(s)
-    return re.sub(r'\s+', ' ', s).strip()
+    s = re.sub(r'\s+', ' ', s).strip()
+    return re.sub(r'\s+([*&])', r'\1', s)
 
 def _t_resolved(t: Type, resolver: Resolver):
     output = ""
@@ -30,7 +32,7 @@ def _t_resolved(t: Type, resolver: Resolver):
     return escape_angle_brackets(_t_clean(output))
 
 def _t_str(t: Type):
-    return _t_clean("".join(p.text.strip() for p in t.parts))
+    return _t_clean("".join(p.text for p in t.parts))
 
 def _badge(s: str, t: str):
     return f"<Badge type=\"{t}\" text=\"{s}\" />"
@@ -50,6 +52,23 @@ def render_variable(v: VarDoc, resolver: Resolver):
         f"<div class=\"description\">\n\n"
         f"{v.brief}\n\n {v.details}\n"
         f"```cpp\n{_t_str(v.type)} {v.name} {init_value};\n```\n"
+        f"</div>"
+        f"</div>"
+    )
+
+def render_var_group(g: VarGroupDoc, resolver: Resolver):
+    table = "|Constant|Description|\n|---|---|\n"
+    for v in g.variables:
+        table += f"<span class=\"type\">{escape(v.name)}</span> | {v.brief}\n"
+
+    return (
+        f"<div class=\"docblock\">"
+        f"<div class=\"definition\">\n\n"
+        f"### <span class=\"name\">{escape(g.header)}</span>\n"
+        f"</div>"
+        f"<div class=\"description\">\n\n"
+        f"{g.description}\n\n"
+        f"{table}"
         f"</div>"
         f"</div>"
     )

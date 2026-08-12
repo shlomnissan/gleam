@@ -20,7 +20,7 @@ def _parse_type(el: ET.Element):
     if el is None: return output
 
     if el.text:
-        output.parts.append(TypePart(text = element_text(el)))
+        output.parts.append(TypePart(text = el.text))
 
     for child in el:
         if child.tag == "ref":
@@ -28,10 +28,10 @@ def _parse_type(el: ET.Element):
             cid = child.get("refid")
             output.parts.append(TypePart(text = text, id = cid))
         if child.tail:
-            output.parts.append(TypePart(text = child.tail.strip()))
+            output.parts.append(TypePart(text = child.tail))
 
     # noise filter: drop specifiers
-    output.parts = [p for p in output.parts if p.text not in ("override", "=0")]
+    output.parts = [p for p in output.parts if p.text.strip() not in ("override", "=0")]
 
     return output
 
@@ -70,9 +70,8 @@ def _function_definition(el: ET.Element):
     s = tighten_template_spaces(s)
     # remove the first non-std qualifier (e.g. vglx::Foo → Foo)
     s = re.sub(r'\b(?!std\b)(\w+)::', '', s, count=1)
-    # remove space between type and pointer/reference (e.g. Camera * → Camera*)
-    s = re.sub(r'\b(\w+)\s+([*&])', r'\1\2', s)
-    s = re.sub(r'([*&])(\S)', r'\1 \2', s)
+    s = re.sub(r'\s+([*&])', r'\1', s)
+    s = re.sub(r'([*&])(?=[^\s*&])', r'\1 ', s)
     # move '=0' from after return type to the end of the declaration
     s = re.sub(
         r'(?P<ret>[\w:<>*&\s]+?)=0\s+(?P<name>\w+::\w+\s*\([^)]*\))',

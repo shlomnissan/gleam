@@ -1,5 +1,5 @@
 from __future__ import annotations
-from ..model import Inventory, ClassDoc
+from ..model import Inventory, ClassDoc, VarGroupDoc
 from ..parse.parse_pieces import (
     parse_description,
     parse_enum,
@@ -8,7 +8,7 @@ from ..parse.parse_pieces import (
     parse_variable,
 )
 from ..resolver import Resolver
-from .xml_utilities import element_text, bool_attr
+from .xml_utilities import element_text, bool_attr, read_pieces
 from pathlib import Path
 
 import xml.etree.ElementTree as ET
@@ -32,6 +32,10 @@ def _is_constructor(el: ET.Element):
 
 def _is_factory(el: ET.Element):
     return bool_attr(el, "static") and element_text(el.find("name")).startswith("Create")
+
+def _read_section_description(el: ET.Element, resolver: Resolver):
+    if el is None: return ""
+    return " ".join(read_pieces(para, resolver) for para in el.findall("para"))
 
 def load_class(inventory: Inventory, id: str, xml_dir: Path, resolver: Resolver, sort_variables = False):
     root = ET.parse(xml_dir / f"{id}.xml").getroot()
@@ -70,6 +74,13 @@ def load_class(inventory: Inventory, id: str, xml_dir: Path, resolver: Resolver,
             )
 
     for section in el.findall("sectiondef"):
+        var_group = None
+        if section.get("kind") == "user-defined":
+            var_group = VarGroupDoc(
+                header = element_text(section.find("header")),
+                description = _read_section_description(section.find("description"), resolver)
+            )
+
         for member in section.findall("memberdef"):
             # skip non-public members
             if member.get("prot") != "public":
@@ -77,7 +88,10 @@ def load_class(inventory: Inventory, id: str, xml_dir: Path, resolver: Resolver,
 
             kind = member.get("kind")
             if kind == "variable":
-                class_doc.variables.append(parse_variable(member, resolver))
+                if var_group is not None:
+                    var_group.variables.append(parse_variable(member, resolver))
+                else:
+                    class_doc.variables.append(parse_variable(member, resolver))
             if kind == "enum":
                 class_doc.enums.append(parse_enum(member, resolver))
             if kind == "typedef":
@@ -91,6 +105,9 @@ def load_class(inventory: Inventory, id: str, xml_dir: Path, resolver: Resolver,
                     class_doc.factories.append(parse_function(member, resolver))
                 else:
                     class_doc.functions.append(parse_function(member, resolver))
+
+        if var_group is not None and var_group.variables:
+            class_doc.var_groups.append(var_group)
 
     if sort_variables:
         class_doc.variables.sort(key=lambda v: v.line)

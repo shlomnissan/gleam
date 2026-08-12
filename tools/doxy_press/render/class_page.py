@@ -5,6 +5,7 @@ from ..render.render_pieces import (
     render_function,
     render_inner_class,
     render_typedef,
+    render_var_group,
     render_variable,
 )
 from ..resolver import Resolver
@@ -52,8 +53,10 @@ def render_class(c: ClassDoc, resolver: Resolver):
         for typedef_doc in c.typedefs:
             lines += [render_typedef(typedef_doc, resolver), "\n"]
 
-    if c.variables:
+    if c.variables or c.var_groups:
         lines += ["## Properties\n"]
+        for group_doc in c.var_groups:
+            lines += [render_var_group(group_doc, resolver), "\n"]
         for var_doc in c.variables:
             lines += [render_variable(var_doc, resolver), "\n"]
 

@@ -93,6 +93,12 @@ class FunctionDoc:
     params: List[ParamDoc] = field(default_factory=list)
 
 @dataclass
+class VarGroupDoc:
+    header: str
+    description: str
+    variables: List[VarDoc] = field(default_factory=list)
+
+@dataclass
 class ClassDoc:
     id: str
     name: str
@@ -105,5 +111,6 @@ class ClassDoc:
     factories: List[FunctionDoc] = field(default_factory=list)
     functions: List[FunctionDoc] = field(default_factory=list)
     variables: List[VarDoc] = field(default_factory=list)
+    var_groups: List[VarGroupDoc] = field(default_factory=list)
     enums: List[EnumDoc] = field(default_factory=list)
     typedefs: List[TypedefDoc] = field(default_factory=list)
