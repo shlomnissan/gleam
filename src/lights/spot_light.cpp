@@ -7,12 +7,18 @@
 
 #include "vglx/lights/spot_light.hpp"
 
+#include "vglx/geometries/buffer_attribute.hpp"
+#include "vglx/geometries/geometry.hpp"
 #include "vglx/materials/unlit_material.hpp"
 #include "vglx/math/utilities.hpp"
+#include "vglx/math/vector3.hpp"
 #include "vglx/scene/mesh.hpp"
 
 #include "utilities/assert.hpp"
 
+#include <cmath>
+#include <memory>
+#include <utility>
 #include <vector>
 
 namespace {
@@ -38,9 +44,13 @@ auto lines_geometry() {
         });
     }
 
-    auto geometry = vglx::Geometry::Create(points);
+    auto geometry = vglx::Geometry::Create();
+    geometry->AddAttribute(vglx::BufferAttribute::Create({
+        .name = vglx::BufferAttribute::kPosition,
+        .format = vglx::BufferAttribute::Format::Float32x3,
+        .rate = vglx::BufferAttribute::Rate::Vertex
+    }, std::move(points)));
     geometry->SetName("directional light line");
-    geometry->SetAttribute({vglx::Geometry::VertexAttributeType::Position, 3});
     geometry->primitive = vglx::Geometry::PrimitiveType::Lines;
     return geometry;
 }
@@ -55,7 +65,6 @@ struct SpotLight::Impl {
     std::shared_ptr<UnlitMaterial> material;
 
     auto CreateDebugMesh(SpotLight* self) -> void {
-        using enum Geometry::VertexAttributeType;
         using enum Geometry::PrimitiveType;
 
         material = UnlitMaterial::Create();

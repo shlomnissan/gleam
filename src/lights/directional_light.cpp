@@ -7,23 +7,38 @@
 
 #include "vglx/lights/directional_light.hpp"
 
+#include "vglx/geometries/buffer_attribute.hpp"
+#include "vglx/geometries/geometry.hpp"
 #include "vglx/materials/unlit_material.hpp"
+#include "vglx/math/vector3.hpp"
 #include "vglx/scene/mesh.hpp"
 
 #include "utilities/assert.hpp"
 
+#include <memory>
+#include <utility>
+#include <vector>
+
 namespace {
 
+auto create_positions(std::vector<float> data) {
+    return vglx::BufferAttribute::Create({
+        .name = vglx::BufferAttribute::kPosition,
+        .format = vglx::BufferAttribute::Format::Float32x3,
+        .rate = vglx::BufferAttribute::Rate::Vertex
+    }, std::move(data));
+}
+
 auto line_geometry() {
-    auto geometry = vglx::Geometry::Create({0, 0, 0, 0, 0, 1});
-    geometry->SetAttribute({vglx::Geometry::VertexAttributeType::Position, 3});
+    auto geometry = vglx::Geometry::Create();
+    geometry->AddAttribute(create_positions({0, 0, 0, 0, 0, 1}));
     geometry->primitive = vglx::Geometry::PrimitiveType::Lines;
     return geometry;
 }
 
 auto plane_geometry() {
-    auto geometry = vglx::Geometry::Create({-1,  1, 0, 1,  1, 0, 1, -1, 0, -1, -1, 0});
-    geometry->SetAttribute({vglx::Geometry::VertexAttributeType::Position, 3});
+    auto geometry = vglx::Geometry::Create();
+    geometry->AddAttribute(create_positions({-1,  1, 0, 1,  1, 0, 1, -1, 0, -1, -1, 0}));
     geometry->primitive = vglx::Geometry::PrimitiveType::LineLoop;
     return geometry;
 }
@@ -41,7 +56,6 @@ struct DirectionalLight::Impl {
     std::shared_ptr<UnlitMaterial> material;
 
     auto CreateDebugMesh(DirectionalLight* self) -> void {
-        using enum Geometry::VertexAttributeType;
         using enum Geometry::PrimitiveType;
 
         material = UnlitMaterial::Create();

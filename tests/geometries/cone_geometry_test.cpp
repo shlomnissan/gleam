@@ -7,6 +7,7 @@
 
 #include <gtest/gtest.h>
 
+#include <vglx/geometries/buffer_attribute.hpp>
 #include <vglx/primitives/cone_geometry.hpp>
 
 #pragma region Fixtures
@@ -27,16 +28,14 @@ protected:
 #pragma region Constructor
 
 TEST_F(ConeGeometryTest, ConstructorInitializesVertexData) {
-    const auto verts_size = cone_.VertexData().size();
-
     // 14 vertices for the torso
     // 13 vertices for the top cap
-    // 8 values per vertex, 27 vertices
-    EXPECT_EQ(verts_size, 8 * 27);
+    // 27 vertices
+    EXPECT_EQ(cone_.VertexCount(), 27);
 }
 
 TEST_F(ConeGeometryTest, ConstructorInitializesIndexData) {
-    const auto index_size = cone_.IndexData().size();
+    const auto index_size = cone_.GetIndexData().size();
 
     // 6 indices per face, 6 faces for the torso (36 total)
     // 3 indices per face, 6 faces for the bottom cap (18 total)
@@ -49,17 +48,22 @@ TEST_F(ConeGeometryTest, ConstructorInitializesName) {
 
 #pragma endregion
 
+#pragma region Attributes
+
 TEST_F(ConeGeometryTest, AttributesConfiguredCorrectly) {
-    using enum vglx::Geometry::VertexAttributeType;
+    using vglx::BufferAttribute;
 
-    const auto& attrs = cone_.Attributes();
+    const auto positions = cone_.GetAttribute(BufferAttribute::kPosition);
+    ASSERT_NE(positions, nullptr);
+    EXPECT_EQ(positions->format, BufferAttribute::Format::Float32x3);
 
-    EXPECT_EQ(attrs[0].type, Position);
-    EXPECT_EQ(attrs[0].item_size, 3u);
-    EXPECT_EQ(attrs[1].type, Normal);
-    EXPECT_EQ(attrs[1].item_size, 3u);
-    EXPECT_EQ(attrs[2].type, UV);
-    EXPECT_EQ(attrs[2].item_size, 2u);
+    const auto normals = cone_.GetAttribute(BufferAttribute::kNormal);
+    ASSERT_NE(normals, nullptr);
+    EXPECT_EQ(normals->format, BufferAttribute::Format::Float32x3);
+
+    const auto uvs = cone_.GetAttribute(BufferAttribute::kTexCoord);
+    ASSERT_NE(uvs, nullptr);
+    EXPECT_EQ(uvs->format, BufferAttribute::Format::Float32x2);
 }
 
 #pragma endregion

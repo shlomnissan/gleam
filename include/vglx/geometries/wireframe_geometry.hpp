@@ -18,15 +18,16 @@ namespace vglx {
  *
  * `WireframeGeometry` takes an existing triangle-based geometry and expands its
  * indexed triangle list into a line list suitable for rendering with
- * @ref Geometry::PrimitiveType "Geometry::PrimitiveType::Lines". The original vertex buffer is reused,
- * while the index buffer is replaced with pairs of indices representing each
- * unique edge of the mesh.
+ * @ref Geometry::PrimitiveType "Geometry::PrimitiveType::Lines". The source geometry's vertex
+ * attributes are shared rather than copied, while the index buffer is replaced
+ * with pairs of indices representing each unique edge of the mesh.
  *
  * This is useful for visual debugging (visualizing topology, silhouette edges,
  * or bounding structures) without modifying the source geometry.
  *
- * @note The input geometry must provide valid triangle indices; non-indexed
- * or non-triangle primitives are not supported.
+ * The input geometry must provide valid triangle indices. Non-indexed
+ * or non-triangle primitives are not supported and wireframe rendering is
+ * not available for instanced meshes.
  *
  * @code
  * auto solid = vglx::BoxGeometry::Create();
@@ -43,8 +44,8 @@ public:
     /**
      * @brief Constructs a wireframe representation of an existing geometry.
      *
-     * The vertex data is shared, but the index buffer is rebuilt so that each
-     * triangle contributes three line segments.
+     * The vertex attributes are shared with the source geometry, but the index
+     * buffer is rebuilt so that each unique triangle edge becomes a line segment.
      *
      * @param geometry Pointer to the original triangle-based geometry.
      */

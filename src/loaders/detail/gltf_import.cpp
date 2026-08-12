@@ -8,10 +8,17 @@
 #define CGLTF_IMPLEMENTATION
 
 #include "loaders/detail/gltf_import.hpp"
+
+#include "vglx/math/matrix4.hpp"
+#include "vglx/textures/texture.hpp"
+
+#include "geometries/vertex_streams.hpp"
+#include "misc/cgltf.hpp"
 #include "utilities/assert.hpp"
 #include "utilities/logger.hpp"
 
-#include "misc/cgltf.hpp"
+#include <cstdint>
+#include <utility>
 
 namespace vglx::detail::gltf {
 
@@ -40,14 +47,18 @@ auto create_geometry(cgltf_primitive* primitive) -> std::shared_ptr<vglx::Geomet
     }
 
     const auto has_normals = norm_ptr != nullptr;
-    const auto has_texcoords = tex_ptr != nullptr;
+    const auto has_uvs = tex_ptr != nullptr;
     const auto has_tangents = tan_ptr != nullptr;
     const auto has_colors = color_ptr != nullptr;
 
-    const auto layout = make_layout(has_texcoords, has_colors);
     const auto vertex_count = pos_ptr->count;
 
-    auto vertex_data = std::vector<float>(vertex_count * layout.stride);
+    auto streams = VertexStreams {};
+    streams.positions.resize(vertex_count * 3);
+    if (has_normals) streams.normals.resize(vertex_count * 3);
+    if (has_uvs) streams.uvs.resize(vertex_count * 2);
+    if (has_uvs && has_tangents) streams.tangents.resize(vertex_count * 4);
+    if (has_colors) streams.colors.resize(vertex_count * 3);
 
     if (has_colors && color_ptr->type == cgltf_type_vec4) {
         Logger::Log(
@@ -61,87 +72,72 @@ auto create_geometry(cgltf_primitive* primitive) -> std::shared_ptr<vglx::Geomet
     for (cgltf_size i = 0; i < vertex_count; ++i) {
         cgltf_accessor_read_float(pos_ptr, i, fl3, 3);
 
-        const auto base = i * layout.stride;
-
-        vertex_data[base + layout.position_offset + 0] = fl3[0];
-        vertex_data[base + layout.position_offset + 1] = fl3[1];
-        vertex_data[base + layout.position_offset + 2] = fl3[2];
+        streams.positions[i * 3 + 0] = fl3[0];
+        streams.positions[i * 3 + 1] = fl3[1];
+        streams.positions[i * 3 + 2] = fl3[2];
 
         if (has_normals) {
-            const auto offset = base + layout.normal_offset;
             cgltf_accessor_read_float(norm_ptr, i, fl3, 3);
 
-            vertex_data[offset + 0] = fl3[0];
-            vertex_data[offset + 1] = fl3[1];
-            vertex_data[offset + 2] = fl3[2];
+            streams.normals[i * 3 + 0] = fl3[0];
+            streams.normals[i * 3 + 1] = fl3[1];
+            streams.normals[i * 3 + 2] = fl3[2];
         }
 
-        if (layout.has_uvs) {
-            const auto offset = base + layout.uv_offset.value();
+        if (has_uvs) {
             cgltf_accessor_read_float(tex_ptr, i, fl2, 2);
 
-            vertex_data[offset + 0] = fl2[0];
-            vertex_data[offset + 1] = 1.0f - fl2[1];
+            streams.uvs[i * 2 + 0] = fl2[0];
+            streams.uvs[i * 2 + 1] = 1.0f - fl2[1];
         }
 
-        if (layout.has_tangents && has_tangents) {
-            const auto offset = base + layout.tangent_offset.value();
+        if (has_uvs && has_tangents) {
             cgltf_accessor_read_float(tan_ptr, i, fl4, 4);
 
-            vertex_data[offset + 0] = fl4[0];
-            vertex_data[offset + 1] = fl4[1];
-            vertex_data[offset + 2] = fl4[2];
-            vertex_data[offset + 3] = fl4[3];
+            streams.tangents[i * 4 + 0] = fl4[0];
+            streams.tangents[i * 4 + 1] = fl4[1];
+            streams.tangents[i * 4 + 2] = fl4[2];
+            streams.tangents[i * 4 + 3] = fl4[3];
         }
 
-        if (layout.has_colors) {
-            const auto offset = base + layout.color_offset.value();
+        if (has_colors) {
             cgltf_accessor_read_float(color_ptr, i, fl4, 4);
 
-            vertex_data[offset + 0] = fl4[0];
-            vertex_data[offset + 1] = fl4[1];
-            vertex_data[offset + 2] = fl4[2];
+            streams.colors[i * 3 + 0] = fl4[0];
+            streams.colors[i * 3 + 1] = fl4[1];
+            streams.colors[i * 3 + 2] = fl4[2];
         }
     }
 
-    auto index_data = std::vector<unsigned> {};
     if (primitive->indices) {
         auto index_accessor = primitive->indices;
-        index_data.resize(index_accessor->count);
+        streams.indices.resize(index_accessor->count);
 
         for (cgltf_size i = 0; i < index_accessor->count; i++) {
-            index_data[i] = cgltf_accessor_read_index(index_accessor, i);
+            streams.indices[i] = cgltf_accessor_read_index(index_accessor, i);
         }
     } else {
-        index_data.resize(vertex_count);
-        for (unsigned i = 0; i < vertex_count; ++i) {
-            index_data[i] = i;
+        streams.indices.resize(vertex_count);
+        for (uint32_t i = 0; i < vertex_count; ++i) {
+            streams.indices[i] = i;
         }
     }
 
     if (!has_normals) {
-        generate_normals(vertex_data, index_data, layout);
+        streams.normals = generate_normals(streams.positions, streams.indices);
     }
 
-    if (layout.has_tangents && !has_tangents) {
-        generate_tangents(vertex_data, index_data, layout);
+    if (has_uvs && !has_tangents) {
+        streams.tangents = generate_tangents(
+            streams.positions,
+            streams.normals,
+            streams.uvs,
+            streams.indices
+        );
     }
 
-    auto geometry = Geometry::Create(vertex_data, index_data);
-    geometry->SetAttribute({.type = Geometry::VertexAttributeType::Position, .item_size = 3});
-    geometry->SetAttribute({.type = Geometry::VertexAttributeType::Normal, .item_size = 3});
-
-    if (layout.has_uvs) {
-        geometry->SetAttribute({.type = Geometry::VertexAttributeType::UV, .item_size = 2});
-    }
-
-    if (layout.has_tangents) {
-        geometry->SetAttribute({.type = Geometry::VertexAttributeType::Tangent, .item_size = 4});
-    }
-
-    if (layout.has_colors) {
-        geometry->SetAttribute({.type = Geometry::VertexAttributeType::Color, .item_size = 3});
-    }
+    auto geometry = Geometry::Create();
+    streams.AddTo(*geometry);
 
     return geometry;
 }

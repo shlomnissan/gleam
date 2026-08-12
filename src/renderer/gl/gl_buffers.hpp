@@ -7,8 +7,9 @@
 
 #pragma once
 
+#include "vglx/core/disposable.hpp"
 #include "vglx/geometries/buffer_attribute.hpp"
-#include "vglx/geometries/geometry2.hpp"
+#include "vglx/geometries/geometry.hpp"
 
 #include <cstdint>
 #include <memory>
@@ -30,7 +31,7 @@ public:
 
     auto GetVertexBuffer(BufferAttribute& attribute) -> GLuint;
 
-    auto GetIndexBuffer(Geometry2& geometry) -> GLuint;
+    auto GetIndexBuffer(Geometry& geometry) -> GLuint;
 
     ~GLBuffers();
 

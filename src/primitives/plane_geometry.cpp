@@ -7,6 +7,8 @@
 
 #include "vglx/primitives/plane_geometry.hpp"
 
+#include "geometries/vertex_streams.hpp"
+
 #include <cassert>
 
 namespace vglx {
@@ -15,8 +17,7 @@ namespace {
 
 auto generate_geometry(
     const PlaneGeometry::Parameters& params,
-    std::vector<float>& vertex_data,
-    std::vector<unsigned int>& index_data
+    VertexStreams& streams
 ) {
     const auto width_half = params.width / 2;
     const auto height_half = params.height / 2;
@@ -36,14 +37,16 @@ auto generate_geometry(
             const auto u = static_cast<float>(ix) / grid_x;
             const auto v = 1 - (static_cast<float>(iy) / grid_y);
 
-            vertex_data.emplace_back(x); // pos x
-            vertex_data.emplace_back(-y); // pos y
-            vertex_data.emplace_back(0.0f); // pos z
-            vertex_data.emplace_back(0.0f); // normal x
-            vertex_data.emplace_back(0.0f); // normal y
-            vertex_data.emplace_back(1.0f); // normal z
-            vertex_data.emplace_back(u); // u
-            vertex_data.emplace_back(v); // v
+            streams.positions.emplace_back(x);
+            streams.positions.emplace_back(-y);
+            streams.positions.emplace_back(0.0f);
+
+            streams.normals.emplace_back(0.0f);
+            streams.normals.emplace_back(0.0f);
+            streams.normals.emplace_back(1.0f);
+
+            streams.uvs.emplace_back(u);
+            streams.uvs.emplace_back(v);
         }
     }
 
@@ -54,12 +57,12 @@ auto generate_geometry(
             const auto c = ix + 1 + grid_x1 * (iy + 1);
             const auto d = ix + 1 + grid_x1 * iy;
 
-            index_data.emplace_back(a);
-            index_data.emplace_back(b);
-            index_data.emplace_back(d);
-            index_data.emplace_back(b);
-            index_data.emplace_back(c);
-            index_data.emplace_back(d);
+            streams.indices.emplace_back(a);
+            streams.indices.emplace_back(b);
+            streams.indices.emplace_back(d);
+            streams.indices.emplace_back(b);
+            streams.indices.emplace_back(c);
+            streams.indices.emplace_back(d);
         }
     }
 }
@@ -74,11 +77,9 @@ PlaneGeometry::PlaneGeometry(const Parameters& params) {
 
     SetName("plane geometry");
 
-    generate_geometry(params, vertex_data_, index_data_);
-
-    SetAttribute({.type = Geometry::VertexAttributeType::Position, .item_size = 3});
-    SetAttribute({.type = Geometry::VertexAttributeType::Normal, .item_size = 3});
-    SetAttribute({.type = Geometry::VertexAttributeType::UV, .item_size = 2});
+    auto streams = VertexStreams {};
+    generate_geometry(params, streams);
+    streams.AddTo(*this);
 }
 
 }

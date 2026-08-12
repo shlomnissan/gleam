@@ -10,6 +10,8 @@
 #include "vglx/math/utilities.hpp"
 #include "vglx/math/vector3.hpp"
 
+#include "geometries/vertex_streams.hpp"
+
 #include <cassert>
 
 namespace vglx {
@@ -30,8 +32,7 @@ auto position_on_curve(float u, unsigned p, unsigned q, float radius) -> Vector3
 
 auto generate_geometry(
     const TorusKnotGeometry::Parameters& params,
-    std::vector<float>& vertex_data,
-    std::vector<unsigned int>& index_data
+    VertexStreams& streams
 ) {
     for (auto i = 0u; i <= params.tubular_segments; ++i) {
         const auto u = static_cast<float>(i) / static_cast<float>(params.tubular_segments)
@@ -58,20 +59,18 @@ auto generate_geometry(
                 p1.z + (cx * n.z + cy * b.z)
             };
 
-            // set position
-            vertex_data.emplace_back(vertex.x);
-            vertex_data.emplace_back(vertex.y);
-            vertex_data.emplace_back(vertex.z);
+            streams.positions.emplace_back(vertex.x);
+            streams.positions.emplace_back(vertex.y);
+            streams.positions.emplace_back(vertex.z);
 
-            // set normal (extrusion center is p1, so vertex - p1 points outward)
+            // the extrusion center is p1, so vertex - p1 points outward
             auto normal = (vertex - p1).Normalize();
-            vertex_data.emplace_back(normal.x);
-            vertex_data.emplace_back(normal.y);
-            vertex_data.emplace_back(normal.z);
+            streams.normals.emplace_back(normal.x);
+            streams.normals.emplace_back(normal.y);
+            streams.normals.emplace_back(normal.z);
 
-            // set uv
-            vertex_data.emplace_back(static_cast<float>(i) / static_cast<float>(params.tubular_segments));
-            vertex_data.emplace_back(static_cast<float>(j) / static_cast<float>(params.radial_segments));
+            streams.uvs.emplace_back(static_cast<float>(i) / static_cast<float>(params.tubular_segments));
+            streams.uvs.emplace_back(static_cast<float>(j) / static_cast<float>(params.radial_segments));
         }
     }
 
@@ -82,12 +81,12 @@ auto generate_geometry(
             const auto c = (params.radial_segments + 1) * j + i;
             const auto d = (params.radial_segments + 1) * (j - 1) +  i;
 
-            index_data.emplace_back(a);
-            index_data.emplace_back(b);
-            index_data.emplace_back(d);
-            index_data.emplace_back(b);
-            index_data.emplace_back(c);
-            index_data.emplace_back(d);
+            streams.indices.emplace_back(a);
+            streams.indices.emplace_back(b);
+            streams.indices.emplace_back(d);
+            streams.indices.emplace_back(b);
+            streams.indices.emplace_back(c);
+            streams.indices.emplace_back(d);
         }
     }
 }
@@ -104,11 +103,9 @@ TorusKnotGeometry::TorusKnotGeometry(const Parameters& params) {
 
     SetName("torus knot geometry");
 
-    generate_geometry(params, vertex_data_, index_data_);
-
-    SetAttribute({.type = Geometry::VertexAttributeType::Position, .item_size = 3});
-    SetAttribute({.type = Geometry::VertexAttributeType::Normal, .item_size = 3});
-    SetAttribute({.type = Geometry::VertexAttributeType::UV, .item_size = 2});
+    auto streams = VertexStreams {};
+    generate_geometry(params, streams);
+    streams.AddTo(*this);
 }
 
 }

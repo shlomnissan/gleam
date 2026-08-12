@@ -7,8 +7,11 @@
 
 #include "renderer/gl/gl_renderer_impl.hpp"
 
-#include "renderer/gl/gl_textures.hpp"
+#include "vglx/cameras/camera.hpp"
 #include "vglx/core/render_target.hpp"
+#include "vglx/geometries/geometry.hpp"
+#include "vglx/lights/light.hpp"
+#include "vglx/materials/material.hpp"
 #include "vglx/materials/pbr_material.hpp"
 #include "vglx/materials/phong_material.hpp"
 #include "vglx/materials/shader_material.hpp"
@@ -17,17 +20,23 @@
 #include "vglx/math/matrix3.hpp"
 #include "vglx/scene/fog.hpp"
 #include "vglx/scene/instanced_mesh.hpp"
+#include "vglx/scene/mesh.hpp"
+#include "vglx/scene/scene.hpp"
 #include "vglx/scene/sprite.hpp"
 #include "vglx/textures/image.hpp"
+#include "vglx/textures/texture.hpp"
+#include "vglx/textures/texture_2d.hpp"
 
 #include "core/program_attributes.hpp"
 #include "core/render_lists.hpp"
 #include "utilities/logger.hpp"
 #include "utilities/scoped_timer.hpp"
 
-#include <glad/glad.h>
-
+#include <algorithm>
 #include <utility>
+#include <vector>
+
+#include <glad/glad.h>
 
 namespace vglx {
 
@@ -143,12 +152,18 @@ auto Renderer::Impl::RenderObject(Renderable* renderable, Scene* scene, Camera* 
     }
 
     state_.ProcessMaterial(material);
-    if (material->wireframe && Renderable::IsMeshType(renderable)) {
-        const auto mesh = static_cast<Mesh*>(renderable);
-        geometry = mesh->GetWireframeGeometry();
-        vertex_buffers_.Bind(geometry);
-    } else {
-        vertex_buffers_.Bind(geometry);
+
+    const auto is_instanced = renderable->GetNodeType() == Node::Type::InstancedMesh;
+
+    if (!is_instanced && material->wireframe && Renderable::IsMeshType(renderable)) {
+        geometry = static_cast<Mesh*>(renderable)->GetWireframeGeometry();
+    }
+
+    const auto vao = is_instanced
+        ? binding_state_.Bind(*static_cast<InstancedMesh*>(renderable), *program)
+        : binding_state_.Bind(*geometry, *program);
+    if (vao == 0) {
+        return;
     }
 
     SetUniforms(program, &attrs, renderable, camera, scene);
@@ -164,23 +179,18 @@ auto Renderer::Impl::RenderObject(Renderable* renderable, Scene* scene, Camera* 
         primitive = GL_LINE_LOOP;
     }
 
-    const auto index_size = geometry->IndexData().size();
+    const auto index_size = geometry->GetIndexData().size();
     const auto vertex_size = geometry->VertexCount();
 
-    if (renderable->GetNodeType() != Node::Type::InstancedMesh) {
-        index_size
-            ? glDrawElements(primitive, index_size, GL_UNSIGNED_INT, nullptr)
-            : glDrawArrays(primitive, 0, vertex_size);
-    }
-
-    if (renderable->GetNodeType() == Node::Type::InstancedMesh) {
-        const auto instanced = static_cast<InstancedMesh*>(renderable);
-        const auto count = instanced->Count();
-        vertex_buffers_.BindInstancedMesh(instanced);
-
+    if (is_instanced) {
+        const auto count = static_cast<InstancedMesh*>(renderable)->GetCount();
         index_size
             ? glDrawElementsInstanced(primitive, index_size, GL_UNSIGNED_INT, nullptr, count)
             : glDrawArraysInstanced(primitive, 0, vertex_size, count);
+    } else {
+        index_size
+            ? glDrawElements(primitive, index_size, GL_UNSIGNED_INT, nullptr)
+            : glDrawArrays(primitive, 0, vertex_size);
     }
 
     rendered_objects_counter_++;
@@ -612,15 +622,18 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
 
             program->UpdateUniforms();
 
-            const auto index_size = geometry->IndexData().size();
+            const auto index_size = geometry->GetIndexData().size();
             const auto vertex_size = geometry->VertexCount();
 
-            vertex_buffers_.Bind(geometry);
+            const auto vao = is_instanced
+                ? binding_state_.Bind(*static_cast<InstancedMesh*>(renderable), *program)
+                : binding_state_.Bind(*geometry, *program);
+            if (vao == 0) {
+                continue;
+            }
 
             if (is_instanced) {
-                const auto instanced = static_cast<InstancedMesh*>(renderable);
-                const auto count = instanced->Count();
-                vertex_buffers_.BindInstancedMesh(instanced);
+                const auto count = static_cast<InstancedMesh*>(renderable)->GetCount();
                 index_size
                     ? glDrawElementsInstanced(GL_TRIANGLES, index_size, GL_UNSIGNED_INT, nullptr, count)
                     : glDrawArraysInstanced(GL_TRIANGLES, 0, vertex_size, count);
@@ -709,7 +722,7 @@ auto Renderer::Impl::Render(Scene* scene, Camera* camera, RenderTarget* target) 
     use_default_target ? scene_buffer_.End() : framebuffers_.End(target);
 
     textures_.Reset();
-    vertex_buffers_.Reset();
+    binding_state_.Reset();
     state_.Reset();
 
     if (use_default_target) {

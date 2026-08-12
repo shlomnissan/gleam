@@ -10,12 +10,11 @@
 #include "renderer/gl/gl_uniform.hpp"
 
 #include <array>
-#include <cstdint>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <unordered_map>
 #include <vector>
-#include <memory>
 
 #include <glad/glad.h>
 
@@ -70,8 +69,6 @@ private:
     GLuint program_id_ {0};
 
     bool has_errors_ {false};
-
-    auto BindVertexAttributeLocations() const -> void;
 
     auto GetUniformLoc(std::string_view name) const -> int;
 

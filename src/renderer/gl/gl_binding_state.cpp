@@ -11,11 +11,8 @@
 
 #include "utilities/logger.hpp"
 
-#include <algorithm>
 #include <format>
-#include <string>
-
-#include <glad/glad.h>
+#include <utility>
 
 namespace vglx {
 
@@ -28,7 +25,7 @@ struct AttributeWithLocation {
 
 }
 
-auto GLBindingState::Bind(Geometry2& geometry, const GLProgram& program) -> GLuint {
+auto GLBindingState::Bind(Geometry& geometry, const GLProgram& program) -> GLuint {
     const auto& key = geometry.UUID();
 
     if (geometry.Disposed()) {
@@ -50,16 +47,7 @@ auto GLBindingState::Bind(Geometry2& geometry, const GLProgram& program) -> GLui
 
     auto [it, inserted] = cache_.try_emplace(key);
     if (inserted) {
-        geometry.OnDispose([this, alive = std::weak_ptr(alive_), key](Disposable*) {
-            if (alive.expired()) return;
-            if (auto it = cache_.find(key); it != cache_.end()) {
-                for (const auto& entry : it->second) {
-                    if (entry.vao == current_vao_) current_vao_ = 0;
-                    glDeleteVertexArrays(1, &entry.vao);
-                }
-                cache_.erase(it);
-            }
-        });
+        RegisterEviction(geometry, key);
     }
 
     it->second.emplace_back(*entry);
@@ -67,10 +55,15 @@ auto GLBindingState::Bind(Geometry2& geometry, const GLProgram& program) -> GLui
     return entry->vao;
 }
 
-auto GLBindingState::Bind(InstancedMesh2& instanced_mesh, const GLProgram& program) -> GLuint {
+auto GLBindingState::Bind(InstancedMesh& instanced_mesh, const GLProgram& program) -> GLuint {
     const auto& key = instanced_mesh.UUID();
 
-    // TODO: check geometry is not disposed
+    auto geometry = instanced_mesh.GetGeometry();
+    if (geometry == nullptr || geometry->Disposed()) {
+        auto name = instanced_mesh.Name().empty() ? key : instanced_mesh.Name();
+        Logger::Log(LogLevel::Error, "Failed to bind instanced mesh {}. Missing or disposed geometry", name);
+        return 0;
+    }
 
     auto transforms_attribute = instanced_mesh.GetInstanceAttribute(BufferAttribute::kInstanceTransform);
     if (transforms_attribute == nullptr || transforms_attribute->Disposed()) {
@@ -79,16 +72,49 @@ auto GLBindingState::Bind(InstancedMesh2& instanced_mesh, const GLProgram& progr
         return 0;
     }
 
-    // TODO: implement
+    if (auto existing = GetEntry(key, *geometry, program, &instanced_mesh)) {
+        return existing->vao;
+    }
 
-    return 0;
+    auto entry = CreateEntry(key, *geometry, program, &instanced_mesh);
+    if (!entry.has_value()) {
+        auto name = instanced_mesh.Name().empty() ? key : instanced_mesh.Name();
+        Logger::Log(LogLevel::Error, "Failed to bind instanced mesh {}. {}", name, entry.error());
+        return 0;
+    }
+
+    auto [it, inserted] = cache_.try_emplace(key);
+    if (inserted) {
+        // The mesh itself is not disposable. Its VAOs are evicted through the
+        // instance transform attribute, which is created in the mesh's
+        // constructor and owned for the mesh's lifetime, so its disposal is
+        // the earliest moment the instance buffers can die.
+        RegisterEviction(*transforms_attribute, key);
+    }
+
+    it->second.emplace_back(*entry);
+
+    return entry->vao;
+}
+
+auto GLBindingState::RegisterEviction(Disposable& disposable, const std::string& key) -> void {
+    disposable.OnDispose([this, alive = std::weak_ptr(alive_), key](Disposable*) {
+        if (alive.expired()) return;
+        if (auto it = cache_.find(key); it != cache_.end()) {
+            for (const auto& entry : it->second) {
+                if (entry.vao == current_vao_) current_vao_ = 0;
+                glDeleteVertexArrays(1, &entry.vao);
+            }
+            cache_.erase(it);
+        }
+    });
 }
 
 auto GLBindingState::GetEntry(
     const std::string& key,
-    Geometry2& geometry,
+    Geometry& geometry,
     const GLProgram& program,
-    InstancedMesh2* instanced_mesh
+    InstancedMesh* instanced_mesh
 ) -> Entry* {
     Entry* found {nullptr};
 
@@ -132,9 +158,9 @@ auto GLBindingState::GetEntry(
 
 auto GLBindingState::CreateEntry(
     const std::string& key,
-    Geometry2& geometry,
+    Geometry& geometry,
     const GLProgram& program,
-    InstancedMesh2* instanced_mesh
+    InstancedMesh* instanced_mesh
 ) -> std::expected<Entry, std::string> {
     if (!program.IsValid()) {
         return std::unexpected(std::format("Program ({}) is invalid", program.ProgramId()));

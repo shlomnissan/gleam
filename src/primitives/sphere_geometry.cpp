@@ -7,8 +7,10 @@
 
 #include "vglx/primitives/sphere_geometry.hpp"
 
-#include "vglx/math/vector3.hpp"
 #include "vglx/math/utilities.hpp"
+#include "vglx/math/vector3.hpp"
+
+#include "geometries/vertex_streams.hpp"
 
 #include <cassert>
 
@@ -18,8 +20,7 @@ namespace {
 
 auto generate_geometry(
     const SphereGeometry::Parameters& params,
-    std::vector<float>& vertex_data,
-    std::vector<unsigned int>& index_data
+    VertexStreams& streams
 ) {
     const auto phi_start = 0.0f;
     const auto phi_length = math::two_pi;
@@ -38,20 +39,17 @@ auto generate_geometry(
             vec.y =  params.radius * math::Cos(theta);
             vec.z =  params.radius * math::Sin(phi) * math::Sin(theta);
 
-            // set position
-            vertex_data.emplace_back(vec.x);
-            vertex_data.emplace_back(vec.y);
-            vertex_data.emplace_back(vec.z);
+            streams.positions.emplace_back(vec.x);
+            streams.positions.emplace_back(vec.y);
+            streams.positions.emplace_back(vec.z);
 
-            // set normal
             vec.Normalize();
-            vertex_data.emplace_back(vec.x);
-            vertex_data.emplace_back(vec.y);
-            vertex_data.emplace_back(vec.z);
+            streams.normals.emplace_back(vec.x);
+            streams.normals.emplace_back(vec.y);
+            streams.normals.emplace_back(vec.z);
 
-            // set uv
-            vertex_data.emplace_back(u);
-            vertex_data.emplace_back(1.0f - v);
+            streams.uvs.emplace_back(u);
+            streams.uvs.emplace_back(1.0f - v);
         }
     }
 
@@ -62,12 +60,12 @@ auto generate_geometry(
             const auto c = ix + 1 + (params.width_segments + 1) * (iy + 1);
             const auto d = ix + 1 + (params.width_segments + 1) * iy;
 
-            index_data.emplace_back(a);
-            index_data.emplace_back(b);
-            index_data.emplace_back(d);
-            index_data.emplace_back(b);
-            index_data.emplace_back(c);
-            index_data.emplace_back(d);
+            streams.indices.emplace_back(a);
+            streams.indices.emplace_back(b);
+            streams.indices.emplace_back(d);
+            streams.indices.emplace_back(b);
+            streams.indices.emplace_back(c);
+            streams.indices.emplace_back(d);
         }
     }
 }
@@ -81,11 +79,9 @@ SphereGeometry::SphereGeometry(const Parameters& params) {
 
     SetName("sphere geometry");
 
-    generate_geometry(params, vertex_data_, index_data_);
-
-    SetAttribute({.type = Geometry::VertexAttributeType::Position, .item_size = 3});
-    SetAttribute({.type = Geometry::VertexAttributeType::Normal, .item_size = 3});
-    SetAttribute({.type = Geometry::VertexAttributeType::UV, .item_size = 2});
+    auto streams = VertexStreams {};
+    generate_geometry(params, streams);
+    streams.AddTo(*this);
 }
 
 }

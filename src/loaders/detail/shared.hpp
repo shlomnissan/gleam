@@ -11,7 +11,6 @@
 #include "vglx/textures/texture.hpp"
 
 #include <cstdint>
-#include <optional>
 #include <string>
 #include <vector>
 
@@ -33,35 +32,16 @@ struct TextureRef {
     [[nodiscard]] auto empty() const -> bool { return uri.empty(); }
 };
 
-struct VertexLayout {
-    uint32_t stride {0};
-    uint32_t position_offset {0};
-    uint32_t normal_offset {0};
+[[nodiscard]] auto generate_normals(
+    const std::vector<float>& positions,
+    const std::vector<uint32_t>& indices
+) -> std::vector<float>;
 
-    std::optional<uint32_t> uv_offset;
-    std::optional<uint32_t> tangent_offset;
-    std::optional<uint32_t> color_offset;
-
-    bool has_uvs {false};
-    bool has_tangents {false};
-    bool has_colors {false};
-};
-
-auto make_layout(
-    bool has_uvs,
-    bool has_colors
-) -> VertexLayout;
-
-auto generate_normals(
-    std::vector<float>& vertex_data,
-    std::vector<unsigned>& index_data,
-    const VertexLayout& layout
-) -> void;
-
-auto generate_tangents(
-    std::vector<float>& vertex_data,
-    std::vector<unsigned>& index_data,
-    const VertexLayout& layout
-) -> void;
+[[nodiscard]] auto generate_tangents(
+    const std::vector<float>& positions,
+    const std::vector<float>& normals,
+    const std::vector<float>& uvs,
+    const std::vector<uint32_t>& indices
+) -> std::vector<float>;
 
 }

@@ -7,9 +7,12 @@
 
 #include "vglx/helpers/grid.hpp"
 
+#include "vglx/geometries/buffer_attribute.hpp"
+#include "vglx/geometries/geometry.hpp"
 #include "vglx/materials/unlit_material.hpp"
 #include "vglx/scene/mesh.hpp"
 
+#include <utility>
 #include <vector>
 
 namespace vglx {
@@ -30,10 +33,12 @@ Grid::Grid(const Parameters& params) {
         k += step;
     }
 
-    using enum Geometry::VertexAttributeType;
-
-    auto geometry = Geometry::Create(vertices);
-    geometry->SetAttribute({.type = Position, .item_size = 3});
+    auto geometry = Geometry::Create();
+    geometry->AddAttribute(BufferAttribute::Create({
+        .name = BufferAttribute::kPosition,
+        .format = BufferAttribute::Format::Float32x3,
+        .rate = BufferAttribute::Rate::Vertex
+    }, std::move(vertices)));
     geometry->primitive = Geometry::PrimitiveType::Lines;
     geometry->SetName("grid");
 

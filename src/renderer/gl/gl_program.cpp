@@ -7,28 +7,17 @@
 
 #include "renderer/gl/gl_program.hpp"
 
-#include "vglx/geometries/geometry.hpp"
+#include "vglx/math/color.hpp"
+#include "vglx/math/vector3.hpp"
 
 #include "core/shader_library.hpp"
 #include "renderer/gl/gl_uniform_buffer.hpp"
 #include "utilities/assert.hpp"
 #include "utilities/logger.hpp"
 
-#include <utility>
-
 namespace vglx {
 
 namespace {
-
-const auto VertexAttributesMap = std::unordered_map<std::string, Geometry::VertexAttributeType> {
-    {"a_Position", Geometry::VertexAttributeType::Position},
-    {"a_Normal", Geometry::VertexAttributeType::Normal},
-    {"a_TexCoord", Geometry::VertexAttributeType::UV},
-    {"a_Tangent", Geometry::VertexAttributeType::Tangent},
-    {"a_Color", Geometry::VertexAttributeType::Color},
-    {"a_InstanceColor", Geometry::VertexAttributeType::InstanceColor},
-    {"a_InstanceTransform", Geometry::VertexAttributeType::InstanceTransform},
-};
 
 auto get_vertex_attribute_locations(GLuint program) -> std::vector<GLProgram::VertexAttributeLocation> {
     auto count = GLint {0};
@@ -91,8 +80,6 @@ GLProgram::GLProgram(const std::vector<ShaderInfo>& shaders) {
         return;
     }
 
-    BindVertexAttributeLocations();
-
     glLinkProgram(program_id_);
     if (!CheckProgramLinkStatus()) {
         has_errors_ = true;
@@ -135,16 +122,6 @@ auto GLProgram::SetUniform(Uniform uniform, const Color* color) -> void {
     if (color != nullptr) {
         const Vector3 c(color->r, color->g, color->b);
         SetUniform(uniform, &c);
-    }
-}
-
-auto GLProgram::BindVertexAttributeLocations() const -> void {
-    for (auto& [attr_name, attr_type] : VertexAttributesMap) {
-        glBindAttribLocation(
-            program_id_,
-            static_cast<int>(attr_type),
-            attr_name.data()
-        );
     }
 }
 

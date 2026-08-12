@@ -7,6 +7,10 @@
 
 #include "vglx/primitives/box_geometry.hpp"
 
+#include "vglx/math/vector3.hpp"
+
+#include "geometries/vertex_streams.hpp"
+
 #include <cassert>
 
 namespace vglx {
@@ -37,8 +41,7 @@ auto set_component(Vector3& vec, char axis, float value) {
 auto build_plane(
     const PlaneParameters& params,
     unsigned int& vertex_counter,
-    std::vector<float>& vertex_data,
-    std::vector<unsigned int>& index_data
+    VertexStreams& streams
 ) {
     const auto width_half = params.width / 2;
     const auto height_half = params.height / 2;
@@ -63,24 +66,24 @@ auto build_plane(
             set_component(vec, params.v, y * params.vdir);
             set_component(vec, params.w, depth_half);
 
-            vertex_data.emplace_back(vec.x);
-            vertex_data.emplace_back(vec.y);
-            vertex_data.emplace_back(vec.z);
+            streams.positions.emplace_back(vec.x);
+            streams.positions.emplace_back(vec.y);
+            streams.positions.emplace_back(vec.z);
 
             // set normals
             set_component(vec, params.u, 0);
             set_component(vec, params.v, 0);
             set_component(vec, params.w, params.depth > 0 ? 1 : -1);
 
-            vertex_data.emplace_back(vec.x);
-            vertex_data.emplace_back(vec.y);
-            vertex_data.emplace_back(vec.z);
+            streams.normals.emplace_back(vec.x);
+            streams.normals.emplace_back(vec.y);
+            streams.normals.emplace_back(vec.z);
 
             // set uvs
             const auto u = static_cast<float>(ix) / params.grid_x;
             const auto v = 1 - (static_cast<float>(iy) / params.grid_y);
-            vertex_data.emplace_back(u);
-            vertex_data.emplace_back(v);
+            streams.uvs.emplace_back(u);
+            streams.uvs.emplace_back(v);
 
             ++counter;
         }
@@ -93,12 +96,12 @@ auto build_plane(
             const auto c = vertex_counter + ix + 1 + grid_x1 * (iy + 1);
             const auto d = vertex_counter + ix + 1 + grid_x1 * iy;
 
-            index_data.emplace_back(a);
-            index_data.emplace_back(b);
-            index_data.emplace_back(d);
-            index_data.emplace_back(b);
-            index_data.emplace_back(c);
-            index_data.emplace_back(d);
+            streams.indices.emplace_back(a);
+            streams.indices.emplace_back(b);
+            streams.indices.emplace_back(d);
+            streams.indices.emplace_back(b);
+            streams.indices.emplace_back(c);
+            streams.indices.emplace_back(d);
         }
     }
 
@@ -116,6 +119,7 @@ BoxGeometry::BoxGeometry(const Parameters& params) {
     assert(params.depth_segments > 0);
 
     auto vertex_counter = 0u;
+    auto streams = VertexStreams {};
 
     SetName("box geometry");
 
@@ -123,41 +127,39 @@ BoxGeometry::BoxGeometry(const Parameters& params) {
         'z', 'y', 'x', -1, -1,
         params.depth, params.height, params.width,
         params.depth_segments, params.height_segments
-    }, vertex_counter, vertex_data_, index_data_);
+    }, vertex_counter, streams);
 
     build_plane({
         'z', 'y', 'x', 1, -1,
         params.depth, params.height, -params.width,
         params.depth_segments, params.height_segments
-    }, vertex_counter, vertex_data_, index_data_);
+    }, vertex_counter, streams);
 
     build_plane({
         'x', 'z', 'y', 1, 1,
         params.width, params.depth, params.height,
         params.width_segments, params.depth_segments
-    }, vertex_counter, vertex_data_, index_data_);
+    }, vertex_counter, streams);
 
     build_plane({
         'x', 'z', 'y', 1, -1,
         params.width, params.depth, -params.height,
         params.width_segments, params.depth_segments
-    }, vertex_counter, vertex_data_, index_data_);
+    }, vertex_counter, streams);
 
     build_plane({
         'x', 'y', 'z', 1, -1,
         params.width, params.height, params.depth,
         params.width_segments, params.height_segments
-    }, vertex_counter, vertex_data_, index_data_);
+    }, vertex_counter, streams);
 
     build_plane({
         'x', 'y', 'z', -1, -1,
         params.width, params.height, -params.depth,
         params.width_segments, params.height_segments
-    }, vertex_counter, vertex_data_, index_data_);
+    }, vertex_counter, streams);
 
-    SetAttribute({.type = Geometry::VertexAttributeType::Position, .item_size = 3});
-    SetAttribute({.type = Geometry::VertexAttributeType::Normal, .item_size = 3});
-    SetAttribute({.type = Geometry::VertexAttributeType::UV, .item_size = 2});
+    streams.AddTo(*this);
 }
 
 }

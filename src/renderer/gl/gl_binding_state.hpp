@@ -7,14 +7,16 @@
 
 #pragma once
 
-#include "vglx/geometries/geometry2.hpp"
-#include "vglx/scene/instanced_mesh2.hpp"
+#include "vglx/core/disposable.hpp"
+#include "vglx/geometries/geometry.hpp"
+#include "vglx/scene/instanced_mesh.hpp"
 
 #include "renderer/gl/gl_buffers.hpp"
 #include "renderer/gl/gl_program.hpp"
 
 #include <expected>
 #include <memory>
+#include <string>
 #include <unordered_map>
 #include <vector>
 
@@ -31,9 +33,9 @@ public:
     auto operator=(const GLBindingState&) -> GLBindingState& = delete;
     auto operator=(GLBindingState&&) -> GLBindingState& = delete;
 
-    [[nodiscard]] auto Bind(Geometry2& geometry, const GLProgram& program) -> GLuint;
+    [[nodiscard]] auto Bind(Geometry& geometry, const GLProgram& program) -> GLuint;
 
-    [[nodiscard]] auto Bind(InstancedMesh2& instanced_mesh, const GLProgram& program) -> GLuint;
+    [[nodiscard]] auto Bind(InstancedMesh& instanced_mesh, const GLProgram& program) -> GLuint;
 
     auto Reset() { current_vao_ = 0; }
 
@@ -56,17 +58,19 @@ private:
 
     auto GetEntry(
         const std::string& key,
-        Geometry2& geometry,
+        Geometry& geometry,
         const GLProgram& program,
-        InstancedMesh2* instanced_mesh = nullptr
+        InstancedMesh* instanced_mesh = nullptr
     ) -> Entry*;
 
     auto CreateEntry(
         const std::string& key,
-        Geometry2& geometry,
+        Geometry& geometry,
         const GLProgram& program,
-        InstancedMesh2* instanced_mesh = nullptr
+        InstancedMesh* instanced_mesh = nullptr
     ) -> std::expected<Entry, std::string>;
+
+    auto RegisterEviction(Disposable& disposable, const std::string& key) -> void;
 };
 
 }

@@ -7,19 +7,31 @@
 
 #include "vglx/helpers/bounding_plane.hpp"
 
+#include "vglx/geometries/buffer_attribute.hpp"
 #include "vglx/geometries/geometry.hpp"
 #include "vglx/geometries/wireframe_geometry.hpp"
 #include "vglx/materials/unlit_material.hpp"
+#include "vglx/math/color.hpp"
 #include "vglx/scene/mesh.hpp"
 
+#include <utility>
 #include <vector>
 
 namespace vglx {
 
 namespace {
 
+auto create_positions(std::vector<float> data) {
+    return BufferAttribute::Create({
+        .name = BufferAttribute::kPosition,
+        .format = BufferAttribute::Format::Float32x3,
+        .rate = BufferAttribute::Rate::Vertex
+    }, std::move(data));
+}
+
 auto create_wireframe_mesh(const Color& color) {
-    auto geometry = Geometry::Create({
+    auto geometry = Geometry::Create();
+    geometry->AddAttribute(create_positions({
          1.0f, -1.0f, 0.0f,
         -1.0f,  1.0f, 0.0f,
         -1.0f, -1.0f, 0.0f,
@@ -29,8 +41,8 @@ auto create_wireframe_mesh(const Color& color) {
          1.0f, -1.0f, 0.0f,
          1.0f,  1.0f, 0.0f,
          0.0f,  0.0f, 0.0f
-    }, { 0, 1, 2, 3, 4, 5, 6, 7, 8 });
-    geometry->SetAttribute({Geometry::VertexAttributeType::Position, 3});
+    }));
+    geometry->SetIndices({ 0, 1, 2, 3, 4, 5, 6, 7, 8 });
 
     auto wireframe_geometry = WireframeGeometry::Create(geometry.get());
     auto wireframe_material = UnlitMaterial::Create({.color = color});
@@ -40,16 +52,15 @@ auto create_wireframe_mesh(const Color& color) {
 }
 
 auto create_solid_mesh(const Color& color) {
-    auto geometry = Geometry::Create({
+    auto geometry = Geometry::Create();
+    geometry->AddAttribute(create_positions({
          1.0f,  1.0f, 0.0f,
         -1.0f,  1.0f, 0.0f,
         -1.0f, -1.0f, 0.0f,
          1.0f,  1.0f, 0.0f,
         -1.0f, -1.0f, 0.0f,
          1.0f, -1.0f, 0.0f
-    });
-
-    geometry->SetAttribute({Geometry::VertexAttributeType::Position, 3});
+    }));
 
     auto solid_material = UnlitMaterial::Create({.color = color});
     solid_material->opacity = 0.2f;

@@ -13,6 +13,8 @@
 #include "vglx/scene/renderable.hpp"
 
 #include "renderer/gl/gl_background_pass.hpp"
+#include "renderer/gl/gl_binding_state.hpp"
+#include "renderer/gl/gl_buffers.hpp"
 #include "renderer/gl/gl_camera.hpp"
 #include "renderer/gl/gl_device.hpp"
 #include "renderer/gl/gl_environment.hpp"
@@ -24,9 +26,10 @@
 #include "renderer/gl/gl_shadow_maps.hpp"
 #include "renderer/gl/gl_state.hpp"
 #include "renderer/gl/gl_textures.hpp"
-#include "renderer/gl/gl_vertex_buffers.hpp"
 
+#include <expected>
 #include <memory>
+#include <string>
 
 namespace vglx {
 
@@ -84,7 +87,11 @@ private:
     GLShadowMaps shadow_maps_;
     GLState state_;
     GLTextures textures_;
-    GLVertexBuffers vertex_buffers_;
+
+    // GLBuffers must be declared before GLBindingState, which holds a
+    // reference to it.
+    GLBuffers buffers_;
+    GLBindingState binding_state_ {buffers_};
 
     Vector2 resolution_ {0.0f, 0.0f};
 

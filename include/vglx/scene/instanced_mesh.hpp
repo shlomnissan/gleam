@@ -9,12 +9,19 @@
 
 #include "vglx_export.h"
 
+#include "vglx/geometries/buffer_attribute.hpp"
+#include "vglx/math/box3.hpp"
 #include "vglx/math/color.hpp"
 #include "vglx/math/matrix4.hpp"
+#include "vglx/math/sphere.hpp"
 #include "vglx/scene/mesh.hpp"
 
+#include <cstddef>
+#include <cstdint>
 #include <memory>
 #include <optional>
+#include <string_view>
+#include <utility>
 #include <vector>
 
 namespace vglx {
@@ -22,13 +29,21 @@ namespace vglx {
 /**
  * @brief Renderable node that draws many copies of the same mesh efficiently.
  *
- * InstancedMesh stores a single geometry/material pair and renders it multiple
- * times in a single draw call using per-instance transforms and optional colors.
- * This dramatically improves performance when drawing large numbers of identical
- * objects by reducing CPU overhead and state changes.
+ * InstancedMesh stores a single geometry/material pair and renders it
+ * multiple times in a single draw call using per-instance transforms and
+ * colors. This dramatically improves performance when drawing large numbers
+ * of identical objects by reducing CPU overhead and state changes.
  *
- * Each instance is addressed by a zero-based index in the range $[0, count)$.
- * Transforms and colors can be queried or updated individually.
+ * Per-instance data is stored in instance-rate @ref BufferAttribute
+ * "buffer attributes". Transforms default to identity and colors to white.
+ * Each instance is addressed by a zero-based index.
+ * Updates through @ref SetTransformAt and @ref SetColorAt
+ * mark the underlying attribute for re-upload.
+ *
+ * Custom per-instance data can be added with @ref AddInstanceAttribute and
+ * consumed by declaring a matching attribute in the shader code of a
+ * @ref ShaderMaterial. The built-in materials only use the instance
+ * transform and color attributes.
  *
  * @code
  * const auto geometry = vglx::BoxGeometry::Create({1.0f, 1.0f, 1.0f});
@@ -36,13 +51,13 @@ namespace vglx {
  *
  * auto boxes = my_scene->Add(vglx::InstancedMesh::Create(
  *   geometry, material, 2500
- * );
+ * ));
  *
  * for (auto i = 0; i < 50; ++i) {
  *   for (auto j = 0; j < 50; ++j) {
- *     Transform3 t {};
+ *     vglx::Transform3 t {};
  *     t.SetPosition({i * 2.0f - 49.0f, j * 2.0f - 49.0f, 0.0f});
- *     boxes->SetTransformAt(j * 50 + i, t);
+ *     boxes->SetTransformAt(j * 50 + i, t.Get());
  *   }
  * }
  * @endcode
@@ -57,6 +72,9 @@ class VGLX_EXPORT InstancedMesh : public Mesh {
 public:
     /**
      * @brief Constructs an instanced mesh.
+     *
+     * Instance transforms are initialized to identity and instance colors
+     * to white.
      *
      * @param geometry Shared geometry used for every instance.
      * @param material Shared material used for every instance.
@@ -90,30 +108,51 @@ public:
         return Node::Type::InstancedMesh;
     }
 
-    /// @brief Returns the number of allocated instances.
-    [[nodiscard]] auto Count() -> size_t { return count_; }
+    /**
+     * @brief Adds a custom per-instance attribute to this mesh.
+     *
+     * The attribute must have an instance rate, a unique name within the
+     * mesh and an element count that matches the instance count. Attributes
+     * that violate these constraints are reported and rejected.
+     *
+     * @param attribute Buffer attribute to add.
+     */
+    auto AddInstanceAttribute(std::shared_ptr<BufferAttribute> attribute) -> void;
 
     /**
-     * @brief Returns the per-instance color at the given index.
-     *
-     * @param idx Instance index.
+     * @brief Returns the list of instance attributes stored on this mesh.
      */
-    [[nodiscard]] auto GetColorAt(std::size_t idx) -> const Color;
+    [[nodiscard]] auto GetInstanceAttributes() const -> const std::vector<std::shared_ptr<BufferAttribute>>& { return attributes_; }
+
+    /**
+     * @brief Returns the instance attribute with the given name.
+     *
+     * @param name Attribute name to look up.
+     * @return The matching attribute, or `nullptr` if none exists.
+     */
+    [[nodiscard]] auto GetInstanceAttribute(std::string_view name) const -> std::shared_ptr<BufferAttribute>;
+
+    /// @brief Returns the number of allocated instances.
+    [[nodiscard]] auto GetCount() const -> size_t { return count_; }
+
+    /**
+     * @brief Returns the layout version incremented when attributes are added.
+     */
+    [[nodiscard]] auto GetLayoutVersion() const -> uint32_t { return layout_version_; }
 
     /**
      * @brief Returns the per-instance transform matrix at the given index.
      *
      * @param idx Instance index.
      */
-    [[nodiscard]] auto GetTransformAt(std::size_t idx) -> const Matrix4;
+    [[nodiscard]] auto TransformAt(std::size_t idx) const -> Matrix4;
 
     /**
-     * @brief Sets the per-instance color at the given index.
+     * @brief Returns the per-instance color at the given index.
      *
      * @param idx Instance index.
-     * @param color New color for the instance.
      */
-    auto SetColorAt(std::size_t idx, const Color& color) -> void;
+    [[nodiscard]] auto ColorAt(std::size_t idx) const -> Color;
 
     /**
      * @brief Sets the per-instance transform at the given index.
@@ -124,12 +163,12 @@ public:
     auto SetTransformAt(std::size_t idx, const Matrix4& matrix) -> void;
 
     /**
-     * @brief Convenience overload that accepts a @ref Transform3.
+     * @brief Sets the per-instance color at the given index.
      *
      * @param idx Instance index.
-     * @param transform World-space transform object to assign.
+     * @param color New color for the instance.
      */
-    auto SetTransformAt(std::size_t idx, Transform3& transform) -> void;
+    auto SetColorAt(std::size_t idx, const Color& color) -> void;
 
     /**
      * @brief Computes a bounding box that encloses all instances.
@@ -141,18 +180,17 @@ public:
      */
     auto BoundingSphere() -> Sphere override;
 
-    ~InstancedMesh() override;
-
 private:
     /// @cond INTERNAL
-    std::vector<Color> colors_;
-    std::vector<Matrix4> transforms_;
+    std::vector<std::shared_ptr<BufferAttribute>> attributes_ {};
 
-    std::size_t count_;
+    size_t count_;
 
-    friend class GLVertexBuffers;
-    class Impl;
-    std::unique_ptr<Impl> impl_;
+    uint32_t layout_version_ {0};
+
+    std::optional<std::pair<Box3, uint32_t>> bounding_box_ {};
+
+    std::optional<std::pair<Sphere, uint32_t>> bounding_sphere_ {};
     /// @endcond
 };
 

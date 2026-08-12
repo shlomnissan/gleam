@@ -11,14 +11,15 @@
 
 #include "utilities/logger.hpp"
 
-#include <cinttypes>
+#include <cstddef>
+#include <cstdint>
 #include <unordered_set>
+#include <utility>
+#include <vector>
 
 namespace vglx {
 
-WireframeGeometry::WireframeGeometry(const Geometry* geometry) :
-    Geometry(geometry->VertexData(), {})
-{
+WireframeGeometry::WireframeGeometry(const Geometry* geometry) {
     if (geometry->primitive != Geometry::PrimitiveType::Triangles) {
         Logger::Log(
             LogLevel::Error,
@@ -26,7 +27,7 @@ WireframeGeometry::WireframeGeometry(const Geometry* geometry) :
         );
     }
 
-    if (geometry->IndexCount() == 0) {
+    if (geometry->GetIndexData().empty()) {
         Logger::Log(
             LogLevel::Error,
             "Failed to initialize wireframe geometry with non-indexed source"
@@ -35,28 +36,35 @@ WireframeGeometry::WireframeGeometry(const Geometry* geometry) :
     }
 
     primitive = Geometry::PrimitiveType::Lines;
-    attributes_ = geometry->Attributes();
 
+    for (const auto& attribute : geometry->GetAttributes()) {
+        AddAttribute(attribute);
+    }
+
+    auto indices = std::vector<uint32_t> {};
     auto seen_edges = std::unordered_set<uint64_t> {};
-    auto add_edge = [this, &seen_edges](unsigned int x, unsigned int y) {
+    auto add_edge = [&indices, &seen_edges](uint32_t x, uint32_t y) {
         const auto key = math::CantorPairingUnordered(
             static_cast<uint64_t>(x),
             static_cast<uint64_t>(y)
         );
         if (seen_edges.emplace(key).second) {
-            index_data_.emplace_back(x);
-            index_data_.emplace_back(y);
+            indices.emplace_back(x);
+            indices.emplace_back(y);
         }
     };
 
-    for (auto i = 0; i < geometry->IndexCount(); i += 3) {
-        const auto i0 = geometry->IndexData()[i];
-        const auto i1 = geometry->IndexData()[i + 1];
-        const auto i2 = geometry->IndexData()[i + 2];
+    const auto& index_data = geometry->GetIndexData();
+    for (auto i = std::size_t {0}; i + 2 < index_data.size(); i += 3) {
+        const auto i0 = index_data[i];
+        const auto i1 = index_data[i + 1];
+        const auto i2 = index_data[i + 2];
         add_edge(i0, i1);
         add_edge(i1, i2);
         add_edge(i2, i0);
     }
+
+    SetIndices(std::move(indices));
 }
 
 }

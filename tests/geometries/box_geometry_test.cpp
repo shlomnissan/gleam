@@ -7,6 +7,7 @@
 
 #include <gtest/gtest.h>
 
+#include <vglx/geometries/buffer_attribute.hpp>
 #include <vglx/primitives/box_geometry.hpp>
 
 #pragma region Fixtures
@@ -28,14 +29,12 @@ protected:
 #pragma region Constructor
 
 TEST_F(BoxGeometryTest, ConstructorInitializesVertexData) {
-    const auto& verts = box_.VertexData();
-
-    // 8 values per vertex, 9 vertices, 6 faces
-    EXPECT_EQ(verts.size(), 8 * 9 * 6);
+    // 9 vertices, 6 faces
+    EXPECT_EQ(box_.VertexCount(), 9 * 6);
 }
 
 TEST_F(BoxGeometryTest, ConstructorInitializesIndexData) {
-    const auto& index = box_.IndexData();
+    const auto& index = box_.GetIndexData();
 
     // 6 indices (2 triangles per sub-plane), 4 sub-planes, 6 faces
     EXPECT_EQ(index.size(), 6 * 4 * 6);
@@ -50,16 +49,19 @@ TEST_F(BoxGeometryTest, ConstructorInitializesName) {
 #pragma region Attributes
 
 TEST_F(BoxGeometryTest, AttributesConfiguredCorrectly) {
-    using enum vglx::Geometry::VertexAttributeType;
+    using vglx::BufferAttribute;
 
-    const auto& attrs = box_.Attributes();
+    const auto positions = box_.GetAttribute(BufferAttribute::kPosition);
+    ASSERT_NE(positions, nullptr);
+    EXPECT_EQ(positions->format, BufferAttribute::Format::Float32x3);
 
-    EXPECT_EQ(attrs[0].type, Position);
-    EXPECT_EQ(attrs[0].item_size, 3u);
-    EXPECT_EQ(attrs[1].type, Normal);
-    EXPECT_EQ(attrs[1].item_size, 3u);
-    EXPECT_EQ(attrs[2].type, UV);
-    EXPECT_EQ(attrs[2].item_size, 2u);
+    const auto normals = box_.GetAttribute(BufferAttribute::kNormal);
+    ASSERT_NE(normals, nullptr);
+    EXPECT_EQ(normals->format, BufferAttribute::Format::Float32x3);
+
+    const auto uvs = box_.GetAttribute(BufferAttribute::kTexCoord);
+    ASSERT_NE(uvs, nullptr);
+    EXPECT_EQ(uvs->format, BufferAttribute::Format::Float32x2);
 }
 
 #pragma endregion

@@ -7,6 +7,7 @@
 
 #include <gtest/gtest.h>
 
+#include <vglx/geometries/buffer_attribute.hpp>
 #include <vglx/primitives/torus_knot_geometry.hpp>
 
 #pragma region Fixtures
@@ -24,14 +25,12 @@ protected:
 #pragma region Constructor
 
 TEST_F(TorusKnotGeometryTest, ConstructorInitializesVertexData) {
-    const auto& verts = torus_knot_.VertexData();
-
-    // 8 values per vertex, (3+1) * (3+1) = 16 vertices
-    EXPECT_EQ(verts.size(), 8 * 16);
+    // (3+1) * (3+1) = 16 vertices
+    EXPECT_EQ(torus_knot_.VertexCount(), 16);
 }
 
 TEST_F(TorusKnotGeometryTest, ConstructorInitializesIndexData) {
-    const auto& index = torus_knot_.IndexData();
+    const auto& index = torus_knot_.GetIndexData();
 
     // 6 indices per quad, 3 * 3 quads
     EXPECT_EQ(index.size(), 3 * 3 * 6);
@@ -46,16 +45,19 @@ TEST_F(TorusKnotGeometryTest, ConstructorInitializesName) {
 #pragma region Attributes
 
 TEST_F(TorusKnotGeometryTest, AttributesConfiguredCorrectly) {
-    using enum vglx::Geometry::VertexAttributeType;
+    using vglx::BufferAttribute;
 
-    const auto& attrs = torus_knot_.Attributes();
+    const auto positions = torus_knot_.GetAttribute(BufferAttribute::kPosition);
+    ASSERT_NE(positions, nullptr);
+    EXPECT_EQ(positions->format, BufferAttribute::Format::Float32x3);
 
-    EXPECT_EQ(attrs[0].type, Position);
-    EXPECT_EQ(attrs[0].item_size, 3u);
-    EXPECT_EQ(attrs[1].type, Normal);
-    EXPECT_EQ(attrs[1].item_size, 3u);
-    EXPECT_EQ(attrs[2].type, UV);
-    EXPECT_EQ(attrs[2].item_size, 2u);
+    const auto normals = torus_knot_.GetAttribute(BufferAttribute::kNormal);
+    ASSERT_NE(normals, nullptr);
+    EXPECT_EQ(normals->format, BufferAttribute::Format::Float32x3);
+
+    const auto uvs = torus_knot_.GetAttribute(BufferAttribute::kTexCoord);
+    ASSERT_NE(uvs, nullptr);
+    EXPECT_EQ(uvs->format, BufferAttribute::Format::Float32x2);
 }
 
 #pragma endregion

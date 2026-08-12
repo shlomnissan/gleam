@@ -7,6 +7,8 @@
 
 #include "vglx/scene/sprite.hpp"
 
+#include "vglx/geometries/buffer_attribute.hpp"
+
 namespace vglx {
 
 Sprite::Sprite(std::shared_ptr<SpriteMaterial> material)
@@ -18,15 +20,31 @@ Sprite::Sprite(std::shared_ptr<SpriteMaterial> material)
 
 auto Sprite::SharedGeometry() -> std::shared_ptr<Geometry>& {
     static auto geometry = []() {
-        auto g = Geometry::Create({
-           -0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-            0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-            0.5f,  0.5f, 0.0f, 1.0f, 1.0f,
-            -0.5f, 0.5f, 0.0f, 0.0f, 1.0f
-        }, {0, 1, 2, 0, 2, 3});
+        auto g = Geometry::Create();
 
-        g->SetAttribute({Geometry::VertexAttributeType::Position, 3});
-        g->SetAttribute({Geometry::VertexAttributeType::UV, 2});
+        g->AddAttribute(BufferAttribute::Create({
+            .name = BufferAttribute::kPosition,
+            .format = BufferAttribute::Format::Float32x3,
+            .rate = BufferAttribute::Rate::Vertex
+        }, {
+           -0.5f, -0.5f, 0.0f,
+            0.5f, -0.5f, 0.0f,
+            0.5f,  0.5f, 0.0f,
+           -0.5f,  0.5f, 0.0f
+        }));
+
+        g->AddAttribute(BufferAttribute::Create({
+            .name = BufferAttribute::kTexCoord,
+            .format = BufferAttribute::Format::Float32x2,
+            .rate = BufferAttribute::Rate::Vertex
+        }, {
+            0.0f, 0.0f,
+            1.0f, 0.0f,
+            1.0f, 1.0f,
+            0.0f, 1.0f
+        }));
+
+        g->SetIndices({0, 1, 2, 0, 2, 3});
 
         return g;
     }();

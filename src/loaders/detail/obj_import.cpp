@@ -9,14 +9,17 @@
 
 #include "loaders/detail/obj_import.hpp"
 
-#include "vglx/math/utilities.hpp"
 #include "vglx/math/vector2.hpp"
-#include "vglx/math/vector3.hpp"
+#include "vglx/textures/texture.hpp"
 
-#include <format>
-#include <unordered_map>
-
+#include "geometries/vertex_streams.hpp"
 #include "misc/tiny_obj_loader.hpp"
+
+#include <cstdint>
+#include <format>
+#include <functional>
+#include <unordered_map>
+#include <utility>
 
 namespace vglx::detail::obj {
 
@@ -106,55 +109,44 @@ auto parse_shape(
     auto& mesh = shape.mesh;
 
     auto seen_vertices = VertexMap {};
-    auto vertex_data = std::vector<float> {};
-    auto index_data = std::vector<unsigned> {};
+    auto streams = VertexStreams {};
     auto has_colors = !attrib.colors.empty();
     auto has_uvs = false;
     for (auto& idx : mesh.indices) {
         if (idx.texcoord_index >= 0) has_uvs = true;
     }
 
-    auto layout = make_layout(has_uvs, has_colors);
-
     for (size_t i = 0; i < mesh.indices.size(); ++i) {
         const auto idx = mesh.indices[i];
 
         auto key = VertexKey {idx.vertex_index, idx.texcoord_index};
         if (seen_vertices.contains(key)) {
-            index_data.push_back(seen_vertices[key]);
+            streams.indices.push_back(seen_vertices[key]);
             continue;
         }
 
-        seen_vertices[key] = static_cast<unsigned>(vertex_data.size() / layout.stride);
-        index_data.push_back(seen_vertices[key]);
+        seen_vertices[key] = static_cast<uint32_t>(streams.positions.size() / 3);
+        streams.indices.push_back(seen_vertices[key]);
 
-        vertex_data.insert(vertex_data.end(), {
+        streams.positions.insert(streams.positions.end(), {
             attrib.vertices[3 * idx.vertex_index + 0],
             attrib.vertices[3 * idx.vertex_index + 1],
             attrib.vertices[3 * idx.vertex_index + 2]
         });
 
-        // placeholder for normals, always generated dynamically
-        vertex_data.insert(vertex_data.end(), {0.0f, 0.0f, 0.0f});
-
-        if (layout.has_uvs) {
+        if (has_uvs) {
             if (idx.texcoord_index >= 0) {
-                vertex_data.insert(vertex_data.end(), {
+                streams.uvs.insert(streams.uvs.end(), {
                     attrib.texcoords[2 * idx.texcoord_index + 0],
                     attrib.texcoords[2 * idx.texcoord_index + 1]
                 });
             } else {
-                vertex_data.insert(vertex_data.end(), {0.0f, 0.0f});
+                streams.uvs.insert(streams.uvs.end(), {0.0f, 0.0f});
             }
         }
 
-        if (layout.has_tangents) {
-            // placeholder for tangents, always generated dynamically
-            vertex_data.insert(vertex_data.end(), {0.0f, 0.0f, 0.0f, 0.0f});
-        }
-
-        if (layout.has_colors) {
-            vertex_data.insert(vertex_data.end(), {
+        if (has_colors) {
+            streams.colors.insert(streams.colors.end(), {
                 attrib.colors[3 * idx.vertex_index + 0],
                 attrib.colors[3 * idx.vertex_index + 1],
                 attrib.colors[3 * idx.vertex_index + 2]
@@ -162,30 +154,22 @@ auto parse_shape(
         }
     }
 
-    generate_normals(vertex_data, index_data, layout);
+    streams.normals = generate_normals(streams.positions, streams.indices);
 
-    if (layout.has_tangents) {
-        generate_tangents(vertex_data, index_data, layout);
+    if (has_uvs) {
+        streams.tangents = generate_tangents(
+            streams.positions,
+            streams.normals,
+            streams.uvs,
+            streams.indices
+        );
     }
 
     auto name = shape.name;
 
-    auto geometry = Geometry::Create(vertex_data, index_data);
+    auto geometry = Geometry::Create();
     geometry->SetName(name);
-    geometry->SetAttribute({.type = Geometry::VertexAttributeType::Position, .item_size = 3});
-    geometry->SetAttribute({.type = Geometry::VertexAttributeType::Normal, .item_size = 3});
-
-    if (layout.has_uvs) {
-        geometry->SetAttribute({.type = Geometry::VertexAttributeType::UV, .item_size = 2});
-    }
-
-    if (layout.has_tangents) {
-        geometry->SetAttribute({.type = Geometry::VertexAttributeType::Tangent, .item_size = 4});
-    }
-
-    if (layout.has_colors) {
-        geometry->SetAttribute({.type = Geometry::VertexAttributeType::Color, .item_size = 3});
-    }
+    streams.AddTo(*geometry);
 
     // Use the material from the first face. Shapes with mixed
     // materials (usemtl mid-group) are not currently supported.

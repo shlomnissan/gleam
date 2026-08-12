@@ -11,19 +11,22 @@
 #include <vglx/geometries/buffer_attribute.hpp>
 #include <vglx/geometries/geometry.hpp>
 #include <vglx/materials/unlit_material.hpp>
-#include <vglx/scene/instanced_mesh2.hpp>
+#include <vglx/math/matrix4.hpp>
+#include <vglx/scene/instanced_mesh.hpp>
 
+#include <cstddef>
 #include <vector>
 
 namespace {
 
 auto create_mesh(std::size_t count) {
-    auto geometry = vglx::Geometry::Create({0.0f, 0.0f, 0.0f});
-    geometry->SetAttribute({
-        .type = vglx::Geometry::VertexAttributeType::Position,
-        .item_size = 3
-    });
-    return vglx::InstancedMesh2::Create(geometry, vglx::UnlitMaterial::Create(), count);
+    auto geometry = vglx::Geometry::Create();
+    geometry->AddAttribute(vglx::BufferAttribute::Create({
+        .name = vglx::BufferAttribute::kPosition,
+        .format = vglx::BufferAttribute::Format::Float32x3,
+        .rate = vglx::BufferAttribute::Rate::Vertex
+    }, {0.0f, 0.0f, 0.0f}));
+    return vglx::InstancedMesh::Create(geometry, vglx::UnlitMaterial::Create(), count);
 }
 
 auto create_translation(float x, float y, float z) {
@@ -39,7 +42,7 @@ auto create_translation(float x, float y, float z) {
 
 #pragma region Construction
 
-TEST(InstancedMesh2, ConstructorInitializesIdentityTransformsAndWhiteColors) {
+TEST(InstancedMesh, ConstructorInitializesIdentityTransformsAndWhiteColors) {
     const auto mesh = create_mesh(2);
 
     EXPECT_EQ(mesh->GetCount(), 2);
@@ -54,7 +57,7 @@ TEST(InstancedMesh2, ConstructorInitializesIdentityTransformsAndWhiteColors) {
 
 #pragma region Transforms and Colors
 
-TEST(InstancedMesh2, SetTransformAtRoundTripsAndBumpsVersion) {
+TEST(InstancedMesh, SetTransformAtRoundTripsAndBumpsVersion) {
     auto mesh = create_mesh(2);
     const auto transform = create_translation(1.0f, 2.0f, 3.0f);
 
@@ -65,7 +68,7 @@ TEST(InstancedMesh2, SetTransformAtRoundTripsAndBumpsVersion) {
     EXPECT_EQ(mesh->GetInstanceAttribute(vglx::BufferAttribute::kInstanceTransform)->GetVersion(), 1);
 }
 
-TEST(InstancedMesh2, SetColorAtRoundTripsAndBumpsVersion) {
+TEST(InstancedMesh, SetColorAtRoundTripsAndBumpsVersion) {
     auto mesh = create_mesh(2);
 
     mesh->SetColorAt(0, {0.2f, 0.4f, 0.6f});
@@ -81,7 +84,7 @@ TEST(InstancedMesh2, SetColorAtRoundTripsAndBumpsVersion) {
 
 #pragma region Instance Attributes
 
-TEST(InstancedMesh2, AddInstanceAttribute) {
+TEST(InstancedMesh, AddInstanceAttribute) {
     auto mesh = create_mesh(2);
     auto attribute = vglx::BufferAttribute::Create({
         .name = "a_Custom",
@@ -95,7 +98,7 @@ TEST(InstancedMesh2, AddInstanceAttribute) {
     EXPECT_EQ(mesh->GetLayoutVersion(), 1);
 }
 
-TEST(InstancedMesh2, RejectsAttributeWithVertexRate) {
+TEST(InstancedMesh, RejectsAttributeWithVertexRate) {
     auto mesh = create_mesh(2);
 
     mesh->AddInstanceAttribute(vglx::BufferAttribute::Create({
@@ -108,7 +111,7 @@ TEST(InstancedMesh2, RejectsAttributeWithVertexRate) {
     EXPECT_EQ(mesh->GetLayoutVersion(), 0);
 }
 
-TEST(InstancedMesh2, RejectsAttributeWithDuplicateName) {
+TEST(InstancedMesh, RejectsAttributeWithDuplicateName) {
     auto mesh = create_mesh(2);
 
     mesh->AddInstanceAttribute(vglx::BufferAttribute::Create({
@@ -120,7 +123,7 @@ TEST(InstancedMesh2, RejectsAttributeWithDuplicateName) {
     EXPECT_EQ(mesh->GetLayoutVersion(), 0);
 }
 
-TEST(InstancedMesh2, RejectsAttributeWithElementCountMismatch) {
+TEST(InstancedMesh, RejectsAttributeWithElementCountMismatch) {
     auto mesh = create_mesh(2);
 
     // 3 elements for 2 instances
@@ -138,7 +141,7 @@ TEST(InstancedMesh2, RejectsAttributeWithElementCountMismatch) {
 
 #pragma region Bounding Volumes
 
-TEST(InstancedMesh2, BoundingBoxEnclosesAllInstances) {
+TEST(InstancedMesh, BoundingBoxEnclosesAllInstances) {
     auto mesh = create_mesh(2);
     mesh->SetTransformAt(0, create_translation(-1.0f, 0.0f, 0.0f));
     mesh->SetTransformAt(1, create_translation(1.0f, 0.0f, 0.0f));
@@ -149,7 +152,7 @@ TEST(InstancedMesh2, BoundingBoxEnclosesAllInstances) {
     EXPECT_VEC3_EQ(box.max, {1.0f, 0.0f, 0.0f});
 }
 
-TEST(InstancedMesh2, BoundingBoxInvalidatedWhenTransformChanges) {
+TEST(InstancedMesh, BoundingBoxInvalidatedWhenTransformChanges) {
     auto mesh = create_mesh(2);
 
     const auto before = mesh->BoundingBox();

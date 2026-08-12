@@ -7,8 +7,6 @@
 
 #include "vglx/scene/renderable.hpp"
 
-#include "vglx/scene/mesh.hpp"
-
 #include "utilities/logger.hpp"
 
 namespace vglx {
@@ -38,12 +36,12 @@ auto Renderable::CanRender(Renderable* r) -> bool {
         return false;
     }
 
-    if (geometry->VertexData().empty()) {
+    if (geometry->VertexCount() == 0) {
         Logger::Log(level, "Skipped node with no geometry data {}", *r);
         return false;
     }
 
-    if (!geometry->HasAttribute(Geometry::VertexAttributeType::Position)) {
+    if (!geometry->HasPositions()) {
         Logger::Log(level, "Skipped node with no vertex positions {}", *r);
         return false;
     }

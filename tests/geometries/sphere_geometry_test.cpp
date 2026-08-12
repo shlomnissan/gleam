@@ -7,6 +7,7 @@
 
 #include <gtest/gtest.h>
 
+#include <vglx/geometries/buffer_attribute.hpp>
 #include <vglx/primitives/sphere_geometry.hpp>
 
 #pragma region Fixtures
@@ -24,14 +25,12 @@ protected:
 #pragma region Constructor
 
 TEST_F(SphereGeometryTest, ConstructorInitializesVertexData) {
-    const auto& verts = sphere_.VertexData();
-
-    // 8 values per vertex, 12 vertices
-    EXPECT_EQ(verts.size(), 8 * 12);
+    // 12 vertices
+    EXPECT_EQ(sphere_.VertexCount(), 12);
 }
 
 TEST_F(SphereGeometryTest, ConstructorInitializesIndexData) {
-    const auto& index = sphere_.IndexData();
+    const auto& index = sphere_.GetIndexData();
 
     // 36 indices (6 quads * 2 triangles)
     EXPECT_EQ(index.size(), 6 * 6);
@@ -46,16 +45,19 @@ TEST_F(SphereGeometryTest, ConstructorInitializesName) {
 #pragma region Attributes
 
 TEST_F(SphereGeometryTest, AttributesConfiguredCorrectly) {
-    using enum vglx::Geometry::VertexAttributeType;
+    using vglx::BufferAttribute;
 
-    const auto& attrs = sphere_.Attributes();
+    const auto positions = sphere_.GetAttribute(BufferAttribute::kPosition);
+    ASSERT_NE(positions, nullptr);
+    EXPECT_EQ(positions->format, BufferAttribute::Format::Float32x3);
 
-    EXPECT_EQ(attrs[0].type, Position);
-    EXPECT_EQ(attrs[0].item_size, 3u);
-    EXPECT_EQ(attrs[1].type, Normal);
-    EXPECT_EQ(attrs[1].item_size, 3u);
-    EXPECT_EQ(attrs[2].type, UV);
-    EXPECT_EQ(attrs[2].item_size, 2u);
+    const auto normals = sphere_.GetAttribute(BufferAttribute::kNormal);
+    ASSERT_NE(normals, nullptr);
+    EXPECT_EQ(normals->format, BufferAttribute::Format::Float32x3);
+
+    const auto uvs = sphere_.GetAttribute(BufferAttribute::kTexCoord);
+    ASSERT_NE(uvs, nullptr);
+    EXPECT_EQ(uvs->format, BufferAttribute::Format::Float32x2);
 }
 
 #pragma endregion

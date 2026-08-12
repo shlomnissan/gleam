@@ -7,15 +7,15 @@
 
 #include "core/program_attributes.hpp"
 
+#include "vglx/geometries/buffer_attribute.hpp"
 #include "vglx/materials/depth_material.hpp"
+#include "vglx/materials/material.hpp"
 #include "vglx/materials/pbr_material.hpp"
 #include "vglx/materials/phong_material.hpp"
 #include "vglx/materials/shader_material.hpp"
 #include "vglx/materials/sprite_material.hpp"
 #include "vglx/materials/unlit_material.hpp"
 #include "vglx/math/utilities.hpp"
-
-#include <cassert>
 
 namespace vglx {
 
@@ -97,8 +97,8 @@ ProgramAttributes::ProgramAttributes(
     instancing = renderable->GetNodeType() == Node::Type::InstancedMesh;
     num_lights = lights.directional + lights.point + lights.spot;
     flip_normals = material->side != Material::Side::Front;
-    vertex_color = geometry->HasAttribute(Geometry::VertexAttributeType::Color);
-    tangent = geometry->HasAttribute(Geometry::VertexAttributeType::Tangent);
+    vertex_color = geometry->GetAttribute(BufferAttribute::kColor) != nullptr;
+    tangent = geometry->GetAttribute(BufferAttribute::kTangent) != nullptr;
 
     static_assert(std::to_underlying(Material::Type::Length) <= 15);
 

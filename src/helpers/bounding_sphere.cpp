@@ -7,10 +7,15 @@
 
 #include "vglx/helpers/bounding_sphere.hpp"
 
+#include "vglx/geometries/buffer_attribute.hpp"
 #include "vglx/geometries/geometry.hpp"
 #include "vglx/materials/unlit_material.hpp"
+#include "vglx/math/sphere.hpp"
 #include "vglx/math/utilities.hpp"
 #include "vglx/scene/mesh.hpp"
+
+#include <utility>
+#include <vector>
 
 namespace vglx {
 
@@ -57,12 +62,14 @@ auto create_geometry(const Sphere& sphere) {
         }
     }
 
-    auto geometry = Geometry::Create(vertices, indices);
+    auto geometry = Geometry::Create();
+    geometry->AddAttribute(BufferAttribute::Create({
+        .name = BufferAttribute::kPosition,
+        .format = BufferAttribute::Format::Float32x3,
+        .rate = BufferAttribute::Rate::Vertex
+    }, std::move(vertices)));
+    geometry->SetIndices(std::move(indices));
     geometry->primitive = Geometry::PrimitiveType::Lines;
-    geometry->SetAttribute({
-        .type = Geometry::VertexAttributeType::Position,
-        .item_size = 3
-    });
 
     return geometry;
 }

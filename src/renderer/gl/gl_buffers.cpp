@@ -28,8 +28,13 @@ auto update_vertex_buffer_object(GLuint vbo, const BufferAttribute& attribute) -
     );
 }
 
-auto update_element_buffer_object(GLuint ebo, const Geometry2& geometry) -> void {
+auto update_element_buffer_object(GLuint ebo, const Geometry& geometry) -> void {
     const auto& data = geometry.GetIndexData();
+
+    // Index data is deliberately uploaded through GL_ARRAY_BUFFER: binding
+    // GL_ELEMENT_ARRAY_BUFFER here would overwrite the element binding of
+    // whatever VAO is currently bound. Buffer objects aren't typed, so the
+    // target only matters when GLBindingState attaches the buffer to a VAO.
     glBindBuffer(GL_ARRAY_BUFFER, ebo);
     glBufferData(
         GL_ARRAY_BUFFER,
@@ -84,7 +89,7 @@ auto GLBuffers::GetVertexBuffer(BufferAttribute& attribute) -> GLuint {
     return entry.buffer_id;
 }
 
-auto GLBuffers::GetIndexBuffer(Geometry2& geometry) -> GLuint {
+auto GLBuffers::GetIndexBuffer(Geometry& geometry) -> GLuint {
     auto geometry_name = geometry.Name().empty() ? geometry.UUID() : geometry.Name();
 
     if (geometry.Disposed()) {
