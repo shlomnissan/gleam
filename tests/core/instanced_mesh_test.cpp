@@ -15,18 +15,27 @@
 #include <vglx/scene/instanced_mesh.hpp>
 
 #include <cstddef>
+#include <utility>
 #include <vector>
 
 namespace {
 
-auto create_mesh(std::size_t count) {
+auto create_geometry(std::vector<float> positions) {
     auto geometry = vglx::Geometry::Create();
     geometry->AddAttribute(vglx::BufferAttribute::Create({
         .name = vglx::BufferAttribute::kPosition,
         .format = vglx::BufferAttribute::Format::Float32x3,
         .rate = vglx::BufferAttribute::Rate::Vertex
-    }, {0.0f, 0.0f, 0.0f}));
-    return vglx::InstancedMesh::Create(geometry, vglx::UnlitMaterial::Create(), count);
+    }, std::move(positions)));
+    return geometry;
+}
+
+auto create_mesh(std::size_t count) {
+    return vglx::InstancedMesh::Create(
+        create_geometry({0.0f, 0.0f, 0.0f}),
+        vglx::UnlitMaterial::Create(),
+        count
+    );
 }
 
 auto create_translation(float x, float y, float z) {
@@ -162,6 +171,31 @@ TEST(InstancedMesh, BoundingBoxInvalidatedWhenTransformChanges) {
 
     const auto after = mesh->BoundingBox();
     EXPECT_VEC3_EQ(after.max, {2.0f, 0.0f, 0.0f});
+}
+
+TEST(InstancedMesh, BoundingBoxInvalidatedWhenPositionDataChanges) {
+    auto geometry = create_geometry({0.0f, 0.0f, 0.0f});
+    auto mesh = vglx::InstancedMesh::Create(geometry, vglx::UnlitMaterial::Create(), 1);
+
+    const auto before = mesh->BoundingBox();
+    EXPECT_VEC3_EQ(before.max, {0.0f, 0.0f, 0.0f});
+
+    geometry->GetAttribute(vglx::BufferAttribute::kPosition)->SetData({3.0f, 0.0f, 0.0f});
+
+    const auto after = mesh->BoundingBox();
+    EXPECT_VEC3_EQ(after.max, {3.0f, 0.0f, 0.0f});
+}
+
+TEST(InstancedMesh, BoundingBoxInvalidatedWhenGeometryIsSwapped) {
+    auto mesh = create_mesh(1);
+
+    const auto before = mesh->BoundingBox();
+    EXPECT_VEC3_EQ(before.max, {0.0f, 0.0f, 0.0f});
+
+    mesh->SetGeometry(create_geometry({0.0f, 5.0f, 0.0f}));
+
+    const auto after = mesh->BoundingBox();
+    EXPECT_VEC3_EQ(after.max, {0.0f, 5.0f, 0.0f});
 }
 
 #pragma endregion

@@ -12,6 +12,8 @@
 #include "vglx/core/disposable.hpp"
 #include "vglx/core/identity.hpp"
 
+#include <cstdint>
+
 namespace vglx {
 
 /**
@@ -68,7 +70,7 @@ public:
      *
      * RGBA8 textures typically use 4-byte row alignment.
      */
-    enum class RowAlignment : std::uint8_t {
+    enum class RowAlignment : uint8_t {
         OneByte = 1, ///< 1-byte alignment (tightly packed).
         TwoBytes = 2, ///< 2-byte alignment.
         FourBytes = 4, ///< 4-byte alignment (default).

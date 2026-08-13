@@ -14,6 +14,7 @@
 #include "vglx/scene/scene.hpp"
 #include "vglx/textures/texture_2d.hpp"
 
+#include <cstddef>
 #include <expected>
 #include <memory>
 #include <string>

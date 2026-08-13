@@ -154,16 +154,25 @@ auto InstancedMesh::SetColorAt(std::size_t idx, const Color& color) -> void {
 }
 
 auto InstancedMesh::BoundingBox() -> Box3 {
-    auto attribute = GetInstanceAttribute(BufferAttribute::kInstanceTransform);
-    if (attribute == nullptr) {
+    auto transform_attr = GetInstanceAttribute(BufferAttribute::kInstanceTransform);
+    if (transform_attr == nullptr) {
         Logger::Log(LogLevel::Error, "Failed to generate bounding box. Missing transform buffer attribute");
         return {};
     }
 
-    // TODO: include geometry position attribute version in key when it's available
+    auto position_attr = GetGeometry()->GetAttribute(BufferAttribute::kPosition);
+    if (position_attr == nullptr) {
+        return {};
+    }
 
-    if (bounding_box_ && bounding_box_->second == attribute->GetVersion()) {
-        return bounding_box_->first;
+    auto key = BoundsKey {
+        .transform_version = transform_attr->GetVersion(),
+        .position_version = position_attr->GetVersion(),
+        .position_uuid = position_attr->UUID()
+    };
+
+    if (bounding_box_ && bounding_box_->first == key) {
+        return bounding_box_->second;
     }
 
     auto base = GetGeometry()->BoundingBox();
@@ -174,25 +183,34 @@ auto InstancedMesh::BoundingBox() -> Box3 {
     auto box = Box3 {};
     for (auto i = std::size_t {0}; i < count_; ++i) {
         auto b = base;
-        b.ApplyTransform(get_transform_at(i, attribute));
+        b.ApplyTransform(get_transform_at(i, transform_attr));
         box.Union(b);
     }
 
-    bounding_box_ = {box, attribute->GetVersion()};
-    return bounding_box_->first;
+    bounding_box_ = {key, box};
+    return bounding_box_->second;
 }
 
 auto InstancedMesh::BoundingSphere() -> Sphere {
-    auto attribute = GetInstanceAttribute(BufferAttribute::kInstanceTransform);
-    if (attribute == nullptr) {
+    auto transform_attr = GetInstanceAttribute(BufferAttribute::kInstanceTransform);
+    if (transform_attr == nullptr) {
         Logger::Log(LogLevel::Error, "Failed to generate bounding sphere. Missing transform buffer attribute");
         return {};
     }
 
-    // TODO: include geometry position attribute version in key when it's available
+    auto position_attr = GetGeometry()->GetAttribute(BufferAttribute::kPosition);
+    if (position_attr == nullptr) {
+        return {};
+    }
 
-    if (bounding_sphere_ && bounding_sphere_->second == attribute->GetVersion()) {
-        return bounding_sphere_->first;
+    auto key = BoundsKey {
+        .transform_version = transform_attr->GetVersion(),
+        .position_version = position_attr->GetVersion(),
+        .position_uuid = position_attr->UUID()
+    };
+
+    if (bounding_sphere_ && bounding_sphere_->first == key) {
+        return bounding_sphere_->second;
     }
 
     auto base = GetGeometry()->BoundingSphere();
@@ -203,12 +221,12 @@ auto InstancedMesh::BoundingSphere() -> Sphere {
     auto sphere = Sphere {};
     for (auto i = std::size_t {0}; i < count_; ++i) {
         auto s = base;
-        s.ApplyTransform(get_transform_at(i, attribute));
+        s.ApplyTransform(get_transform_at(i, transform_attr));
         sphere.Union(s);
     }
 
-    bounding_sphere_ = {sphere, attribute->GetVersion()};
-    return bounding_sphere_->first;
+    bounding_sphere_ = {key, sphere};
+    return bounding_sphere_->second;
 }
 
 }

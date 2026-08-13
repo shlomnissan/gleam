@@ -9,8 +9,9 @@
 
 #include <array>
 #include <bit>
-#include <cinttypes>
 #include <cmath>
+#include <cstddef>
+#include <cstdint>
 #include <limits>
 #include <random>
 #include <sstream>

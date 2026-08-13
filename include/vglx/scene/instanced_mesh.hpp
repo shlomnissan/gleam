@@ -20,6 +20,7 @@
 #include <cstdint>
 #include <memory>
 #include <optional>
+#include <string>
 #include <string_view>
 #include <utility>
 #include <vector>
@@ -181,6 +182,13 @@ public:
     auto BoundingSphere() -> Sphere override;
 
 private:
+    struct BoundsKey {
+        uint32_t transform_version;
+        uint32_t position_version;
+        std::string position_uuid;
+        auto operator==(const BoundsKey&) const -> bool = default;
+    };
+
     /// @cond INTERNAL
     std::vector<std::shared_ptr<BufferAttribute>> attributes_ {};
 
@@ -188,9 +196,9 @@ private:
 
     uint32_t layout_version_ {0};
 
-    std::optional<std::pair<Box3, uint32_t>> bounding_box_ {};
+    std::optional<std::pair<BoundsKey, Box3>> bounding_box_ {};
 
-    std::optional<std::pair<Sphere, uint32_t>> bounding_sphere_ {};
+    std::optional<std::pair<BoundsKey, Sphere>> bounding_sphere_ {};
     /// @endcond
 };
 
