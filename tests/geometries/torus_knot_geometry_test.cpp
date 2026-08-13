@@ -24,7 +24,7 @@ protected:
 
 #pragma region Constructor
 
-TEST_F(TorusKnotGeometryTest, ConstructorInitializesVertexData) {
+TEST_F(TorusKnotGeometryTest, ConstructorInitializesVertexCount) {
     // (3+1) * (3+1) = 16 vertices
     EXPECT_EQ(torus_knot_.VertexCount(), 16);
 }

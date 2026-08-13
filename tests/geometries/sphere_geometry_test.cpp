@@ -24,7 +24,7 @@ protected:
 
 #pragma region Constructor
 
-TEST_F(SphereGeometryTest, ConstructorInitializesVertexData) {
+TEST_F(SphereGeometryTest, ConstructorInitializesVertexCount) {
     // 12 vertices
     EXPECT_EQ(sphere_.VertexCount(), 12);
 }

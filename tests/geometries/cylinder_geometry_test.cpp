@@ -28,7 +28,7 @@ protected:
 
 #pragma region Constructor
 
-TEST_F(CylinderGeometryTest, ConstructorInitializesVertexData) {
+TEST_F(CylinderGeometryTest, ConstructorInitializesVertexCount) {
     // 14 vertices for the torso
     // 26 vertices for top and bottom cap
     // 40 vertices

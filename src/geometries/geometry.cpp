@@ -70,7 +70,7 @@ auto Geometry::AddAttribute(std::shared_ptr<BufferAttribute> attribute) -> void 
     }
 
     if (GetAttribute(attribute->name) != nullptr) {
-        error("An attribute with this name already exist");
+        error("An attribute with this name already exists");
         return;
     }
 

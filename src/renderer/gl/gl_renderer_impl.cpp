@@ -120,9 +120,12 @@ auto Renderer::Impl::RenderObjects(Scene* scene, Camera* camera) -> void {
         state_.SetBlending(Material::Blending::None);
         textures_.Bind(scene->background, 0);
         background_pass_.Render(scene->background);
+
+        // The background pass binds its own vertex array objects directly,
+        // which invalidates the binding state's current VAO tracking.
+        binding_state_.Reset();
     }
 
-    if (!render_lists_->Transparent().empty())
     for (auto renderable : render_lists_->Transparent()) {
         RenderObject(renderable, scene, camera);
     }

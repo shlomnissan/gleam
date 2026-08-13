@@ -50,7 +50,7 @@ auto lines_geometry() {
         .format = vglx::BufferAttribute::Format::Float32x3,
         .rate = vglx::BufferAttribute::Rate::Vertex
     }, std::move(points)));
-    geometry->SetName("directional light line");
+    geometry->SetName("spot light cone");
     geometry->primitive = vglx::Geometry::PrimitiveType::Lines;
     return geometry;
 }
@@ -65,8 +65,6 @@ struct SpotLight::Impl {
     std::shared_ptr<UnlitMaterial> material;
 
     auto CreateDebugMesh(SpotLight* self) -> void {
-        using enum Geometry::PrimitiveType;
-
         material = UnlitMaterial::Create();
         material->side = Material::Side::TwoSided;
         material->color = self->color;

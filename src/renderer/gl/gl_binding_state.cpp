@@ -50,7 +50,8 @@ auto GLBindingState::Bind(Geometry& geometry, const GLProgram& program) -> GLuin
         RegisterEviction(geometry, key);
     }
 
-    it->second.emplace_back(*entry);
+    it->second.geometry_uuid = geometry.UUID();
+    it->second.entries.emplace_back(*entry);
 
     return entry->vao;
 }
@@ -92,7 +93,8 @@ auto GLBindingState::Bind(InstancedMesh& instanced_mesh, const GLProgram& progra
         RegisterEviction(*transforms_attribute, key);
     }
 
-    it->second.emplace_back(*entry);
+    it->second.geometry_uuid = geometry->UUID();
+    it->second.entries.emplace_back(*entry);
 
     return entry->vao;
 }
@@ -101,7 +103,7 @@ auto GLBindingState::RegisterEviction(Disposable& disposable, const std::string&
     disposable.OnDispose([this, alive = std::weak_ptr(alive_), key](Disposable*) {
         if (alive.expired()) return;
         if (auto it = cache_.find(key); it != cache_.end()) {
-            for (const auto& entry : it->second) {
+            for (const auto& entry : it->second.entries) {
                 if (entry.vao == current_vao_) current_vao_ = 0;
                 glDeleteVertexArrays(1, &entry.vao);
             }
@@ -119,8 +121,18 @@ auto GLBindingState::GetEntry(
     Entry* found {nullptr};
 
     if (auto it = cache_.find(key); it != cache_.end()) {
-        auto& entries = it->second;
-        for (auto& e : entries) {
+        auto& bucket = it->second;
+
+        if (instanced_mesh != nullptr && bucket.geometry_uuid != geometry.UUID()) {
+            for (const auto& e : bucket.entries) {
+                if (e.vao == current_vao_) current_vao_ = 0;
+                glDeleteVertexArrays(1, &e.vao);
+            }
+            bucket.entries.clear();
+            return nullptr;
+        }
+
+        for (auto& e : bucket.entries) {
             if (e.program_id == program.ProgramId()) {
                 found = &e;
                 break;
@@ -241,8 +253,8 @@ auto GLBindingState::CreateEntry(
 }
 
 GLBindingState::~GLBindingState() {
-    for (auto& [_, entries] : cache_) {
-        for (auto& entry : entries) {
+    for (auto& [_, bucket] : cache_) {
+        for (auto& entry : bucket.entries) {
             glDeleteVertexArrays(1, &entry.vao);
         }
     }

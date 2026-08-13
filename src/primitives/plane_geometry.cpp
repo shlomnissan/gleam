@@ -30,9 +30,9 @@ auto generate_geometry(
     const auto segment_w = params.width / grid_x;
     const auto segment_h = params.height / grid_y;
 
-    for (auto iy = 0; iy < grid_y1; ++iy) {
+    for (auto iy = 0u; iy < grid_y1; ++iy) {
         const auto y = iy * segment_h - height_half;
-        for (auto ix = 0; ix < grid_x1; ++ix) {
+        for (auto ix = 0u; ix < grid_x1; ++ix) {
             const auto x = ix * segment_w - width_half;
             const auto u = static_cast<float>(ix) / grid_x;
             const auto v = 1 - (static_cast<float>(iy) / grid_y);
@@ -50,8 +50,8 @@ auto generate_geometry(
         }
     }
 
-    for (auto iy = 0; iy < grid_y; ++iy) {
-        for (auto ix = 0; ix < grid_x; ++ix) {
+    for (auto iy = 0u; iy < grid_y; ++iy) {
+        for (auto ix = 0u; ix < grid_x; ++ix) {
             const auto a = ix + grid_x1 * iy;
             const auto b = ix + grid_x1 * (iy + 1);
             const auto c = ix + 1 + grid_x1 * (iy + 1);

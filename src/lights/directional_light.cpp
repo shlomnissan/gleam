@@ -56,8 +56,6 @@ struct DirectionalLight::Impl {
     std::shared_ptr<UnlitMaterial> material;
 
     auto CreateDebugMesh(DirectionalLight* self) -> void {
-        using enum Geometry::PrimitiveType;
-
         material = UnlitMaterial::Create();
         material->side = Material::Side::TwoSided;
         material->color = self->color;
@@ -115,7 +113,7 @@ auto DirectionalLight::Direction() -> Vector3 {
 
     VGLX_ASSERT(
         target->GetScene() == GetScene(),
-        "SpotLight target must belong to the same scene"
+        "DirectionalLight target must belong to the same scene"
     );
 
     return Normalize(GetWorldPosition() - target->GetWorldPosition());

@@ -48,9 +48,14 @@ private:
         GLuint vao;
     };
 
+    struct Bucket {
+        std::string geometry_uuid;
+        std::vector<Entry> entries;
+    };
+
     std::shared_ptr<bool> alive_ { std::make_shared<bool>(true) };
 
-    std::unordered_map<std::string, std::vector<Entry>> cache_ {};
+    std::unordered_map<std::string, Bucket> cache_ {};
 
     GLBuffers& buffers_;
 

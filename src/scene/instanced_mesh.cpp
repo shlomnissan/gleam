@@ -94,7 +94,7 @@ auto InstancedMesh::AddInstanceAttribute(std::shared_ptr<BufferAttribute> attrib
     }
 
     if (GetInstanceAttribute(attribute->name) != nullptr) {
-        error("An attribute with this name already exist");
+        error("An attribute with this name already exists");
         return;
     }
 

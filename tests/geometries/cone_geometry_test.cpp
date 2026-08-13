@@ -27,7 +27,7 @@ protected:
 
 #pragma region Constructor
 
-TEST_F(ConeGeometryTest, ConstructorInitializesVertexData) {
+TEST_F(ConeGeometryTest, ConstructorInitializesVertexCount) {
     // 14 vertices for the torso
     // 13 vertices for the top cap
     // 27 vertices

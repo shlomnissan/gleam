@@ -67,6 +67,7 @@ GLProgram::GLProgram(const std::vector<ShaderInfo>& shaders) {
         glCompileShader(shader_id);
 
         if (!CheckShaderCompileStatus(shader_id)) {
+            glDeleteShader(shader_id);
             compilation_error = true;
             break;
         }
@@ -135,7 +136,7 @@ auto GLProgram::ProcessUniforms() -> void {
 
     auto max_name_length = GLsizei {0};
     glGetProgramiv(program_id_, GL_ACTIVE_UNIFORM_MAX_LENGTH, &max_name_length);
-    auto buffer = std::string {"", static_cast<size_t>(max_name_length)};
+    auto buffer = std::string(static_cast<size_t>(max_name_length), '\0');
 
     for (auto i = 0; i < n_active_uniforms; ++i) {
         auto length = GLsizei {};
@@ -166,7 +167,7 @@ auto GLProgram::ProcessUniformBlocks() -> void {
 
     GLint max_name_length = 0;
     glGetProgramiv(program_id_, GL_ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH, &max_name_length);
-    auto buffer = std::string {"", static_cast<size_t>(max_name_length)};
+    auto buffer = std::string(static_cast<size_t>(max_name_length), '\0');
 
     for (GLint i = 0; i < n_active_uniforms; ++i) {
         auto length = GLsizei {};
@@ -187,7 +188,7 @@ auto GLProgram::CheckShaderCompileStatus(GLuint shader_id) const -> bool {
     if (success == GL_FALSE) {
         auto length = 0;
         glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &length);
-        auto buffer = std::string {"", static_cast<size_t>(length)};
+        auto buffer = std::string(static_cast<size_t>(length), '\0');
         glGetShaderInfoLog(shader_id, length, nullptr, buffer.data());
         Logger::Log(LogLevel::Error, "Shader compilation error {}", buffer);
     }
@@ -200,7 +201,7 @@ auto GLProgram::CheckProgramLinkStatus() const -> bool {
     if (success == GL_FALSE) {
         auto length = 0;
         glGetProgramiv(program_id_, GL_INFO_LOG_LENGTH, &length);
-        auto buffer = std::string {"", static_cast<size_t>(length)};
+        auto buffer = std::string(static_cast<size_t>(length), '\0');
         glGetProgramInfoLog(program_id_, length, nullptr, buffer.data());
         Logger::Log(LogLevel::Error, "Shader program link error {}", buffer);
     }

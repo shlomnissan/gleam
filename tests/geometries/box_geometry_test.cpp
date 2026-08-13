@@ -28,7 +28,7 @@ protected:
 
 #pragma region Constructor
 
-TEST_F(BoxGeometryTest, ConstructorInitializesVertexData) {
+TEST_F(BoxGeometryTest, ConstructorInitializesVertexCount) {
     // 9 vertices, 6 faces
     EXPECT_EQ(box_.VertexCount(), 9 * 6);
 }

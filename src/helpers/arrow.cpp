@@ -19,7 +19,7 @@ namespace vglx {
 
 namespace {
 
-static constexpr auto kConeHeight = 0.1f;
+constexpr auto kConeHeight = 0.1f;
 
 auto line_geometry(float length) {
     const auto line_geometry = Geometry::Create();

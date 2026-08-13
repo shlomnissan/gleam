@@ -26,7 +26,7 @@ protected:
 
 #pragma region Constructor
 
-TEST_F(PlaneGeometryTest, ConstructorInitializesVertexData) {
+TEST_F(PlaneGeometryTest, ConstructorInitializesVertexCount) {
     // 9 vertices
     EXPECT_EQ(plane_.VertexCount(), 9);
 }
