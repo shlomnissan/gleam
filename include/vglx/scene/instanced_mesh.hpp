@@ -137,11 +137,6 @@ public:
     [[nodiscard]] auto GetCount() const -> size_t { return count_; }
 
     /**
-     * @brief Returns the layout version incremented when attributes are added.
-     */
-    [[nodiscard]] auto GetLayoutVersion() const -> uint32_t { return layout_version_; }
-
-    /**
      * @brief Returns the per-instance transform matrix at the given index.
      *
      * @param idx Instance index.
@@ -193,8 +188,6 @@ private:
     std::vector<std::shared_ptr<BufferAttribute>> attributes_ {};
 
     size_t count_;
-
-    uint32_t layout_version_ {0};
 
     std::optional<std::pair<BoundsKey, Box3>> bounding_box_ {};
 

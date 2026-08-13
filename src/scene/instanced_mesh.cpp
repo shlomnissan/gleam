@@ -104,7 +104,6 @@ auto InstancedMesh::AddInstanceAttribute(std::shared_ptr<BufferAttribute> attrib
     }
 
     attributes_.emplace_back(std::move(attribute));
-    layout_version_++;
 }
 
 auto InstancedMesh::TransformAt(std::size_t idx) const -> Matrix4 {

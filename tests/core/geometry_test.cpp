@@ -52,7 +52,7 @@ TEST(Geometry, AddAttribute) {
 
     EXPECT_EQ(geometry->GetAttribute(vglx::BufferAttribute::kPosition), positions);
     EXPECT_EQ(geometry->VertexCount(), 3);
-    EXPECT_EQ(geometry->GetLayoutVersion(), 1);
+    EXPECT_EQ(geometry->GetAttributes().size(), 1);
 }
 
 TEST(Geometry, AddMultipleAttributesWithMatchingCounts) {
@@ -68,7 +68,7 @@ TEST(Geometry, AddMultipleAttributesWithMatchingCounts) {
     EXPECT_NE(geometry->GetAttribute(vglx::BufferAttribute::kPosition), nullptr);
     EXPECT_NE(geometry->GetAttribute(vglx::BufferAttribute::kTexCoord), nullptr);
     EXPECT_EQ(geometry->VertexCount(), 3);
-    EXPECT_EQ(geometry->GetLayoutVersion(), 2);
+    EXPECT_EQ(geometry->GetAttributes().size(), 2);
 }
 
 TEST(Geometry, RejectsAttributeWithDuplicateName) {
@@ -79,7 +79,7 @@ TEST(Geometry, RejectsAttributeWithDuplicateName) {
     geometry->AddAttribute(create_positions(kTrianglePositions));
 
     EXPECT_EQ(geometry->GetAttribute(vglx::BufferAttribute::kPosition), first_attribute);
-    EXPECT_EQ(geometry->GetLayoutVersion(), 1);
+    EXPECT_EQ(geometry->GetAttributes().size(), 1);
 }
 
 TEST(Geometry, RejectsAttributeWithInstanceRate) {
@@ -92,7 +92,7 @@ TEST(Geometry, RejectsAttributeWithInstanceRate) {
     }, {1.0f, 0.0f, 0.0f}));
 
     EXPECT_EQ(geometry->GetAttribute(vglx::BufferAttribute::kInstanceColor), nullptr);
-    EXPECT_EQ(geometry->GetLayoutVersion(), 0);
+    EXPECT_EQ(geometry->GetAttributes().size(), 0);
 }
 
 TEST(Geometry, RejectsInvalidAttribute) {
@@ -101,7 +101,7 @@ TEST(Geometry, RejectsInvalidAttribute) {
     geometry->AddAttribute(create_positions({}));
 
     EXPECT_EQ(geometry->GetAttribute(vglx::BufferAttribute::kPosition), nullptr);
-    EXPECT_EQ(geometry->GetLayoutVersion(), 0);
+    EXPECT_EQ(geometry->GetAttributes().size(), 0);
 }
 
 TEST(Geometry, RejectsAttributeWithElementCountMismatch) {
@@ -118,7 +118,7 @@ TEST(Geometry, RejectsAttributeWithElementCountMismatch) {
     }));
 
     EXPECT_EQ(geometry->GetAttribute(vglx::BufferAttribute::kTexCoord), nullptr);
-    EXPECT_EQ(geometry->GetLayoutVersion(), 1);
+    EXPECT_EQ(geometry->GetAttributes().size(), 1);
 }
 
 #pragma endregion

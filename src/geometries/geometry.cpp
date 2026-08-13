@@ -81,7 +81,6 @@ auto Geometry::AddAttribute(std::shared_ptr<BufferAttribute> attribute) -> void 
     }
 
     attributes_.emplace_back(std::move(attribute));
-    layout_version_++;
 }
 
 auto Geometry::SetIndices(std::vector<uint32_t> index_data) -> void {

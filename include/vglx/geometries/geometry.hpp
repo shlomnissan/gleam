@@ -167,11 +167,6 @@ public:
     [[nodiscard]] auto GetIndexData() const -> const std::vector<uint32_t>& { return index_data_; }
 
     /**
-     * @brief Returns the layout version incremented when attributes are added.
-     */
-    [[nodiscard]] auto GetLayoutVersion() const -> uint32_t { return layout_version_; }
-
-    /**
      * @brief Returns the index version incremented when indices are replaced.
      *
      * The renderer compares versions to decide when the index buffer needs to
@@ -198,8 +193,6 @@ private:
     std::optional<std::pair<Box3, uint32_t>> bounding_box_ {};
 
     std::optional<std::pair<Sphere, uint32_t>> bounding_sphere_ {};
-
-    uint32_t layout_version_ {0};
 
     uint32_t index_version_ {0};
 

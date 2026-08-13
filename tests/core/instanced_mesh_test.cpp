@@ -104,7 +104,7 @@ TEST(InstancedMesh, AddInstanceAttribute) {
     mesh->AddInstanceAttribute(attribute);
 
     EXPECT_EQ(mesh->GetInstanceAttribute("a_Custom"), attribute);
-    EXPECT_EQ(mesh->GetLayoutVersion(), 1);
+    EXPECT_EQ(mesh->GetInstanceAttributes().size(), 3);
 }
 
 TEST(InstancedMesh, RejectsAttributeWithVertexRate) {
@@ -117,7 +117,7 @@ TEST(InstancedMesh, RejectsAttributeWithVertexRate) {
     }, {0.0f, 1.0f}));
 
     EXPECT_EQ(mesh->GetInstanceAttribute("a_Custom"), nullptr);
-    EXPECT_EQ(mesh->GetLayoutVersion(), 0);
+    EXPECT_EQ(mesh->GetInstanceAttributes().size(), 2);
 }
 
 TEST(InstancedMesh, RejectsAttributeWithDuplicateName) {
@@ -129,7 +129,7 @@ TEST(InstancedMesh, RejectsAttributeWithDuplicateName) {
         .rate = vglx::BufferAttribute::Rate::Instance
     }, std::vector<float>(6, 0.0f)));
 
-    EXPECT_EQ(mesh->GetLayoutVersion(), 0);
+    EXPECT_EQ(mesh->GetInstanceAttributes().size(), 2);
 }
 
 TEST(InstancedMesh, RejectsAttributeWithElementCountMismatch) {
@@ -143,7 +143,7 @@ TEST(InstancedMesh, RejectsAttributeWithElementCountMismatch) {
     }, {0.0f, 1.0f, 2.0f}));
 
     EXPECT_EQ(mesh->GetInstanceAttribute("a_Custom"), nullptr);
-    EXPECT_EQ(mesh->GetLayoutVersion(), 0);
+    EXPECT_EQ(mesh->GetInstanceAttributes().size(), 2);
 }
 
 #pragma endregion
