@@ -217,6 +217,33 @@ TEST(Color, ScalarMultiplicationInPlace) {
     static_assert(c2 == vglx::Color {0.4f, 0.8f, 1.2f});
 }
 
+TEST(Color, ComponentWiseMultiplication) {
+    constexpr auto c1 = vglx::Color {0.2f, 0.4f, 0.6f};
+    constexpr auto c2 = vglx::Color {0.5f, 2.0f, 0.0f};
+
+    constexpr auto result = c1 * c2;
+
+    EXPECT_COLOR_EQ(result, {0.1f, 0.8f, 0.0f});
+
+    static_assert(result == vglx::Color {0.1f, 0.8f, 0.0f});
+}
+
+TEST(Color, ComponentWiseMultiplicationInPlace) {
+    auto c1 = vglx::Color {0.2f, 0.4f, 0.6f};
+    c1 *= vglx::Color {0.5f, 2.0f, 0.0f};
+
+    EXPECT_COLOR_EQ(c1, {0.1f, 0.8f, 0.0f});
+
+    // Compile-time check
+    constexpr auto c2 = []() {
+        auto c = vglx::Color {0.2f, 0.4f, 0.6f};
+        c *= vglx::Color {0.5f, 2.0f, 0.0f};
+        return c;
+    }();
+
+    static_assert(c2 == vglx::Color {0.1f, 0.8f, 0.0f});
+}
+
 #pragma endregion
 
 #pragma region Lerp

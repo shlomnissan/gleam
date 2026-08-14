@@ -128,6 +128,18 @@ public:
     }
 
     /**
+     * @brief Multiplies the color component-wise by another color in-place.
+     *
+     * @param c Color to multiply.
+     */
+    constexpr auto operator*=(const Color& c) -> Color& {
+        r = r * c.r;
+        g = g * c.g;
+        b = b * c.b;
+        return *this;
+    }
+
+    /**
      * @brief Compares two Color objects for equality.
      */
     constexpr auto operator==(const Color&) const -> bool = default;
@@ -179,6 +191,17 @@ public:
  */
 [[nodiscard]] constexpr auto operator*(float n, const Color& v) -> Color {
     return v * n;
+}
+
+/**
+ * @brief Multiplies two colors component-wise.
+ * @related Color
+ *
+ * @param a First color.
+ * @param b Second color.
+ */
+[[nodiscard]] constexpr auto operator*(const Color& a, const Color& b) -> Color {
+    return Color {a.r * b.r, a.g * b.g, a.b * b.b};
 }
 
 /**
