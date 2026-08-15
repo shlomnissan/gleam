@@ -6,18 +6,21 @@
 */
 
 #include <array>
+#include <cmath>
 #include <memory>
 #include <print>
 #include <random>
 
 #include "example_runner.hpp"
 
-const auto colors = std::array<vglx::Color, 3> {0x00FFFF, 0xFFFF00, 0xFF00FF};
+constexpr auto colors = std::array<vglx::Color, 3> {0x00FFFF, 0xFFFF00, 0xFF00FF};
+constexpr auto count = 100;
 
 auto rng {std::mt19937 {0u}};
 auto dist {std::uniform_real_distribution<float> {0.0f, 1.0f}};
-auto color_dist {std::uniform_int_distribution<std::size_t> {0, colors.size() - 1}};
 auto elapsed {0.0f};
+auto camera_target {vglx::Vector3::Zero()};
+auto seeds {std::vector<float>(count * count)};
 
 struct Scene : public ExampleScene {
     vglx::InstancedMesh* mesh {nullptr};
@@ -30,7 +33,6 @@ struct Scene : public ExampleScene {
             std::println(stderr, "Failed to load texture {}", path);
         }
 
-        const auto count = 100;
         mesh = this->Add(vglx::InstancedMesh::Create(
             vglx::BoxGeometry::Create(),
             vglx::UnlitMaterial::Create({
@@ -51,20 +53,33 @@ struct Scene : public ExampleScene {
                 auto d = dist(rng) * (1.0f - l);
                 mesh->SetColorAt(i, colors.front() * vglx::Color {l + d, l - d, l - d});
 
+                seeds[i] = dist(rng);
+
                 i++;
             }
         }
     }
 
-
     auto OnUpdate(float dt) -> void override {
-        elapsed += dt;
-        auto angle = elapsed * 0.25f;
-        auto pos_x = vglx::math::Sin(angle) * 10.0f;
-        auto pos_y = 10.0f;
-        auto pos_z = vglx::math::Cos(angle) * 10.0f;
+        elapsed += dt * 0.5f;
+
+        auto pos_x = vglx::math::Sin(elapsed / 4.0f) * 10.0f;
+        auto pos_y = 8.0f + vglx::math::Cos(elapsed / 2.0f) * 2.0f;
+        auto pos_z = vglx::math::Cos(elapsed / 4.0f) * 10.0f;
+
+        camera_target.x = vglx::math::Sin(elapsed) * -8.0f;
+        camera_target.y = vglx::math::Cos(elapsed) * -8.0f;
+
+        camera->up.x = vglx::math::Sin(elapsed / 400);
         camera->transform.SetPosition({pos_x, pos_y, pos_z});
-        camera->LookAt({0.0f, 0.0f, 0.0f});
+        camera->LookAt(camera_target);
+
+        for (auto i = 0; i < count * count; ++i) {
+            auto transform = vglx::Transform3 {mesh->TransformAt(i)};
+            auto offset = std::abs(vglx::math::Sin((elapsed + seeds[i]) * 5.0f + seeds[i]));
+            transform.position.y = offset;
+            mesh->SetTransformAt(i, transform.Get());
+        }
     }
 };
 
