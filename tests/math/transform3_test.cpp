@@ -373,3 +373,73 @@ TEST(Transform3, TranslateAfterRotation) {
 }
 
 #pragma endregion
+
+#pragma region Decompose
+
+TEST(Transform3, DecomposeRoundTrip) {
+    auto source = vglx::Transform3 {};
+    source.SetPosition({2.0f, 1.0f, 3.0f});
+    source.SetRotation(vglx::Euler {0.1f, 0.2f, 0.3f});
+    source.SetScale({2.0f, 3.0f, 4.0f});
+
+    auto t1 = vglx::Transform3 {source.Get()};
+
+    EXPECT_VEC3_NEAR(t1.position, {2.0f, 1.0f, 3.0f}, 1e-4);
+    EXPECT_VEC3_NEAR(t1.scale, {2.0f, 3.0f, 4.0f}, 1e-4);
+    EXPECT_MAT4_NEAR(t1.Get(), source.Get(), 1e-4);
+
+    // SetFromMatrix replaces every component, not just the ones it can recover.
+    auto t2 = vglx::Transform3 {};
+    t2.SetPosition({-9.0f, -9.0f, -9.0f});
+    t2.SetFromMatrix(source.Get());
+
+    EXPECT_VEC3_NEAR(t2.position, {2.0f, 1.0f, 3.0f}, 1e-4);
+    EXPECT_MAT4_NEAR(t2.Get(), source.Get(), 1e-4);
+
+    constexpr auto t3 = []() {
+        auto t = vglx::Transform3 {};
+        t.SetPosition({2.0f, 1.0f, 3.0f});
+        t.SetScale({2.0f, 3.0f, 4.0f});
+        return vglx::Transform3 {t.Get()};
+    }();
+
+    static_assert(ApproxEqual(t3.position.x, 2.0f));
+    static_assert(ApproxEqual(t3.position.y, 1.0f));
+    static_assert(ApproxEqual(t3.position.z, 3.0f));
+    static_assert(ApproxEqual(t3.scale.x, 2.0f));
+    static_assert(ApproxEqual(t3.scale.y, 3.0f));
+    static_assert(ApproxEqual(t3.scale.z, 4.0f));
+}
+
+TEST(Transform3, DecomposeMirroredBasis) {
+    auto source = vglx::Transform3 {};
+    source.SetRotation(vglx::Euler {0.1f, 0.2f, 0.3f});
+    source.SetScale({1.0f, 1.0f, -1.0f});
+
+    auto t = vglx::Transform3 {};
+    t.SetFromMatrix(source.Get());
+
+    // The sign of the mirror is attributed to x regardless of which axis
+    // carried it originally, so the components differ from the source while
+    // the composed matrix does not.
+    EXPECT_VEC3_NEAR(t.scale, {-1.0f, 1.0f, 1.0f}, 1e-4);
+    EXPECT_MAT4_NEAR(t.Get(), source.Get(), 1e-4);
+}
+
+TEST(Transform3, DecomposeDegenerateBasis) {
+    // The y axis has zero length, so the basis encodes no recoverable rotation.
+    constexpr auto mat = vglx::Matrix4 {
+        1.0f, 0.0f, 0.0f, 4.0f,
+        0.0f, 0.0f, 0.0f, 5.0f,
+        0.0f, 0.0f, 1.0f, 6.0f,
+        0.0f, 0.0f, 0.0f, 1.0f
+    };
+
+    auto t = vglx::Transform3 {mat};
+
+    EXPECT_VEC3_NEAR(t.position, {4.0f, 5.0f, 6.0f}, 1e-4);
+    EXPECT_VEC3_NEAR(t.scale, {1.0f, 0.0f, 1.0f}, 1e-4);
+    EXPECT_EQ(t.rotation, vglx::Quaternion {});
+}
+
+#pragma endregion

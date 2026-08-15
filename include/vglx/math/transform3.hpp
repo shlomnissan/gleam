@@ -44,6 +44,19 @@ public:
     constexpr Transform3() = default;
 
     /**
+     * @brief Constructs a transform from a 4×4 affine matrix.
+     *
+     * Decomposes the matrix into @ref position, @ref rotation, and @ref scale.
+     * See @ref SetFromMatrix for the assumptions the decomposition makes about
+     * the input.
+     *
+     * @param mat Affine transform matrix to decompose.
+     */
+    explicit constexpr Transform3(const Matrix4& mat) {
+        Decompose(mat);
+    }
+
+    /**
      * @brief Translates the transform in local space.
      *
      * If the rotation is not empty, the input vector is rotated by the current
@@ -187,6 +200,24 @@ public:
     }
 
     /**
+     * @brief Replaces every component with those of a 4×4 affine matrix.
+     *
+     * Decomposes the matrix into @ref position, @ref rotation, and @ref scale,
+     * inverting the composition performed by @ref Get.
+     *
+     * The matrix is assumed to be a translation-rotation-scale affine
+     * transform. Shear is not representable and will not survive the round
+     * trip. A mirrored basis (negative determinant) is resolved by negating the
+     * x scale, and a degenerate basis with a zero-length axis carries no
+     * recoverable orientation, so the rotation is left as identity.
+     *
+     * @param mat Affine transform matrix to decompose.
+     */
+    constexpr auto SetFromMatrix(const Matrix4& mat) -> void {
+        Decompose(mat);
+    }
+
+    /**
      * @brief Returns the rotation as Euler angles.
      *
      * Provided as a convenience for inspection; the conversion is lossy near
@@ -222,6 +253,40 @@ public:
 private:
     /// @cond INTERNAL
     Matrix4 transform_ {1.0f};
+
+    constexpr auto Decompose(const Matrix4& mat) -> void {
+        const auto axis_x = Vector3 {mat(0, 0), mat(1, 0), mat(2, 0)};
+        const auto axis_y = Vector3 {mat(0, 1), mat(1, 1), mat(2, 1)};
+        const auto axis_z = Vector3 {mat(0, 2), mat(1, 2), mat(2, 2)};
+
+        auto scale_x = axis_x.Length();
+        const auto scale_y = axis_y.Length();
+        const auto scale_z = axis_z.Length();
+
+        if (Dot(Cross(axis_x, axis_y), axis_z) < 0.0f) {
+            scale_x = -scale_x;
+        }
+
+        position = {mat(0, 3), mat(1, 3), mat(2, 3)};
+        scale = {scale_x, scale_y, scale_z};
+
+        if (scale_x == 0.0f || scale_y == 0.0f || scale_z == 0.0f) {
+            rotation = Quaternion {};
+        } else {
+            const auto inv_x = 1.0f / scale_x;
+            const auto inv_y = 1.0f / scale_y;
+            const auto inv_z = 1.0f / scale_z;
+
+            rotation = Quaternion {{
+                axis_x.x * inv_x, axis_y.x * inv_y, axis_z.x * inv_z, 0.0f,
+                axis_x.y * inv_x, axis_y.y * inv_y, axis_z.y * inv_z, 0.0f,
+                axis_x.z * inv_x, axis_y.z * inv_y, axis_z.z * inv_z, 0.0f,
+                0.0f, 0.0f, 0.0f, 1.0f
+            }};
+        }
+
+        touched = true;
+    }
     /// @endcond
 };
 
