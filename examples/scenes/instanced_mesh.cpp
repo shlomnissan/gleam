@@ -17,11 +17,16 @@
 constexpr auto colors = std::array<vglx::Color, 3> {0x00FFFF, 0xFFFF00, 0xFF00FF};
 constexpr auto row_count = 100;
 constexpr auto total_count = row_count * row_count;
+constexpr auto row_offset = static_cast<float>(row_count - 1) / 2.0f;
+constexpr auto max_distance = vglx::math::Sqrt(2.0f) * row_offset;
 
 auto rng {std::mt19937 {0u}};
 auto dist {std::uniform_real_distribution<float> {0.0f, 1.0f}};
 auto elapsed {0.0f};
 auto camera_target {vglx::Vector3::Zero()};
+auto cycle_time = 0.0f;
+auto curr_color_idx = 0;
+auto next_color_idx = 0;
 
 auto seeds {std::vector<float>(total_count)};
 auto tints {std::vector<vglx::Color>(total_count)};
@@ -41,16 +46,15 @@ struct Scene : public ExampleScene {
         mesh = this->Add(vglx::InstancedMesh::Create(
             vglx::BoxGeometry::Create(),
             vglx::UnlitMaterial::Create({
-                .color = 0x00FFFF,
+                .color = 0xFFFFFF,
                 .texture_map = texture.has_value() ? texture.value() : nullptr
             }),
             total_count
         ));
 
-        auto offset = static_cast<float>(row_count - 1) / 2.0f;
         for (auto x = 0, i = 0; x < row_count; ++x) {
             for (auto z = 0; z < row_count; ++z) {
-                transforms[i].SetPosition({offset - static_cast<float>(x), 0.0f, offset - static_cast<float>(z)});
+                transforms[i].SetPosition({row_offset - static_cast<float>(x), 0.0f, row_offset - static_cast<float>(z)});
                 mesh->SetTransformAt(i, transforms[i].Get());
 
                 auto l = 0.5f + dist(rng) * 0.5f;
@@ -67,6 +71,13 @@ struct Scene : public ExampleScene {
 
     auto OnUpdate(float dt) -> void override {
         elapsed += dt * 0.5f;
+        cycle_time += dt / 2.0f;
+
+        if (cycle_time >= 1.0f) {
+            cycle_time = 0.0f;
+            curr_color_idx = next_color_idx;
+            next_color_idx = (next_color_idx + 1) % colors.size();
+        }
 
         auto pos_x = vglx::math::Sin(elapsed / 4.0f) * 10.0f;
         auto pos_y = 8.0f + vglx::math::Cos(elapsed / 2.0f) * 2.0f;
@@ -84,6 +95,13 @@ struct Scene : public ExampleScene {
             transforms[i].position.y = offset;
             transforms[i].touched = true;
             mesh->SetTransformAt(i, transforms[i].Get());
+
+            if (cycle_time < 1.0f) {
+                auto distance = transforms[i].position.Length() / max_distance;
+                if (distance < cycle_time) {
+                    mesh->SetColorAt(i, colors[next_color_idx] * tints[i]);
+                }
+            }
         }
     }
 };
