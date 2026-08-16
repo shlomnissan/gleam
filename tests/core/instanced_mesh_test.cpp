@@ -65,6 +65,7 @@ TEST(InstancedMesh, ConstructorInitializesIdentityTransformsAndWhiteColors) {
 TEST(InstancedMesh, ZeroCountDefaultsToSingleInstance) {
     auto mesh = create_mesh(0);
     const auto transform = create_translation(1.0f, 2.0f, 3.0f);
+    mesh->SetTransformAt(0, transform);
 
     EXPECT_EQ(mesh->GetCount(), 1);
     EXPECT_MAT4_EQ(mesh->TransformAt(0), transform);

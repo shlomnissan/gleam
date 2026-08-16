@@ -52,6 +52,8 @@ struct Scene : public ExampleScene {
             total_count
         ));
 
+        mesh->frustum_culled = false;
+
         for (auto x = 0, i = 0; x < row_count; ++x) {
             for (auto z = 0; z < row_count; ++z) {
                 transforms[i].SetPosition({row_offset - static_cast<float>(x), 0.0f, row_offset - static_cast<float>(z)});
