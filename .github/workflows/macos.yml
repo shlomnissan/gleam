@@ -15,7 +15,7 @@ jobs:
           brew install doxygen
       - name: Configure
         shell: bash
-        run: cmake -B ${{github.workspace}}/build --preset="dev-debug" -G "Ninja" -D VGLX_BUILD_DOCS=1
+        run: cmake -B ${{github.workspace}}/build --preset="development" -G "Ninja" -D VGLX_BUILD_DOCS=1
       - name: Build
         shell: bash
         run: cmake --build ${{github.workspace}}/build

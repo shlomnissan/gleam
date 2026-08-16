@@ -15,7 +15,7 @@ jobs:
         env:
           CC: gcc-14
           CXX: g++-14
-        run: cmake -B ${{github.workspace}}/build --preset="dev-debug" -G "Ninja"
+        run: cmake -B ${{github.workspace}}/build --preset="development" -G "Ninja"
       - name: Build
         shell: bash
         run: cmake --build ${{github.workspace}}/build

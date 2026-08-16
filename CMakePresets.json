@@ -2,28 +2,14 @@
   "version": 3,
   "configurePresets": [
     {
-      "name": "dev-debug",
-      "binaryDir": "${sourceDir}/build/debug",
+      "name": "development",
+      "binaryDir": "${sourceDir}/build/development",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "VGLX_BUILD_DOCS": "OFF",
         "VGLX_BUILD_EXAMPLES": "ON",
         "VGLX_BUILD_IMGUI": "ON",
         "VGLX_BUILD_TESTS": "ON",
-        "VGLX_LOG_LEVEL": "3",
-        "BUILD_SHARED_LIBS": "OFF"
-      }
-    },
-    {
-      "name": "dev-release",
-      "binaryDir": "${sourceDir}/build/release",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "Release",
-        "VGLX_BUILD_DOCS": "OFF",
-        "VGLX_BUILD_EXAMPLES": "ON",
-        "VGLX_BUILD_IMGUI": "ON",
-        "VGLX_BUILD_TESTS": "ON",
-        "VGLX_LOG_LEVEL": "1",
         "BUILD_SHARED_LIBS": "OFF"
       }
     },
@@ -66,6 +52,18 @@
         "VGLX_LOG_LEVEL": "1",
         "BUILD_SHARED_LIBS": "OFF"
       }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "development-debug",
+      "configurePreset": "development",
+      "configuration": "Debug"
+    },
+    {
+      "name": "development-release",
+      "configurePreset": "development",
+      "configuration": "Release"
     }
   ]
 }

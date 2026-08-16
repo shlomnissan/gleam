@@ -12,13 +12,12 @@ jobs:
         shell: bash
         run: |
           mkdir build
-          cmake -B build --preset="dev-debug"
+          cmake -B build --preset="development"
       - name: Build
         shell: bash
         run: cmake --build build --config Debug
       - name: Test
         shell: bash
         run: |
-          cp -r tests/assets build/tests
           cd build
-          ctest -V
+          ctest -V -C Debug

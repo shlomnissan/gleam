@@ -249,7 +249,13 @@ if (VGLX_BUILD_IMGUI)
     target_compile_definitions(${PROJECT_NAME} PUBLIC VGLX_USE_IMGUI=ON)
 endif()
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE VGLX_LOG_LEVEL=${VGLX_LOG_LEVEL})
+if(VGLX_LOG_LEVEL STREQUAL "")
+    set(vglx_log_level "$<IF:$<CONFIG:Debug>,3,1>")
+else()
+    set(vglx_log_level "${VGLX_LOG_LEVEL}")
+endif()
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE VGLX_LOG_LEVEL=${vglx_log_level})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     POSITION_INDEPENDENT_CODE ON

@@ -10,7 +10,7 @@ set(CMAKE_VISIBILITY_INLINE_HIDDEN ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 
-set(VGLX_LOG_LEVEL "3" CACHE STRING "Default VGLX log level (0=Error, 1=Warning, 2=Info, 3=Debug)")
+set(VGLX_LOG_LEVEL "" CACHE STRING "VGLX log level (0=Error, 1=Warning, 2=Info, 3=Debug). Empty follows the build configuration: 3 for Debug, 1 otherwise")
 
 option(VGLX_BUILD_DOCS "Build API documentation using Doxygen" OFF)
 option(VGLX_BUILD_EXAMPLES "Build example application" ON)
