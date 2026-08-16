@@ -187,6 +187,10 @@ private:
     /// @cond INTERNAL
     std::vector<std::shared_ptr<BufferAttribute>> attributes_ {};
 
+    std::shared_ptr<BufferAttribute> transforms_attr_ {};
+
+    std::shared_ptr<BufferAttribute> colors_attr_ {};
+
     size_t count_;
 
     std::optional<std::pair<BoundsKey, Box3>> bounding_box_ {};

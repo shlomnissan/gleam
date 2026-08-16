@@ -62,6 +62,15 @@ TEST(InstancedMesh, ConstructorInitializesIdentityTransformsAndWhiteColors) {
     EXPECT_FLOAT_EQ(mesh->ColorAt(1).b, 1.0f);
 }
 
+TEST(InstancedMesh, ZeroCountDefaultsToSingleInstance) {
+    auto mesh = create_mesh(0);
+    const auto transform = create_translation(1.0f, 2.0f, 3.0f);
+
+    EXPECT_EQ(mesh->GetCount(), 1);
+    EXPECT_MAT4_EQ(mesh->TransformAt(0), transform);
+    EXPECT_FALSE(mesh->BoundingSphere().IsEmpty());
+}
+
 #pragma endregion
 
 #pragma region Transforms and Colors

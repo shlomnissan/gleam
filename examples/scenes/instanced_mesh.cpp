@@ -18,7 +18,7 @@ constexpr auto colors = std::array<vglx::Color, 3> {0x00FFFF, 0xFFFF00, 0xFF00FF
 constexpr auto row_count = 100;
 constexpr auto total_count = row_count * row_count;
 constexpr auto row_offset = static_cast<float>(row_count - 1) / 2.0f;
-constexpr auto max_distance = vglx::math::Sqrt(2.0f) * row_offset;
+constexpr auto max_distance = vglx::math::Sqrt(2.0f) * row_offset + 1.0f;
 
 auto rng {std::mt19937 {0u}};
 auto dist {std::uniform_real_distribution<float> {0.0f, 1.0f}};
@@ -98,7 +98,7 @@ struct Scene : public ExampleScene {
 
             if (cycle_time < 1.0f) {
                 auto distance = transforms[i].position.Length() / max_distance;
-                if (distance < cycle_time) {
+                if (distance <= cycle_time) {
                     mesh->SetColorAt(i, colors[next_color_idx] * tints[i]);
                 }
             }
