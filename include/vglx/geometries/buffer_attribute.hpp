@@ -129,6 +129,7 @@ public:
     BufferAttribute(const Params& params, std::vector<float> data);
 
     BufferAttribute(const BufferAttribute&) = delete;
+
     auto operator=(const BufferAttribute&) -> BufferAttribute& = delete;
 
     /**

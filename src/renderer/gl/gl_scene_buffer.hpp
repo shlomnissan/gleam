@@ -23,12 +23,10 @@ public:
 
     explicit GLSceneBuffer(const Parameters& params);
 
-    // Non-copyable
     GLSceneBuffer(const GLSceneBuffer&) = delete;
-    auto operator=(const GLSceneBuffer&) -> GLSceneBuffer& = delete;
-
-    // Non-moveable
     GLSceneBuffer(GLSceneBuffer&&) = delete;
+
+    auto operator=(const GLSceneBuffer&) -> GLSceneBuffer& = delete;
     auto operator=(GLSceneBuffer&&) -> GLSceneBuffer& = delete;
 
     [[nodiscard]] auto Initialize() -> std::expected<void, std::string>;

@@ -24,7 +24,8 @@ using EventListener = std::function<void(Event*)>;
 class EventDispatcher {
 public:
     EventDispatcher(const EventDispatcher&) = delete;
-    EventDispatcher& operator=(const EventDispatcher&) = delete;
+
+    auto operator=(const EventDispatcher&) -> EventDispatcher& = delete;
 
     static auto Get() -> EventDispatcher& {
         static auto instance = EventDispatcher {};

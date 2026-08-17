@@ -116,12 +116,10 @@ public:
      */
     explicit Renderer(const Renderer::Parameters& params);
 
-    // Non-copyable
     Renderer(const Renderer&) = delete;
-    auto operator=(const Renderer&) -> Renderer& = delete;
-
-    // Movable
     Renderer(Renderer&&) noexcept;
+
+    auto operator=(const Renderer&) -> Renderer& = delete;
     auto operator=(Renderer&&) noexcept -> Renderer&;
 
     /**

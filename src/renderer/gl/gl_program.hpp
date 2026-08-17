@@ -38,8 +38,9 @@ public:
 
     GLProgram(const GLProgram&) = delete;
     GLProgram(GLProgram&&) = delete;
-    GLProgram& operator=(const GLProgram&) = delete;
-    GLProgram& operator=(GLProgram&&) = delete;
+
+    auto operator=(const GLProgram&) -> GLProgram& = delete;
+    auto operator=(GLProgram&&) -> GLProgram& = delete;
 
     [[nodiscard]] auto GetVertexAttributeLocations() const -> const std::vector<VertexAttributeLocation>& {
         return vertex_attribute_locations_;

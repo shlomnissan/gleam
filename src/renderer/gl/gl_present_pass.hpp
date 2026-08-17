@@ -25,12 +25,10 @@ class GLPresentPass {
 public:
     GLPresentPass() = default;
 
-    // Non-copyable
     GLPresentPass(const GLPresentPass&) = delete;
-    auto operator=(const GLPresentPass&) -> GLPresentPass& = delete;
-
-    // Non-moveable
     GLPresentPass(GLPresentPass&&) = delete;
+
+    auto operator=(const GLPresentPass&) -> GLPresentPass& = delete;
     auto operator=(GLPresentPass&&) -> GLPresentPass& = delete;
 
     auto Initialize() -> std::expected<void, std::string>;

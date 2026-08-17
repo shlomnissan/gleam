@@ -22,12 +22,10 @@ public:
 
     Disposable() = default;
 
-    // Non-copyable
     Disposable(const Disposable&) = delete;
-    auto operator=(const Disposable&) -> Disposable& = delete;
-
-    // Non-moveable
     Disposable(Disposable&&) = delete;
+
+    auto operator=(const Disposable&) -> Disposable& = delete;
     auto operator=(Disposable&&) -> Disposable& = delete;
 
     auto Dispose() -> void {

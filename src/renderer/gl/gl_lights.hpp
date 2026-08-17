@@ -58,12 +58,10 @@ public:
 
     GLLights() = default;
 
-    // delete copy constructor and assignment operator
     GLLights(const GLLights&) = delete;
-    auto operator=(const GLLights&) -> GLLights& = delete;
-
-    // delete move constructor and assignment operator
     GLLights(GLLights&&) = delete;
+
+    auto operator=(const GLLights&) -> GLLights& = delete;
     auto operator=(GLLights&&) -> GLLights& = delete;
 
     auto AddLight(

@@ -33,13 +33,11 @@ class GLUniformBuffer {
 public:
     GLUniformBuffer(std::string_view name, std::size_t size);
 
-    // implement move constructor and assignment operator
-    GLUniformBuffer(GLUniformBuffer&& other) noexcept;
-    auto operator=(GLUniformBuffer&& other) noexcept -> GLUniformBuffer&;
-
-    // delete copy constructor and assignment operator
     GLUniformBuffer(const GLUniformBuffer&) = delete;
+    GLUniformBuffer(GLUniformBuffer&& other) noexcept;
+
     auto operator=(const GLUniformBuffer&) -> GLUniformBuffer& = delete;
+    auto operator=(GLUniformBuffer&& other) noexcept -> GLUniformBuffer&;
 
     auto UploadIfNeeded(const void* data, std::size_t size) const -> void;
 

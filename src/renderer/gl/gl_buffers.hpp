@@ -26,6 +26,7 @@ public:
 
     GLBuffers(const GLBuffers&) = delete;
     GLBuffers(GLBuffers&&) = delete;
+
     auto operator=(const GLBuffers&) -> GLBuffers& = delete;
     auto operator=(GLBuffers&&) -> GLBuffers& = delete;
 

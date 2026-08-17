@@ -30,6 +30,7 @@ public:
 
     GLBindingState(const GLBindingState&) = delete;
     GLBindingState(GLBindingState&&) = delete;
+
     auto operator=(const GLBindingState&) -> GLBindingState& = delete;
     auto operator=(GLBindingState&&) -> GLBindingState& = delete;
 

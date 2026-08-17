@@ -18,11 +18,11 @@ class ThreadPool {
 public:
     explicit ThreadPool(size_t thread_count = 0);
 
-    ThreadPool(ThreadPool&&) noexcept;
-    auto operator=(ThreadPool&&) noexcept -> ThreadPool&;
-
     ThreadPool(const ThreadPool&) = delete;
+    ThreadPool(ThreadPool&&) noexcept;
+
     auto operator=(const ThreadPool&) -> ThreadPool& = delete;
+    auto operator=(ThreadPool&&) noexcept -> ThreadPool&;
 
     auto Enqueue(std::function<void()> job) -> bool;
 

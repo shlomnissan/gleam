@@ -63,13 +63,11 @@ class GLTextures {
 public:
     GLTextures() = default;
 
-    // delete copy constructor and assignment operator
     GLTextures(const GLTextures&) = delete;
-    GLTextures& operator=(const GLTextures&) = delete;
-
-    // delete move constructor and assignment operator
     GLTextures(GLTextures&&) = delete;
-    GLTextures& operator=(GLTextures&&) = delete;
+
+    auto operator=(const GLTextures&) -> GLTextures& = delete;
+    auto operator=(GLTextures&&) -> GLTextures& = delete;
 
     auto Bind(const std::shared_ptr<Texture>& texture, int tex_unit) -> void;
 

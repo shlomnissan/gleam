@@ -35,12 +35,10 @@ class GLShadowMaps {
 public:
     GLShadowMaps() = default;
 
-    // Non-copyable
     GLShadowMaps(const GLShadowMaps&) = delete;
-    auto operator=(const GLShadowMaps&) -> GLShadowMaps& = delete;
-
-    // Non-moveable
     GLShadowMaps(GLShadowMaps&&) = delete;
+
+    auto operator=(const GLShadowMaps&) -> GLShadowMaps& = delete;
     auto operator=(GLShadowMaps&&) -> GLShadowMaps& = delete;
 
     auto Initialize() -> std::expected<void, std::string>;

@@ -23,13 +23,11 @@ class GLFramebuffers {
 public:
     GLFramebuffers() = default;
 
-    // delete copy constructor and assignment operator
     GLFramebuffers(const GLFramebuffers&) = delete;
-    GLFramebuffers& operator=(const GLFramebuffers&) = delete;
-
-    // delete move constructor and assignment operator
     GLFramebuffers(GLFramebuffers&&) = delete;
-    GLFramebuffers& operator=(GLFramebuffers&&) = delete;
+
+    auto operator=(const GLFramebuffers&) -> GLFramebuffers& = delete;
+    auto operator=(GLFramebuffers&&) -> GLFramebuffers& = delete;
 
     auto Begin(RenderTarget* target) -> void;
 

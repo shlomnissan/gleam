@@ -92,12 +92,10 @@ public:
      */
     explicit Window(const Window::Parameters& params);
 
-    // Non-copyable
     Window(const Window&) = delete;
-    auto operator=(const Window&) -> Window& = delete;
-
-    // Movable
     Window(Window&&) noexcept;
+
+    auto operator=(const Window&) -> Window& = delete;
     auto operator=(Window&&) noexcept -> Window&;
 
     /**

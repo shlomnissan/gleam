@@ -33,8 +33,9 @@ public:
 
     Impl(const Impl&) = delete;
     Impl(Impl&&) = delete;
-    Impl& operator=(const Impl&) = delete;
-    Impl& operator=(Impl&&) = delete;
+
+    auto operator=(const Impl&) -> Impl& = delete;
+    auto operator=(Impl&&) -> Impl& = delete;
 
     [[nodiscard]] auto Initialize() -> std::expected<void, std::string>;
 

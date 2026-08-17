@@ -66,13 +66,11 @@ struct Image {
           width(params.width),
           height(params.height) {}
 
-    // Non-copyable
     Image(const Image&) = delete;
-    auto operator=(const Image&) -> Image& = delete;
-
-    // Moveable
     Image(Image&&) noexcept = default;
-    auto operator=(Image&&) noexcept -> Image&  = default;
+
+    auto operator=(const Image&) -> Image& = delete;
+    auto operator=(Image&&) noexcept -> Image& = default;
 
     /**
      * @brief Creates a shared instance of @ref Image.
