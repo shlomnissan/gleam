@@ -90,7 +90,7 @@ auto GLBuffers::GetVertexBuffer(BufferAttribute& attribute) -> GLuint {
 }
 
 auto GLBuffers::GetIndexBuffer(Geometry& geometry) -> GLuint {
-    auto geometry_name = geometry.Name().empty() ? geometry.UUID() : geometry.Name();
+    const auto& geometry_name = geometry.DisplayName();
 
     if (geometry.Disposed()) {
         Logger::Log(

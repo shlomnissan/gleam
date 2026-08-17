@@ -90,7 +90,7 @@ auto GLFramebuffers::CreateFramebuffer(RenderTarget* target) -> GLFramebuffer {
 
     framebuffers_.emplace_back(target->UUID(), framebuffer);
 
-    target->OnDispose([this, alive = std::weak_ptr(alive_), name = target->Name().empty() ? target->UUID() : target->Name()](const std::string& target_uuid) {
+    target->OnDispose([this, alive = std::weak_ptr(alive_), name = target->DisplayName()](const std::string& target_uuid) {
         if (alive.expired()) return;
         auto it = std::ranges::find(framebuffers_, target_uuid, &std::pair<std::string, GLFramebuffer>::first);
         if (it != framebuffers_.end()) {
@@ -112,7 +112,7 @@ auto GLFramebuffers::GetFramebuffer(const std::string& uuid) -> GLFramebuffer* {
 
 auto GLFramebuffers::Begin(RenderTarget* target) -> void {
     if (target->Disposed()) {
-        auto name = target->Name().empty() ? target->UUID() : target->Name();
+        const auto& name = target->DisplayName();
         Logger::Log(LogLevel::Error, "Failed to bind render target {}. Render target marked as disposed", name);
         return;
     }

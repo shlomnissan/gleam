@@ -23,14 +23,16 @@ WireframeGeometry::WireframeGeometry(const Geometry* geometry) {
     if (geometry->primitive != Geometry::PrimitiveType::Triangles) {
         Logger::Log(
             LogLevel::Error,
-            "Failed to initialize wireframe geometry with non-triangulated source"
+            "Failed to initialize wireframe geometry with non-triangulated source {}",
+            geometry->DisplayName()
         );
     }
 
     if (geometry->GetIndexData().empty()) {
         Logger::Log(
             LogLevel::Error,
-            "Failed to initialize wireframe geometry with non-indexed source"
+            "Failed to initialize wireframe geometry with non-indexed source {}",
+            geometry->DisplayName()
         );
         return;
     }

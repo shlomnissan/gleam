@@ -29,7 +29,7 @@ auto GLBindingState::Bind(Geometry& geometry, const GLProgram& program) -> GLuin
     const auto& key = geometry.UUID();
 
     if (geometry.Disposed()) {
-        auto name = geometry.Name().empty() ? key : geometry.Name();
+        const auto& name = geometry.DisplayName();
         Logger::Log(LogLevel::Error, "Failed to bind geometry {}. Geometry marked as disposed", name);
         return 0;
     }
@@ -40,7 +40,7 @@ auto GLBindingState::Bind(Geometry& geometry, const GLProgram& program) -> GLuin
 
     auto entry = CreateEntry(key, geometry, program);
     if (!entry.has_value()) {
-        auto name = geometry.Name().empty() ? key : geometry.Name();
+        const auto& name = geometry.DisplayName();
         Logger::Log(LogLevel::Error, "Failed to bind geometry {}. {}", name, entry.error());
         return 0;
     }
@@ -61,14 +61,14 @@ auto GLBindingState::Bind(InstancedMesh& instanced_mesh, const GLProgram& progra
 
     auto geometry = instanced_mesh.GetGeometry();
     if (geometry == nullptr || geometry->Disposed()) {
-        auto name = instanced_mesh.Name().empty() ? key : instanced_mesh.Name();
+        const auto& name = instanced_mesh.DisplayName();
         Logger::Log(LogLevel::Error, "Failed to bind instanced mesh {}. Missing or disposed geometry", name);
         return 0;
     }
 
     auto transforms_attribute = instanced_mesh.GetInstanceAttribute(BufferAttribute::kInstanceTransform);
     if (transforms_attribute == nullptr || transforms_attribute->Disposed()) {
-        auto name = instanced_mesh.Name().empty() ? key : instanced_mesh.Name();
+        const auto& name = instanced_mesh.DisplayName();
         Logger::Log(LogLevel::Error, "Failed to bind instanced mesh {}. Missing or disposed transforms buffer attribute", name);
         return 0;
     }
@@ -79,7 +79,7 @@ auto GLBindingState::Bind(InstancedMesh& instanced_mesh, const GLProgram& progra
 
     auto entry = CreateEntry(key, *geometry, program, &instanced_mesh);
     if (!entry.has_value()) {
-        auto name = instanced_mesh.Name().empty() ? key : instanced_mesh.Name();
+        const auto& name = instanced_mesh.DisplayName();
         Logger::Log(LogLevel::Error, "Failed to bind instanced mesh {}. {}", name, entry.error());
         return 0;
     }

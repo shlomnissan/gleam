@@ -45,8 +45,8 @@ auto DynamicTexture2D::UpdateSubregion(
     if (mip_level >= mips) {
         Logger::Log(
             LogLevel::Error,
-            "UpdateSubregion failed: mip level {} is out of range (max {})",
-            mip_level, mips - 1
+            "UpdateSubregion failed for texture {}: mip level {} is out of range (max {})",
+            DisplayName(), mip_level, mips - 1
         );
         return;
     }
@@ -54,8 +54,8 @@ auto DynamicTexture2D::UpdateSubregion(
     if (w <= 0 || h <= 0) {
         Logger::Log(
             LogLevel::Error,
-            "UpdateSubregion failed: invalid subregion size ({} x {})",
-            w, h
+            "UpdateSubregion failed for texture {}: invalid subregion size ({} x {})",
+            DisplayName(), w, h
         );
         return;
     }
@@ -64,8 +64,8 @@ auto DynamicTexture2D::UpdateSubregion(
     if (x < 0 || y < 0 || x + w > mw || y + h > mh) {
         Logger::Log(
             LogLevel::Error,
-            "UpdateSubregion failed: subregion exceeds mip {} dimensions ({} x {})",
-            mip_level, mw, mh
+            "UpdateSubregion failed for texture {}: subregion exceeds mip {} dimensions ({} x {})",
+            DisplayName(), mip_level, mw, mh
         );
         return;
     }
@@ -75,8 +75,8 @@ auto DynamicTexture2D::UpdateSubregion(
     if (static_cast<int>(data.size()) != expected) {
         Logger::Log(
             LogLevel::Error,
-            "UpdateSubregion failed: data size mismatch (got {} bytes, expected {} bytes)",
-            data.size(), expected
+            "UpdateSubregion failed for texture {}: data size mismatch (got {} bytes, expected {} bytes)",
+            DisplayName(), data.size(), expected
         );
         return;
     }

@@ -21,6 +21,10 @@ public:
 
     [[nodiscard]] const auto& Name() const { return name_; }
 
+    [[nodiscard]] const auto& DisplayName() const {
+        return name_.empty() ? uuid_ : name_;
+    }
+
     auto SetName(std::string_view name) { name_ = name; }
 
 private:

@@ -200,7 +200,7 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
         Logger::Log(LogLevel::Error, "OpenGL error failed to generate texture");
     }
 
-    texture->OnDispose([tex_id, name = texture->Name().empty() ? texture->UUID() : texture->Name()](const std::string&) {
+    texture->OnDispose([tex_id, name = texture->DisplayName()](const std::string&) {
         glDeleteTextures(1, &tex_id);
         Logger::Log(LogLevel::Debug, "Texture buffer cleared {}", name);
     });

@@ -651,7 +651,11 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
     for (auto light : lights) {
         auto config = light->GetShadow();
         if (config == nullptr) {
-            Logger::Log(LogLevel::Error, "Failed to read shadow config from light source");
+            Logger::Log(
+                LogLevel::Error,
+                "Failed to read shadow config from light source {}",
+                light->DisplayName()
+            );
             continue;
         }
 
@@ -766,7 +770,12 @@ auto Renderer::Impl::SetShadowMap(ShadowMap shadow_map) -> void {
 auto Renderer::Impl::CreateTextureFromRenderTarget(RenderTarget* target) -> std::shared_ptr<Texture2D> {
     const auto tex_id = framebuffers_.GetColorAttachment(target);
     if (tex_id == 0) {
-        Logger::Log(LogLevel::Error, "Failed to retrieve color attachment from target");
+        Logger::Log(
+            LogLevel::Error,
+            "Failed to retrieve color attachment from target {}",
+            target->DisplayName()
+        );
+
         return {};
     }
 
