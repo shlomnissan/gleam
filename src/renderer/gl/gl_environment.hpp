@@ -57,7 +57,7 @@ private:
     std::unique_ptr<GLProgram> prg_prefiltered_cube_;
     std::unique_ptr<GLProgram> prg_brdf_lut_;
 
-    std::vector<std::pair<Texture*, GLEnvironmentMaps>> cache_;
+    std::vector<std::pair<std::string, GLEnvironmentMaps>> cache_;
 
     GLuint fbo_ {0};
     GLuint vao_ {0};

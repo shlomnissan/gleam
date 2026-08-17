@@ -10,7 +10,6 @@
 #include "vglx_export.h"
 
 #include "vglx/core/disposable.hpp"
-#include "vglx/core/identity.hpp"
 
 #include <cstddef>
 #include <cstdint>
@@ -57,7 +56,7 @@ namespace vglx {
  *
  * @ingroup GeometryGroup
  */
-class VGLX_EXPORT BufferAttribute : public Disposable, public Identity {
+class VGLX_EXPORT BufferAttribute : public Disposable {
 public:
     /**
      * @name Known attribute names
@@ -194,8 +193,6 @@ public:
      * The renderer compares versions to decide when the attribute needs to be re-uploaded.
      */
     [[nodiscard]] auto GetVersion() const -> uint32_t { return version_; }
-
-    virtual ~BufferAttribute();
 
 private:
     /// @cond INTERNAL

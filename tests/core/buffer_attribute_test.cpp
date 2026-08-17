@@ -9,6 +9,7 @@
 
 #include <vglx/geometries/buffer_attribute.hpp>
 
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -171,7 +172,7 @@ TEST(BufferAttribute, DisposeFiresCallbackOnce) {
     auto attribute = create_attribute(vglx::BufferAttribute::Format::Float32x1, {1.0f});
     auto calls = 0;
 
-    attribute->OnDispose([&calls](vglx::Disposable*) { calls++; });
+    attribute->OnDispose([&calls](const std::string&) { calls++; });
     attribute->Dispose();
     attribute->Dispose();
 
@@ -183,7 +184,7 @@ TEST(BufferAttribute, DisposeFiresOnDestruction) {
 
     {
         auto attribute = create_attribute(vglx::BufferAttribute::Format::Float32x1, {1.0f});
-        attribute->OnDispose([&calls](vglx::Disposable*) { calls++; });
+        attribute->OnDispose([&calls](const std::string&) { calls++; });
     }
 
     EXPECT_EQ(calls, 1);

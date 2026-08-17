@@ -13,6 +13,7 @@
 #include <vglx/geometries/geometry.hpp>
 #include <vglx/math/box3.hpp>
 
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -241,7 +242,7 @@ TEST(Geometry, DisposeFiresCallbackOnce) {
     auto geometry = vglx::Geometry::Create();
     auto calls = 0;
 
-    geometry->OnDispose([&calls](vglx::Disposable*) { calls++; });
+    geometry->OnDispose([&calls](const std::string&) { calls++; });
     geometry->Dispose();
     geometry->Dispose();
 
@@ -253,7 +254,7 @@ TEST(Geometry, DisposeFiresOnDestruction) {
 
     {
         auto geometry = vglx::Geometry::Create();
-        geometry->OnDispose([&calls](vglx::Disposable*) { calls++; });
+        geometry->OnDispose([&calls](const std::string&) { calls++; });
     }
 
     EXPECT_EQ(calls, 1);

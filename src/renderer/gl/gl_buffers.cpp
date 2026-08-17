@@ -137,7 +137,7 @@ auto GLBuffers::GetIndexBuffer(Geometry& geometry) -> GLuint {
 }
 
 auto GLBuffers::RegisterEviction(Disposable& disposable, const std::string& uuid) -> void {
-    disposable.OnDispose([this, alive = std::weak_ptr(alive_), uuid](Disposable*) {
+    disposable.OnDispose([this, alive = std::weak_ptr(alive_), uuid](const std::string&) {
         if (alive.expired()) return;
         if (auto it = cache_.find(uuid); it != cache_.end()) {
             glDeleteBuffers(1, &it->second.buffer_id);

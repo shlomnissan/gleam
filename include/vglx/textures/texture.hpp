@@ -10,7 +10,6 @@
 #include "vglx_export.h"
 
 #include "vglx/core/disposable.hpp"
-#include "vglx/core/identity.hpp"
 
 #include <cstdint>
 
@@ -25,7 +24,7 @@ namespace vglx {
  *
  * @ingroup TexturesGroup
  */
-class VGLX_EXPORT Texture : public Disposable, public Identity {
+class VGLX_EXPORT Texture : public Disposable {
 public:
     /**
      * @brief Enumerates all supported texture types.

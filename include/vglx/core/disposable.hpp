@@ -8,14 +8,17 @@
 #pragma once
 
 #include <functional>
+#include <string>
 #include <vector>
+
+#include "identity.hpp"
 
 namespace vglx {
 
 /// @cond INTERNAL
-class Disposable {
+class Disposable : public Identity {
 public:
-    using OnDisposeCallback = std::function<void(Disposable*)>;
+    using OnDisposeCallback = std::function<void(const std::string&)>;
 
     Disposable() = default;
 
@@ -27,14 +30,14 @@ public:
     Disposable(Disposable&&) = delete;
     auto operator=(Disposable&&) -> Disposable& = delete;
 
-    virtual auto Dispose() -> void {
+    auto Dispose() -> void {
         if (!disposed_) {
             disposed_ = true;
-            for (const auto& c : dispose_callbacks_) c(this);
+            for (const auto& c : dispose_callbacks_) c(UUID());
         }
     }
 
-    [[nodiscard]] virtual auto Disposed() -> bool { return disposed_; }
+    [[nodiscard]] auto Disposed() -> bool { return disposed_; }
 
     auto OnDispose(const OnDisposeCallback& callback) {
         dispose_callbacks_.emplace_back(callback);

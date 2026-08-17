@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <string>
 #include <utility>
 #include <variant>
 
@@ -199,9 +200,9 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
         Logger::Log(LogLevel::Error, "OpenGL error failed to generate texture");
     }
 
-    texture->OnDispose([](Disposable* target) {
-        glDeleteTextures(1, &(static_cast<Texture*>(target)->renderer_id));
-        Logger::Log(LogLevel::Debug, "Texture buffer cleared {}", *static_cast<Texture*>(target));
+    texture->OnDispose([tex_id, name = texture->Name().empty() ? texture->UUID() : texture->Name()](const std::string&) {
+        glDeleteTextures(1, &tex_id);
+        Logger::Log(LogLevel::Debug, "Texture buffer cleared {}", name);
     });
 
     return tex_id;

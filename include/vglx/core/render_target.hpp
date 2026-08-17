@@ -10,7 +10,6 @@
 #include "vglx_export.h"
 
 #include "vglx/core/disposable.hpp"
-#include "vglx/core/identity.hpp"
 #include "vglx/textures/texture.hpp"
 
 #include <cstdint>
@@ -20,7 +19,7 @@
 
 namespace vglx {
 
-class VGLX_EXPORT RenderTarget : public Disposable, public Identity {
+class VGLX_EXPORT RenderTarget : public Disposable {
 public:
     struct Parameters {
         int width;
@@ -39,8 +38,6 @@ public:
     const bool has_depth;
 
     const bool enable_readback;
-
-    unsigned int renderer_id;
 
     explicit RenderTarget(const Parameters& params);
 

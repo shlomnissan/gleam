@@ -10,7 +10,6 @@
 #include "vglx_export.h"
 
 #include "vglx/core/disposable.hpp"
-#include "vglx/core/identity.hpp"
 #include "vglx/geometries/buffer_attribute.hpp"
 #include "vglx/math/box3.hpp"
 #include "vglx/math/sphere.hpp"
@@ -62,7 +61,7 @@ namespace vglx {
  *
  * @ingroup GeometryGroup
  */
-class VGLX_EXPORT Geometry : public Disposable, public Identity {
+class VGLX_EXPORT Geometry : public Disposable {
 public:
     /**
      * @brief Primitive topology used when rendering this geometry.
@@ -181,8 +180,6 @@ public:
      * For non-indexed geometry this value is zero.
      */
     [[nodiscard]] auto GetMaxIndex() const -> uint32_t { return max_index_; }
-
-    virtual ~Geometry();
 
 private:
     /// @cond INTERNAL

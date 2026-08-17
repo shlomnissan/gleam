@@ -88,21 +88,15 @@ auto GLFramebuffers::CreateFramebuffer(RenderTarget* target) -> GLFramebuffer {
         return GLFramebuffer { .fbo = 0 };
     }
 
-    target->renderer_id = framebuffer.fbo;
-    framebuffers_.emplace_back(target, framebuffer);
+    framebuffers_.emplace_back(target->UUID(), framebuffer);
 
-    target->OnDispose([this](Disposable* d) {
-        auto* target = static_cast<RenderTarget*>(d);
-
-        auto it = std::ranges::find_if(framebuffers_, [target](const auto& e) {
-            return e.first == target;
-        });
-
+    target->OnDispose([this, alive = std::weak_ptr(alive_), name = target->Name().empty() ? target->UUID() : target->Name()](const std::string& target_uuid) {
+        if (alive.expired()) return;
+        auto it = std::ranges::find(framebuffers_, target_uuid, &std::pair<std::string, GLFramebuffer>::first);
         if (it != framebuffers_.end()) {
-            target->renderer_id = 0;
             DisposeFramebuffer(it->second);
             framebuffers_.erase(it);
-            Logger::Log(LogLevel::Debug, "Framebuffer object cleared", *target);
+            Logger::Log(LogLevel::Debug, "Framebuffer object cleared {}", name);
         }
     });
 
@@ -111,17 +105,20 @@ auto GLFramebuffers::CreateFramebuffer(RenderTarget* target) -> GLFramebuffer {
     return framebuffer;
 }
 
-auto GLFramebuffers::GetFramebuffer(RenderTarget* target) -> GLFramebuffer {
-    auto it = std::ranges::find_if(framebuffers_, [target](const auto& entry) {
-        return entry.first == target;
-    });
-    if (it != framebuffers_.end()) return it->second;
-
-    return CreateFramebuffer(target);
+auto GLFramebuffers::GetFramebuffer(const std::string& uuid) -> GLFramebuffer* {
+    auto it = std::ranges::find(framebuffers_, uuid, &std::pair<std::string, GLFramebuffer>::first);
+    return it != framebuffers_.end() ? &it->second : nullptr;
 }
 
 auto GLFramebuffers::Begin(RenderTarget* target) -> void {
-    auto framebuffer = GetFramebuffer(target);
+    if (target->Disposed()) {
+        auto name = target->Name().empty() ? target->UUID() : target->Name();
+        Logger::Log(LogLevel::Error, "Failed to bind render target {}. Render target marked as disposed", name);
+        return;
+    }
+
+    auto* existing = GetFramebuffer(target->UUID());
+    auto framebuffer = existing != nullptr ? *existing : CreateFramebuffer(target);
     if (framebuffer.fbo == 0) {
         return;
     }
@@ -132,14 +129,13 @@ auto GLFramebuffers::Begin(RenderTarget* target) -> void {
 }
 
 auto GLFramebuffers::End(RenderTarget* target) -> void {
-    if (target->enable_readback) {
-        auto framebuffer = GetFramebuffer(target);
-        auto format = to_gl_tex_format(target->format);
-
-        glBindTexture(GL_TEXTURE_2D, framebuffer.color_attachment);
-        glGetTexImage(GL_TEXTURE_2D, 0, format.source_format, format.type, target->color_data_.data());
-
-        target->has_readback_ = true;
+    if (target->enable_readback && !target->Disposed()) {
+        if (auto* framebuffer = GetFramebuffer(target->UUID())) {
+            auto format = to_gl_tex_format(target->format);
+            glBindTexture(GL_TEXTURE_2D, framebuffer->color_attachment);
+            glGetTexImage(GL_TEXTURE_2D, 0, format.source_format, format.type, target->color_data_.data());
+            target->has_readback_ = true;
+        }
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -147,8 +143,10 @@ auto GLFramebuffers::End(RenderTarget* target) -> void {
 }
 
 auto GLFramebuffers::GetColorAttachment(RenderTarget* target) -> unsigned int {
-    auto framebuffer = GetFramebuffer(target);
-    return framebuffer.color_attachment;
+    if (auto* existing = GetFramebuffer(target->UUID())) {
+        return existing->color_attachment;
+    }
+    return CreateFramebuffer(target).color_attachment;
 }
 
 auto GLFramebuffers::Reset() -> void {
@@ -156,20 +154,20 @@ auto GLFramebuffers::Reset() -> void {
     current_fbo_ = 0;
 }
 
-auto GLFramebuffers::DisposeFramebuffer(const GLFramebuffer& framebuffer) -> void {
+auto GLFramebuffers::DisposeFramebuffer(GLFramebuffer& framebuffer) -> void {
     if (framebuffer.fbo) glDeleteFramebuffers(1, &framebuffer.fbo);
     if (framebuffer.color_attachment) glDeleteTextures(1, &framebuffer.color_attachment);
     if (framebuffer.depth_attachment) glDeleteRenderbuffers(1, &framebuffer.depth_attachment);
+
+    framebuffer.fbo = 0;
+    framebuffer.color_attachment = 0;
+    framebuffer.depth_attachment = 0;
 }
 
 GLFramebuffers::~GLFramebuffers() {
-    for (auto& [target, framebuffer] : framebuffers_) {
-        target->renderer_id = 0;
-        target->RemoveDisposeHandlers();
+    for (auto& [_, framebuffer] : framebuffers_) {
         DisposeFramebuffer(framebuffer);
-        Logger::Log(LogLevel::Debug, "Framebuffer object cleared", *target);
     }
-    framebuffers_.clear();
 }
 
 }

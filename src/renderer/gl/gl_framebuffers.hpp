@@ -11,6 +11,7 @@
 
 #include "renderer/gl/gl_textures.hpp"
 
+#include <string>
 #include <vector>
 
 namespace vglx {
@@ -49,13 +50,15 @@ private:
         GLuint depth_attachment;
     };
 
-    std::vector<std::pair<RenderTarget*, GLFramebuffer>> framebuffers_ {};
+    std::vector<std::pair<std::string, GLFramebuffer>> framebuffers_ {};
 
-    auto GetFramebuffer(RenderTarget* target) -> GLFramebuffer;
+    std::shared_ptr<bool> alive_ { std::make_shared<bool>(true) };
+
+    auto GetFramebuffer(const std::string& uuid) -> GLFramebuffer*;
 
     auto CreateFramebuffer(RenderTarget* target) -> GLFramebuffer;
 
-    auto DisposeFramebuffer(const GLFramebuffer& framebuffer) -> void;
+    auto DisposeFramebuffer(GLFramebuffer& framebuffer) -> void;
 };
 
 }

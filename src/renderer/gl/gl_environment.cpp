@@ -210,7 +210,7 @@ auto GLEnvironment::GetOrProcess(const std::shared_ptr<Texture>& source) -> std:
     using enum Texture::Type;
     using enum Texture::Mapping;
 
-    auto it = std::ranges::find(cache_, source.get(), &std::pair<Texture*, GLEnvironmentMaps>::first);
+    auto it = std::ranges::find(cache_, source->UUID(), &std::pair<std::string, GLEnvironmentMaps>::first);
     if (it != cache_.end()) {
         return it->second;
     }
@@ -286,14 +286,15 @@ auto GLEnvironment::GetOrProcess(const std::shared_ptr<Texture>& source) -> std:
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAX_LEVEL, kPrefilteredMips - 1);
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
-    cache_.emplace_back(source.get(), output);
+    cache_.emplace_back(source->UUID(), output);
 
-    source->OnDispose([this, alive = std::weak_ptr(alive_)](Disposable* target) {
-        if (alive.expired()) return; // GLEnvironment already destroyed
+    source->OnDispose([this, alive = std::weak_ptr(alive_)](const std::string& texture_uuid) {
+        if (alive.expired()) return;
 
         auto it = std::ranges::find(
-            cache_, static_cast<Texture*>(target),
-            &std::pair<Texture*, GLEnvironmentMaps>::first
+            cache_,
+            texture_uuid,
+            &std::pair<std::string, GLEnvironmentMaps>::first
         );
 
         if (it != cache_.end()) {

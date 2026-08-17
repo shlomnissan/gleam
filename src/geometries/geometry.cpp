@@ -143,8 +143,4 @@ auto Geometry::BoundingSphere() -> Sphere {
     return bounding_sphere_->first;
 }
 
-Geometry::~Geometry() {
-    Dispose();
-}
-
 }

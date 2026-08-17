@@ -100,7 +100,7 @@ auto GLBindingState::Bind(InstancedMesh& instanced_mesh, const GLProgram& progra
 }
 
 auto GLBindingState::RegisterEviction(Disposable& disposable, const std::string& key) -> void {
-    disposable.OnDispose([this, alive = std::weak_ptr(alive_), key](Disposable*) {
+    disposable.OnDispose([this, alive = std::weak_ptr(alive_), key](const std::string&) {
         if (alive.expired()) return;
         if (auto it = cache_.find(key); it != cache_.end()) {
             for (const auto& entry : it->second.entries) {
