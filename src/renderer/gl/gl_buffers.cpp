@@ -89,7 +89,7 @@ auto GLBuffers::GetVertexBuffer(BufferAttribute& attribute) -> GLuint {
     return entry.buffer_id;
 }
 
-auto GLBuffers::GetIndexBuffer(Geometry& geometry) -> GLuint {
+auto GLBuffers::GetIndexBuffer(Geometry& geometry) -> std::optional<GLuint> {
     const auto& geometry_name = geometry.DisplayName();
 
     if (geometry.Disposed()) {
@@ -98,10 +98,10 @@ auto GLBuffers::GetIndexBuffer(Geometry& geometry) -> GLuint {
             "Failed to get index buffer for geometry {}. The geometry has been disposed",
             geometry_name
         );
-        return 0;
+        return std::nullopt;
     }
 
-    if (geometry.GetIndexData().empty()) return 0;
+    if (geometry.GetIndexData().empty()) return GLuint {0};
 
     if (geometry.GetMaxIndex() >= geometry.VertexCount()) {
         Logger::Log(
@@ -109,7 +109,7 @@ auto GLBuffers::GetIndexBuffer(Geometry& geometry) -> GLuint {
             "Invalid index buffer for geometry {}. Max index element exceeds vertex count",
             geometry_name
         );
-        return 0;
+        return std::nullopt;
     }
 
     if (auto it = cache_.find(geometry.UUID()); it != cache_.end()) {

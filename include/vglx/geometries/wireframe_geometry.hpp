@@ -22,6 +22,12 @@ namespace vglx {
  * attributes are shared rather than copied, while the index buffer is replaced
  * with pairs of indices representing each unique edge of the mesh.
  *
+ * Because the attributes are shared, the wireframe is a live view of the
+ * source's vertices rather than a snapshot: updating the source's vertex data
+ * (for example, via @ref BufferAttribute::SetData) updates the wireframe as
+ * well. Likewise, explicitly disposing the source's attributes invalidates any
+ * wireframes that share them.
+ *
  * This is useful for visual debugging (visualizing topology, silhouette edges,
  * or bounding structures) without modifying the source geometry.
  *
@@ -46,6 +52,7 @@ public:
      *
      * The vertex attributes are shared with the source geometry, but the index
      * buffer is rebuilt so that each unique triangle edge becomes a line segment.
+     * Changes to the source's vertex data are reflected in the wireframe.
      *
      * @param geometry Pointer to the original triangle-based geometry.
      */

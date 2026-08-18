@@ -9,17 +9,23 @@
 
 #include "vglx/geometries/buffer_attribute.hpp"
 
+#include <utility>
+
 namespace vglx {
 
 Sprite::Sprite(std::shared_ptr<SpriteMaterial> material)
-  : geometry_(SharedGeometry()), material_(material) {
+  : material_(material) {
     if (material_ == nullptr) {
         material_ = SpriteMaterial::Create();
     }
 }
 
 auto Sprite::SharedGeometry() -> std::shared_ptr<Geometry>& {
-    static auto geometry = []() {
+    static auto geometry = std::shared_ptr<Geometry> {};
+
+    // Rebuild on demand so disposing the shared geometry through a sprite
+    // cannot permanently break sprite rendering.
+    if (geometry == nullptr || geometry->Disposed()) {
         auto g = Geometry::Create();
 
         g->AddAttribute(BufferAttribute::Create({
@@ -46,8 +52,8 @@ auto Sprite::SharedGeometry() -> std::shared_ptr<Geometry>& {
 
         g->SetIndices({0, 1, 2, 0, 2, 3});
 
-        return g;
-    }();
+        geometry = std::move(g);
+    }
 
     return geometry;
 }

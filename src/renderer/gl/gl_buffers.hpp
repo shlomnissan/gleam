@@ -13,6 +13,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <optional>
 #include <string>
 #include <unordered_map>
 
@@ -32,7 +33,9 @@ public:
 
     auto GetVertexBuffer(BufferAttribute& attribute) -> GLuint;
 
-    auto GetIndexBuffer(Geometry& geometry) -> GLuint;
+    // Returns nullopt if the geometry is disposed or its index data is
+    // invalid, 0 if the geometry is non-indexed, and a buffer id otherwise.
+    auto GetIndexBuffer(Geometry& geometry) -> std::optional<GLuint>;
 
     ~GLBuffers();
 

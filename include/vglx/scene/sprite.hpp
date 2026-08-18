@@ -106,13 +106,12 @@ public:
 
     /// @cond INTERNAL
     [[nodiscard]] auto GetGeometry() const -> std::shared_ptr<Geometry> override {
-        return geometry_;
+        return SharedGeometry();
     }
     /// @endcond
 
 private:
     /// @cond INTERNAL
-    std::shared_ptr<Geometry> geometry_;
     std::shared_ptr<Material> material_;
 
     static auto SharedGeometry() -> std::shared_ptr<Geometry>&;

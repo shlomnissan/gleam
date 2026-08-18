@@ -127,8 +127,14 @@ auto generate_tangents(
         const auto n = read_vec3(normals, i);
         const auto b = b_accum[i];
 
-        auto t = t_accum[i];
-        t = Normalize(t - Dot(n, t) * n);
+        auto t = t_accum[i] - Dot(n, t_accum[i]) * n;
+        if (Dot(t, t) <= math::eps * math::eps) {
+            const auto axis = std::fabs(n.x) < 0.9f
+                ? Vector3 {1.0f, 0.0f, 0.0f}
+                : Vector3 {0.0f, 1.0f, 0.0f};
+            t = Cross(n, axis);
+        }
+        t = Normalize(t);
         const auto s = Dot(Cross(n, t), b) >= 0 ? 1.0f : -1.0f;
 
         tangents[i * 4 + 0] = t.x;

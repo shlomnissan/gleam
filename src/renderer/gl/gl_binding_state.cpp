@@ -147,19 +147,27 @@ auto GLBindingState::GetEntry(
         }
 
         for (const auto& attribute : geometry.GetAttributes()) {
-            buffers_.GetVertexBuffer(*attribute);
+            if (buffers_.GetVertexBuffer(*attribute) == 0) {
+                return nullptr;
+            }
         }
 
         if (instanced_mesh != nullptr) {
             for (const auto& attribute : instanced_mesh->GetInstanceAttributes()) {
-                buffers_.GetVertexBuffer(*attribute);
+                if (buffers_.GetVertexBuffer(*attribute) == 0) {
+                    return nullptr;
+                }
             }
         }
 
-        auto ebo = buffers_.GetIndexBuffer(geometry);
-        if (ebo != found->ebo) {
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-            found->ebo = ebo;
+        const auto ebo = buffers_.GetIndexBuffer(geometry);
+        if (!ebo.has_value()) {
+            return nullptr;
+        }
+
+        if (ebo.value() != found->ebo) {
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo.value());
+            found->ebo = ebo.value();
         }
 
         return found;
@@ -220,8 +228,8 @@ auto GLBindingState::CreateEntry(
 
         auto vbo = buffers_.GetVertexBuffer(*attribute);
         if (vbo == 0) {
-            glDeleteVertexArrays(1, &entry.vao);
             current_vao_ = 0;
+            glDeleteVertexArrays(1, &entry.vao);
             return std::unexpected(std::format("Failed to create a buffer for attribute ({})", attribute->name));
         }
 
@@ -243,10 +251,16 @@ auto GLBindingState::CreateEntry(
         glEnableVertexAttribArray(loc);
     }
 
-    auto ebo = buffers_.GetIndexBuffer(geometry);
-    if (ebo) {
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        entry.ebo = ebo;
+    const auto ebo = buffers_.GetIndexBuffer(geometry);
+    if (!ebo.has_value()) {
+        current_vao_ = 0;
+        glDeleteVertexArrays(1, &entry.vao);
+        return std::unexpected("Failed to create a buffer for geometry indices");
+    }
+
+    if (ebo.value() != 0) {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo.value());
+        entry.ebo = ebo.value();
     }
 
     return entry;
