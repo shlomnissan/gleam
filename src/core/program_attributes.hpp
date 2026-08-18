@@ -65,7 +65,8 @@ struct ProgramAttributes {
         Renderable* renderable,
         const LightInfo& lights,
         const Scene* scene,
-        const Material* material_override = nullptr
+        const Geometry* geometry,
+        const Material* material
     );
 };
 

@@ -23,13 +23,9 @@ ProgramAttributes::ProgramAttributes(
     Renderable* renderable,
     const LightInfo& lights,
     const Scene* scene,
-    const Material* material_override
+    const Geometry* geometry,
+    const Material* material
 ) {
-    auto geometry = renderable->GetGeometry().get();
-    const auto material = material_override != nullptr
-        ? material_override
-        : renderable->GetMaterial().get();
-
     type = material->GetType();
 
     if (type == Material::Type::DepthMaterial) {

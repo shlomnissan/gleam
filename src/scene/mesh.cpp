@@ -9,6 +9,8 @@
 
 #include "vglx/geometries/wireframe_geometry.hpp"
 
+#include <utility>
+
 namespace vglx {
 
 auto Mesh::SetGeometry(std::shared_ptr<Geometry> geometry) -> void {
@@ -22,7 +24,11 @@ auto Mesh::GetWireframeGeometry() -> std::shared_ptr<Geometry> {
     }
 
     if (wireframe_geometry_ == nullptr) {
-        wireframe_geometry_ = WireframeGeometry::Create(geometry_.get());
+        auto wireframe = WireframeGeometry::Create(geometry_.get());
+        if (wireframe->GetIndexData().empty()) {
+            return geometry_;
+        }
+        wireframe_geometry_ = std::move(wireframe);
     }
 
     return wireframe_geometry_;

@@ -140,6 +140,12 @@ auto Renderer::Impl::RenderObjects(Scene* scene, Camera* camera) -> void {
 auto Renderer::Impl::RenderObject(Renderable* renderable, Scene* scene, Camera* camera) -> void {
     auto geometry = renderable->GetGeometry();
     auto material = renderable->GetMaterial().get();
+
+    const auto is_instanced = renderable->GetNodeType() == Node::Type::InstancedMesh;
+    if (!is_instanced && material->wireframe && Renderable::IsMeshType(renderable)) {
+        geometry = static_cast<Mesh*>(renderable)->GetWireframeGeometry();
+    }
+
     auto attrs = ProgramAttributes {renderable, {
         .directional = lights_.directional,
         .point = lights_.point,
@@ -147,7 +153,7 @@ auto Renderer::Impl::RenderObject(Renderable* renderable, Scene* scene, Camera* 
         .enable_shadow_maps = shadow_map_ != ShadowMap::None && lights_.has_shadow_casters,
         .enable_pcf_shadows = shadow_map_ == ShadowMap::PCF && lights_.has_shadow_casters,
         .enable_point_shadow_maps = shadow_map_ != ShadowMap::None && lights_.has_point_shadow_casters
-    }, scene};
+    }, scene, geometry.get(), material};
 
     auto program = programs_.GetProgram(attrs);
     if (!program->IsValid()) {
@@ -155,12 +161,6 @@ auto Renderer::Impl::RenderObject(Renderable* renderable, Scene* scene, Camera* 
     }
 
     state_.ProcessMaterial(material);
-
-    const auto is_instanced = renderable->GetNodeType() == Node::Type::InstancedMesh;
-
-    if (!is_instanced && material->wireframe && Renderable::IsMeshType(renderable)) {
-        geometry = static_cast<Mesh*>(renderable)->GetWireframeGeometry();
-    }
 
     const auto vao = is_instanced
         ? binding_state_.Bind(*static_cast<InstancedMesh*>(renderable), *program)
@@ -564,7 +564,11 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
             configure_depth_material(material, depth_material_.get());
 
             auto attrs = ProgramAttributes {
-                renderable, {}, scene, depth_material_.get()
+                renderable,
+                {},
+                scene,
+                renderable->GetGeometry().get(),
+                depth_material_.get()
             };
 
             auto program = programs_.GetProgram(attrs);
