@@ -8,9 +8,11 @@
 #pragma once
 
 #include <array>
+#include <cstdint>
 #include <memory>
+#include <string>
+#include <unordered_map>
 #include <utility>
-#include <vector>
 
 #include <glad/glad.h>
 
@@ -46,7 +48,6 @@ struct TextureFormat {
     int type;
 };
 
-
 auto to_gl_tex_type(const Texture* t) -> int;
 
 auto to_gl_tex_format(Texture::Format f) -> TextureFormat;
@@ -69,18 +70,20 @@ public:
     auto operator=(const GLTextures&) -> GLTextures& = delete;
     auto operator=(GLTextures&&) -> GLTextures& = delete;
 
-    auto Bind(const std::shared_ptr<Texture>& texture, int tex_unit) -> void;
+    auto Bind(const std::shared_ptr<Texture>& texture, uint8_t texture_unit) -> GLuint;
 
     auto Reset() -> void;
 
     ~GLTextures();
 
 private:
-    std::vector<std::weak_ptr<Texture>> textures_;
+    std::unordered_map<std::string, GLuint> cache_ {};
 
     std::array<GLuint, kMaxTextureUnits> current_texture_ids_ {};
 
-    auto GenerateTexture(Texture* texture) const -> GLuint;
+    std::shared_ptr<bool> alive_ { std::make_shared<bool>(true) };
+
+    auto GenerateTexture(Texture* texture) -> GLuint;
 
     auto FlushDynamicTexture(DynamicTexture2D* texture) const -> void;
 };

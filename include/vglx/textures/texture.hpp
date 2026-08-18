@@ -133,14 +133,6 @@ public:
         Equirectangular ///< Panorama sampled by direction.
     };
 
-    /**
-     * @brief Renderer-specific texture handle.
-     *
-     * Typically corresponds to the underlying graphics API object identifier,
-     * for example, an OpenGL texture ID.
-     */
-    unsigned int renderer_id = 0;
-
     /// @brief Row alignment used when uploading texture data.
     RowAlignment row_alignment = RowAlignment::FourBytes;
 

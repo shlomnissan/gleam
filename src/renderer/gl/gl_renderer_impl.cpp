@@ -33,6 +33,7 @@
 #include "utilities/scoped_timer.hpp"
 
 #include <algorithm>
+#include <cstdint>
 #include <utility>
 #include <vector>
 
@@ -414,8 +415,8 @@ auto Renderer::Impl::SetUniforms(
             program->SetUniform(name, &value);
         }
         for (const auto& [name, tex] : m->textures_) {
-            const int tex_unit = kReservedTextureUnits + next_texture_unit_++;
-            textures_.Bind(tex, tex_unit);
+            const auto tex_unit = kReservedTextureUnits + next_texture_unit_++;
+            textures_.Bind(tex, static_cast<uint8_t>(tex_unit));
             program->SetUniform(name, &tex_unit);
 
             if (tex->GetType() == Texture::Type::Texture2D) {
@@ -699,8 +700,8 @@ auto Renderer::Impl::Render(Scene* scene, Camera* camera, RenderTarget* target) 
         : Vector2 { static_cast<float>(viewport_width_), static_cast<float>(viewport_height_) };
 
     if (scene->environment) {
-        textures_.Bind(scene->environment, 0);
-        auto env_maps = environment_.GetOrProcess(scene->environment);
+        auto texture_id = textures_.Bind(scene->environment, 0);
+        auto env_maps = environment_.GetOrProcess(scene->environment, texture_id);
         if (env_maps.has_value()) {
             env_maps_ = env_maps.value();
         }
@@ -785,7 +786,6 @@ auto Renderer::Impl::CreateTextureFromRenderTarget(RenderTarget* target) -> std:
     }));
 
     texture->color_space = Texture::ColorSpace::Linear;
-    texture->renderer_id = tex_id;
     texture->min_filter = Texture::MinFilter::Linear;
     texture->mag_filter = Texture::MagFilter::Linear;
 

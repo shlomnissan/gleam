@@ -88,14 +88,14 @@ auto GLFramebuffers::CreateFramebuffer(RenderTarget* target) -> GLFramebuffer {
         return GLFramebuffer { .fbo = 0 };
     }
 
-    framebuffers_.emplace_back(target->UUID(), framebuffer);
+    cache_.emplace_back(target->UUID(), framebuffer);
 
     target->OnDispose([this, alive = std::weak_ptr(alive_), name = target->DisplayName()](const std::string& target_uuid) {
         if (alive.expired()) return;
-        auto it = std::ranges::find(framebuffers_, target_uuid, &std::pair<std::string, GLFramebuffer>::first);
-        if (it != framebuffers_.end()) {
+        auto it = std::ranges::find(cache_, target_uuid, &std::pair<std::string, GLFramebuffer>::first);
+        if (it != cache_.end()) {
             DisposeFramebuffer(it->second);
-            framebuffers_.erase(it);
+            cache_.erase(it);
             Logger::Log(LogLevel::Debug, "Framebuffer object cleared {}", name);
         }
     });
@@ -106,8 +106,8 @@ auto GLFramebuffers::CreateFramebuffer(RenderTarget* target) -> GLFramebuffer {
 }
 
 auto GLFramebuffers::GetFramebuffer(const std::string& uuid) -> GLFramebuffer* {
-    auto it = std::ranges::find(framebuffers_, uuid, &std::pair<std::string, GLFramebuffer>::first);
-    return it != framebuffers_.end() ? &it->second : nullptr;
+    auto it = std::ranges::find(cache_, uuid, &std::pair<std::string, GLFramebuffer>::first);
+    return it != cache_.end() ? &it->second : nullptr;
 }
 
 auto GLFramebuffers::Begin(RenderTarget* target) -> void {
@@ -165,7 +165,7 @@ auto GLFramebuffers::DisposeFramebuffer(GLFramebuffer& framebuffer) -> void {
 }
 
 GLFramebuffers::~GLFramebuffers() {
-    for (auto& [_, framebuffer] : framebuffers_) {
+    for (auto& [_, framebuffer] : cache_) {
         DisposeFramebuffer(framebuffer);
     }
 }

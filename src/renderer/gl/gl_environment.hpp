@@ -7,13 +7,13 @@
 
 #pragma once
 
-#include <glad/glad.h>
-
 #include <expected>
 #include <memory>
 #include <optional>
 #include <string>
 #include <vector>
+
+#include <glad/glad.h>
 
 namespace vglx {
 
@@ -39,23 +39,21 @@ public:
 
     auto Initialize() -> std::expected<void, std::string>;
 
-    auto GetOrProcess(const std::shared_ptr<Texture>& source) -> std::optional<GLEnvironmentMaps>;
+    auto GetOrProcess(const std::shared_ptr<Texture>& source, GLuint texture_id) -> std::optional<GLEnvironmentMaps>;
 
     auto BrdfLut() const { return lut_; }
 
     ~GLEnvironment();
 
 private:
-    // Lifetime guard for dispose callbacks we register on source textures.
-    // Each callback holds a weak_ptr to this token.
-    std::shared_ptr<int> alive_ = std::make_shared<int>(0);
+    std::vector<std::pair<std::string, GLEnvironmentMaps>> cache_;
+
+    std::shared_ptr<bool> alive_ { std::make_shared<bool>(true) };
 
     std::unique_ptr<GLProgram> prg_equirect_to_cube_;
     std::unique_ptr<GLProgram> prg_irradiance_cube_;
     std::unique_ptr<GLProgram> prg_prefiltered_cube_;
     std::unique_ptr<GLProgram> prg_brdf_lut_;
-
-    std::vector<std::pair<std::string, GLEnvironmentMaps>> cache_;
 
     GLuint fbo_ {0};
     GLuint vao_ {0};

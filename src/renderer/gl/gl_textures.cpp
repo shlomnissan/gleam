@@ -72,38 +72,54 @@ auto apply_sampler_params(GLenum target, const Texture* tex) -> void {
 
 }
 
-auto GLTextures::Bind(const std::shared_ptr<Texture>& texture, int tex_unit) -> void {
+auto GLTextures::Bind(const std::shared_ptr<Texture>& texture, uint8_t texture_unit) -> GLuint {
     VGLX_ASSERT(
-        tex_unit >= 0 && tex_unit < kMaxTextureUnits,
+        texture_unit < kMaxTextureUnits,
         "GLTextures::Bind texture unit out of range"
     );
 
-    glActiveTexture(GL_TEXTURE0 + tex_unit);
-
-    auto tex_id = texture->renderer_id;
-    if (tex_id == 0) {
-        tex_id = GenerateTexture(texture.get());
-        textures_.emplace_back(texture);
+    if (texture->Disposed()) {
+        Logger::Log(
+            LogLevel::Error,
+            "Failed to bind texture {}. Texture was already disposed",
+            texture->DisplayName()
+        );
+        return 0u;
     }
 
-    if (tex_id != current_texture_ids_[tex_unit]) {
-        glBindTexture(to_gl_tex_type(texture.get()), tex_id);
-        current_texture_ids_[tex_unit] = tex_id;
+    auto texture_id = GLuint {0};
+    if (auto it = cache_.find(texture->UUID()); it != cache_.end()) {
+        texture_id = it->second;
+    }
+
+    glActiveTexture(GL_TEXTURE0 + texture_unit);
+
+    if (texture_id == 0) {
+        texture_id = GenerateTexture(texture.get());
+        cache_.emplace(texture->UUID(), texture_id);
+    }
+
+    if (texture_id != current_texture_ids_[texture_unit]) {
+        glBindTexture(to_gl_tex_type(texture.get()), texture_id);
+        current_texture_ids_[texture_unit] = texture_id;
     }
 
     if (texture->GetType() == Texture::Type::DynamicTexture2D) {
         FlushDynamicTexture(static_cast<DynamicTexture2D*>(texture.get()));
     }
+
+    return texture_id;
 }
 
 auto GLTextures::Reset() -> void {
     std::ranges::fill(current_texture_ids_, 0);
 }
 
-auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
-    auto& tex_id = texture->renderer_id;
-    glGenTextures(1, &tex_id);
-    glBindTexture(to_gl_tex_type(texture), tex_id);
+auto GLTextures::GenerateTexture(Texture* texture) -> GLuint {
+    auto texture_id = GLuint {0};
+
+    glGenTextures(1, &texture_id);
+    glBindTexture(to_gl_tex_type(texture), texture_id);
 
     glPixelStorei(
         GL_UNPACK_ALIGNMENT,
@@ -200,12 +216,17 @@ auto GLTextures::GenerateTexture(Texture* texture) const -> GLuint {
         Logger::Log(LogLevel::Error, "OpenGL error failed to generate texture");
     }
 
-    texture->OnDispose([tex_id, name = texture->DisplayName()](const std::string&) {
-        glDeleteTextures(1, &tex_id);
-        Logger::Log(LogLevel::Debug, "Texture buffer cleared {}", name);
+    texture->OnDispose([this, alive = std::weak_ptr(alive_), name = texture->DisplayName()](const std::string& texture_uuid) {
+        if (alive.expired()) return;
+        if (auto it = cache_.find(texture_uuid); it != cache_.end()) {
+            glDeleteTextures(1, &it->second);
+            std::ranges::replace(current_texture_ids_, it->second, 0u);
+            cache_.erase(it);
+            Logger::Log(LogLevel::Debug, "Texture buffer cleared {}", name);
+        }
     });
 
-    return tex_id;
+    return texture_id;
 }
 
 auto GLTextures::FlushDynamicTexture(DynamicTexture2D* texture) const -> void {
@@ -230,15 +251,8 @@ auto GLTextures::FlushDynamicTexture(DynamicTexture2D* texture) const -> void {
 }
 
 GLTextures::~GLTextures() {
-    // Ensure GPU resources owned by texture objects are released
-    // while the OpenGL context is still valid.
-    //
-    // Texture instances may outlive the renderer (e.g. due to static
-    // references in examples). By explicitly disposing them here, we
-    // avoid calling glDelete* from late static destructors after the
-    // OpenGL context has already been destroyed.
-    for (const auto& texture : textures_) {
-        if (auto t = texture.lock()) t->Dispose();
+    for (auto& [_, texture_id] : cache_) {
+        glDeleteTextures(1, &texture_id);
     }
 }
 

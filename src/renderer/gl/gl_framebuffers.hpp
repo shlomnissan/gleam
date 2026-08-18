@@ -9,15 +9,13 @@
 
 #include <glad/glad.h>
 
-#include "renderer/gl/gl_textures.hpp"
-
+#include <memory>
 #include <string>
 #include <vector>
 
 namespace vglx {
 
 class RenderTarget;
-class GLTextures;
 
 class GLFramebuffers {
 public:
@@ -48,7 +46,7 @@ private:
         GLuint depth_attachment;
     };
 
-    std::vector<std::pair<std::string, GLFramebuffer>> framebuffers_ {};
+    std::vector<std::pair<std::string, GLFramebuffer>> cache_ {};
 
     std::shared_ptr<bool> alive_ { std::make_shared<bool>(true) };
 

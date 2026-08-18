@@ -206,7 +206,7 @@ auto GLEnvironment::GenerateBrdfLut() -> void {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-auto GLEnvironment::GetOrProcess(const std::shared_ptr<Texture>& source) -> std::optional<GLEnvironmentMaps> {
+auto GLEnvironment::GetOrProcess(const std::shared_ptr<Texture>& source, GLuint texture_id) -> std::optional<GLEnvironmentMaps> {
     using enum Texture::Type;
     using enum Texture::Mapping;
 
@@ -224,7 +224,7 @@ auto GLEnvironment::GetOrProcess(const std::shared_ptr<Texture>& source) -> std:
         return std::nullopt;
     }
 
-    if (source->renderer_id == 0) {
+    if (texture_id == 0) {
         Logger::Log(
             LogLevel::Error,
             "Attempting to bind an unallocated environment texture"
@@ -248,7 +248,7 @@ auto GLEnvironment::GetOrProcess(const std::shared_ptr<Texture>& source) -> std:
         return std::nullopt;
     }
 
-    auto convolve_src = source->renderer_id;
+    auto convolve_src = texture_id;
 
     if (is_equirect_tex) {
         output.base_cube = create_cube_texture(kBaseCubeSize, true);
@@ -260,7 +260,7 @@ auto GLEnvironment::GetOrProcess(const std::shared_ptr<Texture>& source) -> std:
             );
             return std::nullopt;
         }
-        EquirectToCubeMap(source->renderer_id, output.base_cube);
+        EquirectToCubeMap(texture_id, output.base_cube);
         convolve_src = output.base_cube;
     }
 
