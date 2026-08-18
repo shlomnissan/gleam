@@ -30,26 +30,15 @@ auto unbind_buffers() -> void {
 
 auto GLFramebuffers::CreateFramebuffer(RenderTarget* target) -> GLFramebuffer {
     auto framebuffer = GLFramebuffer { .fbo = 0 };
-    auto format = to_gl_tex_format(target->format);
+
+    framebuffer.color_attachment = textures_.GetTextureId(target->GetTexture());
+    if (framebuffer.color_attachment == 0) {
+        Logger::Log(LogLevel::Error, "Failed to create framebuffer object {}", *target);
+        return framebuffer;
+    }
 
     glGenFramebuffers(1, &framebuffer.fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer.fbo);
-
-    glGenTextures(1, &framebuffer.color_attachment);
-    glBindTexture(GL_TEXTURE_2D, framebuffer.color_attachment);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(
-        GL_TEXTURE_2D,
-        0,
-        format.internal_format,
-        target->width,
-        target->height,
-        0,
-        format.source_format,
-        format.type,
-        nullptr
-    );
 
     glFramebufferTexture2D(
         GL_FRAMEBUFFER,
@@ -81,9 +70,9 @@ auto GLFramebuffers::CreateFramebuffer(RenderTarget* target) -> GLFramebuffer {
         Logger::Log(LogLevel::Error, "Failed to create framebuffer object {}", *target);
 
         if (framebuffer.fbo) glDeleteFramebuffers(1, &framebuffer.fbo);
-        if (framebuffer.color_attachment) glDeleteTextures(1, &framebuffer.color_attachment);
         if (framebuffer.depth_attachment) glDeleteRenderbuffers(1, &framebuffer.depth_attachment);
         unbind_buffers();
+        textures_.Reset();
 
         return GLFramebuffer { .fbo = 0 };
     }
@@ -101,6 +90,7 @@ auto GLFramebuffers::CreateFramebuffer(RenderTarget* target) -> GLFramebuffer {
     });
 
     unbind_buffers();
+    textures_.Reset();
 
     return framebuffer;
 }
@@ -135,18 +125,12 @@ auto GLFramebuffers::End(RenderTarget* target) -> void {
             glBindTexture(GL_TEXTURE_2D, framebuffer->color_attachment);
             glGetTexImage(GL_TEXTURE_2D, 0, format.source_format, format.type, target->color_data_.data());
             target->has_readback_ = true;
+            textures_.Reset();
         }
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     current_fbo_ = 0;
-}
-
-auto GLFramebuffers::GetColorAttachment(RenderTarget* target) -> unsigned int {
-    if (auto* existing = GetFramebuffer(target->UUID())) {
-        return existing->color_attachment;
-    }
-    return CreateFramebuffer(target).color_attachment;
 }
 
 auto GLFramebuffers::Reset() -> void {
@@ -156,7 +140,6 @@ auto GLFramebuffers::Reset() -> void {
 
 auto GLFramebuffers::DisposeFramebuffer(GLFramebuffer& framebuffer) -> void {
     if (framebuffer.fbo) glDeleteFramebuffers(1, &framebuffer.fbo);
-    if (framebuffer.color_attachment) glDeleteTextures(1, &framebuffer.color_attachment);
     if (framebuffer.depth_attachment) glDeleteRenderbuffers(1, &framebuffer.depth_attachment);
 
     framebuffer.fbo = 0;

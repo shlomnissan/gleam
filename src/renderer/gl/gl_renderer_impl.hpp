@@ -60,8 +60,6 @@ public:
 
     auto SetShadowMap(ShadowMap shadow_map) -> void;
 
-    auto CreateTextureFromRenderTarget(RenderTarget* target) -> std::shared_ptr<Texture2D>;
-
     [[nodiscard]] auto RenderedObjectsPerFrame() const {
         return rendered_objects_per_frame_;
     }
@@ -80,7 +78,6 @@ private:
     GLBackgroundPass background_pass_;
     GLCamera camera_ubo_;
     GLEnvironment environment_;
-    GLFramebuffers framebuffers_;
     GLLights lights_;
     GLPresentPass present_pass_;
     GLPrograms programs_;
@@ -88,9 +85,7 @@ private:
     GLShadowMaps shadow_maps_;
     GLState state_;
     GLTextures textures_;
-
-    // GLBuffers must be declared before GLBindingState, which holds a
-    // reference to it.
+    GLFramebuffers framebuffers_ {textures_};
     GLBuffers buffers_;
     GLBindingState binding_state_ {buffers_};
 

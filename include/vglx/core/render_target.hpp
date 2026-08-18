@@ -11,6 +11,7 @@
 
 #include "vglx/core/disposable.hpp"
 #include "vglx/textures/texture.hpp"
+#include "vglx/textures/texture_2d.hpp"
 
 #include <cstdint>
 #include <memory>
@@ -48,8 +49,14 @@ public:
 
     [[nodiscard]] auto ReadColorData() const -> std::span<const std::uint8_t>;
 
+    [[nodiscard]] auto GetTexture() const -> const std::shared_ptr<Texture2D>& {
+        return texture_;
+    }
+
 private:
     friend class GLFramebuffers;
+
+    std::shared_ptr<Texture2D> texture_;
 
     std::vector<uint8_t> color_data_;
 

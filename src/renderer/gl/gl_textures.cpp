@@ -78,26 +78,12 @@ auto GLTextures::Bind(const std::shared_ptr<Texture>& texture, uint8_t texture_u
         "GLTextures::Bind texture unit out of range"
     );
 
-    if (texture->Disposed()) {
-        Logger::Log(
-            LogLevel::Error,
-            "Failed to bind texture {}. Texture was already disposed",
-            texture->DisplayName()
-        );
+    const auto texture_id = GetTextureId(texture);
+    if (texture_id == 0) {
         return 0u;
     }
 
-    auto texture_id = GLuint {0};
-    if (auto it = cache_.find(texture->UUID()); it != cache_.end()) {
-        texture_id = it->second;
-    }
-
     glActiveTexture(GL_TEXTURE0 + texture_unit);
-
-    if (texture_id == 0) {
-        texture_id = GenerateTexture(texture.get());
-        cache_.emplace(texture->UUID(), texture_id);
-    }
 
     if (texture_id != current_texture_ids_[texture_unit]) {
         glBindTexture(to_gl_tex_type(texture.get()), texture_id);
@@ -107,6 +93,30 @@ auto GLTextures::Bind(const std::shared_ptr<Texture>& texture, uint8_t texture_u
     if (texture->GetType() == Texture::Type::DynamicTexture2D) {
         FlushDynamicTexture(static_cast<DynamicTexture2D*>(texture.get()));
     }
+
+    return texture_id;
+}
+
+auto GLTextures::GetTextureId(const std::shared_ptr<Texture>& texture) -> GLuint {
+    if (texture->Disposed()) {
+        Logger::Log(
+            LogLevel::Error,
+            "Failed to retrieve texture {}. Texture was already disposed",
+            texture->DisplayName()
+        );
+        return 0u;
+    }
+
+    if (auto it = cache_.find(texture->UUID()); it != cache_.end()) {
+        return it->second;
+    }
+
+    const auto texture_id = GenerateTexture(texture.get());
+    cache_.emplace(texture->UUID(), texture_id);
+
+    // GenerateTexture binds the new texture to the active unit,
+    // invalidating the unit-binding cache.
+    Reset();
 
     return texture_id;
 }
@@ -128,10 +138,33 @@ auto GLTextures::GenerateTexture(Texture* texture) -> GLuint {
 
     if (texture->GetType() == Texture::Type::Texture2D) {
         auto tex = static_cast<Texture2D*>(texture);
-        tex->format = pick_image_format(*tex->image, tex->color_space);
+        const auto has_pixels = !std::visit(
+            [](const auto& pixels) { return pixels.empty(); },
+            tex->image->data
+        );
+
+        if (has_pixels) {
+            tex->format = pick_image_format(*tex->image, tex->color_space);
+        }
 
         auto format = to_gl_tex_format(tex->format);
-        std::visit([&](const auto& pixels) {
+        if (has_pixels) {
+            std::visit([&](const auto& pixels) {
+                glTexImage2D(
+                    GL_TEXTURE_2D,
+                    0,
+                    format.internal_format,
+                    tex->image->width,
+                    tex->image->height,
+                    0,
+                    format.source_format,
+                    gl_pixel_type(pixels),
+                    pixels.data()
+                );
+            }, tex->image->data);
+
+            if (tex->generate_mipamps) glGenerateMipmap(GL_TEXTURE_2D);
+        } else {
             glTexImage2D(
                 GL_TEXTURE_2D,
                 0,
@@ -140,12 +173,10 @@ auto GLTextures::GenerateTexture(Texture* texture) -> GLuint {
                 tex->image->height,
                 0,
                 format.source_format,
-                gl_pixel_type(pixels),
-                pixels.data()
+                format.type,
+                nullptr
             );
-        }, tex->image->data);
-
-        if (tex->generate_mipamps) glGenerateMipmap(GL_TEXTURE_2D);
+        }
         apply_sampler_params(GL_TEXTURE_2D, tex);
     }
 

@@ -16,10 +16,11 @@
 namespace vglx {
 
 class RenderTarget;
+class GLTextures;
 
 class GLFramebuffers {
 public:
-    GLFramebuffers() = default;
+    explicit GLFramebuffers(GLTextures& textures) : textures_(textures) {}
 
     GLFramebuffers(const GLFramebuffers&) = delete;
     GLFramebuffers(GLFramebuffers&&) = delete;
@@ -31,13 +32,13 @@ public:
 
     auto End(RenderTarget* target) -> void;
 
-    auto GetColorAttachment(RenderTarget* target) -> unsigned int;
-
     auto Reset() -> void;
 
     ~GLFramebuffers();
 
 private:
+    GLTextures& textures_;
+
     GLuint current_fbo_ {0};
 
     struct GLFramebuffer {

@@ -48,10 +48,6 @@ auto Renderer::SetShadowMap(ShadowMap shadow_map) -> void {
     impl_->SetShadowMap(shadow_map);
 }
 
-auto Renderer:: CreateTextureFromRenderTarget(RenderTarget* target) -> std::shared_ptr<Texture2D> {
-    return impl_->CreateTextureFromRenderTarget(target);
-}
-
 auto Renderer::RenderedObjectsPerFrame() const -> size_t {
     return impl_->RenderedObjectsPerFrame();
 }

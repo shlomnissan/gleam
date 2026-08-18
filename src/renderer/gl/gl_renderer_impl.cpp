@@ -23,7 +23,6 @@
 #include "vglx/scene/mesh.hpp"
 #include "vglx/scene/scene.hpp"
 #include "vglx/scene/sprite.hpp"
-#include "vglx/textures/image.hpp"
 #include "vglx/textures/texture.hpp"
 #include "vglx/textures/texture_2d.hpp"
 
@@ -766,30 +765,6 @@ auto Renderer::Impl::SetShadowMap(ShadowMap shadow_map) -> void {
     if (shadow_map_ == ShadowMap::None) {
         shadow_maps_.Clear();
     }
-}
-
-auto Renderer::Impl::CreateTextureFromRenderTarget(RenderTarget* target) -> std::shared_ptr<Texture2D> {
-    const auto tex_id = framebuffers_.GetColorAttachment(target);
-    if (tex_id == 0) {
-        Logger::Log(
-            LogLevel::Error,
-            "Failed to retrieve color attachment from target {}",
-            target->DisplayName()
-        );
-
-        return {};
-    }
-
-    auto texture = Texture2D::Create(Image::Create({
-        .width = static_cast<unsigned int>(target->width),
-        .height = static_cast<unsigned int>(target->height),
-    }));
-
-    texture->color_space = Texture::ColorSpace::Linear;
-    texture->min_filter = Texture::MinFilter::Linear;
-    texture->mag_filter = Texture::MagFilter::Linear;
-
-    return texture;
 }
 
 Renderer::Impl::~Impl() = default;

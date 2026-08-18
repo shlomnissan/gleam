@@ -72,6 +72,8 @@ public:
 
     auto Bind(const std::shared_ptr<Texture>& texture, uint8_t texture_unit) -> GLuint;
 
+    auto GetTextureId(const std::shared_ptr<Texture>& texture) -> GLuint;
+
     auto Reset() -> void;
 
     ~GLTextures();
