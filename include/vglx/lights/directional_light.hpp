@@ -32,7 +32,7 @@ namespace vglx {
  *
  * @code
  * my_scene->Add(vglx::DirectionalLight::Create({
- *   .color = 0xFFFFFF,
+ *   .color = 0xFFFFFFu,
  *   .intensity = 1.0f,
  *   .target = nullptr
  * }));
@@ -44,7 +44,7 @@ class VGLX_EXPORT DirectionalLight : public Light {
 public:
     /// @brief Parameters for constructing a @ref DirectionalLight object.
     struct Parameters {
-        Color color {0xFFFFFF}; ///< Light color.
+        Color color {0xFFFFFFu}; ///< Light color.
         float intensity {1.0f}; ///< Light intensity multiplier.
         Node* target {nullptr}; ///< Node the light is directed toward.
         bool cast_shadow {false}; ///< Enables shadow casting for this light.

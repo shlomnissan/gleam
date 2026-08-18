@@ -33,7 +33,7 @@ namespace vglx {
  *   .open_ended = false
  * });
  *
- * auto material = vglx::PhongMaterial::Create({.color = 0xF2B632});
+ * auto material = vglx::PhongMaterial::Create({.color = 0xF2B632u});
  *
  * my_scene->Add(vglx::Mesh::Create(geometry, material));
  * @endcode

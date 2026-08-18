@@ -14,7 +14,7 @@
 
 #include "example_runner.hpp"
 
-constexpr auto colors = std::array<vglx::Color, 3> {0x00FFFF, 0xFFFF00, 0xFF00FF};
+constexpr auto colors = std::array<vglx::Color, 3> {0x00FFFFu, 0xFFFF00u, 0xFF00FFu};
 constexpr auto row_count = 100;
 constexpr auto total_count = row_count * row_count;
 constexpr auto row_offset = static_cast<float>(row_count - 1) / 2.0f;
@@ -46,7 +46,7 @@ struct Scene : public ExampleScene {
         mesh = this->Add(vglx::InstancedMesh::Create(
             vglx::BoxGeometry::Create(),
             vglx::UnlitMaterial::Create({
-                .color = 0xFFFFFF,
+                .color = 0xFFFFFFu,
                 .texture_map = texture.has_value() ? texture.value() : nullptr
             }),
             total_count
@@ -127,6 +127,6 @@ auto main() -> int {
 
     return run_example(scene.get(), camera.get(), {
         .window_title = "Instanced Mesh",
-        .clear_color = 0xADD8E6
+        .clear_color = 0xADD8E6u
     });
 }

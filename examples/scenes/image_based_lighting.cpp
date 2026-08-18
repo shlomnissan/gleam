@@ -42,12 +42,12 @@ auto get_scene() -> std::expected<std::unique_ptr<ExampleScene>, std::string> {
     scene->Add(std::move(result_model.value()));
 
     scene->Add(vglx::AmbientLight::Create({
-        .color = 0xFFFFFF,
+        .color = 0xFFFFFFu,
         .intensity = 1.0
     }));
 
     scene->Add(vglx::PointLight::Create({
-        .color = 0xFFFFFF,
+        .color = 0xFFFFFFu,
         .intensity = 128.0f
     }))->transform.Translate({2.0f, 6.0f, 10.0f});
 

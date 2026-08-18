@@ -28,7 +28,7 @@ namespace vglx {
  *
  * @code
  * auto geometry = vglx::BoxGeometry::Create();
- * auto material = vglx::UnlitMaterial::Create({.color = 0x00FFAA});
+ * auto material = vglx::UnlitMaterial::Create({.color = 0x00FFAAu});
  *
  * my_scene->Add(vglx::Mesh::Create(geometry, material));
  * @endcode

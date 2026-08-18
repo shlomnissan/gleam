@@ -27,7 +27,7 @@ namespace vglx {
  *
  * @code
  * auto material = vglx::SpriteMaterial::Create({
- *   .color = 0xFFFFFF,
+ *   .color = 0xFFFFFFu,
  *   .texture_map = texture
  * });
  *
@@ -42,7 +42,7 @@ public:
      * @brief Parameters for constructing a @ref SpriteMaterial object.
      */
     struct Parameters {
-        Color color {0xFFFFFF}; ///< Base tint color applied to the texture.
+        Color color {0xFFFFFFu}; ///< Base tint color applied to the texture.
         std::shared_ptr<Texture> texture_map {nullptr}; ///< Sprite texture sampled for color and alpha.
         bool size_attenuation {true}; ///< Attenuate sprite size by distance in perspective.
     };

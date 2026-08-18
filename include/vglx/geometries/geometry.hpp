@@ -54,7 +54,7 @@ namespace vglx {
  *  -0.5f, -0.5f, 0.0f,
  * }));
  *
- * auto material = vglx::PhongMaterial::Create({.color = 0x049EF4});
+ * auto material = vglx::PhongMaterial::Create({.color = 0x049EF4u});
  *
  * my_scene->Add(vglx::Mesh::Create(geometry, material));
  * @endcode

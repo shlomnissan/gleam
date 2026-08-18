@@ -29,7 +29,7 @@ namespace vglx {
  * auto geometry = vglx::BoxGeometry::Create();
  * my_scene->Add(vglx::BoundingSphere::Create({
  *   .sphere = geometry->BoundingSphere(),
- *   .color = 0xFF0000
+ *   .color = 0xFF0000u
  * }));
  * @endcode
  *
@@ -40,7 +40,7 @@ public:
     /// @brief Parameters for constructing a @ref BoundingSphere object.
     struct Parameters {
         Sphere sphere; ///< Spherical bounds to visualize.
-        Color color {0xFFFFFF}; ///< Line color used for rendering the wireframe sphere.
+        Color color {0xFFFFFFu}; ///< Line color used for rendering the wireframe sphere.
     };
 
     /**

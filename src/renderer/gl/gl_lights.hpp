@@ -27,7 +27,7 @@ public:
 
     struct alignas(16) UniformLight {
         alignas(4) int type {0};
-        alignas(16) Color color {0xFFFFFF};
+        alignas(16) Color color {0xFFFFFFu};
         alignas(16) Vector3 position {Vector3::Zero()};
         alignas(16) Vector3 direction {Vector3::Zero()};
         alignas(4) float cone_cos {0.0f};
@@ -45,7 +45,7 @@ public:
         alignas(16) UniformLight lights[kMaxLights];
     };
 
-    Color ambient_light {0x000000};
+    Color ambient_light {0x000000u};
 
     uint8_t ambient {0};
     uint8_t directional {0};

@@ -18,7 +18,6 @@
 namespace vglx {
 
 Grid::Grid(const Parameters& params) {
-    const auto center = params.divisions / 2;
     const auto step = params.size / params.divisions;
     const auto half_size = params.size / 2;
     auto vertices = std::vector<float> {};

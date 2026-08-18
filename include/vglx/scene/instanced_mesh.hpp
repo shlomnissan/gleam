@@ -48,7 +48,7 @@ namespace vglx {
  *
  * @code
  * const auto geometry = vglx::BoxGeometry::Create({1.0f, 1.0f, 1.0f});
- * const auto material = vglx::PhongMaterial::Create({.color = 0xFFFFFF});
+ * const auto material = vglx::PhongMaterial::Create({.color = 0xFFFFFFu});
  *
  * auto boxes = my_scene->Add(vglx::InstancedMesh::Create(
  *   geometry, material, 2500

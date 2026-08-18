@@ -27,7 +27,7 @@ namespace vglx {
  *
  * @code
  * auto material = vglx::UnlitMaterial::Create({
- *   .color = 0xFFFFFF,
+ *   .color = 0xFFFFFFu,
  *   .texture_map = texture
  * });
  *
@@ -42,7 +42,7 @@ public:
      * @brief Parameters for constructing an @ref UnlitMaterial object.
      */
     struct Parameters {
-        Color color {0xFFFFFF}; ///< Base surface color.
+        Color color {0xFFFFFFu}; ///< Base surface color.
         std::shared_ptr<Texture> texture_map {nullptr}; ///< Surface color texture.
         std::shared_ptr<Texture> alpha_map {nullptr}; ///< Per-pixel opacity map.
     };

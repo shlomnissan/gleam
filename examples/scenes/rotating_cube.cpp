@@ -15,16 +15,16 @@ struct Scene : public ExampleScene {
     Scene() {
         mesh = this->Add(vglx::Mesh::Create(
             vglx::BoxGeometry::Create(),
-            vglx::PhongMaterial::Create({.color = 0x049EF4})
+            vglx::PhongMaterial::Create({.color = 0x049EF4u})
         ));
 
         Add(vglx::AmbientLight::Create({
-            .color = 0xFFFFFF,
+            .color = 0xFFFFFFu,
             .intensity = 0.5f
         }));
 
         Add(vglx::PointLight::Create({
-            .color = 0xFFFFFF,
+            .color = 0xFFFFFFu,
             .intensity = 32.0f,
         }))->transform.Translate({2.0f, 2.5f, 4.0f});
     }

@@ -26,7 +26,7 @@ namespace vglx {
  *
  * @code
  * my_scene->Add(vglx::Grid::Create({
- *   .color = 0x333333,
+ *   .color = 0x333333u,
  *   .size = 4.0f,
  *   .divisions = 16
  * }));
@@ -40,7 +40,7 @@ public:
      * @brief Parameters for constructing a @ref Grid object.
      */
     struct Parameters {
-        Color color {0x333333}; ///< Line color used for rendering.
+        Color color {0x333333u}; ///< Line color used for rendering.
         float size {4.0f}; ///< Half-width of the grid in world units.
         unsigned int divisions {16}; ///< Number of grid subdivisions along each axis.
     };

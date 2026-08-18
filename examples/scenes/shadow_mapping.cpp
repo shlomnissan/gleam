@@ -14,7 +14,7 @@ struct Scene : public ExampleScene {
     vglx::Euler rotation {};
 
     Scene() {
-        fog = vglx::Fog::CreateExponential({.color = 0x222244, .density = 0.2f});
+        fog = vglx::Fog::CreateExponential({.color = 0x222244u, .density = 0.2f});
         AddGeometry();
         AddLights();
     }
@@ -26,7 +26,7 @@ struct Scene : public ExampleScene {
                 .tubular_segments = 128,
                 .radial_segments = 64
             }),
-            vglx::PhongMaterial::Create({.color = 0x999999})
+            vglx::PhongMaterial::Create({.color = 0x999999u})
         ));
 
         mesh->cast_shadow = true;
@@ -36,7 +36,7 @@ struct Scene : public ExampleScene {
 
         auto plane = Add(vglx::Mesh::Create(
             vglx::PlaneGeometry::Create({.width = 200, .height = 200}),
-            vglx::PhongMaterial::Create({.color = 0x999999})
+            vglx::PhongMaterial::Create({.color = 0x999999u})
         ));
 
         plane->receive_shadow = true;
@@ -44,10 +44,10 @@ struct Scene : public ExampleScene {
     }
 
     auto AddLights() -> void {
-        Add(vglx::AmbientLight::Create({.color = 0x444444, .intensity = 0.7f}));
+        Add(vglx::AmbientLight::Create({.color = 0x444444u, .intensity = 0.7f}));
 
         auto spot = Add(vglx::SpotLight::Create({
-            .color = 0xff8888,
+            .color = 0xff8888u,
             .intensity = 400.0f,
             .angle = 0.20f,
             .penumbra = 0.3f,
@@ -60,7 +60,7 @@ struct Scene : public ExampleScene {
         spot->shadow.far = 20.0f;
 
         auto directional = Add(vglx::DirectionalLight::Create({
-            .color = 0x8888ff,
+            .color = 0x8888ffu,
             .intensity = 3.0f
         }));
 
@@ -101,7 +101,7 @@ auto main() -> int {
 
     return run_example(scene.get(), camera.get(), {
         .window_title = "Shadow Mapping",
-        .clear_color = 0x222244,
+        .clear_color = 0x222244u,
         .shadow_map = vglx::Renderer::ShadowMap::PCF
     });
 }

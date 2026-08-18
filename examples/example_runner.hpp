@@ -26,7 +26,7 @@ struct ExampleScene : public vglx::Scene {
 
 struct ExampleSettings {
     std::string window_title = {"Example"};
-    vglx::Color clear_color = {0x000000};
+    vglx::Color clear_color = {0x000000u};
     vglx::Renderer::ShadowMap shadow_map {vglx::Renderer::ShadowMap::None};
     vglx::Renderer::ToneMapping tone_mapping {vglx::Renderer::ToneMapping::None};
     float exposure {1.0f};

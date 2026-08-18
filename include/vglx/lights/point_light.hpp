@@ -25,7 +25,7 @@ namespace vglx {
  *
  * @code
  * my_scene->Add(vglx::PointLight::Create({
- *   .color = 0xFFFFFF,
+ *   .color = 0xFFFFFFu,
  *   .intensity = 25.0f,
  *   .range = 0.0f
  * }));
@@ -37,7 +37,7 @@ class VGLX_EXPORT PointLight : public Light {
 public:
     /// @brief Parameters for constructing a @ref PointLight object.
     struct Parameters {
-        Color color {0xFFFFFF}; ///< Light color.
+        Color color {0xFFFFFFu}; ///< Light color.
         float intensity {1.0f}; ///< Light intensity multiplier.
         float range {0.0f}; ///< Maximum range of influence. 0 = unbounded.
         bool cast_shadow {false}; ///< Enables shadow casting for this light.

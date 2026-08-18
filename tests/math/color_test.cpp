@@ -37,9 +37,9 @@ constexpr auto LINEAR_TO_SRGB(const vglx::Color& c) {
 TEST(Color, ConstructorDefault) {
     constexpr auto c = vglx::Color {};
 
-    EXPECT_COLOR_EQ(c, 0xFFFFFF);
+    EXPECT_COLOR_EQ(c, 0xFFFFFFu);
 
-    static_assert(c == vglx::Color {0xFFFFFF});
+    static_assert(c == vglx::Color {0xFFFFFFu});
 }
 
 TEST(Color, ConstructorRGB) {
@@ -51,7 +51,7 @@ TEST(Color, ConstructorRGB) {
 }
 
 TEST(Color, ConstructorHex) {
-    constexpr auto c = LINEAR_TO_SRGB(vglx::Color {0xFF7F50});
+    constexpr auto c = LINEAR_TO_SRGB(vglx::Color {0xFF7F50u});
 
     EXPECT_COLOR_NEAR(c, {1.0f, 0.4f, 0.3f}, 0.1f);
 
@@ -65,7 +65,7 @@ TEST(Color, ConstructorHex) {
 #pragma region Component Access
 
 TEST(Color, ComponentAccessDirect) {
-    constexpr auto c = LINEAR_TO_SRGB(vglx::Color {0xFF7F50});
+    constexpr auto c = LINEAR_TO_SRGB(vglx::Color {0xFF7F50u});
 
     EXPECT_NEAR(c.r, 1.0f, 0.1f);
     EXPECT_NEAR(c.g, 0.4f, 0.1f);
@@ -77,7 +77,7 @@ TEST(Color, ComponentAccessDirect) {
 }
 
 TEST(Color, ComponentAccessRandomAccessOperator) {
-    constexpr auto c = LINEAR_TO_SRGB(vglx::Color {0xFF7F50});
+    constexpr auto c = LINEAR_TO_SRGB(vglx::Color {0xFF7F50u});
 
     EXPECT_NEAR(c[0], 1.0f, 0.1f);
     EXPECT_NEAR(c[1], 0.4f, 0.1f);
@@ -94,7 +94,7 @@ TEST(Color, ComponentAccessRandomAccessOperator) {
 
 TEST(Color, AssignmentOperatorHex) {
     auto c1 = vglx::Color {0.1f, 0.1f, 0.1f};
-    c1 = 0xFF4500;
+    c1 = 0xFF4500u;
 
     EXPECT_COLOR_NEAR(c1, {1.0f, 0.27f, 0.0f}, 0.1f);
 }
@@ -104,9 +104,9 @@ TEST(Color, AssignmentOperatorHex) {
 #pragma region Equality Operator
 
 TEST(Color, EqualityOperator) {
-    constexpr auto c1 = vglx::Color {0xFFAD69};
-    constexpr auto c2 = vglx::Color {0xFFAD69};
-    constexpr auto c3 = vglx::Color {0x47A8BD};
+    constexpr auto c1 = vglx::Color {0xFFAD69u};
+    constexpr auto c2 = vglx::Color {0xFFAD69u};
+    constexpr auto c3 = vglx::Color {0x47A8BDu};
 
     EXPECT_TRUE(c1 == c2);
     EXPECT_FALSE(c1 == c3);
@@ -116,9 +116,9 @@ TEST(Color, EqualityOperator) {
 }
 
 TEST(Color, InequalityOperator) {
-    constexpr auto c1 = vglx::Color {0xFFAD69};
-    constexpr auto c2 = vglx::Color {0xFFAD69};
-    constexpr auto c3 = vglx::Color {0x47A8BD};
+    constexpr auto c1 = vglx::Color {0xFFAD69u};
+    constexpr auto c2 = vglx::Color {0xFFAD69u};
+    constexpr auto c3 = vglx::Color {0x47A8BDu};
 
     EXPECT_FALSE(c1 != c2);
     EXPECT_TRUE(c1 != c3);
@@ -142,7 +142,7 @@ TEST(Color, AdditionBasic) {
 
 TEST(Color, AdditionBlackColor) {
     constexpr auto c = vglx::Color {0.2f, 0.4f, 0.6f};
-    constexpr auto black = vglx::Color {0x000000};
+    constexpr auto black = vglx::Color {0x000000u};
 
     EXPECT_COLOR_EQ(c + black, {0.2f, 0.4f, 0.6f});
 
@@ -164,7 +164,7 @@ TEST(Color, SubtractionBasic) {
 
 TEST(Color, SubtractionWithBlackColor) {
     constexpr auto c = vglx::Color {0.5f, 0.7f, 0.9f};
-    constexpr auto black = vglx::Color {0x000000};
+    constexpr auto black = vglx::Color {0x000000u};
 
     EXPECT_COLOR_EQ(c - black, {0.5f, 0.7f, 0.9f});
 
@@ -174,9 +174,9 @@ TEST(Color, SubtractionWithBlackColor) {
 TEST(Color, SubtractionFromSelf) {
     constexpr auto c = vglx::Color {0.5f, 0.7f, 0.9f};
 
-    EXPECT_COLOR_EQ(c - c, 0x000000);
+    EXPECT_COLOR_EQ(c - c, 0x000000u);
 
-    static_assert(c - c == vglx::Color {0x000000});
+    static_assert(c - c == vglx::Color {0x000000u});
 }
 
 TEST(Color, SubtractionResultingInClamping) {

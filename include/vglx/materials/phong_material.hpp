@@ -28,8 +28,8 @@ namespace vglx {
  *
  * @code
  * auto material = vglx::PhongMaterial::Create({
- *   .color = 0x049EF4,
- *   .specular_color = 0x333333,
+ *   .color = 0x049EF4u,
+ *   .specular_color = 0x333333u,
  *   .shininess = 64.0f,
  *   .albedo_map = texture
  * });
@@ -45,9 +45,9 @@ public:
      * @brief Parameters for constructing a @ref PhongMaterial object.
      */
     struct Parameters {
-        Color color {0xFFFFFF}; ///< Diffuse base color.
-        Color specular_color {0x111111}; ///< Specular highlight tint.
-        Color emissive_color {0x000000}; ///< Emissive color independent of lighting.
+        Color color {0xFFFFFFu}; ///< Diffuse base color.
+        Color specular_color {0x111111u}; ///< Specular highlight tint.
+        Color emissive_color {0x000000u}; ///< Emissive color independent of lighting.
         float ao_intensity {1.0f}; ///< AO contribution strength.
         float shininess {32.0f}; ///< Specular highlight glossiness.
         float emissive_intensity {1.0f}; ///< Emissive multiplier.

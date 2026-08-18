@@ -30,7 +30,7 @@ namespace vglx {
  * my_scene->Add(vglx::Arrow::Create({
  *   .direction = {1.0f, 0.0f, 0.0f},
  *   .origin = Vector3::Zero(),
- *   .color = 0xFF0000,
+ *   .color = 0xFF0000u,
  *   .length = 1.0f
  * }));
  * @endcode
@@ -43,7 +43,7 @@ public:
     struct Parameters {
         Vector3 direction {0.0f, 0.0f, 1.0f}; ///< Direction vector of the arrow.
         Vector3 origin {Vector3::Zero()}; ///< World-space origin of the arrow.
-        Color color {0xFFFFFF}; ///< Arrow color.
+        Color color {0xFFFFFFu}; ///< Arrow color.
         float length {1.0f}; ///< Length of the arrow in world units.
     };
 

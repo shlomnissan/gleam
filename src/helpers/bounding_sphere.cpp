@@ -14,6 +14,7 @@
 #include "vglx/math/utilities.hpp"
 #include "vglx/scene/mesh.hpp"
 
+#include <cstdint>
 #include <utility>
 #include <vector>
 
@@ -22,7 +23,7 @@ namespace vglx {
 namespace {
 
 auto create_geometry(const Sphere& sphere) {
-    constexpr auto segments = 64.0f;
+    constexpr auto segments = uint32_t {64};
 
     std::vector<float> vertices;
     std::vector<unsigned> indices;
@@ -34,9 +35,9 @@ auto create_geometry(const Sphere& sphere) {
 
     for (auto axis = 0; axis < 3; ++axis) {
         auto offset = static_cast<unsigned int>(vertices.size() / 3);
-        for (auto i = 0; i <= static_cast<unsigned>(segments); ++i) {
+        for (auto i = 0; i <= segments; ++i) {
             auto p = center;
-            auto theta = (static_cast<float>(i) / segments) * math::two_pi;
+            auto theta = (static_cast<float>(i) / static_cast<float>(segments)) * math::two_pi;
 
             if (axis == static_cast<unsigned>(Axis::XY)) {
                 p.x += radius * math::Cos(theta);

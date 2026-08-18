@@ -34,7 +34,7 @@ namespace vglx {
  *   .depth_segments = 2
  * });
  *
- * auto material = vglx::PhongMaterial::Create({.color = 0x049EF4});
+ * auto material = vglx::PhongMaterial::Create({.color = 0x049EF4u});
  *
  * my_scene->Add(vglx::Mesh::Create(geometry, material));
  * @endcode

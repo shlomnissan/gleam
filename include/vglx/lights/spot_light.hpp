@@ -33,7 +33,7 @@ namespace vglx {
  *
  * @code
  * my_scene->Add(vglx::SpotLight::Create({
- *   .color = 0xFFFFFF,
+ *   .color = 0xFFFFFFu,
  *   .intensity = 25.0f,
  *   .angle = vglx::math::DegToRad(10.0f),
  *   .penumbra = 0.3f,
@@ -48,7 +48,7 @@ class VGLX_EXPORT SpotLight : public Light {
 public:
     /// @brief Parameters for constructing a @ref SpotLight object.
     struct Parameters {
-        Color color {0xFFFFFF}; ///< Light color.
+        Color color {0xFFFFFFu}; ///< Light color.
         float intensity {1.0f}; ///< Light intensity multiplier.
         float angle {math::pi / 3.0f}; ///< Cone angle (in radians) for spotlight cutoff.
         float penumbra {0.0f}; ///< Softness of the spotlight edge.

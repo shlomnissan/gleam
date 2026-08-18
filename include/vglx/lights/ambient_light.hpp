@@ -25,7 +25,7 @@ namespace vglx {
  *
  * @code
  * my_scene->Add(vglx::AmbientLight::Create({
- *   .color = 0xFFFFFF,
+ *   .color = 0xFFFFFFu,
  *   .intensity = 0.3f
  * }));
  * @endcode
@@ -36,7 +36,7 @@ class AmbientLight : public Light {
 public:
     /// @brief Parameters for constructing an @ref AmbientLight object.
     struct Parameters {
-        Color color {0xFFFFFF}; ///< Light color.
+        Color color {0xFFFFFFu}; ///< Light color.
         float intensity {1.0f}; ///< Light intensity multiplier.
     };
 

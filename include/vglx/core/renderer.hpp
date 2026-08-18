@@ -37,7 +37,7 @@ class RenderTarget;
  * vglx::Renderer renderer({
  *   .framebuffer_width = window.FramebufferWidth(),
  *   .framebuffer_height = window.FramebufferHeight(),
- *   .clear_color = 0x444444
+ *   .clear_color = 0x444444u
  * });
  *
  * auto ok = renderer.Initialize();
@@ -77,7 +77,7 @@ public:
         int framebuffer_width {1280}; ///< Current framebuffer width in pixels.
         int framebuffer_height {720}; ///< Current framebuffer height in pixels.
         int sample_count {1}; ///< Antialiasing level (e.g., 4x MSAA).
-        Color clear_color {0x000000}; ///< Clear color used at the start of a frame.
+        Color clear_color {0x000000u}; ///< Clear color used at the start of a frame.
         ToneMapping tone_mapping {ToneMapping::None}; ///< Tone mapping operator applied to the final frame.
         float exposure {1.0f}; ///< Exposure scale applied to HDR values before tone mapping.
         ShadowMap shadow_map {ShadowMap::None}; ///< Shadow mapping method applied to the scene.

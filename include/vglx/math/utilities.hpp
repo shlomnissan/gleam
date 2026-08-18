@@ -514,14 +514,14 @@ inline auto HashCombine(size_t& seed, const T& value) -> void {
         "fd", "fe", "ff"
     };
 
-    static std::random_device rd;
-    static std::mt19937 e2(rd());
-    static std::uniform_real_distribution dist(0.0, 1.0);
+    static auto rd = std::random_device {};
+    static auto e2 = std::mt19937 {rd()};
+    static auto dist = std::uniform_int_distribution<uint32_t> {};
 
-    const auto d0 = static_cast<size_t>(dist(e2) * 0xffffffff) | 0;
-    const auto d1 = static_cast<size_t>(dist(e2) * 0xffffffff) | 0;
-    const auto d2 = static_cast<size_t>(dist(e2) * 0xffffffff) | 0;
-    const auto d3 = static_cast<size_t>(dist(e2) * 0xffffffff) | 0;
+    const auto d0 = dist(e2);
+    const auto d1 = dist(e2);
+    const auto d2 = dist(e2);
+    const auto d3 = dist(e2);
 
     auto uuid = lut[d0 & 0xff] + lut[d0 >> 8 & 0xff] + lut[d0 >> 16 & 0xff] +
                 lut[d0 >> 24 & 0xff] + '-' + lut[d1 & 0xff] +

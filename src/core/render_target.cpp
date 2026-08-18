@@ -10,11 +10,26 @@
 #include "vglx/textures/image.hpp"
 #include "vglx/textures/texture.hpp"
 
+#include "utilities/logger.hpp"
+
+#include <algorithm>
+
 namespace vglx {
 
+namespace {
+
+auto validate_dimension(int value) -> int {
+    if (value < 1) {
+        Logger::Log(LogLevel::Error, "Invalid render target dimension {}, clamping to 1", value);
+    }
+    return std::max(value, 1);
+}
+
+}
+
 RenderTarget::RenderTarget(const Parameters& params)
-  : width(params.width),
-    height(params.height),
+  : width(validate_dimension(params.width)),
+    height(validate_dimension(params.height)),
     format(params.format),
     has_depth(params.has_depth),
     enable_readback(params.enable_readback)

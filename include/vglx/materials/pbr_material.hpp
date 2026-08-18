@@ -28,7 +28,7 @@ namespace vglx {
  *
  * @code
  * auto material = vglx::PBRMaterial::Create({
- *   .color = 0xFFFFFF,
+ *   .color = 0xFFFFFFu,
  *   .metallic = 1.0f,
  *   .roughness = 0.4f,
  *   .albedo_map = texture
@@ -45,8 +45,8 @@ public:
      * @brief Parameters for constructing a @ref PBRMaterial object.
      */
     struct Parameters {
-        Color color {0xFFFFFF}; ///< Base surface color.
-        Color emissive_color {0x000000}; ///< Emissive color independent of lighting.
+        Color color {0xFFFFFFu}; ///< Base surface color.
+        Color emissive_color {0x000000u}; ///< Emissive color independent of lighting.
         float ao_intensity {1.0f}; ///< AO contribution strength.
         float emissive_intensity {1.0f}; ///< Emissive multiplier.
         float environment_intensity {1.0f}; ///< Environment lighting multiplier.

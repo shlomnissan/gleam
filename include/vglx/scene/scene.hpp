@@ -29,11 +29,11 @@ namespace vglx {
  *
  * @code
  * auto scene = vglx::Scene::Create();
- * scene->fog = vglx::Fog::CreateExponential({.color = 0x444444, .density = 0.3f});
+ * scene->fog = vglx::Fog::CreateExponential({.color = 0x444444u, .density = 0.3f});
  *
  * scene->Add(vglx::Mesh::Create(
  *   vglx::BoxGeometry::Create(),
- *   vglx::PhongMaterial::Create({.color = 0x049EF4})
+ *   vglx::PhongMaterial::Create({.color = 0x049EF4u})
  * ));
  *
  * // Inside the main loop:

@@ -105,7 +105,7 @@ public:
     };
 
     /// @brief Light color represented as @ref Color "RGB components".
-    Color color {0xffffff};
+    Color color {0xffffffu};
 
     /// @brief Intensity multiplier applied to @ref Light::color "color".
     float intensity {1.0f};

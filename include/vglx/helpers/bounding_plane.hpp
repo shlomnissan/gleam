@@ -30,7 +30,7 @@ namespace vglx {
  * my_scene->Add(vglx::BoundingPlane::Create({
  *   .plane = vglx::Plane {vglx::Vector3::Z(), 0.0f},
  *   .size = 2.0f,
- *   .color = 0xFF0000
+ *   .color = 0xFF0000u
  * }));
  * @endcode
  *
@@ -42,7 +42,7 @@ public:
     struct Parameters {
         Plane plane; ///< Infinite geometric plane to visualize.
         float size {1.0f}; ///< Extent of the rendered square patch, measured from center to edge.
-        Color color {0xFFFFFF}; ///< Line color used to draw the patch.
+        Color color {0xFFFFFFu}; ///< Line color used to draw the patch.
     };
 
     /**

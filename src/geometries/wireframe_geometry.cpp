@@ -7,10 +7,9 @@
 
 #include "vglx/geometries/wireframe_geometry.hpp"
 
-#include "vglx/math/utilities.hpp"
-
 #include "utilities/logger.hpp"
 
+#include <algorithm>
 #include <cstddef>
 #include <cstdint>
 #include <unordered_set>
@@ -46,10 +45,8 @@ WireframeGeometry::WireframeGeometry(const Geometry* geometry) {
     auto indices = std::vector<uint32_t> {};
     auto seen_edges = std::unordered_set<uint64_t> {};
     auto add_edge = [&indices, &seen_edges](uint32_t x, uint32_t y) {
-        const auto key = math::CantorPairingUnordered(
-            static_cast<uint64_t>(x),
-            static_cast<uint64_t>(y)
-        );
+        const auto [lo, hi] = std::minmax(x, y);
+        const auto key = static_cast<uint64_t>(lo) << 32 | hi;
         if (seen_edges.emplace(key).second) {
             indices.emplace_back(x);
             indices.emplace_back(y);

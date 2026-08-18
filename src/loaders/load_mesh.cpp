@@ -122,7 +122,7 @@ auto load_obj_material(
     material->emissive_map = load_texture(desc.tex_emissive, dir, sRGB, images);
 
     if (material->albedo_map) {
-        material->color = 0xFFFFFF;
+        material->color = 0xFFFFFFu;
     }
 
     return material;

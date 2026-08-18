@@ -25,14 +25,14 @@ namespace vglx {
  * @code
  * // Adds linear fog to scene
  * my_scene->fog = Fog::CreateLinear({
- *   .color = 0x444444,
+ *   .color = 0x444444u,
  *   .near = 2.0f,
  *   .far = 6.0f
  * });
  *
  * // Adds exponential fog to scene
  * my_scene->fog = Fog::CreateExponential({
- *   .color = 0x444444,
+ *   .color = 0x444444u,
  *   .density = 0.3f
  * });
  * @endcode
@@ -56,7 +56,7 @@ struct Fog {
      * @brief Parameters for constructing a linear @ref Fog object.
      */
     struct LinearParameters {
-        Color color {0xFFFFFF}; ///< Fog color.
+        Color color {0xFFFFFFu}; ///< Fog color.
         float near {1.0f}; ///< Distance at which fog begins to appear.
         float far {1000.0f}; ///< Distance at which fog reaches full intensity.
     };
@@ -65,7 +65,7 @@ struct Fog {
      * @brief Parameters for constructing an exponential @ref Fog object.
      */
     struct ExponentialParameters {
-        Color color {0xFFFFFF}; ///< Fog color.
+        Color color {0xFFFFFFu}; ///< Fog color.
         float density {0.00025f}; ///< Exponential density factor (higher values produce thicker fog).
     };
 

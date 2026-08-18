@@ -52,40 +52,40 @@ auto get_scene() -> std::expected<std::unique_ptr<ExampleScene>, std::string> {
     });
 
     scene->Add(vglx::Mesh::Create(geometry, vglx::PhongMaterial::Create({
-        .color = 0xFFFFFF,
+        .color = 0xFFFFFFu,
         .reflectivity = 0.5f,
         .environment_map = env_map
     })))->transform.Translate({-2.3f, 0.0f, 0.0f});
 
     scene->Add(vglx::Mesh::Create(geometry, vglx::PhongMaterial::Create({
-        .color = 0xFF0000,
+        .color = 0xFF0000u,
         .reflectivity = 0.7f,
         .environment_map = env_map
     })));
 
     scene->Add(vglx::Mesh::Create(geometry, vglx::PhongMaterial::Create({
-        .color = 0x0000FF,
+        .color = 0x0000FFu,
         .reflectivity = 0.9f,
         .environment_map = env_map
     })))->transform.Translate({2.3f, 0.0f, 0.0f});
 
     scene->Add(vglx::AmbientLight::Create({
-        .color = 0xFFFFFF,
+        .color = 0xFFFFFFu,
         .intensity = 0.3f
     }));
 
     scene->Add(vglx::DirectionalLight::Create({
-        .color = 0xFFFFFF,
+        .color = 0xFFFFFFu,
         .intensity = 0.7f,
     }))->transform.Translate({0.0f, 200.0f, 0.0f});
 
     scene->Add(vglx::DirectionalLight::Create({
-        .color = 0xFFFFFF,
+        .color = 0xFFFFFFu,
         .intensity = 0.7f,
     }))->transform.Translate({-100.0f, -200.0f, -100.0f});
 
     scene->Add(vglx::DirectionalLight::Create({
-        .color = 0xFFFFFF,
+        .color = 0xFFFFFFu,
         .intensity = 1.0f,
     }))->transform.Translate({100.0f, 200.0f, 100.0f});
 

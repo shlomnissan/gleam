@@ -27,7 +27,7 @@ auto get_scene() -> std::expected<std::unique_ptr<ExampleScene>, std::string> {
     auto scene = ExampleScene::Create();
     auto sphere = scene->Add(vglx::Mesh::Create(
         vglx::SphereGeometry::Create({.radius = 5.0f}),
-        vglx::PhongMaterial::Create({.color = 0x000011})
+        vglx::PhongMaterial::Create({.color = 0x000011u})
     ));
 
     sphere->GetMaterial()->side = vglx::Material::Side::TwoSided;
@@ -41,17 +41,17 @@ auto get_scene() -> std::expected<std::unique_ptr<ExampleScene>, std::string> {
     mesh->transform.Rotate(vglx::Vector3::Y(), vglx::math::DegToRad(90.0f));
 
     sphere->Add(vglx::AmbientLight::Create({
-        .color = 0xFFFFFF,
+        .color = 0xFFFFFFu,
         .intensity = 0.3f
     }));
 
     sphere->Add(vglx::PointLight::Create({
-        .color = 0xFFFFFF,
+        .color = 0xFFFFFFu,
         .intensity = 128.0f
     }))->transform.Translate({2.0f, 6.0f, 10.0f});
 
     sphere->Add(vglx::PointLight::Create({
-        .color = 0xFAA916,
+        .color = 0xFAA916u,
         .intensity = 64.0f
     }))->transform.Translate({-2.0f, 6.0f, -4.0f});
 

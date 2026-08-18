@@ -29,7 +29,7 @@ namespace vglx {
  * auto geometry = vglx::SphereGeometry::Create();
  * my_scene->Add(vglx::BoundingBox::Create({
  *   .box = geometry->BoundingBox(),
- *   .color = 0xFFFFFF
+ *   .color = 0xFFFFFFu
  * }));
  * @endcode
  *
@@ -40,7 +40,7 @@ public:
     /// @brief Parameters for constructing a @ref BoundingBox object.
     struct Parameters {
         Box3 box; ///< Axis-aligned bounds to visualize.
-        Color color {0xFFFFFF}; ///< Line color used for rendering the box.
+        Color color {0xFFFFFFu}; ///< Line color used for rendering the box.
     };
 
     /**
