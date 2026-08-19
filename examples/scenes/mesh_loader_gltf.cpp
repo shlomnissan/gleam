@@ -65,6 +65,6 @@ auto main() -> int {
 
     return run_example(scene->get(), camera.get(), {
         .window_title = "Mesh Loader glTF",
-        .clear_color = vglx::Color {0xC9C9C9u}
+        .clear_color = 0xC9C9C9u
     });
 }
