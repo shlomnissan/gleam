@@ -19,16 +19,18 @@ namespace vglx {
  * @brief Generated geometry representing a flat 2D plane.
  *
  * PlaneGeometry creates a rectangular, axis-aligned plane centered at the origin
- * in local space. Its width and height define the plane’s extents along the X and Y
- * axes, and optional subdivision counts allow the plane to be tessellated for
- * deformation, smooth shading, or procedural effects.
+ * in local space. Its @ref Parameters::orientation "orientation" selects which
+ * axis the plane faces, its width and height define the plane’s extents along the
+ * two remaining axes, and optional subdivision counts allow the plane to be
+ * tessellated for deformation, smooth shading, or procedural effects.
  *
  * @code
  * auto geometry = vglx::PlaneGeometry::Create({
  *     .width = 5.0f,
  *     .height = 3.0f,
  *     .width_segments = 2,
- *     .height_segments = 2
+ *     .height_segments = 2,
+ *     .orientation = vglx::PlaneGeometry::Orientation::FaceY
  * });
  *
  * auto material = vglx::PhongMaterial::Create({.color = 0x049EF4u});
@@ -40,12 +42,22 @@ namespace vglx {
  */
 class VGLX_EXPORT PlaneGeometry : public Geometry {
 public:
+    /**
+     * @brief Determines which axis the plane faces in local space.
+     */
+    enum class Orientation {
+        FaceX, ///< Normal points along +X (plane spans the ZY axes).
+        FaceY, ///< Normal points along +Y (plane spans the XZ axes).
+        FaceZ  ///< Normal points along +Z (plane spans the XY axes).
+    };
+
     /// @brief Parameters for constructing a @ref PlaneGeometry object.
     struct Parameters {
-        float width {1.0f}; ///< Size along the X-axis.
-        float height {1.0f}; ///< Size along the Y-axis.
+        float width {1.0f}; ///< Width of the plane.
+        float height {1.0f}; ///< Height of the plane.
         unsigned width_segments {1}; ///< Subdivisions along the plane's width.
         unsigned height_segments {1}; ///< Subdivisions along the plane's height.
+        Orientation orientation {Orientation::FaceY}; ///< Axis the plane faces in local space.
     };
 
     /**

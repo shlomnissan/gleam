@@ -40,7 +40,6 @@ struct Scene : public ExampleScene {
         ));
 
         plane->receive_shadow = true;
-        plane->transform.Rotate(vglx::Vector3::X(), -vglx::math::pi_over_2);
     }
 
     auto AddLights() -> void {

@@ -19,6 +19,8 @@ auto generate_geometry(
     const PlaneGeometry::Parameters& params,
     VertexStreams& streams
 ) {
+    using enum PlaneGeometry::Orientation;
+
     const auto width_half = params.width / 2;
     const auto height_half = params.height / 2;
 
@@ -31,19 +33,25 @@ auto generate_geometry(
     const auto segment_h = params.height / grid_y;
 
     for (auto iy = 0u; iy < grid_y1; ++iy) {
-        const auto y = iy * segment_h - height_half;
+        const auto pos_h = iy * segment_h - height_half;
         for (auto ix = 0u; ix < grid_x1; ++ix) {
-            const auto x = ix * segment_w - width_half;
+            const auto pos_w = ix * segment_w - width_half;
             const auto u = static_cast<float>(ix) / grid_x;
             const auto v = 1 - (static_cast<float>(iy) / grid_y);
-
-            streams.positions.emplace_back(x);
-            streams.positions.emplace_back(-y);
-            streams.positions.emplace_back(0.0f);
-
-            streams.normals.emplace_back(0.0f);
-            streams.normals.emplace_back(0.0f);
-            streams.normals.emplace_back(1.0f);
+            switch (params.orientation) {
+                case FaceX:
+                    streams.positions.insert(streams.positions.end(), {0.0f, -pos_h, -pos_w});
+                    streams.normals.insert(streams.normals.end(), {1.0f, 0.0f, 0.0f});
+                    break;
+                case FaceY:
+                    streams.positions.insert(streams.positions.end(), {pos_w, 0.0f, pos_h});
+                    streams.normals.insert(streams.normals.end(), {0.0f, 1.0f, 0.0f});
+                    break;
+                case FaceZ:
+                    streams.positions.insert(streams.positions.end(), {pos_w, -pos_h, 0.0f});
+                    streams.normals.insert(streams.normals.end(), {0.0f, 0.0f, 1.0f});
+                    break;
+            }
 
             streams.uvs.emplace_back(u);
             streams.uvs.emplace_back(v);
