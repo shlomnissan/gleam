@@ -7,40 +7,17 @@
 
 #pragma once
 
-#include <array>
 #include <cstdint>
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include <utility>
+#include <vector>
 
 #include <glad/glad.h>
 
 #include "vglx/textures/texture.hpp"
 
 namespace vglx {
-
-enum class GLTextureMapType {
-    AlbedoMap = 0,
-    AlphaMap = 1,
-    NormalMap = 2,
-    SpecularMap = 3,
-    TextureMap = 4,
-    EmissiveMap = 5,
-    MetallicMap = 6,
-    RoughnessMap = 7,
-    AOMap = 8,
-    EnvironmentMap = 9,
-    IrradianceMap = 10,
-    PrefilteredMap = 11,
-    BrdfLutMap = 12,
-    ShadowMap2D = 13,
-    PointShadowMap = 14,
-    Reserved
-};
-
-constexpr auto kReservedTextureUnits = std::to_underlying(GLTextureMapType::Reserved);
-constexpr auto kMaxTextureUnits = 16;
 
 struct TextureFormat {
     int internal_format;
@@ -62,7 +39,7 @@ class DynamicTexture2D;
 
 class GLTextures {
 public:
-    GLTextures() = default;
+    GLTextures();
 
     GLTextures(const GLTextures&) = delete;
     GLTextures(GLTextures&&) = delete;
@@ -70,9 +47,9 @@ public:
     auto operator=(const GLTextures&) -> GLTextures& = delete;
     auto operator=(GLTextures&&) -> GLTextures& = delete;
 
-    auto Bind(const std::shared_ptr<Texture>& texture, uint8_t texture_unit) -> GLuint;
+    [[nodiscard]] auto Bind(const std::shared_ptr<Texture>& texture, uint8_t texture_unit) -> GLuint;
 
-    auto GetTextureId(const std::shared_ptr<Texture>& texture) -> GLuint;
+    [[nodiscard]] auto GetTextureId(const std::shared_ptr<Texture>& texture) -> GLuint;
 
     auto Reset() -> void;
 
@@ -81,7 +58,7 @@ public:
 private:
     std::unordered_map<std::string, GLuint> cache_ {};
 
-    std::array<GLuint, kMaxTextureUnits> current_texture_ids_ {};
+    std::vector<GLuint> current_texture_ids_ {};
 
     std::shared_ptr<bool> alive_ { std::make_shared<bool>(true) };
 

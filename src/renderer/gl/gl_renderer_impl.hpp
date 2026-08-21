@@ -110,8 +110,6 @@ private:
 
     float exposure_ {1.0f};
 
-    int next_texture_unit_ {0};
-
     auto ProcessLights(Camera* camera) -> void;
 
     auto RenderObjects(Scene* scene, Camera* camera) -> void;

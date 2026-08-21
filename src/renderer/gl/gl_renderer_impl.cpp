@@ -33,7 +33,6 @@
 
 #include <algorithm>
 #include <cstdint>
-#include <utility>
 #include <vector>
 
 #include <glad/glad.h>
@@ -118,8 +117,9 @@ auto Renderer::Impl::RenderObjects(Scene* scene, Camera* camera) -> void {
         state_.SetDepthFunction(Material::Depth::LessEqual);
         state_.SetSide(Material::Side::TwoSided);
         state_.SetBlending(Material::Blending::None);
-        textures_.Bind(scene->background, 0);
-        background_pass_.Render(scene->background);
+        if (textures_.Bind(scene->background, 0) != 0u) {
+            background_pass_.Render(scene->background);
+        }
 
         // The background pass binds its own vertex array objects directly,
         // which invalidates the binding state's current VAO tracking.
@@ -134,7 +134,6 @@ auto Renderer::Impl::RenderObjects(Scene* scene, Camera* camera) -> void {
 
     rendered_objects_per_frame_ = rendered_objects_counter_;
     rendered_objects_counter_ = 0;
-    next_texture_unit_ = 0;
 }
 
 auto Renderer::Impl::RenderObject(Renderable* renderable, Scene* scene, Camera* camera) -> void {
@@ -209,6 +208,8 @@ auto Renderer::Impl::SetUniforms(
     auto material = renderable->GetMaterial().get();
     auto model = renderable->GetWorldTransform();
 
+    auto next_texture_unit = 0;
+
     program->SetUniform(Uniform::Model, &model);
     program->SetUniform(Uniform::Opacity, &material->opacity);
 
@@ -220,46 +221,14 @@ auto Renderer::Impl::SetUniforms(
     static const auto kIdentity = Matrix3::Identity();
     program->SetUniform(Uniform::TextureTransform, &kIdentity);
 
-    const auto bind_texture = [&](GLTextureMapType type, std::shared_ptr<Texture> tex) {
-        textures_.Bind(tex, std::to_underlying(type));
+    const auto bind_texture = [&](Uniform uniform, const std::shared_ptr<Texture>& tex) {
+        auto texture_unit = next_texture_unit++;
+        if (textures_.Bind(tex, static_cast<uint8_t>(texture_unit)) == 0u) return;
+        program->SetUniform(uniform, &texture_unit);
+
         if (tex->GetType() == Texture::Type::Texture2D) {
             const auto& transform = static_cast<Texture2D*>(tex.get())->transform.Get();
             program->SetUniform(Uniform::TextureTransform, &transform);
-        }
-
-        switch(type) {
-            case GLTextureMapType::AlbedoMap:
-                program->SetUniform(Uniform::AlbedoMap, &type);
-                break;
-            case GLTextureMapType::AlphaMap:
-                program->SetUniform(Uniform::AlphaMap, &type);
-                break;
-            case GLTextureMapType::NormalMap:
-                program->SetUniform(Uniform::NormalMap, &type);
-                break;
-            case GLTextureMapType::SpecularMap:
-                program->SetUniform(Uniform::SpecularMap, &type);
-                break;
-            case GLTextureMapType::TextureMap:
-                program->SetUniform(Uniform::TextureMap, &type);
-                break;
-            case GLTextureMapType::EmissiveMap:
-                program->SetUniform(Uniform::EmissiveMap, &type);
-                break;
-            case GLTextureMapType::EnvironmentMap:
-                program->SetUniform(Uniform::EnvironmentMap, &type);
-                break;
-            case GLTextureMapType::MetallicMap:
-                program->SetUniform(Uniform::MetallicMap, &type);
-                break;
-            case GLTextureMapType::RoughnessMap:
-                program->SetUniform(Uniform::RoughnessMap, &type);
-                break;
-            case GLTextureMapType::AOMap:
-                program->SetUniform(Uniform::AOMap, &type);
-                break;
-            default:
-                Logger::Log(LogLevel::Error, "Unable to bind unknown texture map type");
         }
     };
 
@@ -282,19 +251,19 @@ auto Renderer::Impl::SetUniforms(
         auto m = static_cast<PBRMaterial*>(material);
 
         if (attrs->ibl) {
-            glActiveTexture(GL_TEXTURE0 + std::to_underlying(GLTextureMapType::IrradianceMap));
+            const auto irradiance_unit = next_texture_unit++;
+            const auto prefiltered_unit = next_texture_unit++;
+            const auto brdf_lut_unit = next_texture_unit++;
+            const auto prefiltered_max_lod = static_cast<float>(env_maps_.prefiltered_mips - 1);
+
+            glActiveTexture(GL_TEXTURE0 + irradiance_unit);
             glBindTexture(GL_TEXTURE_CUBE_MAP, env_maps_.irradiance);
 
-            glActiveTexture(GL_TEXTURE0 + std::to_underlying(GLTextureMapType::PrefilteredMap));
+            glActiveTexture(GL_TEXTURE0 + prefiltered_unit);
             glBindTexture(GL_TEXTURE_CUBE_MAP, env_maps_.prefiltered);
 
-            glActiveTexture(GL_TEXTURE0 + std::to_underlying(GLTextureMapType::BrdfLutMap));
+            glActiveTexture(GL_TEXTURE0 + brdf_lut_unit);
             glBindTexture(GL_TEXTURE_2D, environment_.BrdfLut());
-
-            const auto irradiance_unit = std::to_underlying(GLTextureMapType::IrradianceMap);
-            const auto prefiltered_unit = std::to_underlying(GLTextureMapType::PrefilteredMap);
-            const auto brdf_lut_unit = std::to_underlying(GLTextureMapType::BrdfLutMap);
-            const auto prefiltered_max_lod = static_cast<float>(env_maps_.prefiltered_mips - 1);
 
             program->SetUniform(Uniform::IrradianceMap, &irradiance_unit);
             program->SetUniform(Uniform::PrefilteredMap, &prefiltered_unit);
@@ -312,17 +281,17 @@ auto Renderer::Impl::SetUniforms(
             program->SetUniform(Uniform::MaterialRoughness, &m->roughness);
 
             if (attrs->shadow_maps) {
-                auto tex_unit = std::to_underlying(GLTextureMapType::ShadowMap2D);
-                glActiveTexture(GL_TEXTURE0 + tex_unit);
+                auto texture_unit = next_texture_unit++;
+                glActiveTexture(GL_TEXTURE0 + texture_unit);
                 glBindTexture(GL_TEXTURE_2D_ARRAY, shadow_maps_.GetTexture2D());
-                program->SetUniform(Uniform::ShadowMaps2D, &tex_unit);
+                program->SetUniform(Uniform::ShadowMaps2D, &texture_unit);
                 program->SetUniform(Uniform::ReceiveShadow, &renderable->receive_shadow);
 
                 if (attrs->point_shadow_maps) {
-                    auto point_tex_unit = std::to_underlying(GLTextureMapType::PointShadowMap);
-                    glActiveTexture(GL_TEXTURE0 + point_tex_unit);
+                    auto point_texture_unit = next_texture_unit++;
+                    glActiveTexture(GL_TEXTURE0 + point_texture_unit);
                     glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, shadow_maps_.GetPointTexture());
-                    program->SetUniform(Uniform::PointShadowMaps, &point_tex_unit);
+                    program->SetUniform(Uniform::PointShadowMaps, &point_texture_unit);
                 }
             }
         }
@@ -331,27 +300,27 @@ auto Renderer::Impl::SetUniforms(
         program->SetUniform(Uniform::EmissiveIntensity, &m->emissive_intensity);
 
         if (attrs->albedo_map) {
-            bind_texture(GLTextureMapType::AlbedoMap, m->albedo_map);
+            bind_texture(Uniform::AlbedoMap, m->albedo_map);
         }
         if (attrs->alpha_map) {
-            bind_texture(GLTextureMapType::AlphaMap, m->alpha_map);
+            bind_texture(Uniform::AlphaMap, m->alpha_map);
         }
         if (attrs->ao_map) {
-            bind_texture(GLTextureMapType::AOMap, m->ao_map);
+            bind_texture(Uniform::AOMap, m->ao_map);
             program->SetUniform(Uniform::AOIntensity, &m->ao_intensity);
         }
         if (attrs->emissive_map) {
-            bind_texture(GLTextureMapType::EmissiveMap, m->emissive_map);
+            bind_texture(Uniform::EmissiveMap, m->emissive_map);
         }
         if (attrs->normal_map) {
-            bind_texture(GLTextureMapType::NormalMap, m->normal_map);
+            bind_texture(Uniform::NormalMap, m->normal_map);
             program->SetUniform(Uniform::NormalIntensity, &m->normal_intensity);
         }
         if (attrs->metallic_map) {
-            bind_texture(GLTextureMapType::MetallicMap, m->metallic_map);
+            bind_texture(Uniform::MetallicMap, m->metallic_map);
         }
         if (attrs->roughness_map) {
-            bind_texture(GLTextureMapType::RoughnessMap, m->roughness_map);
+            bind_texture(Uniform::RoughnessMap, m->roughness_map);
         }
     }
 
@@ -364,17 +333,17 @@ auto Renderer::Impl::SetUniforms(
             program->SetUniform(Uniform::MaterialShininess, &m->shininess);
 
             if (attrs->shadow_maps) {
-                auto tex_unit = std::to_underlying(GLTextureMapType::ShadowMap2D);
-                glActiveTexture(GL_TEXTURE0 + tex_unit);
+                auto texture_unit = next_texture_unit++;
+                glActiveTexture(GL_TEXTURE0 + texture_unit);
                 glBindTexture(GL_TEXTURE_2D_ARRAY, shadow_maps_.GetTexture2D());
-                program->SetUniform(Uniform::ShadowMaps2D, &tex_unit);
+                program->SetUniform(Uniform::ShadowMaps2D, &texture_unit);
                 program->SetUniform(Uniform::ReceiveShadow, &renderable->receive_shadow);
 
                 if (attrs->point_shadow_maps) {
-                    auto point_tex_unit = std::to_underlying(GLTextureMapType::PointShadowMap);
-                    glActiveTexture(GL_TEXTURE0 + point_tex_unit);
+                    auto point_texture_unit = next_texture_unit++;
+                    glActiveTexture(GL_TEXTURE0 + point_texture_unit);
                     glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, shadow_maps_.GetPointTexture());
-                    program->SetUniform(Uniform::PointShadowMaps, &point_tex_unit);
+                    program->SetUniform(Uniform::PointShadowMaps, &point_texture_unit);
                 }
             }
         }
@@ -383,28 +352,28 @@ auto Renderer::Impl::SetUniforms(
         program->SetUniform(Uniform::EmissiveIntensity, &m->emissive_intensity);
 
         if (attrs->albedo_map) {
-            bind_texture(GLTextureMapType::AlbedoMap, m->albedo_map);
+            bind_texture(Uniform::AlbedoMap, m->albedo_map);
         }
         if (attrs->alpha_map) {
-            bind_texture(GLTextureMapType::AlphaMap, m->alpha_map);
+            bind_texture(Uniform::AlphaMap, m->alpha_map);
         }
         if (attrs->ao_map) {
-            bind_texture(GLTextureMapType::AOMap, m->ao_map);
+            bind_texture(Uniform::AOMap, m->ao_map);
             program->SetUniform(Uniform::AOIntensity, &m->ao_intensity);
         }
         if (attrs->emissive_map) {
-            bind_texture(GLTextureMapType::EmissiveMap, m->emissive_map);
+            bind_texture(Uniform::EmissiveMap, m->emissive_map);
         }
         if (attrs->environment_map) {
-            bind_texture(GLTextureMapType::EnvironmentMap, m->environment_map);
+            bind_texture(Uniform::EnvironmentMap, m->environment_map);
             program->SetUniform(Uniform::Reflectivity, &m->reflectivity);
         }
         if (attrs->normal_map) {
-            bind_texture(GLTextureMapType::NormalMap, m->normal_map);
+            bind_texture(Uniform::NormalMap, m->normal_map);
             program->SetUniform(Uniform::NormalIntensity, &m->normal_intensity);
         }
         if (attrs->specular_map) {
-            bind_texture(GLTextureMapType::SpecularMap, m->specular_map);
+            bind_texture(Uniform::SpecularMap, m->specular_map);
         }
     }
 
@@ -414,8 +383,8 @@ auto Renderer::Impl::SetUniforms(
             program->SetUniform(name, &value);
         }
         for (const auto& [name, tex] : m->textures_) {
-            const auto tex_unit = kReservedTextureUnits + next_texture_unit_++;
-            textures_.Bind(tex, static_cast<uint8_t>(tex_unit));
+            const auto tex_unit = next_texture_unit++;
+            if (textures_.Bind(tex, static_cast<uint8_t>(tex_unit)) == 0u) continue;
             program->SetUniform(name, &tex_unit);
 
             if (tex->GetType() == Texture::Type::Texture2D) {
@@ -434,7 +403,7 @@ auto Renderer::Impl::SetUniforms(
         program->SetUniform(Uniform::Rotation, &r->rotation);
 
         if (attrs->texture_map) {
-            bind_texture(GLTextureMapType::TextureMap, m->texture_map);
+            bind_texture(Uniform::TextureMap, m->texture_map);
         }
     }
 
@@ -443,10 +412,10 @@ auto Renderer::Impl::SetUniforms(
         program->SetUniform(Uniform::Color, &m->color);
 
         if (attrs->alpha_map) {
-            bind_texture(GLTextureMapType::AlphaMap, m->alpha_map);
+            bind_texture(Uniform::AlphaMap, m->alpha_map);
         }
         if (attrs->texture_map) {
-            bind_texture(GLTextureMapType::TextureMap, m->texture_map);
+            bind_texture(Uniform::TextureMap, m->texture_map);
         }
     }
 }
@@ -587,6 +556,7 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
             }
 
             state_.UseProgram(program->ProgramId());
+            auto next_texture_unit = 0;
 
             program->SetUniform(Uniform::Model, &model);
 
@@ -598,12 +568,12 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
                 program->SetUniform(Uniform::TextureTransform, &kIdentity);
 
                 const auto bind_alpha_texture = [&](
-                    GLTextureMapType type,
                     Uniform uniform,
                     const std::shared_ptr<Texture>& tex
                 ) {
-                    textures_.Bind(tex, std::to_underlying(type));
-                    program->SetUniform(uniform, &type);
+                    auto texture_unit = next_texture_unit++;
+                    if (textures_.Bind(tex, static_cast<uint8_t>(texture_unit)) == 0u) return;
+                    program->SetUniform(uniform, &texture_unit);
                     if (tex->GetType() == Texture::Type::Texture2D) {
                         const auto& transform = static_cast<Texture2D*>(tex.get())->transform.Get();
                         program->SetUniform(Uniform::TextureTransform, &transform);
@@ -612,7 +582,6 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
 
                 if (attrs.albedo_map) {
                     bind_alpha_texture(
-                        GLTextureMapType::AlbedoMap,
                         Uniform::AlbedoMap,
                         depth_material_->albedo_map
                     );
@@ -620,7 +589,6 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
 
                 if (attrs.alpha_map) {
                     bind_alpha_texture(
-                        GLTextureMapType::AlphaMap,
                         Uniform::AlphaMap,
                         depth_material_->alpha_map
                     );
@@ -703,10 +671,11 @@ auto Renderer::Impl::Render(Scene* scene, Camera* camera, RenderTarget* target) 
         : Vector2 { static_cast<float>(viewport_width_), static_cast<float>(viewport_height_) };
 
     if (scene->environment) {
-        auto texture_id = textures_.Bind(scene->environment, 0);
-        auto env_maps = environment_.GetOrProcess(scene->environment, texture_id);
-        if (env_maps.has_value()) {
-            env_maps_ = env_maps.value();
+        if (const auto texture_id = textures_.Bind(scene->environment, 0); texture_id != 0u) {
+            auto env_maps = environment_.GetOrProcess(scene->environment, texture_id);
+            if (env_maps.has_value()) {
+                env_maps_ = env_maps.value();
+            }
         }
     }
 

@@ -72,11 +72,22 @@ auto apply_sampler_params(GLenum target, const Texture* tex) -> void {
 
 }
 
+GLTextures::GLTextures() {
+    current_texture_ids_.resize(std::max(16, gl::limits().max_texture_units), 0);
+}
+
 auto GLTextures::Bind(const std::shared_ptr<Texture>& texture, uint8_t texture_unit) -> GLuint {
-    VGLX_ASSERT(
-        texture_unit < kMaxTextureUnits,
-        "GLTextures::Bind texture unit out of range"
-    );
+    auto max_size = current_texture_ids_.size();
+
+    if (texture_unit >= max_size) {
+        Logger::Log(
+            LogLevel::Error,
+            "Failed to bind texture. Unit {} exceeds max texture units {}",
+            texture_unit,
+            max_size
+        );
+        return 0u;
+    }
 
     const auto texture_id = GetTextureId(texture);
     if (texture_id == 0) {

@@ -32,7 +32,7 @@ auto limits() -> const Renderer::Limits& {
         auto l = Renderer::Limits {};
         glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &l.max_anisotropy);
         glGetIntegerv(GL_MAX_SAMPLES, &l.max_samples);
-        glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &l.max_texture_units);
+        glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &l.max_texture_units);
         glGetIntegerv(GL_MAX_TEXTURE_SIZE, &l.max_texture_size);
         glGetIntegerv(GL_MAX_CUBE_MAP_TEXTURE_SIZE, &l.max_cube_map_size);
         glGetIntegerv(GL_MAX_RENDERBUFFER_SIZE, &l.max_renderbuffer_size);
