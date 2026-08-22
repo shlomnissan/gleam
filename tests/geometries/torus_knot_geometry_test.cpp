@@ -65,6 +65,10 @@ TEST_F(TorusKnotGeometryTest, AttributesConfiguredCorrectly) {
 #pragma region Assertions
 
 TEST(TorusKnotGeometry, DeathWhenParamsAreInvalid) {
+#ifdef NDEBUG
+    GTEST_SKIP() << "VGLX_ASSERT is disabled in release builds";
+#endif
+
     EXPECT_DEATH({
         vglx::TorusKnotGeometry({.radius = 0.0f});
     }, ".*params.radius > 0.0f");

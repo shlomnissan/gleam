@@ -125,6 +125,10 @@ TEST(PlaneGeometry, OrientationPreservesTriangleWinding) {
 #pragma region Assertions
 
 TEST(PlaneGeometry, DeathWhenParamsAreInvalid) {
+#ifdef NDEBUG
+    GTEST_SKIP() << "VGLX_ASSERT is disabled in release builds";
+#endif
+
     EXPECT_DEATH({
         vglx::PlaneGeometry({.width = 0.0f});
     }, ".*params.width > 0");

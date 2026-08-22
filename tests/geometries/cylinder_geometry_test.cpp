@@ -72,6 +72,10 @@ TEST_F(CylinderGeometryTest, AttributesConfiguredCorrectly) {
 #pragma region Assertions
 
 TEST(CylinderGeometry, DeathWhenParamsAreInvalid) {
+#ifdef NDEBUG
+    GTEST_SKIP() << "VGLX_ASSERT is disabled in release builds";
+#endif
+
     EXPECT_DEATH({
         vglx::CylinderGeometry({.height = 0.0f});
     }, ".*params.height > 0");

@@ -14,9 +14,24 @@
 
 using namespace std::string_literals;
 
+class LoggerTest : public testing::Test {
+protected:
+    void SetUp() override {
+        previous_level_ = vglx::GetLogLevel();
+        vglx::SetLogLevel(vglx::LogLevel::Debug);
+    }
+
+    void TearDown() override {
+        vglx::SetLogLevel(previous_level_);
+    }
+
+private:
+    vglx::LogLevel previous_level_;
+};
+
 #pragma region Standard Logger
 
-TEST(Logger, LogInfo) {
+TEST_F(LoggerTest, LogInfo) {
     testing::internal::CaptureStdout();
     vglx::Logger::Log(vglx::LogLevel::Info, "info");
     auto output = testing::internal::GetCapturedStdout();
@@ -24,7 +39,7 @@ TEST(Logger, LogInfo) {
     EXPECT_THAT(output, ::testing::HasSubstr("\x1B[1;34m[Info]\x1B[0m: info"));
 }
 
-TEST(Logger, LogWarning) {
+TEST_F(LoggerTest, LogWarning) {
     testing::internal::CaptureStdout();
     vglx::Logger::Log(vglx::LogLevel::Warning, "warning");
     auto output = testing::internal::GetCapturedStdout();
@@ -32,7 +47,7 @@ TEST(Logger, LogWarning) {
     EXPECT_THAT(output, ::testing::HasSubstr("\x1B[1;33m[Warning]\x1B[0m: warning"));
 }
 
-TEST(Logger, LogError) {
+TEST_F(LoggerTest, LogError) {
     testing::internal::CaptureStderr();
     vglx::Logger::Log(vglx::LogLevel::Error, "error");
     auto output = testing::internal::GetCapturedStderr();
@@ -40,7 +55,7 @@ TEST(Logger, LogError) {
     EXPECT_THAT(output, ::testing::HasSubstr("\x1B[1;31m[Error]\x1B[0m: error"));
 }
 
-TEST(Logger, LogDebug) {
+TEST_F(LoggerTest, LogDebug) {
     testing::internal::CaptureStdout();
     vglx::Logger::Log(vglx::LogLevel::Debug, "debug");
     auto output = testing::internal::GetCapturedStdout();
@@ -52,7 +67,7 @@ TEST(Logger, LogDebug) {
 
 #pragma region Log once
 
-TEST(Logger, LogOnceSuppressesRepeatedMessages) {
+TEST_F(LoggerTest, LogOnceSuppressesRepeatedMessages) {
     testing::internal::CaptureStdout();
     vglx::Logger::LogOnce(vglx::LogLevel::Info, "log once repeated");
     vglx::Logger::LogOnce(vglx::LogLevel::Info, "log once repeated");
@@ -63,7 +78,7 @@ TEST(Logger, LogOnceSuppressesRepeatedMessages) {
     EXPECT_EQ(output.find("log once repeated", first + 1), std::string::npos);
 }
 
-TEST(Logger, LogOnceEmitsDistinctMessages) {
+TEST_F(LoggerTest, LogOnceEmitsDistinctMessages) {
     testing::internal::CaptureStdout();
     vglx::Logger::LogOnce(vglx::LogLevel::Info, "log once resource {}", "a"s);
     vglx::Logger::LogOnce(vglx::LogLevel::Info, "log once resource {}", "b"s);
@@ -77,7 +92,7 @@ TEST(Logger, LogOnceEmitsDistinctMessages) {
 
 #pragma region String formatting
 
-TEST(Logger, StringFormatting) {
+TEST_F(LoggerTest, StringFormatting) {
     testing::internal::CaptureStdout();
 
     auto version = "OpenGL ES 3.2 NVIDIA 560.94 initialized"s;

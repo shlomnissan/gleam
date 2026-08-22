@@ -69,6 +69,10 @@ TEST_F(BoxGeometryTest, AttributesConfiguredCorrectly) {
 #pragma region Assertions
 
 TEST(BoxGeometry, DeathWhenParamsAreInvalid) {
+#ifdef NDEBUG
+    GTEST_SKIP() << "VGLX_ASSERT is disabled in release builds";
+#endif
+
     EXPECT_DEATH({
         vglx::BoxGeometry({.width = 0.0f});
     }, ".*params.width > 0");

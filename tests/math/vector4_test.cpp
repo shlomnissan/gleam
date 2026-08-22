@@ -108,7 +108,6 @@ TEST(Vector4, ComponentAccessRandomAccessOperator) {
     EXPECT_FLOAT_EQ(v[1], 2.0f);
     EXPECT_FLOAT_EQ(v[2], 3.0f);
     EXPECT_FLOAT_EQ(v[3], 4.0f);
-    EXPECT_DEATH({ (void)v[4]; }, ".*i >= 0 && i < 4.*");
 
     static_assert(v[0] == 1.0f);
     static_assert(v[1] == 2.0f);

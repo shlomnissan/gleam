@@ -65,6 +65,10 @@ TEST_F(SphereGeometryTest, AttributesConfiguredCorrectly) {
 #pragma region Assertions
 
 TEST(SphereGeometry, DeathWhenParamsAreInvalid) {
+#ifdef NDEBUG
+    GTEST_SKIP() << "VGLX_ASSERT is disabled in release builds";
+#endif
+
     EXPECT_DEATH({
         vglx::SphereGeometry({.radius = 0.0f});
     }, ".*params.radius > 0.0f");

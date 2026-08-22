@@ -71,6 +71,10 @@ TEST_F(ConeGeometryTest, AttributesConfiguredCorrectly) {
 #pragma region Assertions
 
 TEST(ConeGeometry, DeathWhenParamsAreInvalid) {
+#ifdef NDEBUG
+    GTEST_SKIP() << "VGLX_ASSERT is disabled in release builds";
+#endif
+
     EXPECT_DEATH({
         vglx::ConeGeometry({.height = 0.0f});
     }, ".*params.height > 0");
