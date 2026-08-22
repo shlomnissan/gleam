@@ -16,16 +16,16 @@ namespace vglx {
 Renderer::Renderer(const Renderer::Parameters& params)
     : impl_(std::make_unique<Impl>(params)) {}
 
-Renderer::Renderer(Renderer&&) noexcept = default;
-
-auto Renderer::operator=(Renderer&&) noexcept -> Renderer& = default;
-
 auto Renderer::Initialize() -> std::expected<void, std::string> {
     return impl_->Initialize();
 }
 
 auto Renderer::Render(Scene* scene, Camera* camera, RenderTarget* target) -> void {
     impl_->Render(scene, camera, target);
+}
+
+auto Renderer::Clear(RenderTarget* target) -> void {
+    impl_->Clear(target);
 }
 
 auto Renderer::SetViewport(int x, int y, int width, int height) -> void {

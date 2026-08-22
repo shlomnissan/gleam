@@ -117,10 +117,10 @@ public:
     explicit Renderer(const Renderer::Parameters& params);
 
     Renderer(const Renderer&) = delete;
-    Renderer(Renderer&&) noexcept;
+    Renderer(Renderer&&) noexcept = delete;
 
     auto operator=(const Renderer&) -> Renderer& = delete;
-    auto operator=(Renderer&&) noexcept -> Renderer&;
+    auto operator=(Renderer&&) noexcept -> Renderer& = delete;
 
     /**
      * @brief Initializes GPU state and allocates required resources.
@@ -132,13 +132,27 @@ public:
      *
      * The scene is expected to be in a consistent state for rendering.
      * If you are using the runtime path, this is handled automatically.
-     * In direct initialization flows, call tye per-frame update routine
+     * In direct initialization flows, call the per-frame update routine
      * @ref Scene::Advance prior to rendering.
      *
      * @param scene Pointer to the scene to render.
      * @param camera Pointer to the active camera.
+     * @param target Pointer to the render target to clear or `nullptr`
+     * for default framebuffer.
      */
     auto Render(Scene* scene, Camera* camera, RenderTarget* target = nullptr) -> void;
+
+    /**
+     * @brief Clears the color and depth buffers of the given target.
+     *
+     * Intended for compositing flows where automatic clearing is disabled
+     * (see @ref SetAutoClear). Call it once at the start of a frame, then
+     * render multiple scenes into the same target.
+     *
+     * @param target Pointer to the render target to clear or `nullptr`
+     * for default framebuffer.
+     */
+    auto Clear(RenderTarget* target = nullptr) -> void;
 
     /**
      * @brief Sets the active viewport rectangle in pixels.
@@ -175,7 +189,11 @@ public:
      * When enabled (the default), each call to @ref Render clears the color
      * and depth buffers before drawing. Disable it to composite multiple
      * scenes into the same frame, such as rendering a screen-space overlay
-     * on top of a previously rendered scene.
+     * on top of a previously rendered scene, using @ref Clear to clear
+     * explicitly when needed.
+     *
+     * @param auto_clear Clear the depth and color buffers automatically at the start
+     * of each frame.
      */
     auto SetAutoClear(bool auto_clear) -> void;
 

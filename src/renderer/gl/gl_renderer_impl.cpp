@@ -713,6 +713,14 @@ auto Renderer::Impl::Render(Scene* scene, Camera* camera, RenderTarget* target) 
     }
 }
 
+auto Renderer::Impl::Clear(RenderTarget* target) -> void {
+    target == nullptr ? scene_buffer_.Begin() : framebuffers_.Begin(target);
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    framebuffers_.Reset();
+}
+
 auto Renderer::Impl::SetViewport(int x, int y, int width, int height) -> void {
     viewport_width_ = width;
     viewport_height_ = height;
