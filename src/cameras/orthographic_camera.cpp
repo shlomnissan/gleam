@@ -42,10 +42,13 @@ auto OrthographicCamera::OnResize(int width, int height) -> void {
 
     switch (resize_policy) {
     case ResizePolicy::PixelSpace: {
-        params_.left = 0;
-        params_.right = fw;
-        params_.top = 0;
-        params_.bottom = fh;
+        const auto x_flipped = params_.left > params_.right;
+        const auto y_flipped = params_.top > params_.bottom;
+
+        params_.left = x_flipped ? fw : 0;
+        params_.right = x_flipped ? 0 : fw;
+        params_.top = y_flipped ? fh : 0;
+        params_.bottom = y_flipped ? 0 : fh;
         break;
     }
     case ResizePolicy::FixedVertical: {

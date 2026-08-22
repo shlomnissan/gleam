@@ -58,7 +58,7 @@ public:
      * @brief Defines how the orthographic projection should adapt on window resize.
      */
     enum class ResizePolicy {
-        PixelSpace, ///< Projection matches framebuffer dimensions.
+        PixelSpace, ///< Projection matches framebuffer dimensions, preserving axis orientation.
         FixedVertical, ///< Vertical extent remains constant, horizontal adjusted.
         FixedHorizontal ///< Horizontal extent remains constant, vertical adjusted.
     };
