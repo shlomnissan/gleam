@@ -67,20 +67,37 @@ TEST(BufferAttribute, ElementCount) {
 
 TEST(BufferAttribute, SetDataReplacesDataAndBumpsVersion) {
     auto attribute = create_attribute(vglx::BufferAttribute::Format::Float32x3, {
-        1.0f, 2.0f, 3.0f
+        1.0f, 2.0f, 3.0f,
+        4.0f, 5.0f, 6.0f
     });
 
     EXPECT_EQ(attribute->GetVersion(), 0);
+
+    attribute->SetData({
+        7.0f, 8.0f, 9.0f,
+        10.0f, 11.0f, 12.0f
+    });
+
+    EXPECT_EQ(attribute->GetData().size(), 6);
+    EXPECT_FLOAT_EQ(attribute->GetData()[0], 7.0f);
+    EXPECT_EQ(attribute->ElementCount(), 2);
+    EXPECT_EQ(attribute->GetVersion(), 1);
+}
+
+TEST(BufferAttribute, SetDataRejectsElementCountChange) {
+    auto attribute = create_attribute(vglx::BufferAttribute::Format::Float32x3, {
+        1.0f, 2.0f, 3.0f
+    });
 
     attribute->SetData({
         4.0f, 5.0f, 6.0f,
         7.0f, 8.0f, 9.0f
     });
 
-    EXPECT_EQ(attribute->GetData().size(), 6);
-    EXPECT_FLOAT_EQ(attribute->GetData()[0], 4.0f);
-    EXPECT_EQ(attribute->ElementCount(), 2);
-    EXPECT_EQ(attribute->GetVersion(), 1);
+    EXPECT_EQ(attribute->GetData().size(), 3);
+    EXPECT_FLOAT_EQ(attribute->GetData()[0], 1.0f);
+    EXPECT_EQ(attribute->ElementCount(), 1);
+    EXPECT_EQ(attribute->GetVersion(), 0);
 }
 
 TEST(BufferAttribute, SetDataRejectsNonDivisibleSize) {

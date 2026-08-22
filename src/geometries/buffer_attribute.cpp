@@ -51,6 +51,11 @@ auto BufferAttribute::SetData(std::vector<float> data) -> void {
         return;
     }
 
+    if (data.size() != data_.size()) {
+        Logger::Log(LogLevel::Error, "Buffer attribute skipped data update. Attributes cannot be resized");
+        return;
+    }
+
     data_ = std::move(data);
     version_++;
 }

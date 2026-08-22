@@ -145,9 +145,12 @@ public:
     /**
      * @brief Replaces the attribute data.
      *
-     * The new data may have a different element count but must be divisible
-     * by the number of components implied by the format, otherwise the update
-     * is rejected. A successful update marks the attribute for re-upload.
+     * The new data must contain the same number of elements as the existing
+     * data. Attributes cannot be resized after construction. To change the
+     * element count, create a new attribute instead. Data must also be
+     * divisible by the number of components implied by the format, otherwise
+     * the update is rejected. A successful update marks the attribute for
+     * re-upload.
      *
      * @param data Flat array of floats containing the new attribute data.
      */
