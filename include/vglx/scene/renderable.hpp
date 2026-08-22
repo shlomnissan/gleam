@@ -36,6 +36,16 @@ public:
     /// @brief When `true` this object participates in view frustum culling.
     bool frustum_culled {true};
 
+    /**
+     * @brief Explicit draw-order override within a render pass.
+     *
+     * Objects with a lower value are drawn first. Objects that share a value
+     * fall back to the pass's distance-based sort: front-to-back for opaque
+     * objects and back-to-front for transparent ones. Useful for layering
+     * objects that render without depth testing.
+     */
+    int render_order {0};
+
     /// @brief When `true` this object casts shadows onto shadow receivers.
     bool cast_shadow {false};
 

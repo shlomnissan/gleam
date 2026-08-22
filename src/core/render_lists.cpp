@@ -9,6 +9,7 @@
 
 #include <ranges>
 #include <limits>
+#include <utility>
 
 #include "utilities/assert.hpp"
 
@@ -24,13 +25,17 @@ auto RenderLists::ProcessScene(Scene* scene, Camera* camera, bool sort) -> void 
 
     const auto c = camera->GetWorldPosition();
     const auto f = camera->Forward();
-    const auto compare = [&](auto* renderable) {
+    const auto depth = [&](auto* renderable) {
         return Dot(renderable->GetWorldPosition() - c, f);
     };
 
     if (sort) {
-        std::ranges::stable_sort(opaque_, std::ranges::less {}, compare);
-        std::ranges::stable_sort(transparent_, std::ranges::greater {}, compare);
+        std::ranges::stable_sort(opaque_, std::ranges::less {}, [&](auto* r) {
+            return std::pair {r->render_order, depth(r)};
+        });
+        std::ranges::stable_sort(transparent_, std::ranges::less {}, [&](auto* r) {
+            return std::pair {r->render_order, -depth(r)};
+        });
     }
 }
 
