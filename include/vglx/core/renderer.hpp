@@ -78,6 +78,7 @@ public:
         int framebuffer_height {720}; ///< Current framebuffer height in pixels.
         int sample_count {1}; ///< Antialiasing level (e.g., 4x MSAA).
         Color clear_color {0x000000u}; ///< Clear color used at the start of a frame.
+        bool auto_clear {true}; ///< Automatic buffer clearing at the start of a frame.
         ToneMapping tone_mapping {ToneMapping::None}; ///< Tone mapping operator applied to the final frame.
         float exposure {1.0f}; ///< Exposure scale applied to HDR values before tone mapping.
         ShadowMap shadow_map {ShadowMap::None}; ///< Shadow mapping method applied to the scene.
@@ -167,6 +168,16 @@ public:
      * @param color Clear color in RGB format.
      */
     auto SetClearColor(const Color& color) -> void;
+
+    /**
+     * @brief Sets whether the color and depth buffers are cleared before drawing.
+     *
+     * When enabled (the default), each call to @ref Render clears the color
+     * and depth buffers before drawing. Disable it to composite multiple
+     * scenes into the same frame, such as rendering a screen-space overlay
+     * on top of a previously rendered scene.
+     */
+    auto SetAutoClear(bool auto_clear) -> void;
 
     /**
      * @brief Sets the tone mapping operator for subsequent frames.

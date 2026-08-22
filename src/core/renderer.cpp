@@ -36,6 +36,10 @@ auto Renderer::SetClearColor(const Color& color) -> void {
     impl_->SetClearColor(color);
 }
 
+auto Renderer::SetAutoClear(bool auto_clear) -> void {
+    impl_->SetAutoClear(auto_clear);
+}
+
 auto Renderer::SetToneMapping(ToneMapping tone_mapping) -> void {
     impl_->SetToneMapping(tone_mapping);
 }

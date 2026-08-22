@@ -54,6 +54,8 @@ public:
 
     auto SetClearColor(const Color& color) -> void;
 
+    auto SetAutoClear(bool auto_clear) -> void;
+
     auto SetToneMapping(ToneMapping tone_mapping) -> void;
 
     auto SetExposure(float exposure) -> void;
@@ -103,6 +105,8 @@ private:
     size_t rendered_objects_per_frame_ {0};
 
     Renderer::ShadowMap shadow_map_ {Renderer::ShadowMap::None};
+
+    bool auto_clear_ {true};
 
     Renderer::ToneMapping tone_mapping_ {Renderer::ToneMapping::None};
 

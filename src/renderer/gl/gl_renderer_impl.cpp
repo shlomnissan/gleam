@@ -51,6 +51,7 @@ Renderer::Impl::Impl(const Renderer::Parameters& params)
     shadow_render_lists_(std::make_unique<RenderLists>()),
     depth_material_(DepthMaterial::Create()),
     shadow_map_(params.shadow_map),
+    auto_clear_(params.auto_clear),
     tone_mapping_(params.tone_mapping),
     exposure_(params.exposure)
 {
@@ -691,7 +692,9 @@ auto Renderer::Impl::Render(Scene* scene, Camera* camera, RenderTarget* target) 
     const auto use_default_target = target == nullptr;
     use_default_target ? scene_buffer_.Begin() : framebuffers_.Begin(target);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    if (auto_clear_) {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
 
     camera_ubo_.Update(camera->projection_matrix, camera->view_matrix);
 
@@ -719,6 +722,10 @@ auto Renderer::Impl::SetViewport(int x, int y, int width, int height) -> void {
 
 auto Renderer::Impl::SetClearColor(const Color& color) -> void {
     state_.SetClearColor(color);
+}
+
+auto Renderer::Impl::SetAutoClear(bool auto_clear) -> void {
+    auto_clear_ = auto_clear;
 }
 
 auto Renderer::Impl::SetToneMapping(ToneMapping tone_mapping) -> void {
