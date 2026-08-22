@@ -69,9 +69,9 @@ public:
     /**
      * @brief Constructs a matrix from three column vectors.
      *
-     * @param vec1 First column.
-     * @param vec2 Second column.
-     * @param vec3 Third column.
+     * @param vec0 First column.
+     * @param vec1 Second column.
+     * @param vec2 Third column.
      */
     constexpr Matrix3(
         const Vector3& vec0,
