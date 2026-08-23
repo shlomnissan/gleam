@@ -53,14 +53,14 @@ public:
      * existing categories.
      */
     enum class Type {
+        Billboard, ///< Camera-facing quad.
         Camera, ///< Perspective or orthographic camera.
         Default, ///< Generic node without special behavior.
         InstancedMesh, ///< Node containing instanced meshes.
         Light, ///< Light source (directional, point, or spot).
         Mesh, ///< Single mesh with an associated material.
         Renderable, ///< Any node that can be rendered to the screen.
-        Scene, ///< Root of a scene hierarchy.
-        Sprite ///< Billboarded sprite.
+        Scene ///< Root of a scene hierarchy.
     };
 
     /// @brief Local transform (position, rotation, scale) of this node.

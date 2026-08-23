@@ -11,18 +11,18 @@
 #include "vglx/core/render_target.hpp"
 #include "vglx/geometries/geometry.hpp"
 #include "vglx/lights/light.hpp"
+#include "vglx/materials/billboard_material.hpp"
 #include "vglx/materials/material.hpp"
 #include "vglx/materials/pbr_material.hpp"
 #include "vglx/materials/phong_material.hpp"
 #include "vglx/materials/shader_material.hpp"
-#include "vglx/materials/sprite_material.hpp"
 #include "vglx/materials/unlit_material.hpp"
 #include "vglx/math/matrix3.hpp"
+#include "vglx/scene/billboard.hpp"
 #include "vglx/scene/fog.hpp"
 #include "vglx/scene/instanced_mesh.hpp"
 #include "vglx/scene/mesh.hpp"
 #include "vglx/scene/scene.hpp"
-#include "vglx/scene/sprite.hpp"
 #include "vglx/textures/texture.hpp"
 #include "vglx/textures/texture_2d.hpp"
 
@@ -395,9 +395,9 @@ auto Renderer::Impl::SetUniforms(
         }
     }
 
-    if (attrs->type == Material::Type::SpriteMaterial) {
-        auto m = static_cast<SpriteMaterial*>(material);
-        auto r = static_cast<Sprite*>(renderable);
+    if (attrs->type == Material::Type::BillboardMaterial) {
+        auto m = static_cast<BillboardMaterial*>(material);
+        auto r = static_cast<Billboard*>(renderable);
 
         program->SetUniform(Uniform::Anchor, &r->anchor);
         program->SetUniform(Uniform::Color, &m->color);

@@ -17,8 +17,7 @@ namespace vglx {
  *
  * Euler stores orientation using intrinsic Tait–Bryan angles in YXZ order:
  * yaw around the Y-axis is applied first, then pitch around the rotated
- * X-axis, then roll around the rotated Z-axis (equivalent to the three.js
- * Euler order "YXZ"). All angles are specified in radians.
+ * X-axis, then roll around the rotated Z-axis. All angles are specified in radians.
  *
  * Instances can be constructed from individual angles or extracted from a
  * transformation matrix, and converted back to a @ref Matrix4 for use in

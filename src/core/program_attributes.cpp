@@ -13,7 +13,7 @@
 #include "vglx/materials/pbr_material.hpp"
 #include "vglx/materials/phong_material.hpp"
 #include "vglx/materials/shader_material.hpp"
-#include "vglx/materials/sprite_material.hpp"
+#include "vglx/materials/billboard_material.hpp"
 #include "vglx/materials/unlit_material.hpp"
 #include "vglx/math/utilities.hpp"
 
@@ -73,8 +73,8 @@ ProgramAttributes::ProgramAttributes(
         fragment_shader = m->fragment_shader_;
     }
 
-    if (type == Material::Type::SpriteMaterial) {
-        auto m = static_cast<const SpriteMaterial*>(material);
+    if (type == Material::Type::BillboardMaterial) {
+        auto m = static_cast<const BillboardMaterial*>(material);
         color = true;
         texture_map = m->texture_map != nullptr;
         size_attenuation = m->size_attenuation;

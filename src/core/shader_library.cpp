@@ -7,22 +7,22 @@
 
 #include "core/shader_library.hpp"
 
+#include "vglx/materials/billboard_material.hpp"
 #include "vglx/materials/pbr_material.hpp"
 #include "vglx/materials/phong_material.hpp"
 #include "vglx/materials/shader_material.hpp"
-#include "vglx/materials/sprite_material.hpp"
 #include "vglx/materials/unlit_material.hpp"
 
 #include "utilities/logger.hpp"
 
+#include "shaders/headers/billboard_material_frag.h"
+#include "shaders/headers/billboard_material_vert.h"
 #include "shaders/headers/depth_material_frag.h"
 #include "shaders/headers/depth_material_vert.h"
 #include "shaders/headers/pbr_material_frag.h"
 #include "shaders/headers/pbr_material_vert.h"
 #include "shaders/headers/phong_material_frag.h"
 #include "shaders/headers/phong_material_vert.h"
-#include "shaders/headers/sprite_material_frag.h"
-#include "shaders/headers/sprite_material_vert.h"
 #include "shaders/headers/unlit_material_frag.h"
 #include "shaders/headers/unlit_material_vert.h"
 #include "shaders/snippets/headers/frag_global_lights_glsl.h"
@@ -76,13 +76,13 @@ auto ShaderLibrary::GetShaderSource(const ProgramAttributes& attrs) const -> std
         }};
     }
 
-    if (attrs.type == Material::Type::SpriteMaterial) {
+    if (attrs.type == Material::Type::BillboardMaterial) {
         return {{
             ShaderType::kVertexShader,
-            ProcessShader(attrs, _SHADER_sprite_material_vert)
+            ProcessShader(attrs, _SHADER_billboard_material_vert)
         }, {
             ShaderType::kFragmentShader,
-            ProcessShader(attrs, _SHADER_sprite_material_frag)
+            ProcessShader(attrs, _SHADER_billboard_material_frag)
         }};
     }
 

@@ -31,11 +31,11 @@ public:
      * @brief Enumerates all supported material types.
      */
     enum class Type {
+        BillboardMaterial, ///< Specialized material for camera-facing billboards.
         DepthMaterial, ///< Renders depth only; used internally for shadow map passes.
         PBRMaterial, ///< Implements physically-based rendering with the metallic workflow.
         PhongMaterial, ///< Implements the Blinn–Phong lighting model.
         ShaderMaterial, ///< Uses a custom shader program for rendering.
-        SpriteMaterial, ///< Specialized material for 2D sprites and billboards.
         UnlitMaterial, ///< Renders without lighting; color appears as-is.
         Length, ///< Sentinel value representing the number of material types.
     };
@@ -139,6 +139,8 @@ public:
      */
     [[nodiscard]] inline static auto TypeToString(Type type) -> std::string {
         switch(type) {
+            case Material::Type::BillboardMaterial:
+                return "billboard_material";
             case Material::Type::DepthMaterial:
                 return "depth_material";
             case Material::Type::PBRMaterial:
@@ -147,8 +149,6 @@ public:
                 return "phong_material";
             case Material::Type::ShaderMaterial:
                 return "shader_material";
-            case Material::Type::SpriteMaterial:
-                return "sprite_material";
             case Material::Type::UnlitMaterial:
                 return "unlit_material";
             default:

@@ -5,7 +5,7 @@
 ===========================================================================
 */
 
-#include "vglx/scene/sprite.hpp"
+#include "vglx/scene/billboard.hpp"
 
 #include "vglx/geometries/buffer_attribute.hpp"
 
@@ -13,18 +13,18 @@
 
 namespace vglx {
 
-Sprite::Sprite(std::shared_ptr<SpriteMaterial> material)
+Billboard::Billboard(std::shared_ptr<BillboardMaterial> material)
   : material_(material) {
     if (material_ == nullptr) {
-        material_ = SpriteMaterial::Create();
+        material_ = BillboardMaterial::Create();
     }
 }
 
-auto Sprite::SharedGeometry() -> std::shared_ptr<Geometry>& {
+auto Billboard::SharedGeometry() -> std::shared_ptr<Geometry>& {
     static auto geometry = std::shared_ptr<Geometry> {};
 
-    // Rebuild on demand so disposing the shared geometry through a sprite
-    // cannot permanently break sprite rendering.
+    // Rebuild on demand so disposing the shared geometry through a billboard
+    // cannot permanently break billboard rendering.
     if (geometry == nullptr || geometry->Disposed()) {
         auto g = Geometry::Create();
 

@@ -121,8 +121,7 @@ public:
      *
      * Uses the convention $\Phi = \pi \cdot I$, where $I$ is
      * @ref Light::intensity "intensity" in candela, so power is independent
-     * of the cone @ref angle. This matches the three.js convention rather
-     * than the exact solid-angle integral.
+     * of the cone @ref angle.
      */
     [[nodiscard]] auto GetPower() const -> float {
         return intensity * math::pi;

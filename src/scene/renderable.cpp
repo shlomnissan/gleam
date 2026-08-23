@@ -51,13 +51,13 @@ auto Renderable::CanRender(Renderable* r) -> bool {
         return false;
     }
 
-    if (node_type == Node::Type::Sprite && mat_type != Material::Type::SpriteMaterial) {
-        Logger::Log(level, "Skipped sprite with non-sprite material {}", *r);
+    if (node_type == Node::Type::Billboard && mat_type != Material::Type::BillboardMaterial) {
+        Logger::Log(level, "Skipped billboard with non-billboard material {}", *r);
         return false;
     }
 
-    if (mat_type == Material::Type::SpriteMaterial && node_type != Node::Type::Sprite) {
-        Logger::Log(level, "Skipped non-sprite node with sprite material {}", *r);
+    if (mat_type == Material::Type::BillboardMaterial && node_type != Node::Type::Billboard) {
+        Logger::Log(level, "Skipped non-billboard node with billboard material {}", *r);
         return false;
     }
 

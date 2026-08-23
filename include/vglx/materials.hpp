@@ -12,9 +12,9 @@
  * @brief Classes defining material properties for meshes.
  */
 
+#include "vglx/materials/billboard_material.hpp"
 #include "vglx/materials/depth_material.hpp"
 #include "vglx/materials/pbr_material.hpp"
 #include "vglx/materials/phong_material.hpp"
 #include "vglx/materials/shader_material.hpp"
-#include "vglx/materials/sprite_material.hpp"
 #include "vglx/materials/unlit_material.hpp"

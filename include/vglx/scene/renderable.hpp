@@ -24,7 +24,7 @@ namespace vglx {
  * Renderable extends @ref Node with the interface the renderer needs to issue a
  * draw call: a @ref Geometry, a @ref Material, and bounding volumes used for
  * visibility culling. It is the common base for all drawable node types, such
- * as @ref Mesh, @ref InstancedMesh, and @ref Sprite.
+ * as @ref Mesh, @ref InstancedMesh, and @ref Billboard.
  *
  * This class is not instantiated directly. Use one of the concrete renderable
  * types, or derive from it to implement a custom drawable.
