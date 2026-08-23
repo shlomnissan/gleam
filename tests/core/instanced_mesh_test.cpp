@@ -68,8 +68,25 @@ TEST(InstancedMesh, ZeroCountDefaultsToSingleInstance) {
     mesh->SetTransformAt(0, transform);
 
     EXPECT_EQ(mesh->GetCount(), 1);
+    EXPECT_EQ(mesh->GetDrawCount(), 1);
     EXPECT_MAT4_EQ(mesh->TransformAt(0), transform);
     EXPECT_FALSE(mesh->BoundingSphere().IsEmpty());
+}
+
+#pragma endregion
+
+#pragma region Draw Count
+
+TEST(InstancedMesh, SetDrawCountClampsToCapacity) {
+    auto mesh = create_mesh(4);
+
+    EXPECT_EQ(mesh->GetDrawCount(), 4);
+
+    mesh->SetDrawCount(2);
+    EXPECT_EQ(mesh->GetDrawCount(), 2);
+
+    mesh->SetDrawCount(10);
+    EXPECT_EQ(mesh->GetDrawCount(), 4);
 }
 
 #pragma endregion

@@ -42,13 +42,14 @@ InstancedMesh::InstancedMesh(
     std::shared_ptr<Geometry> geometry,
     std::shared_ptr<Material> material,
     std::size_t count
-) : Mesh(geometry, material), count_(count) {
+) : Mesh(geometry, material), count_(count), draw_count_(count) {
     if (count_ == 0) {
         count_ = 1;
+        draw_count_ = 1;
         Logger::Log(
             LogLevel::Warning,
             "Instanced mesh must be initialized with at least one element, "
-            "zero element count provided, defaulting to one."
+            "zero element count provided, defaulting to one"
         );
     }
 
@@ -135,6 +136,17 @@ auto InstancedMesh::ColorAt(std::size_t idx) const -> Color {
     return Color { data[idx * 3 + 0], data[idx * 3 + 1], data[idx * 3 + 2] };
 }
 
+auto InstancedMesh::SetDrawCount(size_t draw_count) -> void {
+    if (draw_count > count_) {
+        Logger::Log(
+            LogLevel::Warning,
+            "Instanced mesh draw count cannot exceed the initial allocation, defaulting to max elements {}",
+            count_
+        );
+    }
+    draw_count_ = std::min(draw_count, count_);
+}
+
 auto InstancedMesh::SetTransformAt(std::size_t idx, const Matrix4& matrix) -> void {
     VGLX_ASSERT(idx < count_, "Index exceeds instance count");
     transforms_attr_->Write(idx * 16, std::bit_cast<std::array<float, 16>>(matrix));
@@ -154,6 +166,7 @@ auto InstancedMesh::BoundingBox() -> Box3 {
     auto key = BoundsKey {
         .transform_version = transforms_attr_->GetVersion(),
         .position_version = position_attr->GetVersion(),
+        .draw_count = draw_count_,
         .position_uuid = position_attr->UUID()
     };
 
@@ -167,7 +180,7 @@ auto InstancedMesh::BoundingBox() -> Box3 {
     }
 
     auto box = Box3 {};
-    for (auto i = std::size_t {0}; i < count_; ++i) {
+    for (auto i = std::size_t {0}; i < draw_count_; ++i) {
         auto b = base;
         b.ApplyTransform(get_transform_at(i, transforms_attr_));
         box.Union(b);
@@ -186,6 +199,7 @@ auto InstancedMesh::BoundingSphere() -> Sphere {
     auto key = BoundsKey {
         .transform_version = transforms_attr_->GetVersion(),
         .position_version = position_attr->GetVersion(),
+        .draw_count = draw_count_,
         .position_uuid = position_attr->UUID()
     };
 
@@ -199,7 +213,7 @@ auto InstancedMesh::BoundingSphere() -> Sphere {
     }
 
     auto sphere = Sphere {};
-    for (auto i = std::size_t {0}; i < count_; ++i) {
+    for (auto i = std::size_t {0}; i < draw_count_; ++i) {
         auto s = base;
         s.ApplyTransform(get_transform_at(i, transforms_attr_));
         sphere.Union(s);

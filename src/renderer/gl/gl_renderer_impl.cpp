@@ -186,7 +186,7 @@ auto Renderer::Impl::RenderObject(Renderable* renderable, Scene* scene, Camera* 
     const auto vertex_size = geometry->VertexCount();
 
     if (is_instanced) {
-        const auto count = static_cast<InstancedMesh*>(renderable)->GetCount();
+        const auto count = static_cast<InstancedMesh*>(renderable)->GetDrawCount();
         index_size
             ? glDrawElementsInstanced(primitive, index_size, GL_UNSIGNED_INT, nullptr, count)
             : glDrawArraysInstanced(primitive, 0, vertex_size, count);
@@ -609,7 +609,7 @@ auto Renderer::Impl::RenderShadowMaps(Scene* scene, Camera* camera) -> void {
             }
 
             if (is_instanced) {
-                const auto count = static_cast<InstancedMesh*>(renderable)->GetCount();
+                const auto count = static_cast<InstancedMesh*>(renderable)->GetDrawCount();
                 index_size
                     ? glDrawElementsInstanced(GL_TRIANGLES, index_size, GL_UNSIGNED_INT, nullptr, count)
                     : glDrawArraysInstanced(GL_TRIANGLES, 0, vertex_size, count);

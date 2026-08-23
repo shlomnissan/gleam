@@ -136,6 +136,9 @@ public:
     /// @brief Returns the number of allocated instances.
     [[nodiscard]] auto GetCount() const -> size_t { return count_; }
 
+    /// @brief Returns the number of instances to draw.
+    [[nodiscard]] auto GetDrawCount() const -> size_t { return draw_count_; }
+
     /**
      * @brief Returns the per-instance transform matrix at the given index.
      *
@@ -149,6 +152,13 @@ public:
      * @param idx Instance index.
      */
     [[nodiscard]] auto ColorAt(std::size_t idx) const -> Color;
+
+    /**
+     * @brief Sets the number of instances to draw.
+     *
+     * @param draw_count Number of instances. Must not exceed the initial allocation.
+     */
+    auto SetDrawCount(std::size_t draw_count) -> void;
 
     /**
      * @brief Sets the per-instance transform at the given index.
@@ -180,6 +190,7 @@ private:
     struct BoundsKey {
         uint32_t transform_version;
         uint32_t position_version;
+        std::size_t draw_count;
         std::string position_uuid;
         auto operator==(const BoundsKey&) const -> bool = default;
     };
@@ -191,7 +202,9 @@ private:
 
     std::shared_ptr<BufferAttribute> colors_attr_ {};
 
-    size_t count_;
+    std::size_t count_ {0};
+
+    std::size_t draw_count_ {0};
 
     std::optional<std::pair<BoundsKey, Box3>> bounding_box_ {};
 
