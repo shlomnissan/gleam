@@ -132,7 +132,7 @@ auto ShaderLibrary::InjectAttributes(
     if (attrs.shadow_maps) features += "#define USE_SHADOW_MAPS\n";
     if (attrs.pcf_shadows) features += "#define USE_PCF_SHADOWS\n";
     if (attrs.point_shadow_maps) features += "#define USE_POINT_SHADOW_MAPS\n";
-
+    if (attrs.uv) features += "#define USE_UV\n";
     if (attrs.albedo_map) features += "#define USE_ALBEDO_MAP\n";
     if (attrs.alpha_map) features += "#define USE_ALPHA_MAP\n";
     if (attrs.ao_map) features += "#define USE_AO_MAP\n";

@@ -4,12 +4,44 @@
 
 #pragma inject_attributes
 
-#include "snippets/frag_global_params.glsl"
-#include "snippets/frag_global_fog.glsl"
+layout (location = 0) out vec4 o_FragColor;
+
+#ifdef USE_UV
+    in vec2 v_TexCoords;
+#endif
+
+#ifdef USE_VERTEX_COLOR
+    in vec3 v_Color;
+#endif
+
+#ifdef USE_INSTANCING
+    in vec3 v_InstanceColor;
+#endif
 
 #ifdef USE_NORMAL_MAP
     in mat3 v_TBN;
 #endif
+
+#ifdef USE_FOG
+    in float v_ViewDepth;
+#endif
+
+in vec4 v_Position;
+in vec3 v_Normal;
+in vec3 v_ViewDir;
+
+uniform float u_Opacity;
+
+#ifdef USE_ALPHA_TEST
+    uniform float u_AlphaTest;
+#endif
+
+layout(std140) uniform ub_Camera {
+    mat4 u_Projection;
+    mat4 u_View;
+};
+
+#include "snippets/frag_global_fog.glsl"
 
 struct PBRMaterial {
     vec3 Color;

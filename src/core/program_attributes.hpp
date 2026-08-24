@@ -45,6 +45,7 @@ struct ProgramAttributes {
     bool tangent {false};
     bool flip_normals {false};
     bool vertex_color {false};
+    bool uv {false};
 
     bool albedo_map {false};
     bool alpha_map {false};

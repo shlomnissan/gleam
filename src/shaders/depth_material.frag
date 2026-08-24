@@ -1,10 +1,16 @@
 #version 410 core
 
-#extension GL_GOOGLE_include_directive : enable
-
 #pragma inject_attributes
 
-#include "snippets/frag_global_params.glsl"
+#ifdef USE_UV
+    in vec2 v_TexCoords;
+#endif
+
+uniform float u_Opacity;
+
+#ifdef USE_ALPHA_TEST
+    uniform float u_AlphaTest;
+#endif
 
 uniform sampler2D u_AlbedoMap;
 uniform sampler2D u_AlphaMap;

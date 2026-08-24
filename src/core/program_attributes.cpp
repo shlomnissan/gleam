@@ -96,6 +96,16 @@ ProgramAttributes::ProgramAttributes(
     vertex_color = geometry->GetAttribute(BufferAttribute::kColor) != nullptr;
     tangent = geometry->GetAttribute(BufferAttribute::kTangent) != nullptr;
 
+    uv = albedo_map ||
+         alpha_map ||
+         ao_map ||
+         emissive_map ||
+         metallic_map ||
+         roughness_map ||
+         specular_map ||
+         texture_map ||
+         (normal_map && tangent);
+
     static_assert(std::to_underlying(Material::Type::Length) <= 15);
 
     key |= (std::to_underlying(type) & 0xF); // (0–15) → 4 bits

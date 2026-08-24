@@ -4,7 +4,31 @@
 
 #pragma inject_attributes
 
-#include "snippets/frag_global_params.glsl"
+layout (location = 0) out vec4 o_FragColor;
+
+#ifdef USE_UV
+    in vec2 v_TexCoords;
+#endif
+
+#ifdef USE_VERTEX_COLOR
+    in vec3 v_Color;
+#endif
+
+#ifdef USE_INSTANCING
+    in vec3 v_InstanceColor;
+#endif
+
+#ifdef USE_FOG
+    in float v_ViewDepth;
+#endif
+
+uniform float u_Opacity;
+uniform vec3 u_Color;
+
+#ifdef USE_ALPHA_TEST
+    uniform float u_AlphaTest;
+#endif
+
 #include "snippets/frag_global_fog.glsl"
 
 uniform sampler2D u_AlphaMap;
