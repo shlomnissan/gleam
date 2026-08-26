@@ -206,7 +206,7 @@ The sampler is declared in the fragment shader like any other uniform and the en
 uniform sampler2D u_MyTexture;
 ```
 
-Sampling requires texture coordinates which the geometry provides through the `a_TexCoord` attribute. When a bound texture defines a [UV transform](/reference/textures/texture_2d), the engine uploads it through the `u_TextureTransform` uniform.
+Sampling requires texture coordinates which the geometry provides through the `a_TexCoord` attribute. When a bound texture defines a [UV transform](/reference/textures/texture2d), the engine uploads it through the `u_TextureTransform` uniform.
 
 ## Debugging Shaders
 
