@@ -41,7 +41,7 @@ layout(std140) uniform ub_Camera {
     mat4 u_View;
 };
 
-#include "snippets/frag_global_fog.glsl"
+#include "include/fog.incl.glsl"
 
 struct PBRMaterial {
     vec3 Color;
@@ -132,7 +132,7 @@ vec3 cookTorranceShading(
 
 #if NUM_LIGHTS > 0
 
-#include "snippets/frag_global_lights.glsl"
+#include "include/lights.incl.glsl"
 
 vec3 processLights(
     const in vec3 normal,

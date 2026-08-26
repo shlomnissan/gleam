@@ -41,7 +41,7 @@ layout(std140) uniform ub_Camera {
     mat4 u_View;
 };
 
-#include "snippets/frag_global_fog.glsl"
+#include "include/fog.incl.glsl"
 
 #ifdef USE_ENVIRONMENT_MAP
     uniform samplerCube u_EnvironmentMap;
@@ -94,7 +94,7 @@ vec3 phongShading(
 
 #if NUM_LIGHTS > 0
 
-#include "snippets/frag_global_lights.glsl"
+#include "include/lights.incl.glsl"
 
 vec3 processLights(
     const in vec3 normal,

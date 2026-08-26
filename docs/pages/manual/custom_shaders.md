@@ -1,24 +1,24 @@
 # Custom Shaders
 
-In VGLX, shaders are attached to materials and materials are paired with geometry. A [Mesh](/reference/scene/mesh) is the fundamental renderable unit in the engine: it combines geometry, which describes what is drawn, with a material, which describes how that geometry is shaded.
+In VGLX, shaders are attached to materials and materials are paired with geometry. A [Mesh](/reference/scene/mesh) is the fundamental renderable unit in the engine: it combines geometry which describes what is drawn, with a material which describes how that geometry is shaded.
 
 The engine provides several built-in materials each backed by its own shader program. These materials are typically sufficient and allow you to build scenes without writing any shader code at all.
 
-When you need more control over how geometry is transformed and shaded you use the [Shader Material](/reference/materials/shader_material). This material allows you to supply your own vertex and fragment shader code giving you full control over vertex transformation and fragment shading while still integrating cleanly with the rest of the engine.
+When you need more control over how geometry is transformed and shaded you use the [Shader Material](/reference/materials/shader_material). This material lets you supply your own vertex and fragment shader code giving you full control over vertex transformation and fragment shading while still integrating cleanly with the rest of the engine.
 
-VGLX uses [GLSL](https://en.wikipedia.org/wiki/OpenGL_Shading_Language) for all shader programs. Writing custom shaders assumes familiarity with shader programming concepts such as vertex and fragment stages, attributes, uniforms, and varyings. This guide does not teach GLSL. It focuses on how custom shaders fit in.
+VGLX uses [GLSL](https://en.wikipedia.org/wiki/OpenGL_Shading_Language) for shader programs. Writing custom shaders assumes familiarity with shader programming concepts such as vertex and fragment stages, attributes, uniforms, and varyings. This guide does not teach GLSL. It focuses on how custom shaders fit in.
 
-In this guide we will write a minimal custom shader program, attach it to a shader material, and use it for rendering. Along the way we will look at how VGLX injects built-in attributes and varyings, and how custom uniforms are defined and updated from the application.
+This guide demonstrates how to write a minimal custom shader program, attach it to a shader material, and use it for rendering. It also explains how geometry attributes are matched to shader declarations, which built-in uniforms the engine provides, and how custom uniforms are defined and updated from the application.
 
-You can do a lot with VGLX without writing custom shaders but if you want full flexibility over how your geometry is rendered custom shaders are the extension point and this guide is where to start.
+You can do a lot with VGLX without writing custom shaders, but if you want full flexibility over how your geometry is rendered custom shaders are the extension point.
 
 ## Shader Materials
 
 A [Shader Material](/reference/materials/shader_material) is a material backed by user-defined shaders. Unlike built-in materials, shader materials do not come with a predefined shader program. You provide code for both the vertex and fragment shaders when constructing the material.
 
-VGLX keeps the structure around custom shaders intentionally light. It provides only a small set of injected symbols. Everything else is your shader. This makes shader materials flexible and allows custom rendering techniques to integrate cleanly without fighting the engine.
+The structure around custom shaders is intentionally light. Your shaders are self-contained GLSL programs: you declare the attributes, uniforms, and varyings you use, and the engine supplies their values by name.
 
-To demonstrate how shader materials work we will start from the rotating cube scene introduced in the [previous guide](/manual/creating_application). This version uses a built-in [Unlit Material](/reference/materials/unlit_material) that colors the cube with a single constant color:
+We can start with a simple scene that renders a rotating cube. The scene uses a built-in [Unlit Material](/reference/materials/unlit_material) that colors the cube with a single constant color:
 
 ```cpp
 struct MyScene : public vglx::Scene {
@@ -29,33 +29,38 @@ struct MyScene : public vglx::Scene {
 
         mesh = Add(vglx::Mesh::Create(
             vglx::BoxGeometry::Create(),
-            vglx::UnlitMaterial::Create({.color = 0xFF00FF})
+            vglx::UnlitMaterial::Create({.color = 0xFF00FFu})
         ));
     }
 
     auto OnUpdate(float delta) -> void override {
-        const auto rotation_speed = vglx::math::pi_over_2;
-        mesh->transform.Rotate(vglx::Vector3::X(), rotation_speed * delta);
-        mesh->transform.Rotate(vglx::Vector3::Y(), rotation_speed * delta);
+        const auto speed = vglx::math::pi_over_2;
+        mesh->transform.Rotate(vglx::Vector3::X(), speed * delta);
+        mesh->transform.Rotate(vglx::Vector3::Y(), speed * delta);
     }
 };
 ```
 
-This scene renders a rotating cube in flat magenta. To illustrate how to use a custom shader we will replace the built-in material with a shader material that implements the same behavior. It colors all fragments with a single uniform color.
+To demonstrate how to use shader materials, we replace the built-in material with a custom shader that implements the same behavior.
 
-We begin by defining the vertex and fragment shader source code as raw string literals:
+Let's define the vertex and fragment shader source code as raw string literals, connect them to a shader material, and attach the material to the mesh:
 
 ```cpp
 constexpr auto vertex_shader = R"(
 #version 410 core
 #pragma inject_attributes
 
-#include "snippets/vert_global_params.glsl"
+in vec3 a_Position;
+
+uniform mat4 u_Model;
+
+layout(std140) uniform ub_Camera {
+    mat4 u_Projection;
+    mat4 u_View;
+};
 
 void main() {
-    #include "snippets/vert_main_varyings.glsl"
-
-    gl_Position = u_Projection * u_ModelView * vec4(a_Position, 1.0);
+    gl_Position = u_Projection * u_View * u_Model * vec4(a_Position, 1.0);
 }
 )";
 
@@ -63,7 +68,7 @@ constexpr auto fragment_shader = R"(
 #version 410 core
 #pragma inject_attributes
 
-#include "snippets/frag_global_params.glsl"
+layout (location = 0) out vec4 o_FragColor;
 
 uniform vec3 color;
 
@@ -71,141 +76,97 @@ void main() {
     o_FragColor = vec4(color, 1.0);
 }
 )";
-```
 
-Before examining the shader code in detail let’s connect these shaders to a shader material and attach it to a mesh:
-
-```cpp
 vglx::Mesh* mesh {nullptr};
-std::shared_ptr<vglx::ShaderMaterial> material;
+
+std::shared_ptr<vglx::ShaderMaterial> material {nullptr};
 
 MyScene(vglx::Camera* camera) {
     material = vglx::ShaderMaterial::Create({
         .vertex_shader = vertex_shader,
         .fragment_shader = fragment_shader,
-        .uniforms = {{"color", vglx::Color {0xFF00FF}}}
+        .uniforms = {{"color", vglx::Color {0xFF00FFu}}}
     });
 
-    mesh = Add(vglx::Mesh::Create(
-        vglx::BoxGeometry::Create(),
-        material
-    ));
+    mesh = Add(vglx::Mesh::Create(vglx::BoxGeometry::Create(), material));
 }
 ```
 
-Running the application now produces the same visual result as before. The difference is that the color is now applied by a custom shader program rather than a built-in material.
+Running the application now produces the same visual result as before. The difference is that the cube is now rendered using a custom shader program rather than a built-in material.
 
-![Rotating Cube Unlit](/manual_04.webp)
+A few notes about the shader program we created:
+- The shader material factory expects valid GLSL source code for both shader stages.
+- VGLX targets GLSL 4.10 core so the version directive should always be `410 core`.
+- Custom uniforms should be provided at construction time as a name/value map.
+- The `#pragma inject_attributes` directive injects preprocessor definitions based on the material and program configuration. It is required in both shader stages.
 
-The [Shader Material factory](/reference/materials/shader_material#function-create-54e37359) expects valid GLSL source code for both shader stages. Uniforms can be provided at construction time as a name/value map. These values are uploaded and bound automatically when the material is used for rendering.
-
-If you have experience writing GLSL you may notice that the shader code contains a few elements that are specific to VGLX. Let’s break down the vertex shader first:
-
-```glsl
-#version 410 core
-#pragma inject_attributes
-
-#include "snippets/vert_global_params.glsl"
-
-void main() {
-    #include "snippets/vert_main_varyings.glsl"
-
-    gl_Position = u_Projection * u_ModelView * vec4(a_Position, 1.0);
-}
-```
-
-VGLX targets GLSL 4.10 core and every shader must begin with the corresponding version directive. Immediately after that is the `#pragma inject_attributes` directive. This is a engine-specific pragma that injects preprocessor definitions based on the material and program configuration. Like the version directive it should always appear at the top.
-
-Shader code in VGLX is organized into reusable snippets. These snippets declare commonly used [attributes, uniforms, and varyings](/manual/custom_shaders#shader-interface). They are brought into the shader using standard `#include` directives. In the vertex shader we include `vert_global_params.glsl` to gain access to built-in vertex attributes and camera-related uniforms.
-
-Inside `main` we include `vert_main_varyings.glsl` which defines varyings passed from the vertex stage to the fragment stage. The fragment shader follows the same structure:
-
-```glsl
-#version 410 core
-#pragma inject_attributes
-
-#include "snippets/frag_global_params.glsl"
-
-uniform vec3 color;
-
-void main() {
-    o_FragColor = vec4(color, 1.0);
-}
-```
-
-The fragment shader begins by injecting attributes and including global parameters. In this case the `snippets/frag_global_params.glsl` snippet is included. The fragment shader also defines a custom uniform named `color`. This uniform is not populated by the engine automatically. It is provided by the application when the shader material is created:
-
-```cpp
-material = vglx::ShaderMaterial::Create({
-    .vertex_shader = vertex_shader,
-    .fragment_shader = fragment_shader,
-    .uniforms = {{"color", vglx::Color {0xFF00FF}}} // sets color uniform
-});
-```
-
-If you plan to update uniforms dynamically it is a good idea to store the shader material instance as a member. Changing the cube’s color after creation can be done by updating the uniform value:
-
-```cpp
-material->SetUniform("color", vglx::Color {0xFF0000});
-```
-
-With this minimal example we implemented a complete custom shader program and integrated it into VGLX. While the shader itself is simple the same structure scales to complex techniques. Shaders are the foundation of everything rendered on screen and shader materials provide the entry point for extending VGLX beyond its built-in materials.
+This minimal example implements a complete custom shader program. While the shader itself is simple, the same structure scales to complex techniques.
 
 ## Shader Interface
 
-Shader programs rely on a small set of built-in attributes, uniforms, and varyings. These symbols are injected into shader code using the `#pragma inject_attributes` directive and standard include snippets and provide access to common data.
-
-The following tables list the symbols that are available in shader snippets.
+Shader programs interact with the engine through a small set of conventions: attribute names that match the geometry's buffer attributes, built-in uniforms populated by name, and preprocessor definitions injected through the `#pragma inject_attributes` directive.
 
 #### Vertex Attributes
 
-Vertex attributes describe per-vertex data supplied by the geometry. These are the attributes available in the vertex shader stage:
+Vertex attributes describe per-vertex or per-instance data supplied by the geometry. Attribute declarations are matched to [buffer attributes](/reference/geometries/buffer_attribute) by name so any attribute the geometry provides, including custom attributes, is available under its buffer attribute name.
 
-| Name                  | Type   | Defined In                 | Description                     |
-| --------------------- | ------ | -------------------------- | ------------------------------- |
-| `a_Position`          | `vec3` | `vert_global_params.glsl`  | Vertex position in local space  |
-| `a_Normal`            | `vec3` | `vert_global_params.glsl`  | Vertex normal in local space    |
-| `a_TexCoord`          | `vec2` | `vert_global_params.glsl`  | Primary texture coordinates     |
-| `a_Tangent`           | `vec4` | `vert_global_params.glsl`  | Tangent and handedness          |
-| `a_Color`             | `vec3` | `vert_global_params.glsl`  | Per-vertex color attribute      |
-| `a_InstanceColor`     | `vec3` | `vert_global_params.glsl`  | Per-instance color modifier     |
-| `a_InstanceTransform` | `mat4` | `vert_global_params.glsl`  | Per-instance model transform    |
+These are the names used by geometry generators and asset loaders:
+
+| Name                  | Type   | Description                     |
+| --------------------- | ------ | ------------------------------- |
+| `a_Position`          | `vec3` | Vertex position in local space  |
+| `a_Normal`            | `vec3` | Vertex normal in local space    |
+| `a_TexCoord`          | `vec2` | Primary texture coordinates     |
+| `a_Tangent`           | `vec4` | Tangent and handedness          |
+| `a_Color`             | `vec3` | Per-vertex color attribute      |
+| `a_InstanceColor`     | `vec3` | Per-instance color modifier     |
+| `a_InstanceTransform` | `mat4` | Per-instance model transform    |
+
+Declare only the attributes your shader uses. An attribute that is declared and used becomes a hard requirement: if the geometry does not provide a matching buffer attribute the mesh will not render and an error is logged.
+
+Instance attributes are only available when the material is used with an [Instanced Mesh](/reference/scene/instanced_mesh).
 
 #### Uniforms
 
-Built-in uniforms provide per-draw or per-frame state supplied by the engine. These uniforms are declared in shader snippets and are populated automatically:
+Built-in uniforms provide per-draw or per-frame state supplied by the engine. Declare the ones you use and they are populated automatically:
 
-| Name                 | Type    | Defined In                 | Description                     |
-| -------------------- | ------- | -------------------------- | ------------------------------- |
-| `u_Model`            | `mat4`  | `vert_global_params.glsl`  | World transform                 |
-| `u_View`             | `mat4`  | `vert_global_params.glsl`  | View transform                  |
-| `u_Projection`       | `mat4`  | `vert_global_params.glsl`  | Projection transform            |
-| `u_ModelView`        | `mat4`  | `vert_main_varyings.glsl`  | Model-view transform            |
-| `u_TextureTransform` | `mat3`  | `vert_global_params.glsl`  | Texture transform               |
-| `u_Opacity`          | `float` | `frag_global_params.glsl`  | Alpha factor                    |
-| `u_Color`            | `vec3`  | `frag_global_params.glsl`  | Base color                      |
-| `u_Fog`              | `Fog`   | `frag_global_fog.glsl`     | Fog parameters                  |
+| Name                 | Type    | Description                                 |
+| -------------------- | ------- | ------------------------------------------- |
+| `u_Model`            | `mat4`  | World transform                             |
+| `u_TextureTransform` | `mat3`  | Texture transform                           |
+| `u_Opacity`          | `float` | Alpha factor                                |
+| `u_AlphaTest`        | `float` | Alpha cutoff                                |
+| `u_Resolution`       | `vec2`  | Framebuffer resolution in pixels            |
 
-#### Varyings
+The camera matrices are provided through a uniform block. Declaring the block makes both matrices available and the engine binds it automatically:
 
-Varyings are interpolated values produced by the vertex shader and consumed by the fragment shader. They are declared by including the appropriate snippets:
+```glsl
+layout(std140) uniform ub_Camera {
+    mat4 u_Projection;
+    mat4 u_View;
+};
+```
 
-| Name              | Type    | Defined In                 | Description                     |
-| ----------------- | ------- | -------------------------- | ------------------------------- |
-| `v_Position`      | `vec4`  | `vert_main_varyings.glsl`  | View space position             |
-| `v_TexCoords`     | `vec2`  | `vert_main_varyings.glsl`  | Transformed UVs                 |
-| `v_Normal`        | `vec3`  | `vert_main_varyings.glsl`  | View-space normal               |
-| `v_ViewDir`       | `vec3`  | `vert_main_varyings.glsl`  | View direction                  |
-| `v_ViewDepth`     | `float` | `vert_main_varyings.glsl`  | View space depth                |
-| `v_Color`         | `vec3`  | `vert_main_varyings.glsl`  | Interpolated color              |
-| `v_InstanceColor` | `vec3`  | `vert_main_varyings.glsl`  | Instance color                  |
-| `v_TBN`           | `mat3`  | `vert_main_varyings.glsl`  | Tangent basis matrix            |
+#### Preprocessor Definitions
 
-All varyings are defined and written in the vertex stage. To access them in the fragment shader the corresponding attributes must be declared and the required global shader snippets must be injected in both stages.
+The `#pragma inject_attributes` directive injects preprocessor definitions that describe the material and scene configuration, allowing a single shader source to adapt to its rendering context. These are the definitions relevant to shader materials:
 
-- `vert_global_params.glsl` at the top of the vertex shader
-- `vert_main_varyings.glsl` inside the vertex shader `main` function
-- `frag_global_params.glsl` at the top of the fragment shader
+| Name                | Description                                          |
+| ------------------- | ---------------------------------------------------- |
+| `USE_INSTANCING`    | The material is rendered by an instanced mesh        |
+| `USE_FOG`           | The material has fog enabled and the scene defines it |
+| `USE_ALPHA_TEST`    | The material's alpha test threshold is set           |
+| `USE_FLAT_SHADED`   | The material is flat shaded                          |
+| `USE_FLIP_NORMALS`  | The material renders back or double-sided faces      |
+| `USE_VERTEX_COLOR`  | The geometry provides an `a_Color` attribute         |
+| `NUM_LIGHTS`        | Number of active lights in the scene (always defined) |
+
+#### Includes
+
+Two shader includes can be brought into fragment shaders using standard `#include` directives. They are self-contained functions resolved by the engine before compilation:
+
+- `include/fog.incl.glsl` defines the `Fog` uniform struct and `applyFog(inout vec3 color, const in float depth)`. Its contents are gated behind `USE_FOG` so it is safe to include unconditionally. The depth argument is the fragment's view-space depth, which the vertex stage typically provides through a varying.
+- `include/lights.incl.glsl` defines the `Light` struct, the `ub_Lights` uniform block, and the `attenuation` and `shadowFactor` helpers used by the built-in lit materials. It must be included inside an `#if NUM_LIGHTS > 0` block. The light data is uploaded by the engine automatically so including the file is all that is needed to iterate the scene's lights.
 
 ## Custom Uniforms
 
@@ -215,27 +176,41 @@ The following table lists accepted uniform value types and the GLSL types they m
 
 | Application Type | GLSL Type | Example                                  |
 | ---------------- | --------- | ---------------------------------------- |
+| `bool`           | `bool`    | `{true}`                                 |
 | `int`            | `int`     | `{1}`                                    |
 | `float`          | `float`   | `{1.5f}`                                 |
-| `Color`          | `vec3`    | `vglx::Color {0xFF00FF}`                 |
+| `Color`          | `vec3`    | `vglx::Color {0xFF00FFu}`                |
 | `Matrix3`        | `mat3`    | `vglx::Matrix3 {1.0f}`                   |
 | `Matrix4`        | `mat4`    | `vglx::Matrix4 {1.0f}`                   |
 | `Vector2`        | `vec2`    | `vglx::Vector2 {1.0f, 0.0f}`             |
 | `Vector3`        | `vec3`    | `vglx::Vector3 {1.0f, 0.0f, 1.0f}`       |
 | `Vector4`        | `vec4`    | `vglx::Vector4 {1.0f, 0.0f, 1.0f, 0.0f}` |
 
-Uniform values can be updated after creation by mutating the material’s uniform map. Updates take effect the next time the material is rendered.
+Uniform values can be updated after creation using the material's [SetUniform](/reference/materials/shader_material#function-set-uniform-96f6b87f) method. Updates take effect the next time the material is rendered.
+
+## Textures
+
+Shader materials can sample textures like any other material. A texture is associated with a sampler uniform by name, either at construction time through the texture bindings list or later using the material's [SetTexture](/reference/materials/shader_material#function-set-texture-7891f192) method:
+
+```cpp
+material = vglx::ShaderMaterial::Create({
+    .vertex_shader = vertex_shader,
+    .fragment_shader = fragment_shader,
+    .textures = {{"u_MyTexture", texture}}
+});
+```
+
+The sampler is declared in the fragment shader like any other uniform and the engine binds the texture to an available texture unit automatically:
+
+```glsl
+uniform sampler2D u_MyTexture;
+```
+
+Sampling requires texture coordinates which the geometry provides through the `a_TexCoord` attribute. When a bound texture defines a [UV transform](/reference/textures/texture_2d), the engine uploads it through the `u_TextureTransform` uniform.
 
 ## Debugging Shaders
 
 Shaders can be difficult to debug. A single mistake may result in a black screen, incorrect colors, or missing geometry. When you run into problems start from the smallest shader that works and add features back incrementally.
-
-Start with simple checks inside the shader:
-
-- Output a constant color to confirm the fragment shader is running.
-- Visualize inputs such as normals, UVs, or depth by writing them as colors.
-- Clamp or normalize intermediate values before displaying them.
-- Temporarily bypass complex math and reintroduce it step by step.
 
 For deeper issues the most effective tool is [RenderDoc](https://renderdoc.org/). Capture a frame and inspect the draw call that renders your mesh to verify the full GPU state:
 

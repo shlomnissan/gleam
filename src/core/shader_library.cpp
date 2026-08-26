@@ -25,11 +25,8 @@
 #include "shaders/headers/phong_material_vert.h"
 #include "shaders/headers/unlit_material_frag.h"
 #include "shaders/headers/unlit_material_vert.h"
-#include "shaders/snippets/headers/frag_global_lights_glsl.h"
-#include "shaders/snippets/headers/frag_global_fog_glsl.h"
-#include "shaders/snippets/headers/frag_global_params_glsl.h"
-#include "shaders/snippets/headers/vert_global_params_glsl.h"
-#include "shaders/snippets/headers/vert_main_varyings_glsl.h"
+#include "shaders/include/headers/fog_incl_glsl.h"
+#include "shaders/include/headers/lights_incl_glsl.h"
 
 #include <unordered_map>
 
@@ -164,11 +161,8 @@ auto ShaderLibrary::InjectAttributes(
 
 auto ShaderLibrary::ResolveIncludes(std::string& source) const -> void {
     static const std::unordered_map<std::string, std::string> include_map = {
-        {"snippets/frag_global_lights.glsl", _SNIPPET_frag_global_lights},
-        {"snippets/frag_global_fog.glsl", _SNIPPET_frag_global_fog},
-        {"snippets/frag_global_params.glsl", _SNIPPET_frag_global_params},
-        {"snippets/vert_global_params.glsl", _SNIPPET_vert_global_params},
-        {"snippets/vert_main_varyings.glsl", _SNIPPET_vert_main_varyings}
+        {"include/fog.incl.glsl", _INCLUDE_fog},
+        {"include/lights.incl.glsl", _INCLUDE_lights}
     };
 
     for (const auto& [include, content] : include_map) {

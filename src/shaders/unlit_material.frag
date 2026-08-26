@@ -29,7 +29,7 @@ uniform vec3 u_Color;
     uniform float u_AlphaTest;
 #endif
 
-#include "snippets/frag_global_fog.glsl"
+#include "include/fog.incl.glsl"
 
 uniform sampler2D u_AlphaMap;
 uniform sampler2D u_TextureMap;

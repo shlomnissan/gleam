@@ -187,6 +187,7 @@ public:
     auto BoundingSphere() -> Sphere override;
 
 private:
+    /// @cond INTERNAL
     struct BoundsKey {
         uint32_t transform_version;
         uint32_t position_version;
@@ -195,7 +196,6 @@ private:
         auto operator==(const BoundsKey&) const -> bool = default;
     };
 
-    /// @cond INTERNAL
     std::vector<std::shared_ptr<BufferAttribute>> attributes_ {};
 
     std::shared_ptr<BufferAttribute> transforms_attr_ {};

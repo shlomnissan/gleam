@@ -1,7 +1,7 @@
 # ShaderProcessor.cmake
 #
 # This module searches for GLSL files and converts them into C-style strings.
-# It makes a distinction between shaders and snippets. Snippets are used for
+# It makes a distinction between shaders and includes. Includes are used for
 # common code that is included across multiple shaders at runtime.
 
 file(GLOB_RECURSE SHADERS CONFIGURE_DEPENDS "**/*.vert" "**/*.frag" "**/*.glsl")
@@ -14,13 +14,13 @@ foreach(SHADER IN LISTS SHADERS)
     get_filename_component(EXTENSION ${SHADER} EXT)
 
     string(REGEX REPLACE "\\." "_" EXT ${EXTENSION})
-    string(REGEX REPLACE "\\.[^.]*$" "" FILENAME_NO_EXT ${FILENAME})
+    get_filename_component(FILENAME_NO_EXT ${SHADER} NAME_WE)
     set(HEADER_FILE ${DIRECTORY}/headers/${FILENAME_NO_EXT}${EXT}.h)
 
-    string(FIND "${DIRECTORY}" "snippets" POSITION)
-    if (POSITION GREATER -1)
-        set(VAR "_SNIPPET_${FILENAME_NO_EXT}")
-        message("🎨 Writing snippet ${FILENAME_NO_EXT}.h")
+    get_filename_component(DIRECTORY_NAME ${DIRECTORY} NAME)
+    if (DIRECTORY_NAME STREQUAL "include")
+        set(VAR "_INCLUDE_${FILENAME_NO_EXT}")
+        message("🎨 Writing include ${FILENAME_NO_EXT}.h")
     else()
         set(VAR "_SHADER_${FILENAME_NO_EXT}${EXT}")
         message("🎨 Writing shader ${FILENAME_NO_EXT}.h")

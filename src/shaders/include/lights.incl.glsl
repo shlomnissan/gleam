@@ -1,25 +1,3 @@
-/*
-
-This fragment shader snippet defines the Light struct, the ub_Lights uniform
-block, and distance attenuation shared by all lit materials. It must be
-included inside an #if NUM_LIGHTS > 0 block, after NUM_LIGHTS is defined.
-
-@func float attenuation(const in float dist, const in Light light)
-- @desc Computes physical inverse-square attenuation with an optional smooth
-  cutoff that reaches zero at the light's range
-- @param const in float dist - The distance from the light to the fragment
-- @param const in Light light - The light whose range controls the cutoff
-- @return float - Factor to multiply with the light's contribution
-
-@func float shadowFactor(const in Light light)
-- @desc Samples the light's shadow map with a hardware-filtered depth compare;
-  returns 1.0 when the fragment is lit, 0.0 when fully shadowed. Always 1.0
-  when the fragment does not receive shadows or the light does not cast them
-- @param const in Light light - The light whose shadow map is sampled
-- @return float - Factor to multiply with the light's contribution
-
-*/
-
 struct Light {
     int Type; // 1 = directional, 2 = point, 3 = spot
     vec3 Color;
