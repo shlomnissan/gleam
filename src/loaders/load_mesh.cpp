@@ -267,6 +267,15 @@ auto load_gltf_mesh(const fs::path& path) -> std::expected<std::unique_ptr<Node>
                 ? materials[primitive.material_index]
                 : PBRMaterial::Create();
 
+            if (primitive.flat_shaded) {
+                if (has_material) {
+                    material = load_gltf_material(
+                        gltf.materials[primitive.material_index], base_dir, images
+                    );
+                }
+                material->flat_shaded = true;
+            }
+
             node->Add(Mesh::Create(primitive.geometry, material));
         }
 

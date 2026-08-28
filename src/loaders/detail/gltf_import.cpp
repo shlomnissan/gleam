@@ -48,13 +48,14 @@ auto create_geometry(cgltf_primitive* primitive) -> std::shared_ptr<vglx::Geomet
 
     const auto has_normals = norm_ptr != nullptr;
     const auto has_uvs = tex_ptr != nullptr;
-    const auto has_tangents = tan_ptr != nullptr;
+    const auto has_tangents = has_normals && tan_ptr != nullptr;
     const auto has_colors = color_ptr != nullptr;
 
     const auto vertex_count = pos_ptr->count;
 
     auto streams = VertexStreams {};
     streams.positions.resize(vertex_count * 3);
+
     if (has_normals) streams.normals.resize(vertex_count * 3);
     if (has_uvs) streams.uvs.resize(vertex_count * 2);
     if (has_uvs && has_tangents) streams.tangents.resize(vertex_count * 4);
@@ -123,11 +124,7 @@ auto create_geometry(cgltf_primitive* primitive) -> std::shared_ptr<vglx::Geomet
         }
     }
 
-    if (!has_normals) {
-        streams.normals = generate_normals(streams.positions, streams.indices);
-    }
-
-    if (has_uvs && !has_tangents) {
+    if (has_normals && has_uvs && !has_tangents) {
         streams.tangents = generate_tangents(
             streams.positions,
             streams.normals,
@@ -149,12 +146,13 @@ auto parse_primitives(const cgltf_data* data) {
         auto mesh = &data->meshes[i];
         for (cgltf_size j = 0; j < mesh->primitives_count; ++j) {
             auto primitive = &mesh->primitives[j];
+            auto has_normals = cgltf_find_accessor(primitive, cgltf_attribute_type_normal, 0) != nullptr;
+            auto index = primitive->material ? int(cgltf_material_index(data, primitive->material)) : -1;
             if (auto geometry = create_geometry(primitive)) {
                 output[i].emplace_back(GLTFPrimitive {
                     .geometry = std::move(geometry),
-                    .material_index = primitive->material
-                        ? static_cast<int>(cgltf_material_index(data, primitive->material))
-                        : -1,
+                    .material_index = index,
+                    .flat_shaded = !has_normals,
                 });
             }
         }

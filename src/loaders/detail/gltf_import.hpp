@@ -47,6 +47,7 @@ struct PBRMaterialDescriptor {
 struct GLTFPrimitive {
     std::shared_ptr<Geometry> geometry;
     int material_index {-1};
+    bool flat_shaded {false};
 };
 
 struct GLTFNodeEntry {

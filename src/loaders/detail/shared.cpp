@@ -30,12 +30,15 @@ auto generate_normals(
     const std::vector<float>& positions,
     const std::vector<uint32_t>& indices
 ) -> std::vector<float> {
+    const auto vertex_count = positions.size() / 3;
+
     auto normals = std::vector<float>(positions.size(), 0.0f);
 
-    for (size_t i = 0; i + 2 < indices.size(); i += 3) {
-        const auto i0 = indices[i + 0];
-        const auto i1 = indices[i + 1];
-        const auto i2 = indices[i + 2];
+    const auto index_count = indices.empty() ? vertex_count : indices.size();
+    for (size_t i = 0; i + 2 < index_count; i += 3) {
+        const auto i0 = indices.empty() ? static_cast<uint32_t>(i + 0) : indices[i + 0];
+        const auto i1 = indices.empty() ? static_cast<uint32_t>(i + 1) : indices[i + 1];
+        const auto i2 = indices.empty() ? static_cast<uint32_t>(i + 2) : indices[i + 2];
 
         const auto v0 = read_vec3(positions, i0);
         const auto v1 = read_vec3(positions, i1);
@@ -51,7 +54,6 @@ auto generate_normals(
         }
     }
 
-    const auto vertex_count = positions.size() / 3;
     for (size_t i = 0; i < vertex_count; ++i) {
         auto n = read_vec3(normals, i);
         if (n.Length() > 0.0f) {
@@ -77,10 +79,11 @@ auto generate_tangents(
     auto t_accum = std::vector<Vector3>(vertex_count);
     auto b_accum = std::vector<Vector3>(vertex_count);
 
-    for (size_t i = 0; i + 2 < indices.size(); i += 3) {
-        const auto i0 = indices[i + 0];
-        const auto i1 = indices[i + 1];
-        const auto i2 = indices[i + 2];
+    const auto index_count = indices.empty() ? vertex_count : indices.size();
+    for (size_t i = 0; i + 2 < index_count; i += 3) {
+        const auto i0 = indices.empty() ? static_cast<uint32_t>(i + 0) : indices[i + 0];
+        const auto i1 = indices.empty() ? static_cast<uint32_t>(i + 1) : indices[i + 1];
+        const auto i2 = indices.empty() ? static_cast<uint32_t>(i + 2) : indices[i + 2];
 
         const auto v0 = read_vec3(positions, i0);
         const auto v1 = read_vec3(positions, i1);
