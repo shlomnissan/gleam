@@ -5,7 +5,7 @@
 ===========================================================================
 */
 
-#include "geometries/detail/generate_attributes.hpp"
+#include "geometries/generate_attributes.hpp"
 
 #include "vglx/math/utilities.hpp"
 #include "vglx/math/vector2.hpp"
@@ -13,7 +13,7 @@
 
 #include <cmath>
 
-namespace vglx::detail {
+namespace vglx {
 
 namespace {
 

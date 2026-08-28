@@ -12,7 +12,7 @@
 #include "vglx/math/matrix4.hpp"
 #include "vglx/textures/texture.hpp"
 
-#include "geometries/detail/generate_attributes.hpp"
+#include "geometries/generate_attributes.hpp"
 #include "geometries/vertex_streams.hpp"
 #include "misc/cgltf.hpp"
 #include "utilities/assert.hpp"

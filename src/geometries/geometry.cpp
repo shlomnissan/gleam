@@ -10,6 +10,7 @@
 #include "vglx/math/utilities.hpp"
 #include "vglx/math/vector3.hpp"
 
+#include "geometries/generate_attributes.hpp"
 #include "utilities/logger.hpp"
 
 #include <algorithm>
@@ -103,6 +104,63 @@ auto Geometry::VertexCount() const -> uint32_t {
 
 auto Geometry::HasPositions() const -> bool {
     return GetAttribute(BufferAttribute::kPosition) != nullptr;
+}
+
+auto Geometry::GenerateNormals() -> void {
+    auto position_attribute = GetAttribute(BufferAttribute::kPosition);
+    if (position_attribute == nullptr || position_attribute->GetData().empty()) {
+        Logger::Log(LogLevel::Error, "Failed to generate normals. Missing vertex position buffer");
+        return;
+    }
+
+    auto normals = generate_normals(position_attribute->GetData(), index_data_);
+
+    if (auto normal_attribute = GetAttribute(BufferAttribute::kNormal)) {
+        normal_attribute->SetData(std::move(normals));
+    } else {
+        AddAttribute(BufferAttribute::Create({
+            .name = BufferAttribute::kNormal,
+            .format = BufferAttribute::Format::Float32x3,
+            .rate = BufferAttribute::Rate::Vertex
+        }, std::move(normals)));
+    }
+}
+
+auto Geometry::GenerateTangents() -> void {
+    auto position_attribute = GetAttribute(BufferAttribute::kPosition);
+    if (position_attribute == nullptr || position_attribute->GetData().empty()) {
+        Logger::Log(LogLevel::Error, "Failed to generate tangents. Missing vertex position buffer");
+        return;
+    }
+
+    auto normal_attribute = GetAttribute(BufferAttribute::kNormal);
+    if (normal_attribute == nullptr || normal_attribute->GetData().empty()) {
+        Logger::Log(LogLevel::Error, "Failed to generate tangents. Missing vertex normal buffer");
+        return;
+    }
+
+    auto uv_attribute = GetAttribute(BufferAttribute::kTexCoord);
+    if (uv_attribute == nullptr || uv_attribute->GetData().empty()) {
+        Logger::Log(LogLevel::Error, "Failed to generate tangents. Missing texture coordinate buffer");
+        return;
+    }
+
+    auto tangents = generate_tangents(
+        position_attribute->GetData(),
+        normal_attribute->GetData(),
+        uv_attribute->GetData(),
+        index_data_
+    );
+
+    if (auto tangent_attribute = GetAttribute(BufferAttribute::kTangent)) {
+        tangent_attribute->SetData(std::move(tangents));
+    } else {
+        AddAttribute(BufferAttribute::Create({
+            .name = BufferAttribute::kTangent,
+            .format = BufferAttribute::Format::Float32x4,
+            .rate = BufferAttribute::Rate::Vertex
+        }, std::move(tangents)));
+    }
 }
 
 auto Geometry::BoundingBox() -> Box3 {

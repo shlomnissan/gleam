@@ -130,6 +130,24 @@ public:
     [[nodiscard]] auto GetAttribute(std::string_view name) const -> std::shared_ptr<BufferAttribute>;
 
     /**
+     * @brief Generates vertex normals from the position attribute.
+     *
+     * Normals are computed per face and averaged across shared vertices,
+     * producing smooth normals for indexed geometry and flat normals for
+     * non-indexed geometry.
+     */
+    auto GenerateNormals() -> void;
+
+    /**
+     * @brief Generates vertex tangents from the position, normal, and
+     * texture coordinate attributes.
+     *
+     * Tangents are computed per face from the UV parameterization, averaged
+     * across shared vertices, and stored with handedness in `w`.
+     */
+    auto GenerateTangents() -> void;
+
+    /**
      * @brief Returns an axis-aligned bounding box that encloses the geometry.
      *
      * The box is computed from the position attribute and cached. It is

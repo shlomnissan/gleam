@@ -10,7 +10,7 @@
 #include <cstdint>
 #include <vector>
 
-namespace vglx::detail {
+namespace vglx {
 
 [[nodiscard]] auto generate_normals(
     const std::vector<float>& positions,
