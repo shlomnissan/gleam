@@ -5,9 +5,10 @@
 ===========================================================================
 */
 
-#include "loaders/detail/shared.hpp"
+#include "geometries/detail/generate_attributes.hpp"
 
 #include "vglx/math/utilities.hpp"
+#include "vglx/math/vector2.hpp"
 #include "vglx/math/vector3.hpp"
 
 #include <cmath>

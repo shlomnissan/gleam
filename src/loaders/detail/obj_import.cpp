@@ -12,6 +12,7 @@
 #include "vglx/math/vector2.hpp"
 #include "vglx/textures/texture.hpp"
 
+#include "geometries/detail/generate_attributes.hpp"
 #include "geometries/vertex_streams.hpp"
 #include "misc/tiny_obj_loader.hpp"
 

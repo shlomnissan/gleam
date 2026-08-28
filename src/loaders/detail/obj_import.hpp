@@ -10,7 +10,7 @@
 #include "vglx/geometries/geometry.hpp"
 #include "vglx/math/color.hpp"
 
-#include "shared.hpp"
+#include "texture_ref.hpp"
 
 #include <expected>
 #include <filesystem>

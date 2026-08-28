@@ -10,9 +10,7 @@
 #include "vglx/math/vector2.hpp"
 #include "vglx/textures/texture.hpp"
 
-#include <cstdint>
 #include <string>
-#include <vector>
 
 namespace vglx::detail {
 
@@ -31,17 +29,5 @@ struct TextureRef {
 
     [[nodiscard]] auto empty() const -> bool { return uri.empty(); }
 };
-
-[[nodiscard]] auto generate_normals(
-    const std::vector<float>& positions,
-    const std::vector<uint32_t>& indices
-) -> std::vector<float>;
-
-[[nodiscard]] auto generate_tangents(
-    const std::vector<float>& positions,
-    const std::vector<float>& normals,
-    const std::vector<float>& uvs,
-    const std::vector<uint32_t>& indices
-) -> std::vector<float>;
 
 }

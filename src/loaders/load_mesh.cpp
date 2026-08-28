@@ -17,7 +17,7 @@
 #include "loaders/detail/gltf_import.hpp"
 #include "loaders/detail/image_import.hpp"
 #include "loaders/detail/obj_import.hpp"
-#include "loaders/detail/shared.hpp"
+#include "loaders/detail/texture_ref.hpp"
 
 #include "utilities/logger.hpp"
 #include "utilities/thread_pool.hpp"
