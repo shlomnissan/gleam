@@ -30,6 +30,19 @@ auto generate_heightfield() {
     return data;
 }
 
+auto process_geometry(vglx::Geometry& geometry) {
+    auto position_attribute = geometry.GetAttribute(vglx::BufferAttribute::kPosition);
+    auto positions = position_attribute->GetData();
+    auto heightfield = generate_heightfield();
+    assert(positions.size() == heightfield.size() * 3);
+    for (auto i = size_t {0}; i < heightfield.size(); ++i) {
+        positions[i * 3 + 1] = heightfield[i];
+    }
+
+    position_attribute->SetData(std::move(positions));
+    geometry.GenerateNormals();
+}
+
 auto get_camera() {
     auto camera = vglx::PerspectiveCamera::Create({
         .fov = vglx::math::DegToRad(60.0f),
@@ -44,32 +57,27 @@ auto get_camera() {
 auto get_scene() {
     auto scene = ExampleScene::Create();
 
-    auto geometry = vglx::PlaneGeometry::Create({
-        .width = 7500,
-        .height = 7500,
-        .width_segments = world_width - 1,
-        .height_segments = world_height - 1
-    });
+    scene->Add(vglx::DirectionalLight::Create({
+        .color = 0xFFFFFFu,
+        .intensity = 1.0f
+    }))->transform.Translate({1500.0f, 1200.0f, 800.0f});
 
-    auto position_attribute = geometry->GetAttribute(vglx::BufferAttribute::kPosition);
-    auto positions = position_attribute->GetData();
-    auto heightfield = generate_heightfield();
-    assert(positions.size() == heightfield.size() * 3);
-    for (auto i = size_t {0}; i < heightfield.size(); ++i) {
-        positions[i * 3 + 1] = heightfield[i];
-    }
+    scene->Add(vglx::AmbientLight::Create({
+        .color = 0xFFFFFFu,
+        .intensity = 0.3f
+    }));
 
-    position_attribute->SetData(std::move(positions));
-
-    scene->Add(vglx::Mesh::Create(
-        geometry,
-        vglx::UnlitMaterial::Create({.color = 0xFF0000u})
+    auto mesh = scene->Add(vglx::Mesh::Create(
+        vglx::PlaneGeometry::Create({
+            .width = 7500,
+            .height = 7500,
+            .width_segments = world_width - 1,
+            .height_segments = world_height - 1
+        }),
+        vglx::PhongMaterial::Create({.color = 0xFF0000u})
     ));
 
-    scene->Add(vglx::Mesh::Create(
-        vglx::WireframeGeometry::Create(geometry.get()),
-        vglx::UnlitMaterial::Create({.color = 0xFFFFFFu})
-    ));
+    process_geometry(*mesh->GetGeometry().get());
 
     return scene;
 }
