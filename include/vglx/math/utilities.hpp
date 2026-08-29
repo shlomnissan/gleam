@@ -164,32 +164,6 @@ alignas(64) inline constexpr auto exp_val_table = std::array<uint32_t, 180> {
 }
 
 /**
- * @brief Computes the Cantor pairing of two values.
- * @ingroup MathGroup
- *
- * @tparam T Integer-like type.
- * @param x First value.
- * @param y Second value.
- * @return Unique paired value.
- */
-[[nodiscard]] constexpr auto CantorPairing(const auto x, const auto y) {
-    return ((x + y) * (x + y + 1)) / 2 + y;
-}
-
-/**
- * @brief Computes unordered Cantor pairing (order-invariant).
- * @ingroup MathGroup
- *
- * @tparam T Integer-like type.
- * @param x First value.
- * @param y Second value.
- * @return Unique paired value, independent of input order.
- */
-[[nodiscard]] constexpr auto CantorPairingUnordered(const auto x, const auto y) {
-    return x > y ? CantorPairing(y, x) : CantorPairing(x, y);
-}
-
-/**
  * @brief Returns the absolute value.
  * @ingroup MathGroup
  *
