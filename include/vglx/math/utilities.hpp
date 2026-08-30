@@ -159,8 +159,24 @@ alignas(64) inline constexpr auto exp_val_table = std::array<uint32_t, 180> {
  * @param f Interpolation factor in [0, 1].
  * @return Interpolated value.
  */
-[[nodiscard]] constexpr auto Lerp(const float a, const float b, const float f) {
-    return std::lerp(a, b, f);
+[[nodiscard]] constexpr auto Lerp(float min, float max, const float x) {
+    return std::lerp(min, max, x);
+}
+
+/**
+ * @brief Smoothly interpolates between 0 and 1 with eased endpoints.
+ * @ingroup MathGroup
+ *
+ * @param min Lower edge (must be less than max).
+ * @param max Upper edge (must be greater than min).
+ * @param x Input value.
+ * @return Interpolated value.
+ */
+[[nodiscard]] constexpr auto Smoothstep(float min, float max, float x) {
+    if (x <= min) return 0.0f;
+    if (x >= max) return 1.0f;
+    const auto t = (x - min) / (max - min);
+    return t * t * (3.0f - 2.0f * t);
 }
 
 /**

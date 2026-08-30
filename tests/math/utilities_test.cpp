@@ -239,6 +239,38 @@ TEST(MathUtilities, LerpOutOfRangeFactor) {
 
 #pragma endregion
 
+#pragma region Smoothstep
+
+TEST(MathUtilities, SmoothstepBasicBehavior) {
+    static_assert(math::Smoothstep(0.0f, 1.0f, 0.0f) == 0.0f);
+    static_assert(math::Smoothstep(0.0f, 1.0f, 0.5f) == 0.5f);
+    static_assert(math::Smoothstep(0.0f, 1.0f, 1.0f) == 1.0f);
+
+    EXPECT_FLOAT_EQ(math::Smoothstep(0.0f, 1.0f, 0.0f), 0.0f);
+    EXPECT_FLOAT_EQ(math::Smoothstep(0.0f, 1.0f, 0.5f), 0.5f);
+    EXPECT_FLOAT_EQ(math::Smoothstep(0.0f, 1.0f, 1.0f), 1.0f);
+}
+
+TEST(MathUtilities, SmoothstepOutOfRangeInput) {
+    static_assert(math::Smoothstep(10.0f, 20.0f, 5.0f) == 0.0f);
+    static_assert(math::Smoothstep(10.0f, 20.0f, 25.0f) == 1.0f);
+
+    EXPECT_FLOAT_EQ(math::Smoothstep(10.0f, 20.0f, 5.0f), 0.0f);
+    EXPECT_FLOAT_EQ(math::Smoothstep(10.0f, 20.0f, 25.0f), 1.0f);
+}
+
+TEST(MathUtilities, SmoothstepDegenerateRangeReturnsBound) {
+    static_assert(math::Smoothstep(2.0f, 2.0f, -5.0f) == 0.0f);
+    static_assert(math::Smoothstep(2.0f, 2.0f, 2.0f) == 0.0f);
+    static_assert(math::Smoothstep(2.0f, 2.0f, 10.0f) == 1.0f);
+
+    EXPECT_FLOAT_EQ(math::Smoothstep(2.0f, 2.0f, -5.0f), 0.0f);
+    EXPECT_FLOAT_EQ(math::Smoothstep(2.0f, 2.0f, 2.0f), 0.0f);
+    EXPECT_FLOAT_EQ(math::Smoothstep(2.0f, 2.0f, 10.0f), 1.0f);
+}
+
+#pragma endregion
+
 #pragma region Atan
 
 TEST(MathUtilities, AtanCommonAngles) {
