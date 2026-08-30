@@ -17,20 +17,20 @@
 TEST(Plane, DefaultConstructor) {
     constexpr auto plane = vglx::Plane {};
 
-    EXPECT_EQ(plane.normal, vglx::Vector3::Y());
+    EXPECT_EQ(plane.normal, vglx::Vector3::UnitY());
     EXPECT_EQ(plane.distance, 0.0f);
 
-    static_assert(plane.normal == vglx::Vector3::Y());
+    static_assert(plane.normal == vglx::Vector3::UnitY());
     static_assert(plane.distance == 0.0f);
 }
 
 TEST(Plane, ConstructorParameterized) {
-    constexpr auto plane = vglx::Plane {vglx::Vector3::X(), 1.0f};
+    constexpr auto plane = vglx::Plane {vglx::Vector3::UnitX(), 1.0f};
 
-    EXPECT_EQ(plane.normal, vglx::Vector3::X());
+    EXPECT_EQ(plane.normal, vglx::Vector3::UnitX());
     EXPECT_EQ(plane.distance, 1.0f);
 
-    static_assert(plane.normal == vglx::Vector3::X());
+    static_assert(plane.normal == vglx::Vector3::UnitX());
     static_assert(plane.distance == 1.0f);
 }
 
@@ -39,7 +39,7 @@ TEST(Plane, ConstructorParameterized) {
 #pragma region Distance to Point
 
 TEST(Plane, DistanceToPointOnPlane) {
-    constexpr auto plane = vglx::Plane {vglx::Vector3::Y(), 0.0f};
+    constexpr auto plane = vglx::Plane {vglx::Vector3::UnitY(), 0.0f};
     constexpr auto point = vglx::Vector3 {0.0f, 0.0f, 0.0f};
 
     EXPECT_FLOAT_EQ(plane.DistanceToPoint(point), 0.0f);
@@ -48,7 +48,7 @@ TEST(Plane, DistanceToPointOnPlane) {
 }
 
 TEST(Plane, DistanceToPointAbovePlane) {
-    constexpr auto plane = vglx::Plane {vglx::Vector3::Y(), 0.0f};
+    constexpr auto plane = vglx::Plane {vglx::Vector3::UnitY(), 0.0f};
     constexpr auto point = vglx::Vector3 {0.0f, 1.0f, 0.0f};
 
     EXPECT_FLOAT_EQ(plane.DistanceToPoint(point), 1.0f);
@@ -57,7 +57,7 @@ TEST(Plane, DistanceToPointAbovePlane) {
 }
 
 TEST(Plane, DistanceToPointBelowPlane) {
-    constexpr const auto plane = vglx::Plane {vglx::Vector3::Y(), 0.0f};
+    constexpr const auto plane = vglx::Plane {vglx::Vector3::UnitY(), 0.0f};
     constexpr const auto point = vglx::Vector3 {0.0f, -1.0f, 0.0f};
 
     EXPECT_FLOAT_EQ(plane.DistanceToPoint(point), -1.0f);
@@ -66,7 +66,7 @@ TEST(Plane, DistanceToPointBelowPlane) {
 }
 
 TEST(Plane, DistanceToPointWithOffset) {
-    constexpr auto plane = vglx::Plane {vglx::Vector3::Y(), 1.0f};
+    constexpr auto plane = vglx::Plane {vglx::Vector3::UnitY(), 1.0f};
     constexpr auto point = vglx::Vector3 {0.0f, 2.0f, 0.0f};
 
     EXPECT_FLOAT_EQ(plane.DistanceToPoint(point), 3.0f);
@@ -75,7 +75,7 @@ TEST(Plane, DistanceToPointWithOffset) {
 }
 
 TEST(Plane, DistanceToPointWithNegativeOffset) {
-    constexpr auto plane = vglx::Plane {vglx::Vector3::Y(), -1.0f};
+    constexpr auto plane = vglx::Plane {vglx::Vector3::UnitY(), -1.0f};
     constexpr auto point = vglx::Vector3 {0.0f, 2.0f, 0.0f};
 
     EXPECT_FLOAT_EQ(plane.DistanceToPoint(point), 1.0f);
@@ -115,7 +115,7 @@ TEST(Plane, DistanceToPointWithNonUnitNormalAndOffset) {
 #pragma region Distance to Sphere
 
 TEST(Plane, DistanceToSphereWithCenterOnPlane) {
-    constexpr auto plane = vglx::Plane {vglx::Vector3::Y(), 0.0f};
+    constexpr auto plane = vglx::Plane {vglx::Vector3::UnitY(), 0.0f};
     constexpr auto sphere = vglx::Sphere {vglx::Vector3::Zero(), 1.0f};
 
     EXPECT_FLOAT_EQ(plane.DistanceToSphere(sphere), -1.0f);
@@ -124,7 +124,7 @@ TEST(Plane, DistanceToSphereWithCenterOnPlane) {
 }
 
 TEST(Plane, DistanceToSphereAbovePlane) {
-    constexpr auto plane = vglx::Plane {vglx::Vector3::Y(), 1.0f};
+    constexpr auto plane = vglx::Plane {vglx::Vector3::UnitY(), 1.0f};
     constexpr auto sphere = vglx::Sphere {vglx::Vector3 {0.0f, 3.0f, 0.0f}, 1.0f};
 
     EXPECT_FLOAT_EQ(plane.DistanceToSphere(sphere), 3.0f);
@@ -140,7 +140,7 @@ TEST(Plane, NormalizePlanWithNonUnitNormal) {
     auto p1 = vglx::Plane {{2.0f, 0.0f, 0.0f}, 4.0f};
     p1.Normalize();
 
-    EXPECT_VEC3_NEAR(p1.normal, vglx::Vector3::X(), 1e-4f);
+    EXPECT_VEC3_NEAR(p1.normal, vglx::Vector3::UnitX(), 1e-4f);
     EXPECT_NEAR(p1.distance, 2.0f, 1e-4f);
 
     constexpr auto p2 = []() {
@@ -156,14 +156,14 @@ TEST(Plane, NormalizePlanWithNonUnitNormal) {
 }
 
 TEST(Plane, NormalizePlaneWithUnitNormal) {
-    auto p1 = vglx::Plane {vglx::Vector3::Y(), 1.0f};
+    auto p1 = vglx::Plane {vglx::Vector3::UnitY(), 1.0f};
     p1.Normalize();
 
-    EXPECT_VEC3_NEAR(p1.normal, vglx::Vector3::Y(), 1e-4f);
+    EXPECT_VEC3_NEAR(p1.normal, vglx::Vector3::UnitY(), 1e-4f);
     EXPECT_NEAR(p1.distance, 1.0f, 1e-4f);
 
     constexpr auto p2 = []() {
-        auto p = vglx::Plane {vglx::Vector3::Y(), 1.0f};
+        auto p = vglx::Plane {vglx::Vector3::UnitY(), 1.0f};
         p.Normalize();
         return p;
     }();

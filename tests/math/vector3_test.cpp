@@ -44,7 +44,7 @@ TEST(Vector3, ConstructorParameterized) {
 #pragma region Unit vectors
 
 TEST(Vector3, UnitVectorAlongX) {
-    constexpr auto v = vglx::Vector3::X();
+    constexpr auto v = vglx::Vector3::UnitX();
 
     EXPECT_VEC3_EQ(v, {1.0, 0.0, 0.0});
 
@@ -52,7 +52,7 @@ TEST(Vector3, UnitVectorAlongX) {
 }
 
 TEST(Vector3, UnitVectorAlongY) {
-    constexpr auto v = vglx::Vector3::Y();
+    constexpr auto v = vglx::Vector3::UnitY();
 
     EXPECT_VEC3_EQ(v, {0.0, 1.0, 0.0});
 
@@ -60,7 +60,7 @@ TEST(Vector3, UnitVectorAlongY) {
 }
 
 TEST(Vector3, UnitVectorAlongZ) {
-    constexpr auto v = vglx::Vector3::Z();
+    constexpr auto v = vglx::Vector3::UnitZ();
 
     EXPECT_VEC3_EQ(v, {0.0, 0.0, 1.0});
 

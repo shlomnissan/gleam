@@ -28,7 +28,7 @@ namespace vglx {
  *
  * @code
  * my_scene->Add(vglx::BoundingPlane::Create({
- *   .plane = vglx::Plane {vglx::Vector3::Z(), 0.0f},
+ *   .plane = vglx::Plane {vglx::Vector3::UnitZ(), 0.0f},
  *   .size = 2.0f,
  *   .color = 0xFF0000u
  * }));

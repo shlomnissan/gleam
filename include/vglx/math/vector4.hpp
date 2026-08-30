@@ -61,22 +61,22 @@ struct Vector4 {
     /**
      * @brief Returns the unit vector along the X axis.
      */
-    [[nodiscard]] static constexpr auto X() -> Vector4 { return {1.0f, 0.0f, 0.0f, 0.0f}; }
+    [[nodiscard]] static constexpr auto UnitX() -> Vector4 { return {1.0f, 0.0f, 0.0f, 0.0f}; }
 
     /**
      * @brief Returns the unit vector along the Y axis.
      */
-    [[nodiscard]] static constexpr auto Y() -> Vector4 { return {0.0f, 1.0f, 0.0f, 0.0f}; }
+    [[nodiscard]] static constexpr auto UnitY() -> Vector4 { return {0.0f, 1.0f, 0.0f, 0.0f}; }
 
     /**
      * @brief Returns the unit vector along the Z axis.
      */
-    [[nodiscard]] static constexpr auto Z() -> Vector4 { return {0.0f, 0.0f, 1.0f, 0.0f}; }
+    [[nodiscard]] static constexpr auto UnitZ() -> Vector4 { return {0.0f, 0.0f, 1.0f, 0.0f}; }
 
     /**
      * @brief Returns the unit vector along the W axis.
      */
-    [[nodiscard]] static constexpr auto W() -> Vector4 { return {0.0f, 0.0f, 0.0f, 1.0f}; }
+    [[nodiscard]] static constexpr auto UnitW() -> Vector4 { return {0.0f, 0.0f, 0.0f, 1.0f}; }
 
     /**
      * @brief Returns the zero vector.

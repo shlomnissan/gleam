@@ -43,7 +43,7 @@ TEST(Vector2, ConstructorParameterized) {
 #pragma region Unit vectors
 
 TEST(Vector2, UnitVectorAlongX) {
-    constexpr auto v = vglx::Vector2::X();
+    constexpr auto v = vglx::Vector2::UnitX();
 
     EXPECT_VEC2_EQ(v, {1.0f, 0.0f});
 
@@ -51,7 +51,7 @@ TEST(Vector2, UnitVectorAlongX) {
 }
 
 TEST(Vector2, UnitVectorAlongY) {
-    constexpr auto v = vglx::Vector2::Y();
+    constexpr auto v = vglx::Vector2::UnitY();
 
     EXPECT_VEC2_EQ(v, {0.0f, 1.0f});
 

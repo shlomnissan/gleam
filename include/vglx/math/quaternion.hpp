@@ -125,9 +125,9 @@ struct Quaternion {
      * @param euler Input @ref Euler angles in radians.
      */
     [[nodiscard]] static constexpr auto FromEuler(const Euler& euler) -> Quaternion {
-        return FromAxisAngle(Vector3::Y(), euler.yaw)
-             * FromAxisAngle(Vector3::X(), euler.pitch)
-             * FromAxisAngle(Vector3::Z(), euler.roll);
+        return FromAxisAngle(Vector3::UnitY(), euler.yaw)
+             * FromAxisAngle(Vector3::UnitX(), euler.pitch)
+             * FromAxisAngle(Vector3::UnitZ(), euler.roll);
     }
 
     /**

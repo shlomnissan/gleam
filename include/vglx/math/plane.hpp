@@ -25,7 +25,7 @@ namespace vglx {
  */
 struct Plane {
     /// @brief Plane normal vector.
-    Vector3 normal {Vector3::Y()};
+    Vector3 normal {Vector3::UnitY()};
 
     /// @brief Signed distance from the origin to the plane along the normal.
     float distance {0.0f};

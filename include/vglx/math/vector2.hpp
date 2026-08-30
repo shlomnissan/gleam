@@ -56,12 +56,12 @@ struct Vector2 {
     /**
      * @brief Returns the unit vector along the X axis.
      */
-    [[nodiscard]] static constexpr auto X() -> Vector2 { return {1.0f, 0.0f}; }
+    [[nodiscard]] static constexpr auto UnitX() -> Vector2 { return {1.0f, 0.0f}; }
 
     /**
      * @brief Returns the unit vector along the Y axis.
      */
-    [[nodiscard]] static constexpr auto Y() -> Vector2 { return {0.0f, 1.0f}; }
+    [[nodiscard]] static constexpr auto UnitY() -> Vector2 { return {0.0f, 1.0f}; }
 
     /**
      * @brief Returns the zero vector.

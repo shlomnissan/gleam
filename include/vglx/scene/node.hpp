@@ -67,7 +67,7 @@ public:
     Transform3 transform;
 
     /// @brief Local up direction used by helpers such as @ref LookAt.
-    Vector3 up {Vector3::Y()};
+    Vector3 up {Vector3::UnitY()};
 
     /// @brief When `true` the world transform is automatically updated each frame.
     bool transform_auto_update {true};

@@ -58,17 +58,17 @@ struct Vector3 {
     /**
      * @brief Returns the unit vector along the X axis.
      */
-    [[nodiscard]] static constexpr auto X() -> Vector3 { return {1.0f, 0.0f, 0.0f}; }
+    [[nodiscard]] static constexpr auto UnitX() -> Vector3 { return {1.0f, 0.0f, 0.0f}; }
 
     /**
      * @brief Returns the unit vector along the Y axis.
      */
-    [[nodiscard]] static constexpr auto Y() -> Vector3 { return {0.0f, 1.0f, 0.0f}; }
+    [[nodiscard]] static constexpr auto UnitY() -> Vector3 { return {0.0f, 1.0f, 0.0f}; }
 
     /**
      * @brief Returns the unit vector along the Z axis.
      */
-    [[nodiscard]] static constexpr auto Z() -> Vector3 { return {0.0f, 0.0f, 1.0f}; }
+    [[nodiscard]] static constexpr auto UnitZ() -> Vector3 { return {0.0f, 0.0f, 1.0f}; }
 
     /**
      * @brief Returns the zero vector.
