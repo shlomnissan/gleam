@@ -18,6 +18,8 @@ option(VGLX_BUILD_IMGUI "Build and integrate ImGui from the vendored source" ON)
 option(VGLX_BUILD_TESTS "Build unit tests and test infrastructure using GTest" ON)
 option(VGLX_BUILD_BENCHMARKS "Build microbenchmarks using Google Benchmark" OFF)
 
+include(GNUInstallDirs)
+
 add_subdirectory("vendor")
 add_subdirectory("src")
 

@@ -268,13 +268,12 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 include(GenerateExportHeader)
 generate_export_header(${PROJECT_NAME})
 
-include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 write_basic_package_version_file(
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
     VERSION ${vglx_VERSION_MAJOR}.${vglx_VERSION_MINOR}.${vglx_VERSION_PATCH}
-    COMPATIBILITY SameMajorVersion
+    COMPATIBILITY SameMinorVersion
 )
 
 set(CONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
