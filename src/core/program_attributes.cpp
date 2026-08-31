@@ -15,7 +15,8 @@
 #include "vglx/materials/shader_material.hpp"
 #include "vglx/materials/billboard_material.hpp"
 #include "vglx/materials/unlit_material.hpp"
-#include "vglx/math/utilities.hpp"
+
+#include "utilities/hash.hpp"
 
 namespace vglx {
 
@@ -137,7 +138,7 @@ ProgramAttributes::ProgramAttributes(
     key |= (alpha_test ? 1ULL : 0ULL) << 38; // 1 bit
 
     if (type == Material::Type::ShaderMaterial) {
-        math::HashCombine(key, shader_material_id);
+        HashCombine(key, shader_material_id);
     }
 }
 

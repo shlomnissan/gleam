@@ -10,9 +10,7 @@
 #include <array>
 #include <bit>
 #include <cmath>
-#include <cstddef>
 #include <cstdint>
-#include <functional>
 #include <limits>
 
 namespace vglx::math {
@@ -454,18 +452,6 @@ alignas(64) inline constexpr auto exp_val_table = std::array<uint32_t, 180> {
         return c * 12.92f;
     }
     return 1.055f * Pow(c, 1.0f / 2.4f) - 0.055f;
-}
-
-/**
- * @brief Combines a seed with a new value to produce a composite hash.
- * @ingroup MathGroup
- *
- * @param seed The existing hash seed to be updated.
- * @param value The value to hash and combine into the seed.
- */
-template <typename T>
-inline auto HashCombine(size_t& seed, const T& value) -> void {
-    seed ^= std::hash<T>{}(value) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 }
 
 }

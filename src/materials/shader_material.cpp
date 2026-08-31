@@ -6,7 +6,8 @@
 */
 
 #include "vglx/materials/shader_material.hpp"
-#include "vglx/math/utilities.hpp"
+
+#include "utilities/hash.hpp"
 
 namespace vglx {
 
@@ -17,8 +18,8 @@ ShaderMaterial::ShaderMaterial(Parameters params)
 {
     uniforms_.reserve(params.uniforms.size());
 
-    math::HashCombine(shader_material_id_, vertex_shader_);
-    math::HashCombine(shader_material_id_, fragment_shader_);
+    HashCombine(shader_material_id_, vertex_shader_);
+    HashCombine(shader_material_id_, fragment_shader_);
 
     for (const auto& [k, v] : params.uniforms) uniforms_.try_emplace(k, v);
 }
