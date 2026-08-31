@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include "vglx/math/utilities.hpp"
-
 #include <string>
 #include <string_view>
 
@@ -17,6 +15,8 @@ namespace vglx {
 /// @cond INTERNAL
 class Identity {
 public:
+    Identity();
+
     [[nodiscard]] const auto& UUID() const { return uuid_; }
 
     [[nodiscard]] const auto& Name() const { return name_; }
@@ -28,7 +28,7 @@ public:
     auto SetName(std::string_view name) { name_ = name; }
 
 private:
-    std::string uuid_ {math::GenerateUUID()};
+    std::string uuid_;
 
     std::string name_ {};
 };

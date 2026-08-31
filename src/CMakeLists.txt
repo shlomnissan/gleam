@@ -5,6 +5,7 @@ set(SOURCE_CODE
     "cameras/camera.cpp"
     "cameras/orthographic_camera.cpp"
     "cameras/perspective_camera.cpp"
+    "core/identity.cpp"
     "core/program_attributes.cpp"
     "core/program_attributes.hpp"
     "core/render_lists.cpp"

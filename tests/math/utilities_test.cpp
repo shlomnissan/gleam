@@ -10,7 +10,6 @@
 #include "test_helpers.hpp"
 
 #include <cassert>
-#include <regex>
 
 #include <vglx/math/utilities.hpp>
 
@@ -559,23 +558,6 @@ TEST(MathUtilities, RoundTripSRGBLinearSRGB) {
         const float linear = math::SRGBToLinear(c);
         const float srgb = math::LinearToSRGB(linear);
         EXPECT_NEAR(srgb, c, 1e-5f);
-    }
-}
-
-#pragma endregion
-
-#pragma region UUID
-
-TEST(MathUtilities, UUIDFormat) {
-    static const std::regex e("^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$", std::regex_constants::icase);
-    EXPECT_TRUE(std::regex_match(math::GenerateUUID(), e));
-}
-
-TEST(MathUtilities, UUIDUniqueness) {
-    std::set<std::string> uuids;
-    for (auto i = 0; i < 1000; i++) {
-        const auto uuid = math::GenerateUUID();
-        EXPECT_TRUE(uuids.emplace(uuid).second);
     }
 }
 
