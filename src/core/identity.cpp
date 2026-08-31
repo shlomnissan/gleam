@@ -44,14 +44,14 @@ namespace {
         "fd", "fe", "ff"
     };
 
-    static auto rd = std::random_device {};
-    static auto e2 = std::mt19937 {rd()};
+    static auto seed = std::random_device {};
+    static auto rng = std::mt19937 {seed()};
     static auto dist = std::uniform_int_distribution<uint32_t> {};
 
-    const auto d0 = dist(e2);
-    const auto d1 = dist(e2);
-    const auto d2 = dist(e2);
-    const auto d3 = dist(e2);
+    const auto d0 = dist(rng);
+    const auto d1 = dist(rng);
+    const auto d2 = dist(rng);
+    const auto d3 = dist(rng);
 
     auto uuid = lut[d0 & 0xff] + lut[d0 >> 8 & 0xff] + lut[d0 >> 16 & 0xff] +
                 lut[d0 >> 24 & 0xff] + '-' + lut[d1 & 0xff] +

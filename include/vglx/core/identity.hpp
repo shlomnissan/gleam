@@ -7,13 +7,15 @@
 
 #pragma once
 
+#include "vglx_export.h"
+
 #include <string>
 #include <string_view>
 
 namespace vglx {
 
 /// @cond INTERNAL
-class Identity {
+class VGLX_EXPORT Identity {
 public:
     Identity();
 
