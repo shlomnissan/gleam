@@ -1,0 +1,22 @@
+/*
+===========================================================================
+  VGLX https://vglx.org
+  Copyright © 2024 - Present, Shlomi Nissan
+===========================================================================
+*/
+
+#pragma once
+
+#define VGLX_VERSION_MAJOR @PROJECT_VERSION_MAJOR@
+#define VGLX_VERSION_MINOR @PROJECT_VERSION_MINOR@
+#define VGLX_VERSION_PATCH @PROJECT_VERSION_PATCH@
+#define VGLX_VERSION_STRING "@PROJECT_VERSION@"
+
+namespace vglx {
+
+inline constexpr auto version_major = VGLX_VERSION_MAJOR;
+inline constexpr auto version_minor = VGLX_VERSION_MINOR;
+inline constexpr auto version_patch = VGLX_VERSION_PATCH;
+inline constexpr auto version = VGLX_VERSION_STRING;
+
+}

@@ -271,6 +271,12 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 include(GenerateExportHeader)
 generate_export_header(${PROJECT_NAME})
 
+configure_file(
+    ${CMAKE_SOURCE_DIR}/cmake/version.hpp.in
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/version.hpp
+    @ONLY
+)
+
 include(CMakePackageConfigHelpers)
 
 write_basic_package_version_file(
@@ -305,6 +311,11 @@ install(DIRECTORY ${PUBLIC_HEADERS_DIR}/
 install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/vglx_export.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}/version.hpp
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
 )
 
 install(FILES

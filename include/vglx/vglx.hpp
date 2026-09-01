@@ -20,3 +20,4 @@
 #include "vglx/scene.hpp"
 #include "vglx/textures.hpp"
 #include "vglx/utilities.hpp"
+#include "vglx/version.hpp"
