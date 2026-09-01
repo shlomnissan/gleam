@@ -8,10 +8,13 @@
 
 <div align="center">
 
+[![version-badge](https://img.shields.io/github/v/release/shlomnissan/vglx)](https://github.com/shlomnissan/vglx/releases)
+[![docs-badge](https://img.shields.io/badge/docs-online-blue.svg)](https://shlomnissan.github.io/vglx/)
+
 ![windows-badge](https://github.com/shlomnissan/vglx/actions/workflows/windows.yml/badge.svg)
 ![macos-badge](https://github.com/shlomnissan/vglx/actions/workflows/macos.yml/badge.svg)
 ![ubuntu-badge](https://github.com/shlomnissan/vglx/actions/workflows/ubuntu.yml/badge.svg)
-[![docs-badge](https://img.shields.io/badge/docs-online-blue.svg)](https://shlomnissan.github.io/vglx/)
+
 
 </div>
 
