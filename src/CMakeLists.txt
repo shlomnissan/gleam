@@ -141,6 +141,8 @@ set(PUBLIC_HEADERS
     "${PUBLIC_HEADERS_DIR}/materials/unlit_material.hpp"
     "${PUBLIC_HEADERS_DIR}/math/box3.hpp"
     "${PUBLIC_HEADERS_DIR}/math/color.hpp"
+    "${PUBLIC_HEADERS_DIR}/math/constants.hpp"
+    "${PUBLIC_HEADERS_DIR}/math/detail/tables.hpp"
     "${PUBLIC_HEADERS_DIR}/math/euler.hpp"
     "${PUBLIC_HEADERS_DIR}/math/frustum.hpp"
     "${PUBLIC_HEADERS_DIR}/math/matrix3.hpp"
