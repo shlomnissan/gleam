@@ -3,6 +3,10 @@
   VGLX https://vglx.org
   Copyright © 2024 - Present, Shlomi Nissan
 ===========================================================================
+
+Based on three.js dynamic instancing example
+https://threejs.org/examples/?q=instan#webgl_instancing_dynamic
+
 */
 
 #include <array>
