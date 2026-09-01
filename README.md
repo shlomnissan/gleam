@@ -40,6 +40,12 @@ python3 -m tools.installer.main
 
 The installer checks for CMake, detects your compiler, and asks for an installation prefix.
 
+## Versioning
+
+This project follows [Semantic Versioning](https://semver.org).
+
+While the engine is pre-`1.0.0`, minor releases may include breaking API changes and patch releases are limited to fixes. The API will stabilize at `1.0.0`, after which breaking changes only occur in major releases.
+
 ## Minimal Example
 
 ```cpp
