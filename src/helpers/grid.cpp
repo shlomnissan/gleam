@@ -10,7 +10,6 @@
 #include "vglx/geometries/buffer_attribute.hpp"
 #include "vglx/geometries/geometry.hpp"
 #include "vglx/materials/unlit_material.hpp"
-#include "vglx/scene/mesh.hpp"
 
 #include <utility>
 #include <vector>
@@ -41,7 +40,8 @@ Grid::Grid(const Parameters& params) {
     geometry->primitive = Geometry::PrimitiveType::Lines;
     geometry->SetName("grid");
 
-    Add(Mesh::Create(geometry, UnlitMaterial::Create({.color = params.color})));
+    SetGeometry(geometry);
+    SetMaterial(UnlitMaterial::Create({.color = params.color}));
 }
 
 }

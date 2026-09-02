@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## [Unreleased]
 
+### Added
+
+- Protected default constructor for `Mesh` subclasses
+
+### Fixed
+
+- Crash when rendering a node with a null material
+
 ## [0.1.0] - 2026-09-01
 
 ### Added

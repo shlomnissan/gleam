@@ -11,7 +11,7 @@
 
 #include "vglx/math/color.hpp"
 #include "vglx/math/sphere.hpp"
-#include "vglx/scene/node.hpp"
+#include "vglx/scene/mesh.hpp"
 
 #include <memory>
 
@@ -35,7 +35,7 @@ namespace vglx {
  *
  * @ingroup HelpersGroup
  */
-class VGLX_EXPORT BoundingSphere : public Node {
+class VGLX_EXPORT BoundingSphere : public Mesh {
 public:
     /// @brief Parameters for constructing a @ref BoundingSphere object.
     struct Parameters {

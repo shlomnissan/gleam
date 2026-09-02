@@ -12,7 +12,6 @@
 #include "vglx/materials/unlit_material.hpp"
 #include "vglx/math/sphere.hpp"
 #include "vglx/math/utilities.hpp"
-#include "vglx/scene/mesh.hpp"
 
 #include <cstdint>
 #include <utility>
@@ -78,7 +77,8 @@ auto create_geometry(const Sphere& sphere) {
 }
 
 BoundingSphere::BoundingSphere(const Parameters& params) {
-    Add(Mesh::Create(create_geometry(params.sphere), UnlitMaterial::Create({.color = params.color})));
+    SetGeometry(create_geometry(params.sphere));
+    SetMaterial(UnlitMaterial::Create({.color = params.color}));
 }
 
 }

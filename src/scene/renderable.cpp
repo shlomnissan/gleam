@@ -20,44 +20,38 @@ auto Renderable::BoundingSphere() -> Sphere {
 }
 
 auto Renderable::CanRender(Renderable* r) -> bool {
-    const auto level = LogLevel::Error;
     const auto geometry = r->GetGeometry();
     const auto material = r->GetMaterial();
-    const auto mat_type = material->GetType();
-    const auto node_type = r->GetNodeType();
 
-    if (geometry == nullptr) {
-        Logger::Log(level, "Skipped rendering a node with invalid geometry {}", *r);
+    if (geometry == nullptr || material == nullptr) {
         return false;
     }
 
     if (geometry->Disposed()) {
-        Logger::Log(level, "Skipped rendering a node with disposed geometry {}", *r);
+        Logger::Log(LogLevel::Error, "Skipped rendering a node with disposed geometry {}", *r);
         return false;
     }
 
     if (geometry->VertexCount() == 0) {
-        Logger::Log(level, "Skipped node with no geometry data {}", *r);
+        Logger::Log(LogLevel::Error, "Skipped node with no geometry data {}", *r);
         return false;
     }
 
     if (!geometry->HasPositions()) {
-        Logger::Log(level, "Skipped node with no vertex positions {}", *r);
+        Logger::Log(LogLevel::Error, "Skipped node with no vertex positions {}", *r);
         return false;
     }
 
-    if (material == nullptr) {
-        Logger::Log(level, "Skipped node with invalid material {}", *r);
+    const auto node_type = r->GetNodeType();
+    const auto material_type = material->GetType();
+
+    if (node_type == Node::Type::Billboard && material_type != Material::Type::BillboardMaterial) {
+        Logger::Log(LogLevel::Error, "Skipped billboard with non-billboard material {}", *r);
         return false;
     }
 
-    if (node_type == Node::Type::Billboard && mat_type != Material::Type::BillboardMaterial) {
-        Logger::Log(level, "Skipped billboard with non-billboard material {}", *r);
-        return false;
-    }
-
-    if (mat_type == Material::Type::BillboardMaterial && node_type != Node::Type::Billboard) {
-        Logger::Log(level, "Skipped non-billboard node with billboard material {}", *r);
+    if (material_type == Material::Type::BillboardMaterial && node_type != Node::Type::Billboard) {
+        Logger::Log(LogLevel::Error, "Skipped non-billboard node with billboard material {}", *r);
         return false;
     }
 

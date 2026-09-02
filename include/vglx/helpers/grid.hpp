@@ -10,7 +10,7 @@
 #include "vglx_export.h"
 
 #include "vglx/math/color.hpp"
-#include "vglx/scene/node.hpp"
+#include "vglx/scene/mesh.hpp"
 
 #include <memory>
 
@@ -34,7 +34,7 @@ namespace vglx {
  *
  * @ingroup HelpersGroup
  */
-class VGLX_EXPORT Grid : public Node {
+class VGLX_EXPORT Grid : public Mesh {
 public:
     /**
      * @brief Parameters for constructing a @ref Grid object.

@@ -104,6 +104,16 @@ public:
 
     ~Mesh() override = default;
 
+protected:
+    /**
+     * @brief Constructs a mesh without geometry or material.
+     *
+     * Available to subclasses that assign their geometry and material during
+     * construction, or later, via @ref SetGeometry and @ref SetMaterial. A mesh
+     * with either left unset is skipped by the renderer.
+     */
+    Mesh() = default;
+
 private:
     /// @cond INTERNAL
     std::shared_ptr<Geometry> geometry_;

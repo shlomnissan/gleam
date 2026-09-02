@@ -11,7 +11,6 @@
 #include "vglx/geometries/geometry.hpp"
 #include "vglx/materials/unlit_material.hpp"
 #include "vglx/math/box3.hpp"
-#include "vglx/scene/mesh.hpp"
 
 #include <vector>
 
@@ -50,7 +49,8 @@ auto create_geometry(const Box3& box) {
 }
 
 BoundingBox::BoundingBox(const Parameters& params) {
-    Add(Mesh::Create(create_geometry(params.box), UnlitMaterial::Create({.color = params.color})));
+    SetGeometry(create_geometry(params.box));
+    SetMaterial(UnlitMaterial::Create({.color = params.color}));
 }
 
 }
