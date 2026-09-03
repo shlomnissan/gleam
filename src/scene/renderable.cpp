@@ -19,54 +19,49 @@ auto Renderable::BoundingSphere() -> Sphere {
     return GetGeometry()->BoundingSphere();
 }
 
-auto Renderable::CanRender(Renderable* r) -> bool {
-    const auto geometry = r->GetGeometry();
-    const auto material = r->GetMaterial();
+auto Renderable::CanRender() const -> bool {
+    const auto geometry = GetGeometry();
+    const auto material = GetMaterial();
 
     if (geometry == nullptr || material == nullptr) {
         return false;
     }
 
     if (geometry->Disposed()) {
-        Logger::Log(LogLevel::Error, "Skipped rendering a node with disposed geometry {}", *r);
+        Logger::Log(LogLevel::Error, "Skipped rendering a node with disposed geometry {}", *this);
         return false;
     }
 
     if (geometry->VertexCount() == 0) {
-        Logger::Log(LogLevel::Error, "Skipped node with no geometry data {}", *r);
+        Logger::Log(LogLevel::Error, "Skipped node with no geometry data {}", *this);
         return false;
     }
 
     if (!geometry->HasPositions()) {
-        Logger::Log(LogLevel::Error, "Skipped node with no vertex positions {}", *r);
+        Logger::Log(LogLevel::Error, "Skipped node with no vertex positions {}", *this);
         return false;
     }
 
-    const auto node_type = r->GetNodeType();
+    const auto node_type = GetNodeType();
     const auto material_type = material->GetType();
 
     if (node_type == Node::Type::Billboard && material_type != Material::Type::BillboardMaterial) {
-        Logger::Log(LogLevel::Error, "Skipped billboard with non-billboard material {}", *r);
+        Logger::Log(LogLevel::Error, "Skipped billboard with non-billboard material {}", *this);
         return false;
     }
 
     if (material_type == Material::Type::BillboardMaterial && node_type != Node::Type::Billboard) {
-        Logger::Log(LogLevel::Error, "Skipped non-billboard node with billboard material {}", *r);
+        Logger::Log(LogLevel::Error, "Skipped non-billboard node with billboard material {}", *this);
         return false;
     }
 
     return true;
 }
 
-auto Renderable::InFrustum(Renderable* r, const Frustum& frustum) -> bool {
-    auto bounding_sphere = r->BoundingSphere();
-    bounding_sphere.ApplyTransform(r->GetWorldTransform());
+auto Renderable::InFrustum(const Frustum& frustum) -> bool {
+    auto bounding_sphere = BoundingSphere();
+    bounding_sphere.ApplyTransform(GetWorldTransform());
     return frustum.IntersectsWithSphere(bounding_sphere);
-}
-
-auto Renderable::IsMeshType(Renderable* r) -> bool {
-    return r->GetNodeType() == Node::Type::Mesh ||
-           r->GetNodeType() == Node::Type::InstancedMesh;
 }
 
 }

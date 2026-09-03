@@ -91,13 +91,20 @@ public:
      */
     [[nodiscard]] auto IsRenderable() const -> bool override { return true; }
 
-    /// @cond INTERNAL
-    [[nodiscard]] static auto CanRender(Renderable* r) -> bool;
+    /**
+     * @brief Returns `true` if this object has everything it needs to be drawn.
+     *
+     * Checks that the object has a geometry with vertex positions, a material,
+     * and that the material type is compatible with the node type.
+     */
+    [[nodiscard]] auto CanRender() const -> bool;
 
-    [[nodiscard]] static auto InFrustum(Renderable* r, const Frustum& frustum) -> bool;
-
-    [[nodiscard]] static auto IsMeshType(Renderable* r) -> bool;
-    /// @endcond
+    /**
+     * @brief Returns `true` if this object's world-space bounds intersect the frustum.
+     *
+     * @param frustum Frustum to test against in world space.
+     */
+    [[nodiscard]] auto InFrustum(const Frustum& frustum) -> bool;
 
     virtual ~Renderable() override = default;
 

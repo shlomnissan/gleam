@@ -141,8 +141,10 @@ auto Renderer::Impl::RenderObject(Renderable* renderable, Scene* scene, Camera* 
     auto geometry = renderable->GetGeometry();
     auto material = renderable->GetMaterial().get();
 
+    const auto is_mesh_type = renderable->GetNodeType() == Node::Type::Mesh ||
+                              renderable->GetNodeType() == Node::Type::InstancedMesh;
     const auto is_instanced = renderable->GetNodeType() == Node::Type::InstancedMesh;
-    if (!is_instanced && material->wireframe && Renderable::IsMeshType(renderable)) {
+    if (!is_instanced && material->wireframe && is_mesh_type) {
         geometry = static_cast<Mesh*>(renderable)->GetWireframeGeometry();
     }
 
